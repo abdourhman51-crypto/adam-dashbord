@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=aajqbmjasnbwwyvgrlzy"
+    },
+    "adam-n8n": {
+      "type": "http",
+      "url": "https://adam-voices-n8n.hawiyat.cloud/mcp-server/http"
+    }
+  }
+}
