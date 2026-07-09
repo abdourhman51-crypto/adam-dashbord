@@ -1,0 +1,239 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────
+   نظام ألوان آدم — Adam Brand Design Tokens
+   Primary: Adam Green #1F4D2E · Accent: Adam Gold #D4A017
+   ───────────────────────────────────────────── */
+
+:root {
+  /* الوضع الفاتح — كريمي دافئ */
+  --bg: #faf8f3;
+  --bg-subtle: #f1efe6;
+  --surface: #ffffff;
+  --surface-2: #f7f5ee;
+  --border: #e5e2d9;
+  --border-strong: #cfcbbe;
+
+  --text: #1e1e1e;
+  --text-secondary: #3a3a36;
+  --text-muted: #6e6b63;
+
+  --primary: #1f4d2e;
+  --primary-soft: #e8f0ea;
+  --primary-strong: #163a22;
+  --on-primary: #faf8f3;
+
+  --gold: #d4a017;
+  --gold-soft: #faf3df;
+  --gold-strong: #a86a00;
+
+  --success: #2e7d32;
+  --success-soft: #e8f3e9;
+  --info: #1565c0;
+  --info-soft: #e7eff9;
+  --warning: #b45309;
+  --warning-soft: #fdf3e3;
+  --error: #dc2626;
+  --error-soft: #fdeaea;
+  --violet: #7c3aed;
+  --violet-soft: #f1eafd;
+
+  --chart-1: #1f4d2e;
+  --chart-2: #d4a017;
+  --chart-3: #4c8a62;
+  --chart-4: #a86a00;
+  --chart-5: #6e6b63;
+  --grid-line: #e5e2d9;
+
+  --shadow-card: 0 1px 2px rgb(30 30 30 / 0.04), 0 2px 8px rgb(30 30 30 / 0.04);
+  --shadow-pop: 0 4px 12px rgb(30 30 30 / 0.08), 0 12px 32px rgb(30 30 30 / 0.1);
+
+  /* ─── سلّم الطبقات (z-index scale) — مصدر واحد للحقيقة ───
+     content(0) < sticky header/sidebar(40) < dropdown/popover(60)
+     < overlay/modal(1000) < toast(1100). النوافذ الحوارية تُركَّب عبر
+     portal على <body> فتتجاوز أي سياق تكديس (stacking context) في الصفحة. */
+  --z-content: 0;
+  --z-sticky: 40;
+  --z-dropdown: 60;
+  --z-overlay: 1000;
+  --z-toast: 1100;
+}
+
+.dark {
+  /* الوضع الداكن — غابة آدم */
+  --bg: #0d1a12;
+  --bg-subtle: #102017;
+  --surface: #14251a;
+  --surface-2: #1a2e21;
+  --border: #24402f;
+  --border-strong: #35573f;
+
+  --text: #f1efe6;
+  --text-secondary: #d9d5c9;
+  --text-muted: #a3b0a4;
+
+  --primary: #5e9c74;
+  --primary-soft: #1c3526;
+  --primary-strong: #7ab890;
+  --on-primary: #0d1a12;
+
+  --gold: #e3b23c;
+  --gold-soft: #2c2410;
+  --gold-strong: #f0c96a;
+
+  --success: #66bb6a;
+  --success-soft: #17301a;
+  --info: #64a5e8;
+  --info-soft: #12253c;
+  --warning: #f0ad4e;
+  --warning-soft: #33260e;
+  --error: #ef6b6b;
+  --error-soft: #3a1616;
+  --violet: #a78bfa;
+  --violet-soft: #251b3d;
+
+  --chart-1: #5e9c74;
+  --chart-2: #e3b23c;
+  --chart-3: #8fc4a2;
+  --chart-4: #f0c96a;
+  --chart-5: #a3b0a4;
+  --grid-line: #24402f;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 8px rgb(0 0 0 / 0.25);
+  --shadow-pop: 0 4px 12px rgb(0 0 0 / 0.4), 0 12px 32px rgb(0 0 0 / 0.45);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-primary: var(--primary);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-strong: var(--primary-strong);
+  --color-on-primary: var(--on-primary);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-gold-strong: var(--gold-strong);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-error: var(--error);
+  --color-error-soft: var(--error-soft);
+  --color-violet: var(--violet);
+  --color-violet-soft: var(--violet-soft);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-feature-settings: "tnum";
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* أرقام جدولية للبيانات */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* شريط تمرير أنيق */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 8px;
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* حركة ظهور ناعمة للبطاقات.
+   ملاحظة معمارية: نستخدم fill-mode=backwards (لا forwards) عمداً — حتى لا تحتفظ
+   البطاقات بـ transform ثابت بعد انتهاء الحركة. أي transform ≠ none يُنشئ
+   «سياق تكديس» ويجعل العنصر الحاوي لأي عنصر fixed بداخله، وهو ما كان يحبس
+   النوافذ الحوارية خلف البطاقات. الحالة النهائية (translateY(0)) مطابقة بصرياً
+   للوضع الطبيعي، فلا فرق في المظهر. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise-in {
+  animation: rise-in 0.35s ease-out backwards;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 25%,
+    var(--bg-subtle) 50%,
+    var(--surface-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite linear;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in,
+  .skeleton {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* طباعة التقارير */
+@media print {
+  aside,
+  header.app-header,
+  .no-print {
+    display: none !important;
+  }
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  body {
+    background: #fff;
+  }
+}
