@@ -13,9 +13,10 @@ interface ProductStageProps {
 }
 
 /**
- * Each object gets a launch: a pinned scene where scroll turns the
- * piece in hand (angle cutouts scrubbed in sequence), while the
- * dossier — name, matter, price — settles around it.
+ * Each object gets a launch: a pinned scene that opens like a
+ * curtain, where scroll turns the piece in hand (angle cutouts and
+ * their floor reflections scrubbed in sequence) under a travelling
+ * key light, while the dossier settles around it.
  */
 export function ProductStage({ product, flip = false }: ProductStageProps) {
   const rootRef = useRef<HTMLElement>(null);
@@ -26,14 +27,14 @@ export function ProductStage({ product, flip = false }: ProductStageProps) {
 
     const ctx = gsap.context(() => {
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const angles = gsap.utils.toArray<HTMLElement>(".stage__angle", root);
+      const angleCount = product.angles.length;
 
       if (reduced) {
         gsap.set(root.querySelectorAll(".stage__numeral, .stage__dossier > *, .stage__object"), {
           opacity: 1,
           clearProps: "transform",
         });
-        if (angles.length) gsap.set(angles[0], { opacity: 1 });
+        gsap.set(root.querySelectorAll('[data-i="0"]'), { opacity: 1 });
         return;
       }
 
@@ -49,20 +50,28 @@ export function ProductStage({ product, flip = false }: ProductStageProps) {
         },
       });
 
-      /* The numeral rises behind everything, slower than the scroll */
+      /* The curtain — the scene opens from a letterboxed sliver */
       tl.fromTo(
-        ".stage__numeral",
-        { yPercent: 40, opacity: 0 },
-        { yPercent: -6, opacity: 0.9, duration: 0.5, ease: "power1.out" },
+        ".stage__frame-inner",
+        { clipPath: "inset(12% 5% 12% 5%)", scale: 1.04 },
+        { clipPath: "inset(0% 0% 0% 0%)", scale: 1, duration: 0.12, ease: "power1.out" },
         0,
       )
+
+        /* The numeral rises behind everything, slower than the scroll */
+        .fromTo(
+          ".stage__numeral",
+          { yPercent: 40, opacity: 0 },
+          { yPercent: -6, opacity: 0.9, duration: 0.5, ease: "power1.out" },
+          0.02,
+        )
 
         /* The object arrives — weighted, floating */
         .fromTo(
           ".stage__object",
           { y: "50vh", rotate: flip ? 9 : -9, opacity: 0 },
           { y: "0vh", rotate: 0, opacity: 1, duration: 0.22, ease: "power1.out" },
-          0.04,
+          0.06,
         )
 
         /* Dossier settles in */
@@ -70,29 +79,35 @@ export function ProductStage({ product, flip = false }: ProductStageProps) {
           ".stage__dossier > *",
           { y: 44, opacity: 0 },
           { y: 0, opacity: 1, duration: 0.14, stagger: 0.028, ease: "power1.out" },
-          0.12,
-        );
+          0.14,
+        )
 
-      /* Scroll turns the object — angle cutouts in sequence */
-      if (angles.length > 1) {
+        /* The key light travels across the scene once */
+        .fromTo(
+          ".stage__sweep",
+          { xPercent: -160, opacity: 0 },
+          { xPercent: 160, opacity: 1, duration: 0.42, ease: "power1.inOut" },
+          0.2,
+        )
+        .to(".stage__sweep", { opacity: 0, duration: 0.08 }, 0.58);
+
+      /* Scroll turns the object — angles and their reflections in step */
+      if (angleCount > 1) {
         const turnStart = 0.34;
         const turnSpan = 0.5;
-        const step = turnSpan / angles.length;
-        angles.forEach((angle, i) => {
-          if (i === 0) return;
+        const step = turnSpan / angleCount;
+        for (let i = 1; i < angleCount; i++) {
           const at = turnStart + step * i;
-          tl.to(angles[i - 1], { opacity: 0, scale: 0.985, duration: 0.05 }, at);
+          tl.to(root.querySelectorAll(`[data-i="${i - 1}"]`), { opacity: 0, scale: 0.985, duration: 0.05 }, at);
           tl.fromTo(
-            angle,
+            root.querySelectorAll(`[data-i="${i}"]`),
             { opacity: 0, scale: 1.015 },
-            { opacity: 1, scale: 1, duration: 0.05 },
+            { opacity: (_i, el) => ((el as HTMLElement).dataset.mirror ? 0.16 : 1), scale: 1, duration: 0.05 },
             at,
           );
-        });
-        /* a slow drift through the whole turn keeps it alive */
+        }
         tl.to(".stage__object", { y: "-4vh", rotate: flip ? -2 : 2, duration: turnSpan + 0.1 }, turnStart);
       } else {
-        /* single angle: levitation and a slow lean instead */
         tl.to(".stage__object", { y: "-6vh", rotate: flip ? -4 : 4, duration: 0.55 }, 0.35);
       }
 
@@ -115,45 +130,65 @@ export function ProductStage({ product, flip = false }: ProductStageProps) {
       aria-label={`${product.name} — ${product.variant}`}
     >
       <div className="stage__frame">
-        <span className="stage__numeral display" aria-hidden="true">
-          {product.index}
-        </span>
+        <div className="stage__frame-inner">
+          <span className="stage__sweep" aria-hidden="true" />
+          <span className="stage__numeral display" aria-hidden="true">
+            {product.index}
+          </span>
 
-        <div className="stage__object">
-          {product.angles.map((angle, i) => (
-            <img
-              key={angle.src}
-              className="stage__angle"
-              src={angle.src}
-              alt={i === 0 ? angle.alt : ""}
-              style={{ opacity: i === 0 ? 1 : 0 }}
-              loading="lazy"
-            />
-          ))}
-          <span className="stage__shadow" aria-hidden="true" />
-        </div>
+          <div className="stage__object">
+            <div className="stage__angles">
+              {product.angles.map((angle, i) => (
+                <img
+                  key={angle.src}
+                  className="stage__angle"
+                  data-i={i}
+                  src={angle.src}
+                  alt={i === 0 ? angle.alt : ""}
+                  style={{ opacity: i === 0 ? 1 : 0 }}
+                  loading="lazy"
+                />
+              ))}
+            </div>
+            <div className="stage__mirror" aria-hidden="true">
+              {product.angles.map((angle, i) => (
+                <img
+                  key={angle.src}
+                  className="stage__angle stage__angle--mirror"
+                  data-i={i}
+                  data-mirror="true"
+                  src={angle.src}
+                  alt=""
+                  style={{ opacity: i === 0 ? 0.16 : 0 }}
+                  loading="lazy"
+                />
+              ))}
+            </div>
+            <span className="stage__shadow" aria-hidden="true" />
+          </div>
 
-        <div className="stage__dossier">
-          <p className="label stage__kicker">
-            N° {product.index} — {product.variant}
-          </p>
-          <h2 className="stage__name display">{product.name}</h2>
-          <p className="stage__narrative">{product.narrative}</p>
-          <ul className="stage__details">
-            {product.details.map((d) => (
-              <li key={d} className="stage__detail">
-                {d}
-              </li>
-            ))}
-          </ul>
-          <div className="stage__commerce">
-            <p className="stage__price">
-              <span className="stage__price-now">{product.price}</span>
-              <s className="stage__price-was">{product.wasPrice}</s>
+          <div className="stage__dossier">
+            <p className="label stage__kicker">
+              N° {product.index} — {product.variant}
             </p>
-            <MagneticButton variant={product.theme === "plaster" ? "light" : "dark"} ariaLabel={`Découvrir ${product.name}`}>
-              Découvrir
-            </MagneticButton>
+            <h2 className="stage__name display">{product.name}</h2>
+            <p className="stage__narrative">{product.narrative}</p>
+            <ul className="stage__details">
+              {product.details.map((d) => (
+                <li key={d} className="stage__detail">
+                  {d}
+                </li>
+              ))}
+            </ul>
+            <div className="stage__commerce">
+              <p className="stage__price">
+                <span className="stage__price-now">{product.price}</span>
+                <s className="stage__price-was">{product.wasPrice}</s>
+              </p>
+              <MagneticButton variant={product.theme === "plaster" ? "light" : "dark"} ariaLabel={`Découvrir ${product.name}`}>
+                Découvrir
+              </MagneticButton>
+            </div>
           </div>
         </div>
       </div>

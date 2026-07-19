@@ -33,9 +33,9 @@
   --line-dark: rgba(237, 230, 218, 0.14);
   --line-light: rgba(23, 19, 16, 0.16);
 
-  /* Type */
-  --font-display: "Cormorant Garamond", "Times New Roman", serif;
-  --font-ui: "Jost", "Helvetica Neue", sans-serif;
+  /* Type — Didone fashion voice + engraved roman for meta */
+  --font-display: "Bodoni Moda", "Didot", "Times New Roman", serif;
+  --font-ui: "Marcellus", "Trajan Pro", serif;
 
   /* Scale — fluid, editorial */
   --text-hero: clamp(4.5rem, 16vw, 15rem);
@@ -55,6 +55,12 @@
   --dur-med: 0.7s;
   --dur-fast: 0.35s;
 
-  /* Depth */
+  /* Depth — layered, material */
   --shadow-object: 0 60px 80px -30px rgba(10, 9, 8, 0.55);
+  --shadow-lift:
+    0 80px 120px -45px rgba(6, 5, 5, 0.8),
+    0 34px 60px -28px rgba(6, 5, 5, 0.55),
+    0 6px 18px rgba(6, 5, 5, 0.4);
+  --edge-light: inset 0 1px 0 rgba(242, 237, 227, 0.14);
+  --hairline: 1px solid rgba(237, 230, 218, 0.12);
 }

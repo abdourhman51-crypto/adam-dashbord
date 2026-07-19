@@ -10,13 +10,35 @@
 }
 
 .magnetic-btn--dark {
-  border: 1px solid var(--line-dark);
+  border: 1px solid rgba(237, 230, 218, 0.22);
   color: var(--ink-on-dark);
+  box-shadow: var(--edge-light), 0 14px 30px -14px rgba(6, 5, 5, 0.6);
+  background: linear-gradient(180deg, rgba(242, 237, 227, 0.05), rgba(242, 237, 227, 0.01));
 }
 
 .magnetic-btn--light {
-  border: 1px solid var(--line-light);
+  border: 1px solid rgba(23, 19, 16, 0.28);
   color: var(--ink-on-light);
+  box-shadow: inset 0 1px 0 rgba(255, 253, 248, 0.7), 0 14px 30px -14px rgba(23, 19, 16, 0.35);
+  background: linear-gradient(180deg, rgba(255, 253, 248, 0.5), rgba(255, 253, 248, 0.1));
+}
+
+/* travelling sheen on hover */
+.magnetic-btn::before {
+  content: "";
+  position: absolute;
+  top: -30%;
+  bottom: -30%;
+  left: -50%;
+  width: 40%;
+  transform: skewX(-18deg) translateX(-120%);
+  background: linear-gradient(90deg, transparent, rgba(255, 250, 240, 0.35), transparent);
+  transition: transform 0.9s var(--ease-lux);
+  pointer-events: none;
+}
+
+.magnetic-btn:hover::before {
+  transform: skewX(-18deg) translateX(480%);
 }
 
 .magnetic-btn__fill {

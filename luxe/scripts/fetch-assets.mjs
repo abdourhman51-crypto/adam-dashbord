@@ -29,6 +29,13 @@ const catalogIds = [
 ];
 const catalog = catalogIds.map((id) => `catalog/img_${id}.jpg`);
 
+/* hero film frame sequences, scrubbed by scroll */
+const pad = (n) => String(n).padStart(3, "0");
+const film = [
+  ...Array.from({ length: 101 }, (_, i) => `film/elle/f_${pad(i + 1)}.jpg`),
+  ...Array.from({ length: 61 }, (_, i) => `film/lui/f_${pad(i + 1)}.jpg`),
+];
+
 const exists = (p) => access(p).then(() => true, () => false);
 
 async function fetchAsset(rel) {
@@ -41,5 +48,13 @@ async function fetchAsset(rel) {
   console.log(`fetched ${rel}`);
 }
 
-await Promise.all([...products, ...catalog].map(fetchAsset));
+/* modest concurrency — 180+ files, be polite to the origin */
+const queue = [...products, ...catalog, ...film];
+const workers = Array.from({ length: 12 }, async () => {
+  while (queue.length) {
+    const rel = queue.shift();
+    if (rel) await fetchAsset(rel);
+  }
+});
+await Promise.all(workers);
 console.log("assets ready");

@@ -7,39 +7,83 @@
   height: 100vh;
   height: 100svh;
   overflow: hidden;
+  background: var(--noir);
+}
+
+.stage__frame-inner {
+  position: absolute;
+  inset: 0;
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
   align-items: center;
   padding-inline: var(--gutter);
   gap: clamp(1.5rem, 4vw, 4rem);
+  overflow: hidden;
+  will-change: clip-path, transform;
 }
 
-.stage--flip .stage__frame {
+.stage--flip .stage__frame-inner {
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
 }
 
-/* ——— Ambiances ——— */
-.stage--plaster .stage__frame {
+/* ——— Ambiances — layered light, never flat ——— */
+.stage--plaster .stage__frame-inner {
   background:
-    radial-gradient(ellipse 85% 70% at 60% 30%, rgba(242, 237, 227, 0.9), transparent 75%),
-    radial-gradient(ellipse 70% 55% at 30% 80%, rgba(200, 125, 42, 0.14), transparent 65%),
-    linear-gradient(175deg, var(--ivory) 0%, var(--plaster-light) 55%, var(--plaster) 100%);
+    radial-gradient(ellipse 85% 70% at 60% 28%, rgba(248, 244, 236, 0.95), transparent 74%),
+    radial-gradient(ellipse 70% 55% at 30% 82%, rgba(200, 125, 42, 0.16), transparent 65%),
+    radial-gradient(ellipse 40% 30% at 82% 74%, rgba(23, 19, 16, 0.1), transparent 70%),
+    linear-gradient(175deg, var(--ivory) 0%, var(--plaster-light) 52%, var(--plaster) 100%);
   color: var(--ink-on-light);
 }
 
-.stage--noir .stage__frame {
+.stage--noir .stage__frame-inner {
   background:
-    radial-gradient(ellipse 80% 60% at 40% 35%, rgba(75, 68, 58, 0.34), transparent 72%),
-    linear-gradient(180deg, var(--noir) 0%, var(--smoke) 60%, var(--noir) 100%);
+    radial-gradient(ellipse 70% 55% at 42% 30%, rgba(90, 80, 66, 0.4), transparent 70%),
+    radial-gradient(ellipse 45% 35% at 74% 70%, rgba(200, 125, 42, 0.07), transparent 65%),
+    linear-gradient(180deg, #0d0b09 0%, var(--smoke) 55%, #070605 100%);
   color: var(--ink-on-dark);
 }
 
-.stage--oxblood .stage__frame {
+.stage--oxblood .stage__frame-inner {
   background:
-    radial-gradient(ellipse 85% 70% at 60% 35%, rgba(123, 51, 64, 0.3), transparent 70%),
-    radial-gradient(ellipse 60% 45% at 25% 85%, rgba(200, 125, 42, 0.08), transparent 60%),
-    linear-gradient(180deg, #140a0c 0%, var(--oxblood) 130%);
+    radial-gradient(ellipse 80% 65% at 58% 32%, rgba(140, 58, 72, 0.42), transparent 70%),
+    radial-gradient(ellipse 55% 42% at 24% 86%, rgba(200, 125, 42, 0.1), transparent 62%),
+    radial-gradient(ellipse 100% 80% at 50% 110%, rgba(6, 4, 5, 0.7), transparent 60%),
+    linear-gradient(180deg, #120809 0%, var(--oxblood) 140%);
   color: var(--ink-on-dark);
+}
+
+/* ——— Travelling key light ——— */
+.stage__sweep {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 30%;
+  width: 34%;
+  transform: rotate(14deg);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(242, 237, 227, 0.05) 35%,
+    rgba(242, 237, 227, 0.09) 50%,
+    rgba(242, 237, 227, 0.05) 65%,
+    transparent
+  );
+}
+
+.stage--plaster .stage__sweep {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 252, 245, 0.35) 35%,
+    rgba(255, 252, 245, 0.55) 50%,
+    rgba(255, 252, 245, 0.35) 65%,
+    transparent
+  );
+  mix-blend-mode: soft-light;
 }
 
 /* ——— The numeral ——— */
@@ -50,7 +94,7 @@
   right: clamp(0.5rem, 4vw, 5rem);
   font-size: clamp(14rem, 38vw, 34rem);
   line-height: 1;
-  font-weight: 300;
+  font-weight: 400;
   opacity: 0;
   pointer-events: none;
   user-select: none;
@@ -64,26 +108,30 @@
 
 .stage--plaster .stage__numeral {
   color: transparent;
-  -webkit-text-stroke: 1px rgba(23, 19, 16, 0.18);
+  -webkit-text-stroke: 1px rgba(23, 19, 16, 0.2);
+  filter: drop-shadow(0 20px 40px rgba(23, 19, 16, 0.08));
 }
 
 .stage--noir .stage__numeral {
   color: transparent;
-  -webkit-text-stroke: 1px rgba(237, 230, 218, 0.14);
+  -webkit-text-stroke: 1px rgba(237, 230, 218, 0.16);
+  filter: drop-shadow(0 0 60px rgba(237, 230, 218, 0.05));
 }
 
 .stage--oxblood .stage__numeral {
   color: transparent;
-  -webkit-text-stroke: 1px rgba(224, 155, 61, 0.2);
+  -webkit-text-stroke: 1px rgba(224, 155, 61, 0.26);
+  filter: drop-shadow(0 0 60px rgba(224, 155, 61, 0.08));
 }
 
-/* ——— The object ——— */
+/* ——— The object + its reflection ——— */
 .stage__object {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   order: 2;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   will-change: transform;
 }
 
@@ -91,34 +139,54 @@
   order: 1;
 }
 
+.stage__angles,
+.stage__mirror {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+}
+
 .stage__angle {
   grid-area: 1 / 1;
   width: 100%;
   max-width: clamp(320px, 40vw, 680px);
   object-fit: contain;
-  filter: drop-shadow(0 40px 50px rgba(10, 9, 8, 0.45));
+  filter: drop-shadow(0 50px 60px rgba(6, 5, 5, 0.5)) drop-shadow(0 12px 18px rgba(6, 5, 5, 0.35));
   will-change: opacity, transform;
+}
+
+.stage__mirror {
+  margin-top: -2%;
+  transform: scaleY(-1);
+  pointer-events: none;
+}
+
+.stage__angle--mirror {
+  filter: blur(3px) saturate(0.8);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 55%);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 55%);
 }
 
 .stage__shadow {
   position: absolute;
-  bottom: -14%;
-  width: 70%;
+  bottom: 16%;
+  width: 66%;
   height: 34px;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(10, 9, 8, 0.4), transparent 70%);
-  filter: blur(6px);
+  background: radial-gradient(ellipse at center, rgba(6, 5, 5, 0.5), transparent 70%);
+  filter: blur(8px);
   opacity: 0;
 }
 
 .stage--plaster .stage__shadow {
-  background: radial-gradient(ellipse at center, rgba(23, 19, 16, 0.35), transparent 70%);
+  background: radial-gradient(ellipse at center, rgba(23, 19, 16, 0.4), transparent 70%);
 }
 
 /* ——— The dossier ——— */
 .stage__dossier {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   order: 1;
   display: flex;
   flex-direction: column;
@@ -141,16 +209,20 @@
 
 .stage__name {
   font-size: var(--text-title);
-  font-weight: 500;
-  line-height: 1;
+  font-weight: 600;
+  line-height: 0.95;
+}
+
+.stage--plaster .stage__name {
+  text-shadow: 0 2px 0 rgba(255, 253, 248, 0.6);
 }
 
 .stage__narrative {
   font-family: var(--font-display);
   font-style: italic;
   font-size: var(--text-lead);
-  font-weight: 300;
-  line-height: 1.4;
+  font-weight: 400;
+  line-height: 1.45;
   opacity: 0.85;
 }
 
@@ -165,7 +237,8 @@
 .stage__detail {
   position: relative;
   padding-left: 1.1rem;
-  font-size: calc(var(--text-body) * 0.92);
+  font-size: calc(var(--text-body) * 0.88);
+  letter-spacing: 0.04em;
   opacity: 0.72;
 }
 
@@ -173,10 +246,11 @@
   content: "";
   position: absolute;
   left: 0;
-  top: 0.72em;
+  top: 0.78em;
   width: 0.45rem;
   height: 1px;
   background: var(--amber);
+  box-shadow: 0 0 6px rgba(200, 125, 42, 0.5);
 }
 
 .stage__commerce {
@@ -195,7 +269,7 @@
 .stage__price-now {
   font-family: var(--font-display);
   font-size: clamp(1.4rem, 2.4vw, 2rem);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .stage__price-was {
@@ -206,10 +280,10 @@
 
 /* ——— Mobile ——— */
 @media (max-width: 768px) {
-  .stage__frame,
-  .stage--flip .stage__frame {
+  .stage__frame-inner,
+  .stage--flip .stage__frame-inner {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    grid-template-rows: minmax(0, 0.9fr) minmax(0, 1.1fr);
     padding-block: clamp(4.5rem, 10vh, 6rem) clamp(2rem, 5vh, 3rem);
     align-items: center;
   }
@@ -228,11 +302,15 @@
   }
 
   .stage__angle {
-    max-width: min(82vw, 460px);
+    max-width: min(80vw, 440px);
+  }
+
+  .stage__mirror {
+    display: none;
   }
 
   .stage__numeral {
-    top: 38%;
+    top: 36%;
     font-size: clamp(11rem, 52vw, 16rem);
   }
 

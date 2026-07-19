@@ -18,12 +18,13 @@ export function Manifesto() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         ".manifesto__line i",
-        { yPercent: 115, rotate: 2 },
+        { yPercent: 118, rotate: 3, filter: "blur(10px)" },
         {
           yPercent: 0,
           rotate: 0,
-          duration: 1.3,
-          stagger: 0.14,
+          filter: "blur(0px)",
+          duration: 1.5,
+          stagger: 0.16,
           ease: "power3.out",
           scrollTrigger: { trigger: root, start: "top 72%" },
         },
