@@ -1,46 +1,59 @@
+/* The footer is the palace's dark stone plinth — Nero Marquina,
+   ivory engraving, the seal set into the stone. */
 .footer {
   position: relative;
-  background: var(--noir);
-  border-top: 1px solid var(--line-dark);
+  background-color: var(--nero);
+  background-image:
+    radial-gradient(ellipse 70% 60% at 15% 100%, rgba(200, 164, 92, 0.1), transparent 60%),
+    radial-gradient(ellipse 60% 45% at 85% 0%, rgba(240, 234, 222, 0.06), transparent 60%),
+    var(--veins-dark);
+  background-size: auto, auto, 1400px 1400px;
+  color: var(--ivory-ink);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   overflow: hidden;
 }
 
-.footer::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse 70% 60% at 15% 100%, rgba(200, 125, 42, 0.08), transparent 60%);
-}
-
 .footer__body {
+  position: relative;
   display: grid;
   grid-template-columns: 1.6fr repeat(3, minmax(0, 1fr));
   gap: clamp(2rem, 5vw, 5rem);
   padding-block: var(--space-section) clamp(3rem, 8vh, 5rem);
 }
 
+.footer__brand-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  align-items: flex-start;
+}
+
+.footer__seal {
+  width: clamp(72px, 9vw, 104px);
+}
+
 .footer__wordmark {
-  font-size: clamp(2.6rem, 6vw, 5rem);
-  letter-spacing: 0.22em;
-  font-weight: 500;
+  font-family: var(--font-brand);
+  font-size: clamp(2.4rem, 5.5vw, 4.6rem);
+  letter-spacing: 0.1em;
   line-height: 1;
+  color: var(--ivory-ink);
 }
 
 .footer__tm {
   font-size: 0.16em;
   vertical-align: super;
-  color: var(--amber);
+  color: var(--gold-bright);
 }
 
 .footer__motto {
-  margin-top: 0.6rem;
   font-size: clamp(1.1rem, 1.8vw, 1.5rem);
-  color: var(--amber-bright);
+  color: var(--gold-bright);
 }
 
 .footer__col-title {
-  color: var(--ink-on-dark-dim);
+  color: var(--ivory-ink-dim);
   margin-bottom: 1.4rem;
 }
 
@@ -55,7 +68,7 @@
   position: relative;
   display: inline-block;
   font-size: calc(var(--text-body) * 0.95);
-  color: var(--ink-on-dark);
+  color: var(--ivory-ink);
   opacity: 0.78;
   transition: opacity 0.35s var(--ease-lux);
 }
@@ -67,7 +80,7 @@
   bottom: -2px;
   width: 100%;
   height: 1px;
-  background: var(--amber);
+  background: var(--gold-bright);
   transform: scaleX(0);
   transform-origin: right center;
   transition: transform 0.5s var(--ease-lux);
@@ -83,26 +96,27 @@
 }
 
 .footer__base {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding-block: 1.6rem;
-  border-top: 1px solid var(--line-dark);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .footer__legal {
-  color: var(--ink-on-dark-dim);
+  color: var(--ivory-ink-dim);
   font-size: 0.6rem;
 }
 
 .footer__top {
-  color: var(--ink-on-dark);
+  color: var(--ivory-ink);
   transition: color 0.35s var(--ease-lux), transform 0.35s var(--ease-lux);
 }
 
 .footer__top:hover {
-  color: var(--amber-bright);
+  color: var(--gold-bright);
   transform: translateY(-3px);
 }
 

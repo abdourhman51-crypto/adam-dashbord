@@ -7,7 +7,7 @@
   height: 100vh;
   height: 100svh;
   overflow: hidden;
-  background: var(--noir);
+  background: var(--marble);
 }
 
 .stage__frame-inner {
@@ -26,31 +26,69 @@
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
 }
 
-/* ——— Ambiances — layered light, never flat ——— */
+/* ——— Three rooms, three stones ——— */
+
+/* Calacatta — white marble, gold-threaded */
 .stage--plaster .stage__frame-inner {
-  background:
-    radial-gradient(ellipse 85% 70% at 60% 28%, rgba(248, 244, 236, 0.95), transparent 74%),
-    radial-gradient(ellipse 70% 55% at 30% 82%, rgba(200, 125, 42, 0.16), transparent 65%),
-    radial-gradient(ellipse 40% 30% at 82% 74%, rgba(23, 19, 16, 0.1), transparent 70%),
-    linear-gradient(175deg, var(--ivory) 0%, var(--plaster-light) 52%, var(--plaster) 100%);
-  color: var(--ink-on-light);
+  background-color: var(--marble);
+  background-image:
+    radial-gradient(ellipse 70% 55% at 55% 0%, rgba(255, 254, 249, 0.95), transparent 62%),
+    radial-gradient(ellipse 60% 40% at 30% 100%, rgba(200, 164, 92, 0.1), transparent 65%),
+    var(--mineral-clouds),
+    var(--veins-light);
+  background-size: auto, auto, 900px 900px, 1400px 1400px;
+  color: var(--ink);
 }
 
+/* Nero Marquina — black marble, white-veined */
 .stage--noir .stage__frame-inner {
-  background:
-    radial-gradient(ellipse 70% 55% at 42% 30%, rgba(90, 80, 66, 0.4), transparent 70%),
-    radial-gradient(ellipse 45% 35% at 74% 70%, rgba(200, 125, 42, 0.07), transparent 65%),
-    linear-gradient(180deg, #0d0b09 0%, var(--smoke) 55%, #070605 100%);
-  color: var(--ink-on-dark);
+  background-color: var(--nero);
+  background-image:
+    radial-gradient(ellipse 65% 50% at 45% 8%, rgba(240, 234, 222, 0.1), transparent 65%),
+    radial-gradient(ellipse 50% 38% at 76% 78%, rgba(200, 164, 92, 0.07), transparent 62%),
+    var(--veins-dark);
+  background-size: auto, auto, 1400px 1400px;
+  color: var(--ivory-ink);
 }
 
+/* White onyx — translucent stone, lit from behind */
 .stage--oxblood .stage__frame-inner {
-  background:
-    radial-gradient(ellipse 80% 65% at 58% 32%, rgba(140, 58, 72, 0.42), transparent 70%),
-    radial-gradient(ellipse 55% 42% at 24% 86%, rgba(200, 125, 42, 0.1), transparent 62%),
-    radial-gradient(ellipse 100% 80% at 50% 110%, rgba(6, 4, 5, 0.7), transparent 60%),
-    linear-gradient(180deg, #120809 0%, var(--oxblood) 140%);
-  color: var(--ink-on-dark);
+  background-color: var(--onyx-glow);
+  background-image:
+    radial-gradient(ellipse 52% 62% at 58% 44%, rgba(255, 244, 219, 0.95), rgba(247, 236, 217, 0.35) 60%, transparent 78%),
+    radial-gradient(ellipse 70% 55% at 20% 90%, rgba(123, 51, 64, 0.12), transparent 60%),
+    radial-gradient(ellipse 80% 70% at 90% 6%, rgba(200, 164, 92, 0.16), transparent 60%),
+    var(--mineral-clouds),
+    var(--veins-light);
+  background-size: auto, auto, auto, 900px 900px, 1400px 1400px;
+  color: var(--ink);
+}
+
+/* polished sheen across every room */
+.stage__frame-inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 32%,
+    rgba(255, 255, 255, 0.34) 47%,
+    rgba(255, 255, 255, 0.06) 53%,
+    rgba(255, 255, 255, 0) 68%
+  );
+  mix-blend-mode: soft-light;
+}
+
+.stage--noir .stage__frame-inner::after {
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 34%,
+    rgba(255, 255, 255, 0.09) 48%,
+    rgba(255, 255, 255, 0.02) 54%,
+    rgba(255, 255, 255, 0) 68%
+  );
+  mix-blend-mode: screen;
 }
 
 /* ——— Travelling key light ——— */
@@ -67,34 +105,35 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(242, 237, 227, 0.05) 35%,
-    rgba(242, 237, 227, 0.09) 50%,
-    rgba(242, 237, 227, 0.05) 65%,
-    transparent
-  );
-}
-
-.stage--plaster .stage__sweep {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 252, 245, 0.35) 35%,
-    rgba(255, 252, 245, 0.55) 50%,
-    rgba(255, 252, 245, 0.35) 65%,
+    rgba(255, 252, 245, 0.4) 35%,
+    rgba(255, 252, 245, 0.6) 50%,
+    rgba(255, 252, 245, 0.4) 65%,
     transparent
   );
   mix-blend-mode: soft-light;
 }
 
-/* ——— The numeral ——— */
+.stage--noir .stage__sweep {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(240, 234, 222, 0.06) 35%,
+    rgba(240, 234, 222, 0.1) 50%,
+    rgba(240, 234, 222, 0.06) 65%,
+    transparent
+  );
+  mix-blend-mode: normal;
+}
+
+/* ——— The numeral: carved, gold-leafed ——— */
 .stage__numeral {
   position: absolute;
   top: 50%;
   translate: 0 -50%;
   right: clamp(0.5rem, 4vw, 5rem);
+  font-family: var(--font-brand);
   font-size: clamp(14rem, 38vw, 34rem);
   line-height: 1;
-  font-weight: 400;
   opacity: 0;
   pointer-events: none;
   user-select: none;
@@ -108,20 +147,20 @@
 
 .stage--plaster .stage__numeral {
   color: transparent;
-  -webkit-text-stroke: 1px rgba(23, 19, 16, 0.2);
-  filter: drop-shadow(0 20px 40px rgba(23, 19, 16, 0.08));
+  -webkit-text-stroke: 1.5px rgba(22, 19, 15, 0.22);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.7);
 }
 
 .stage--noir .stage__numeral {
   color: transparent;
-  -webkit-text-stroke: 1px rgba(237, 230, 218, 0.16);
-  filter: drop-shadow(0 0 60px rgba(237, 230, 218, 0.05));
+  -webkit-text-stroke: 1.5px rgba(240, 234, 222, 0.2);
+  filter: drop-shadow(0 0 60px rgba(240, 234, 222, 0.06));
 }
 
 .stage--oxblood .stage__numeral {
   color: transparent;
-  -webkit-text-stroke: 1px rgba(224, 155, 61, 0.26);
-  filter: drop-shadow(0 0 60px rgba(224, 155, 61, 0.08));
+  -webkit-text-stroke: 1.5px rgba(168, 133, 62, 0.42);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.6);
 }
 
 /* ——— The object + its reflection ——— */
@@ -152,8 +191,12 @@
   width: 100%;
   max-width: clamp(320px, 40vw, 680px);
   object-fit: contain;
-  filter: drop-shadow(0 50px 60px rgba(6, 5, 5, 0.5)) drop-shadow(0 12px 18px rgba(6, 5, 5, 0.35));
+  filter: drop-shadow(0 50px 60px rgba(22, 19, 15, 0.4)) drop-shadow(0 12px 18px rgba(22, 19, 15, 0.25));
   will-change: opacity, transform;
+}
+
+.stage--noir .stage__angle {
+  filter: drop-shadow(0 50px 60px rgba(0, 0, 0, 0.65)) drop-shadow(0 12px 18px rgba(0, 0, 0, 0.45));
 }
 
 .stage__mirror {
@@ -163,24 +206,20 @@
 }
 
 .stage__angle--mirror {
-  filter: blur(3px) saturate(0.8);
-  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 55%);
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 55%);
+  filter: blur(4px) saturate(0.75);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 50%);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 50%);
 }
 
 .stage__shadow {
   position: absolute;
-  bottom: 16%;
-  width: 66%;
-  height: 34px;
+  bottom: 11%;
+  width: 56%;
+  height: 24px;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(6, 5, 5, 0.5), transparent 70%);
-  filter: blur(8px);
+  background: radial-gradient(ellipse at center, rgba(22, 19, 15, 0.26), transparent 72%);
+  filter: blur(10px);
   opacity: 0;
-}
-
-.stage--plaster .stage__shadow {
-  background: radial-gradient(ellipse at center, rgba(23, 19, 16, 0.4), transparent 70%);
 }
 
 /* ——— The dossier ——— */
@@ -200,28 +239,29 @@
 }
 
 .stage__kicker {
-  color: var(--amber);
+  color: var(--gold);
 }
 
-.stage--plaster .stage__kicker {
-  color: var(--amber-deep);
+.stage--noir .stage__kicker {
+  color: var(--gold-bright);
 }
 
 .stage__name {
+  font-family: var(--font-brand);
   font-size: var(--text-title);
-  font-weight: 600;
-  line-height: 0.95;
+  line-height: 1;
 }
 
-.stage--plaster .stage__name {
-  text-shadow: 0 2px 0 rgba(255, 253, 248, 0.6);
+.stage--plaster .stage__name,
+.stage--oxblood .stage__name {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .stage__narrative {
   font-family: var(--font-display);
   font-style: italic;
   font-size: var(--text-lead);
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.45;
   opacity: 0.85;
 }
@@ -239,7 +279,7 @@
   padding-left: 1.1rem;
   font-size: calc(var(--text-body) * 0.88);
   letter-spacing: 0.04em;
-  opacity: 0.72;
+  opacity: 0.75;
 }
 
 .stage__detail::before {
@@ -249,8 +289,8 @@
   top: 0.78em;
   width: 0.45rem;
   height: 1px;
-  background: var(--amber);
-  box-shadow: 0 0 6px rgba(200, 125, 42, 0.5);
+  background: var(--gold);
+  box-shadow: 0 0 6px rgba(168, 133, 62, 0.5);
 }
 
 .stage__commerce {

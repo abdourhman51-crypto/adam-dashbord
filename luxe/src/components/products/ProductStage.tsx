@@ -185,7 +185,7 @@ export function ProductStage({ product, flip = false }: ProductStageProps) {
                 <span className="stage__price-now">{product.price}</span>
                 <s className="stage__price-was">{product.wasPrice}</s>
               </p>
-              <MagneticButton variant={product.theme === "plaster" ? "light" : "dark"} ariaLabel={`Découvrir ${product.name}`}>
+              <MagneticButton variant={product.theme === "noir" ? "dark" : "light"} ariaLabel={`Découvrir ${product.name}`}>
                 Découvrir
               </MagneticButton>
             </div>

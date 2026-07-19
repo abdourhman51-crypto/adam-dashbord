@@ -1,5 +1,6 @@
 import { navigation } from "@/data/products";
 import { scrollToTop } from "@/lib/smooth-scroll";
+import { Medallion } from "@/components/shared/Medallion";
 import "./Footer.css";
 
 export function Footer() {
@@ -7,7 +8,8 @@ export function Footer() {
     <footer className="footer">
       <div className="footer__body shell">
         <div className="footer__brand-block">
-          <p className="footer__wordmark display">
+          <Medallion className="footer__seal" size="clamp(72px, 9vw, 104px)" />
+          <p className="footer__wordmark">
             LUXELS<span className="footer__tm">™</span>
           </p>
           <p className="footer__motto display-italic">Look different.</p>

@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useFilmSequence } from "./useFilmSequence";
+import { Medallion } from "@/components/shared/Medallion";
 import "./CinematicHero.css";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -197,7 +198,7 @@ export function CinematicHero() {
 
   return (
     <section ref={rootRef} className="hero" aria-label="Le film de la collection">
-      <div className="hero__stage">
+      <div className="hero__stage marble-surface">
         <div className="hero__ambient hero__ambient--warm" aria-hidden="true" />
         <div className="hero__ambient hero__ambient--floor" aria-hidden="true" />
 
@@ -216,6 +217,7 @@ export function CinematicHero() {
 
         {/* — Opening: still, monumental — */}
         <div className="hero__opening">
+          <Medallion className="hero__seal" size="clamp(84px, 13vh, 128px)" />
           <p className="hero__eyebrow">Maison de lunetterie — Alger</p>
           <h1 className="hero__wordmark">
             LUXELS<span className="hero__wordmark-tm">™</span>

@@ -9,18 +9,24 @@
   isolation: isolate;
 }
 
+/* dark rooms: ivory line on black stone */
 .magnetic-btn--dark {
-  border: 1px solid rgba(237, 230, 218, 0.22);
-  color: var(--ink-on-dark);
-  box-shadow: var(--edge-light), 0 14px 30px -14px rgba(6, 5, 5, 0.6);
-  background: linear-gradient(180deg, rgba(242, 237, 227, 0.05), rgba(242, 237, 227, 0.01));
+  border: 1px solid rgba(240, 234, 222, 0.28);
+  color: var(--ivory-ink);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 14px 30px -14px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(180deg, rgba(240, 234, 222, 0.06), rgba(240, 234, 222, 0.01));
 }
 
+/* light rooms: carved crystal pill */
 .magnetic-btn--light {
-  border: 1px solid rgba(23, 19, 16, 0.28);
-  color: var(--ink-on-light);
-  box-shadow: inset 0 1px 0 rgba(255, 253, 248, 0.7), 0 14px 30px -14px rgba(23, 19, 16, 0.35);
-  background: linear-gradient(180deg, rgba(255, 253, 248, 0.5), rgba(255, 253, 248, 0.1));
+  border: var(--edge-crystal);
+  color: var(--ink);
+  box-shadow: var(--shadow-crystal);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(250, 247, 240, 0.45));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 /* travelling sheen on hover */
@@ -32,7 +38,7 @@
   left: -50%;
   width: 40%;
   transform: skewX(-18deg) translateX(-120%);
-  background: linear-gradient(90deg, transparent, rgba(255, 250, 240, 0.35), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 250, 240, 0.5), transparent);
   transition: transform 0.9s var(--ease-lux);
   pointer-events: none;
 }
@@ -41,12 +47,13 @@
   transform: skewX(-18deg) translateX(480%);
 }
 
+/* the fill rises like liquid gold */
 .magnetic-btn__fill {
   position: absolute;
   inset: -1px;
   z-index: -1;
   border-radius: inherit;
-  background: var(--amber);
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
   transform: translateY(102%);
   transition: transform 0.55s var(--ease-lux);
 }
@@ -62,5 +69,5 @@
 
 .magnetic-btn:hover .magnetic-btn__label,
 .magnetic-btn:focus-visible .magnetic-btn__label {
-  color: var(--noir);
+  color: #fffdf7;
 }
