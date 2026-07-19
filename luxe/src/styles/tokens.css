@@ -1,0 +1,60 @@
+/* ————————————————————————————————————————————————
+   LUXELS — Design tokens
+   Palette drawn from the campaign films (warm plaster,
+   deep shadow) and the objects themselves (honey lens,
+   oxblood acetate). The logotype is monochrome; colour
+   belongs to the light.
+   ———————————————————————————————————————————————— */
+
+:root {
+  /* Surfaces */
+  --noir: #0a0908;
+  --carbon: #14110e;
+  --smoke: #1e1a15;
+  --stone: #4b443a;
+  --plaster: #c9bba8;
+  --plaster-light: #e2d9c9;
+  --ivory: #f2ede3;
+
+  /* Accents */
+  --amber: #c87d2a;
+  --amber-bright: #e09b3d;
+  --amber-deep: #8f5518;
+  --oxblood: #4a1e24;
+  --oxblood-bright: #7b3340;
+
+  /* Ink */
+  --ink-on-dark: #ede6da;
+  --ink-on-dark-dim: rgba(237, 230, 218, 0.55);
+  --ink-on-light: #171310;
+  --ink-on-light-dim: rgba(23, 19, 16, 0.55);
+
+  /* Lines */
+  --line-dark: rgba(237, 230, 218, 0.14);
+  --line-light: rgba(23, 19, 16, 0.16);
+
+  /* Type */
+  --font-display: "Cormorant Garamond", "Times New Roman", serif;
+  --font-ui: "Jost", "Helvetica Neue", sans-serif;
+
+  /* Scale — fluid, editorial */
+  --text-hero: clamp(4.5rem, 16vw, 15rem);
+  --text-chapter: clamp(3.5rem, 11vw, 11rem);
+  --text-title: clamp(2.4rem, 6vw, 5.5rem);
+  --text-lead: clamp(1.25rem, 2.2vw, 1.9rem);
+  --text-body: clamp(0.95rem, 1.1vw, 1.05rem);
+  --text-label: clamp(0.66rem, 0.8vw, 0.75rem);
+
+  /* Rhythm */
+  --space-section: clamp(6rem, 14vh, 12rem);
+  --gutter: clamp(1.25rem, 4vw, 4rem);
+
+  /* Motion */
+  --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-slow: 1.2s;
+  --dur-med: 0.7s;
+  --dur-fast: 0.35s;
+
+  /* Depth */
+  --shadow-object: 0 60px 80px -30px rgba(10, 9, 8, 0.55);
+}

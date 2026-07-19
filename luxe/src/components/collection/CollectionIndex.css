@@ -1,0 +1,156 @@
+.index {
+  position: relative;
+  background: var(--carbon);
+  overflow: hidden;
+}
+
+.index__track {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  height: 100vh;
+  height: 100svh;
+  padding-inline: var(--gutter);
+  width: max-content;
+  will-change: transform;
+}
+
+/* ——— Intro panel ——— */
+.index__intro {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2.5vh, 1.8rem);
+  width: min(78vw, 34rem);
+  flex-shrink: 0;
+}
+
+.index__kicker {
+  color: var(--amber);
+}
+
+.index__title {
+  font-size: var(--text-title);
+  line-height: 1.02;
+}
+
+.index__title em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--amber-bright);
+}
+
+.index__note {
+  color: var(--ink-on-dark-dim);
+  max-width: 30em;
+}
+
+.index__hint {
+  color: var(--ink-on-dark-dim);
+  padding-top: 1rem;
+}
+
+/* ——— Cards ——— */
+.index__card {
+  flex-shrink: 0;
+  width: clamp(240px, 24vw, 340px);
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.index__frame {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--ivory);
+  border-radius: 2px;
+}
+
+.index__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: multiply;
+  transition: transform 0.9s var(--ease-lux);
+}
+
+.index__card:hover .index__photo {
+  transform: scale(1.05);
+}
+
+.index__tag {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  padding: 0.45em 0.9em;
+  background: rgba(10, 9, 8, 0.82);
+  color: var(--plaster-light);
+  border-radius: 999px;
+  font-size: 0.58rem;
+}
+
+.index__meta {
+  display: flex;
+  gap: 0.9rem;
+  align-items: baseline;
+}
+
+.index__num {
+  color: var(--amber);
+  font-size: 0.6rem;
+}
+
+.index__name {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: calc(var(--text-body) * 0.98);
+  letter-spacing: 0.06em;
+}
+
+.index__colorway {
+  color: var(--ink-on-dark-dim);
+}
+
+.index__price {
+  display: flex;
+  gap: 0.8em;
+  align-items: baseline;
+  font-size: calc(var(--text-body) * 0.9);
+  color: var(--amber-bright);
+}
+
+.index__price s {
+  color: var(--ink-on-dark-dim);
+  font-size: 0.85em;
+}
+
+/* ——— Outro panel ——— */
+.index__outro {
+  flex-shrink: 0;
+  width: min(70vw, 30rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-inline: clamp(1rem, 4vw, 3rem);
+}
+
+.index__outro-line {
+  font-size: clamp(1.8rem, 3.6vw, 3rem);
+  line-height: 1.15;
+}
+
+.index__outro-kicker {
+  color: var(--ink-on-dark-dim);
+}
+
+/* ——— Reduced motion: let it scroll natively ——— */
+@media (prefers-reduced-motion: reduce) {
+  .index {
+    overflow-x: auto;
+  }
+
+  .index__track {
+    height: auto;
+    padding-block: var(--space-section);
+  }
+}

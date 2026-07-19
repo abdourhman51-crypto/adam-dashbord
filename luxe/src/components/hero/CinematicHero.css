@@ -1,0 +1,225 @@
+.hero {
+  position: relative;
+  background: var(--noir);
+}
+
+.hero__stage {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+/* — Colour grades — */
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  will-change: opacity;
+}
+
+.hero__bg--plaster {
+  background:
+    radial-gradient(ellipse 90% 75% at 50% 38%, rgba(226, 217, 201, 0.16), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 72% 60%, rgba(200, 125, 42, 0.12), transparent 65%),
+    linear-gradient(180deg, #171310 0%, #241d15 55%, #171310 100%);
+}
+
+.hero__bg--smoke {
+  background:
+    radial-gradient(ellipse 80% 65% at 45% 40%, rgba(75, 68, 58, 0.28), transparent 70%),
+    radial-gradient(ellipse 50% 45% at 25% 65%, rgba(123, 51, 64, 0.1), transparent 65%),
+    linear-gradient(180deg, #0a0908 0%, #14110e 55%, #0a0908 100%);
+}
+
+/* — Opening — */
+.hero__opening {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1rem, 3vh, 2rem);
+  text-align: center;
+  z-index: 3;
+}
+
+.hero__eyebrow {
+  color: var(--ink-on-dark-dim);
+}
+
+.hero__wordmark {
+  font-size: var(--text-hero);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-indent: 0.14em; /* optically recentre tracked text */
+}
+
+.hero__wordmark-tm {
+  font-size: 0.14em;
+  vertical-align: super;
+  letter-spacing: 0;
+  color: var(--amber);
+}
+
+.hero__tagline {
+  font-size: var(--text-lead);
+  color: var(--amber-bright);
+}
+
+.hero__cue {
+  position: absolute;
+  bottom: clamp(2rem, 6vh, 4rem);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: var(--ink-on-dark-dim);
+}
+
+.hero__cue-line {
+  width: 1px;
+  height: clamp(2.5rem, 7vh, 5rem);
+  background: linear-gradient(to bottom, var(--amber), transparent);
+  animation: cue-pulse 2.6s var(--ease-lux) infinite;
+  transform-origin: top;
+}
+
+@keyframes cue-pulse {
+  0%, 100% { transform: scaleY(0.35); opacity: 0.4; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+/* — Scenes — */
+.hero__scene {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+}
+
+.hero__chapter {
+  position: absolute;
+  top: clamp(5.5rem, 12vh, 8rem);
+  left: var(--gutter);
+  color: var(--ink-on-dark-dim);
+  opacity: 0;
+}
+
+.hero__scene--lui .hero__chapter {
+  left: auto;
+  right: var(--gutter);
+  text-align: right;
+}
+
+.hero__word {
+  font-size: var(--text-chapter);
+  line-height: 1;
+  opacity: 0;
+  user-select: none;
+}
+
+.hero__scene--elle .hero__word {
+  color: var(--plaster-light);
+  margin-right: 16vw;
+}
+
+.hero__scene--lui .hero__word {
+  color: var(--ink-on-dark);
+  margin-left: 16vw;
+}
+
+.hero__object {
+  position: absolute;
+  width: clamp(300px, 44vw, 720px);
+  filter: drop-shadow(0 50px 60px rgba(10, 9, 8, 0.6));
+  opacity: 0;
+  will-change: transform;
+}
+
+.hero__object--elle {
+  right: clamp(2rem, 12vw, 14rem);
+  bottom: 24vh;
+}
+
+.hero__object--lui {
+  left: clamp(2rem, 12vw, 14rem);
+  bottom: 22vh;
+}
+
+.hero__copy {
+  position: absolute;
+  bottom: clamp(3rem, 9vh, 6rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  font-family: var(--font-display);
+  font-size: var(--text-lead);
+  font-weight: 300;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.hero__scene--elle .hero__copy { color: var(--plaster-light); }
+.hero__scene--lui .hero__copy { color: var(--ink-on-dark-dim); }
+
+.hero__copy span {
+  display: block;
+  overflow: hidden;
+}
+
+.hero__copy i {
+  display: block;
+  font-style: inherit;
+  will-change: transform;
+}
+
+/* — Finale — */
+.hero__finale {
+  position: absolute;
+  bottom: clamp(2.5rem, 7vh, 5rem);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  opacity: 0;
+  z-index: 4;
+}
+
+.hero__finale-kicker {
+  color: var(--amber);
+}
+
+.hero__finale-title {
+  font-size: clamp(1.8rem, 3.4vw, 3rem);
+}
+
+@media (max-width: 768px) {
+  .hero__object--elle {
+    right: 50%;
+    transform: translateX(50%);
+    bottom: 30vh;
+    width: min(78vw, 420px);
+  }
+
+  .hero__object--lui {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 30vh;
+    width: min(78vw, 420px);
+  }
+
+  .hero__scene--elle .hero__word,
+  .hero__scene--lui .hero__word {
+    margin: 0;
+  }
+}
