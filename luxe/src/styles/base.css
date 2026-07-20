@@ -12,6 +12,7 @@
 html {
   scroll-behavior: auto; /* Lenis owns scrolling */
   -webkit-text-size-adjust: 100%;
+  overflow-x: clip; /* the gallery never scrolls sideways */
 }
 
 html.lenis,
