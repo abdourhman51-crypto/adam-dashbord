@@ -120,17 +120,31 @@ button {
 .marble-surface::after {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: -6%;
   pointer-events: none;
-  /* polished-stone sheen: one long diagonal highlight */
+  /* polished-stone sheen: one long diagonal highlight, drifting
+     imperceptibly — daylight moving across the room */
   background: linear-gradient(
     115deg,
     rgba(255, 255, 255, 0) 30%,
     rgba(255, 255, 255, 0.4) 47%,
-    rgba(255, 255, 255, 0.08) 53%,
+    rgba(255, 253, 244, 0.1) 53%,
     rgba(255, 255, 255, 0) 70%
   );
   mix-blend-mode: soft-light;
+  animation: light-drift 34s ease-in-out infinite alternate;
+}
+
+/* ——— The living light system ———
+   Nothing loops visibly; the room simply breathes. */
+@keyframes light-drift {
+  from { transform: translateX(-2.5%); }
+  to { transform: translateX(2.5%); }
+}
+
+@keyframes light-breath {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
 }
 
 .marble-surface--dark {

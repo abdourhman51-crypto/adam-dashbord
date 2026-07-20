@@ -54,8 +54,8 @@ export function CollectionIndex() {
             Lunettes <em>avec</em> applique
           </h2>
           <p className="index__note">
-            Vingt références, quatre montures, une écriture. Catalogue importé de la maison —
-            édition actuellement épuisée.
+            Vingt pièces, quatre montures, une écriture. Édition épuisée —
+            conservée ici comme mémoire de la maison.
           </p>
           <p className="label index__hint" aria-hidden="true">
             Faites défiler —

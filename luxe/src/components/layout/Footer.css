@@ -1,16 +1,18 @@
-/* The footer is the palace's dark stone plinth — Nero Marquina,
-   ivory engraving, the seal set into the stone. */
+/* The footer is the villa's shaded stone base — deeper warm marble
+   in soft shadow, engraved ink, the seal set into the stone. */
 .footer {
   position: relative;
-  background-color: var(--nero);
+  background-color: var(--marble-shade);
   background-image:
-    radial-gradient(ellipse 70% 60% at 15% 100%, rgba(200, 164, 92, 0.1), transparent 60%),
-    radial-gradient(ellipse 60% 45% at 85% 0%, rgba(240, 234, 222, 0.06), transparent 60%),
-    var(--veins-dark);
-  background-size: auto, auto, 1400px 1400px;
-  color: var(--ivory-ink);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    radial-gradient(ellipse 70% 60% at 15% 0%, rgba(255, 252, 243, 0.75), transparent 60%),
+    radial-gradient(ellipse 60% 45% at 85% 100%, rgba(200, 164, 92, 0.14), transparent 60%),
+    radial-gradient(ellipse 45% 40% at 60% 100%, var(--sage), transparent 65%),
+    var(--mineral-clouds),
+    var(--veins-light);
+  background-size: auto, auto, auto, 900px 900px, 1400px 1400px;
+  color: var(--ink);
+  border-top: var(--edge-crystal);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
   overflow: hidden;
 }
 
@@ -38,22 +40,23 @@
   font-size: clamp(2.4rem, 5.5vw, 4.6rem);
   letter-spacing: 0.1em;
   line-height: 1;
-  color: var(--ivory-ink);
+  color: var(--ink);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .footer__tm {
   font-size: 0.16em;
   vertical-align: super;
-  color: var(--gold-bright);
+  color: var(--gold);
 }
 
 .footer__motto {
   font-size: clamp(1.1rem, 1.8vw, 1.5rem);
-  color: var(--gold-bright);
+  color: var(--gold-deep);
 }
 
 .footer__col-title {
-  color: var(--ivory-ink-dim);
+  color: var(--ink-dim);
   margin-bottom: 1.4rem;
 }
 
@@ -68,7 +71,7 @@
   position: relative;
   display: inline-block;
   font-size: calc(var(--text-body) * 0.95);
-  color: var(--ivory-ink);
+  color: var(--ink);
   opacity: 0.78;
   transition: opacity 0.35s var(--ease-lux);
 }
@@ -80,7 +83,7 @@
   bottom: -2px;
   width: 100%;
   height: 1px;
-  background: var(--gold-bright);
+  background: var(--gold);
   transform: scaleX(0);
   transform-origin: right center;
   transition: transform 0.5s var(--ease-lux);
@@ -102,21 +105,21 @@
   justify-content: space-between;
   gap: 1rem;
   padding-block: 1.6rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--line-on-light);
 }
 
 .footer__legal {
-  color: var(--ivory-ink-dim);
+  color: var(--ink-dim);
   font-size: 0.6rem;
 }
 
 .footer__top {
-  color: var(--ivory-ink);
+  color: var(--ink);
   transition: color 0.35s var(--ease-lux), transform 0.35s var(--ease-lux);
 }
 
 .footer__top:hover {
-  color: var(--gold-bright);
+  color: var(--gold-deep);
   transform: translateY(-3px);
 }
 

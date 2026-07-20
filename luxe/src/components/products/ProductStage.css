@@ -40,15 +40,18 @@
   color: var(--ink);
 }
 
-/* Nero Marquina — black marble, white-veined */
+/* Statuario — cooler white marble, bolder grey veining; the black
+   object carries all the contrast */
 .stage--noir .stage__frame-inner {
-  background-color: var(--nero);
+  background-color: var(--marble-warm);
   background-image:
-    radial-gradient(ellipse 65% 50% at 45% 8%, rgba(240, 234, 222, 0.1), transparent 65%),
-    radial-gradient(ellipse 50% 38% at 76% 78%, rgba(200, 164, 92, 0.07), transparent 62%),
-    var(--veins-dark);
-  background-size: auto, auto, 1400px 1400px;
-  color: var(--ivory-ink);
+    radial-gradient(ellipse 65% 50% at 45% 6%, rgba(255, 254, 250, 0.95), transparent 62%),
+    radial-gradient(ellipse 50% 38% at 78% 82%, rgba(200, 164, 92, 0.09), transparent 62%),
+    radial-gradient(ellipse 45% 35% at 12% 70%, var(--sage), transparent 60%),
+    var(--mineral-clouds),
+    var(--veins-light);
+  background-size: auto, auto, auto, 900px 900px, 1400px 1400px;
+  color: var(--ink);
 }
 
 /* White onyx — translucent stone, lit from behind */
@@ -80,15 +83,9 @@
   mix-blend-mode: soft-light;
 }
 
-.stage--noir .stage__frame-inner::after {
-  background: linear-gradient(
-    115deg,
-    rgba(255, 255, 255, 0) 34%,
-    rgba(255, 255, 255, 0.09) 48%,
-    rgba(255, 255, 255, 0.02) 54%,
-    rgba(255, 255, 255, 0) 68%
-  );
-  mix-blend-mode: screen;
+/* daylight drifts across every room */
+.stage__frame-inner::after {
+  animation: light-drift 30s ease-in-out infinite alternate;
 }
 
 /* ——— Travelling key light ——— */
@@ -113,16 +110,19 @@
   mix-blend-mode: soft-light;
 }
 
-.stage--noir .stage__sweep {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(240, 234, 222, 0.06) 35%,
-    rgba(240, 234, 222, 0.1) 50%,
-    rgba(240, 234, 222, 0.06) 65%,
-    transparent
-  );
-  mix-blend-mode: normal;
+/* the halo — soft radial light breathing behind each piece */
+.stage__halo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -52%;
+  width: 130%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle at center, rgba(255, 248, 228, 0.55) 0%, rgba(255, 248, 228, 0.14) 42%, transparent 68%);
+  mix-blend-mode: soft-light;
+  animation: light-breath 9s ease-in-out infinite;
 }
 
 /* ——— The numeral: carved, gold-leafed ——— */
@@ -153,8 +153,8 @@
 
 .stage--noir .stage__numeral {
   color: transparent;
-  -webkit-text-stroke: 1.5px rgba(240, 234, 222, 0.2);
-  filter: drop-shadow(0 0 60px rgba(240, 234, 222, 0.06));
+  -webkit-text-stroke: 1.5px rgba(22, 19, 15, 0.24);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.7);
 }
 
 .stage--oxblood .stage__numeral {
@@ -195,9 +195,6 @@
   will-change: opacity, transform;
 }
 
-.stage--noir .stage__angle {
-  filter: drop-shadow(0 50px 60px rgba(0, 0, 0, 0.65)) drop-shadow(0 12px 18px rgba(0, 0, 0, 0.45));
-}
 
 .stage__mirror {
   margin-top: -2%;
@@ -243,7 +240,7 @@
 }
 
 .stage--noir .stage__kicker {
-  color: var(--gold-bright);
+  color: var(--gold-deep);
 }
 
 .stage__name {
@@ -252,8 +249,7 @@
   line-height: 1;
 }
 
-.stage--plaster .stage__name,
-.stage--oxblood .stage__name {
+.stage__name {
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 

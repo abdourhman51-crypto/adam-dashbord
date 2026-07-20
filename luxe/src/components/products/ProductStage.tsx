@@ -131,6 +131,7 @@ export function ProductStage({ product, flip = false }: ProductStageProps) {
     >
       <div className="stage__frame">
         <div className="stage__frame-inner">
+          <span className="stage__halo" aria-hidden="true" />
           <span className="stage__sweep" aria-hidden="true" />
           <span className="stage__numeral display" aria-hidden="true">
             {product.index}
@@ -185,8 +186,8 @@ export function ProductStage({ product, flip = false }: ProductStageProps) {
                 <span className="stage__price-now">{product.price}</span>
                 <s className="stage__price-was">{product.wasPrice}</s>
               </p>
-              <MagneticButton variant={product.theme === "noir" ? "dark" : "light"} ariaLabel={`Découvrir ${product.name}`}>
-                Découvrir
+              <MagneticButton variant="light" ariaLabel={`Découvrir ${product.name}`}>
+                Découvrir la pièce
               </MagneticButton>
             </div>
           </div>

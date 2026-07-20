@@ -8,13 +8,16 @@
    ———————————————————————————————————————————————— */
 
 :root {
-  /* Stone */
-  --marble: #f4f0e7;
-  --marble-warm: #ece6d8;
-  --marble-shade: #ddd5c4;
-  --onyx-glow: #f7ecd9;
-  --nero: #14120f;
+  /* Stone — warmed by morning light */
+  --marble: #f7f2e8;
+  --marble-warm: #f1eadb;
+  --marble-shade: #e2d9c6;
+  --onyx-glow: #f9efdb;
+  --nero: #1a1611;
   --nero-vein: rgba(240, 234, 222, 0.1);
+
+  /* Morning air — the faintest breath of green */
+  --sage: rgba(126, 136, 104, 0.09);
 
   /* Metal & accent */
   --gold: #a8853e;
