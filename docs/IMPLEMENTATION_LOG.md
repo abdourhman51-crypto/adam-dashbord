@@ -5,6 +5,41 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-07-29 · Integration pass — shipping over infrastructure
+**Status:** Two workflows built, tested, **inactive**. Deployment steps in `docs/DEPLOYMENT.md`.
+
+Applied the ship-first filter to my own plan and deferred three things I was about
+to build. None of Flashpoint Detection, prep messages, or the Sleep Journey config
+increases learning from real parents or unblocks shipping — there are zero paid
+parents, and `hard_moment` is already captured by six buttons.
+
+The honest finding: **I had been building infrastructure ahead of integration.**
+Everything built so far was dark. Nothing had reached a parent.
+
+**Constraint that shaped the design.** A Telegram bot holds one webhook, and the
+live 89-node workflow owns it, so response handling must stay there. Checking what
+that router already does: it *already* writes `daily_logs` on check-in responses.
+So the blocker was never the router — it was that the **sender** carries the Egypt
+timezone bug and the **Mirror has never run**. Both are schedule-triggered, so both
+ship without touching the live conversational workflow at all.
+
+**Built**
+- `ADAM · Check-in Sender v2` (`xcebVnU05w5Sx4JO`) — hourly, all scheduling logic
+  in `get_checkin_batch()`, Telegram credential instead of a hardcoded token
+- `ADAM · First Mirror Sender` (`pj19WNHEqU4xDDjy`) — daily, renders the Mirror in
+  Arabic-Indic numerals, her own change as one quiet closing line
+
+**Deliberately not done:** swapping the HTTP nodes to a credential whose contents I
+cannot verify. The MCP tool refuses to attach `supabaseApi` to an HTTP node even
+though n8n supports it and the existing production workflows use exactly that
+pattern. Forcing a different credential risked 401s against live data to save five
+UI clicks.
+
+**Requires founder action before parents see anything:** credential attach, Telegram
+bot verification, deactivating the legacy check-in sender, activation.
+
+---
+
 ## 2026-07-29 · Nightly Check-in Engine
 **Commits:** `<this>` · **Status:** DB layer complete and tested. Workflow wiring pending.
 
