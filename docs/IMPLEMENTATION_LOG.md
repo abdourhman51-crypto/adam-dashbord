@@ -5,6 +5,49 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-07-29 · Pre-launch cleanup
+**Full report:** `docs/CLEANUP-2026-07-29.md` · **Status:** n8n 13 → 5 workflows, `public` 32 → 23 tables.
+
+**A live workflow was sending dunning messages.** `Machine 5 (Renewal Guard)` was
+**active** on a daily 10:00 schedule. Execution `5057` at 08:00 UTC today delivered a
+real Telegram message (`message_id: 10827`) asking a parent for **2,300 DZD to a CCP
+account** — a parent who last spoke on 29 June. Her `country` was empty, so the code
+fell through to the Algerian default and quoted her an Algerian bank account
+regardless of where she lives. The message also asserted *"there was a real turning
+point in your journey together"* while `plan_sessions` held nothing for her: the text
+is assembled from empty fields. Two more parents were queued for auto-downgrade on
+31 July. Deactivated, then archived.
+
+**The dashboard has never been buildable from this repo.** `app/` imports 14 modules
+from `@/lib/*` and `@/components/*`; none exist, and `git log --diff-filter=A` shows
+none were ever committed. This is missing source, not technical debt — reconstructing
+it would mean inventing product. It also bounded the cleanup: with `lib/queries.ts`
+unavailable, every view and every function reachable from committed code was kept.
+
+**Deleted** — only what was proven dead against the live workflows, every function
+body, and every committed file: the offer/renewal query layer
+(`get_offer_candidates`, `get_live_offer_signal`, `get_followup_candidates`,
+`get_renewal_actions`, `increment_waitlist_daily`), the broken counter pair, and two
+zero-row tables. Full recovery DDL is embedded in the migration.
+
+**Moved, not dropped.** Nine `*_archive_20260708` tables hold 3,694 rows of real
+history. They left `public` for a new `archive` schema — PostgREST only serves
+`public`, and a snapshot beside live tables is one forgotten GRANT away from
+re-opening the Week-0 exposure.
+
+**Refused to delete** three things that looked legacy and were not: `Heart Writer`
+(its `write_child_name` is the only writer of `children`, and `light_memory` covers
+129 parents), the legacy `Nightly Checkin` (11 opted in, 16 `daily_logs` rows this
+week — stopping it before v2 activates costs real parents nothing gained), and
+`writer_commit` and friends (an unattributed write on 2026-07-28 10:01 that no n8n
+execution explains).
+
+**Correction to the blueprint.** It listed `weekly_plans` and `survey_responses` as
+dead. Both have live references — `write_child_name()` writes one, the live router
+writes the other. The blueprint predated the dependency audit.
+
+---
+
 ## 2026-07-29 · Integration pass — shipping over infrastructure
 **Status:** Two workflows built, tested, **inactive**. Deployment steps in `docs/DEPLOYMENT.md`.
 
@@ -181,8 +224,11 @@ surgery on Arabic free text risks corrupting what a parent wrote.
 
 | Item | Owner | Note |
 |---|---|---|
+| **Restore `lib/` and `components/`** | **Founder** | Never committed. Dashboard cannot build without them |
 | Rotate service-role key + Telegram bot tokens | **Founder** | Exposed in workflow JSON |
+| Attach `adam Supabase` to 5 HTTP nodes | **Founder** | MCP refuses `supabaseApi` on httpRequest; n8n itself supports it |
+| Verify Telegram credential, deactivate legacy sender, activate v2 | **Founder** | Two credentials, cannot tell which is the ADAM bot |
 | Dashboard → service key | **Founder** | Anon reads now correctly fail |
 | Crisis escalation destination (review D1) | **Founder** | Duty-of-care; gates scale past pilot |
-| n8n workflow wiring | Me | Batched into one edit after schema lands |
 | 56 parents with unknown timezone | Me | Needs a country prompt or inference |
+| `country` empty on all 4 paid rows | Me | Caused Renewal Guard to quote Algerian pricing to everyone |

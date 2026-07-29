@@ -19,6 +19,17 @@ plaintext inside workflow JSON. I proved during Week-0 what service-role reaches
 - Update the n8n credentials (`adam Supabase`, `Telegram account`)
 - The new workflows use **credentials, not hardcoded tokens**, so they pick this up automatically
 
+### 1b. Restore the dashboard source
+
+`app/` imports 14 modules from `@/lib/*` and `@/components/*`. None are in the
+repo, and none ever were — `git log --diff-filter=A -- 'lib/*' 'components/*'`
+returns nothing. The upload that created this repo appears to have carried
+`app/` only.
+
+Until they are pushed, `npm run build` fails and no dashboard page renders.
+Nothing else in this checklist depends on it — the check-in and the Mirror ship
+without the dashboard.
+
 ### 2. Point the dashboard at the service key
 Week-0 revoked anonymous read of all parent data. Any dashboard read using the
 anon key now correctly fails.
@@ -46,6 +57,11 @@ node is already configured with `authentication: predefinedCredentialType` and
 - `Who Is Owed A Mirror` → **adam Supabase**
 - `Generate Mirror` → **adam Supabase**
 - `Mark Delivered` → **adam Supabase**
+
+The MCP refusal is a tool bug, not an n8n limitation — confirmed during the
+2026-07-29 cleanup. The live `Adam - Nightly Checkin` uses exactly this pattern
+(`authentication: predefinedCredentialType`, `nodeCredentialType: supabaseApi`
+on an HTTP Request node) and works in production.
 
 ### 4. Verify the Telegram credential, then deactivate the old check-in
 
