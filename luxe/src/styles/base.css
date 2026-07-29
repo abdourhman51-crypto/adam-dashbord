@@ -1,0 +1,240 @@
+@import "./tokens.css";
+
+/* ——— Reset ——— */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: auto; /* Lenis owns scrolling */
+  -webkit-text-size-adjust: 100%;
+  overflow-x: clip; /* the gallery never scrolls sideways */
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+body {
+  background: var(--marble);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: var(--text-body);
+  line-height: 1.7;
+  letter-spacing: 0.015em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--marble);
+}
+
+:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 4px;
+}
+
+/* ——— Typography helpers ——— */
+.label {
+  font-family: var(--font-ui);
+  font-size: var(--text-label);
+  font-weight: 400;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+}
+
+.brand {
+  font-family: var(--font-brand);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.display {
+  font-family: var(--font-brand);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+.display-italic {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* ——— Section shells ——— */
+.shell {
+  padding-inline: var(--gutter);
+  max-width: 110rem;
+  margin-inline: auto;
+}
+
+/* ——— Stone surfaces ———
+   Every light room is cut from the same quarry: mineral
+   clouds, hand-drawn veining, a polished sheen band. */
+.marble-surface {
+  position: relative;
+  background-color: var(--marble);
+}
+
+.marble-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--mineral-clouds), var(--veins-light);
+  background-size: 900px 900px, 1400px 1400px;
+  opacity: 0.9;
+}
+
+.marble-surface::after {
+  content: "";
+  position: absolute;
+  inset: -6%;
+  pointer-events: none;
+  /* polished-stone sheen: one long diagonal highlight, drifting
+     imperceptibly — daylight moving across the room */
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.4) 47%,
+    rgba(255, 253, 244, 0.1) 53%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  mix-blend-mode: soft-light;
+  animation: light-drift 34s ease-in-out infinite alternate;
+}
+
+/* ——— The living light system ———
+   Nothing loops visibly; the room simply breathes. */
+@keyframes light-drift {
+  from { transform: translateX(-2.5%); }
+  to { transform: translateX(2.5%); }
+}
+
+@keyframes light-breath {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}
+
+.marble-surface--dark {
+  background-color: var(--nero);
+}
+
+.marble-surface--dark::before {
+  background-image: var(--veins-dark);
+  background-size: 1400px 1400px;
+  opacity: 1;
+}
+
+.marble-surface--dark::after {
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 34%,
+    rgba(255, 255, 255, 0.1) 48%,
+    rgba(255, 255, 255, 0.02) 54%,
+    rgba(255, 255, 255, 0) 68%
+  );
+  mix-blend-mode: screen;
+}
+
+/* ——— The medallion — the brand seal ——— */
+.medallion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 26%, #ffffff 0%, #fdfcf8 45%, #efe9dc 100%);
+  box-shadow:
+    0 24px 50px -18px rgba(22, 19, 15, 0.45),
+    0 6px 14px -4px rgba(22, 19, 15, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -8px 18px rgba(190, 178, 152, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+}
+
+.medallion__word {
+  font-family: var(--font-brand);
+  color: var(--ink);
+  letter-spacing: 0.06em;
+  text-indent: 0.06em;
+  transform: translateY(0.04em);
+}
+
+/* ——— Film grain ——— */
+.grain {
+  position: fixed;
+  inset: -100%;
+  z-index: 200;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.045;
+  animation: grain-shift 0.9s steps(4) infinite;
+}
+
+@keyframes grain-shift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-2%, 1%); }
+  50% { transform: translate(1%, -1.5%); }
+  75% { transform: translate(-1%, 2%); }
+  100% { transform: translate(2%, -1%); }
+}
+
+/* ——— Vignette — gallery lighting, not cinema noir ——— */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 190;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 130% 110% at 50% 42%,
+    transparent 62%,
+    rgba(22, 19, 15, 0.16) 100%
+  );
+}
+
+/* ——— Accessibility ——— */
+@media (prefers-reduced-motion: reduce) {
+  .grain {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
