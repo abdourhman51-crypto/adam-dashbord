@@ -1,0 +1,1063 @@
+<title>آدم — شرح المنتج من عين الأم</title>
+<style>
+/* ---- tokens ---- */
+:root{
+  --night:#161A2E; --ink:#232840; --body:#3A3F58;
+  --paper:#F3F4F8; --surface:#FFFFFF; --sunk:#EAECF3;
+  --line:#D6D9E4; --hair:#E3E6EE; --muted:#666C86;
+  --lamp:#8F6420; --lamp-ink:#8F6420; --lamp-bg:#F7F0E1; --lamp-line:#DFCCA4;
+  --calm:#1F6155; --calm-bg:#E3F0EC; --calm-line:#B4D6CE;
+  --alert:#8E382F; --alert-bg:#F9E8E6; --alert-line:#E5C0BA;
+  --adam-bubble:#FFFFFF; --adam-line:#DCE0EB;
+  --mom-bubble:#E6E9F4; --mom-line:#D0D5E7;
+  --thread:#D6D9E4;
+  --display:"Noto Naskh Arabic","Amiri","Traditional Arabic","Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI","Noto Sans Arabic","Dubai",Tahoma,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --night:#EAECF4; --ink:#EAECF4; --body:#C2C7D9;
+    --paper:#0F1224; --surface:#191D33; --sunk:#14182D;
+    --line:#2F3550; --hair:#252B45; --muted:#8D94AE;
+    --lamp:#DFAE5C; --lamp-ink:#DFAE5C; --lamp-bg:#2A2416; --lamp-line:#4A3D22;
+    --calm:#5FB6A2; --calm-bg:#16281F; --calm-line:#2C4A3E;
+    --alert:#D98177; --alert-bg:#2C1A18; --alert-line:#4E2C27;
+    --adam-bubble:#212642; --adam-line:#333A5A;
+    --mom-bubble:#2C3352; --mom-line:#3D4568;
+    --thread:#2F3550;
+  }
+}
+:root[data-theme="light"]{
+  --night:#161A2E; --ink:#232840; --body:#3A3F58;
+  --paper:#F3F4F8; --surface:#FFFFFF; --sunk:#EAECF3;
+  --line:#D6D9E4; --hair:#E3E6EE; --muted:#666C86;
+  --lamp:#8F6420; --lamp-ink:#8F6420; --lamp-bg:#F7F0E1; --lamp-line:#DFCCA4;
+  --calm:#1F6155; --calm-bg:#E3F0EC; --calm-line:#B4D6CE;
+  --alert:#8E382F; --alert-bg:#F9E8E6; --alert-line:#E5C0BA;
+  --adam-bubble:#FFFFFF; --adam-line:#DCE0EB;
+  --mom-bubble:#E6E9F4; --mom-line:#D0D5E7;
+  --thread:#D6D9E4;
+}
+:root[data-theme="dark"]{
+  --night:#EAECF4; --ink:#EAECF4; --body:#C2C7D9;
+  --paper:#0F1224; --surface:#191D33; --sunk:#14182D;
+  --line:#2F3550; --hair:#252B45; --muted:#8D94AE;
+  --lamp:#DFAE5C; --lamp-ink:#DFAE5C; --lamp-bg:#2A2416; --lamp-line:#4A3D22;
+  --calm:#5FB6A2; --calm-bg:#16281F; --calm-line:#2C4A3E;
+  --alert:#D98177; --alert-bg:#2C1A18; --alert-line:#4E2C27;
+  --adam-bubble:#212642; --adam-line:#333A5A;
+  --mom-bubble:#2C3352; --mom-line:#3D4568;
+  --thread:#2F3550;
+}
+
+*{box-sizing:border-box}
+html{ -webkit-text-size-adjust:100% }
+body{
+  margin:0; direction:rtl; text-align:right;
+  background:var(--paper); color:var(--body);
+  font-family:var(--sans); font-size:17px; line-height:1.75;
+  font-feature-settings:"kern";
+}
+.wrap{ max-width:1120px; margin:0 auto; padding:0 20px 96px }
+p{ margin:0 0 1em; max-width:68ch }
+strong{ color:var(--ink); font-weight:700 }
+a{ color:var(--lamp-ink) }
+
+/* ---------- masthead ---------- */
+.mast{ padding:72px 0 40px; border-bottom:1px solid var(--line); margin-bottom:8px }
+.kicker{
+  font-size:12px; letter-spacing:.14em; color:var(--muted);
+  font-weight:600; margin-bottom:20px;
+}
+h1{
+  font-family:var(--display); font-weight:700;
+  font-size:clamp(34px,5.4vw,58px); line-height:1.25;
+  color:var(--night); margin:0 0 20px; text-wrap:balance;
+  letter-spacing:-.005em;
+}
+.standfirst{ font-size:clamp(18px,2.2vw,21px); line-height:1.7; color:var(--body); max-width:60ch; margin:0 }
+.standfirst em{ color:var(--ink); font-style:normal; font-weight:600 }
+
+/* ---------- generic section ---------- */
+section{ padding-top:64px }
+h2{
+  font-family:var(--display); font-weight:700;
+  font-size:clamp(25px,3.4vw,34px); line-height:1.35;
+  color:var(--night); margin:0 0 8px; text-wrap:balance;
+}
+h2 + .dek{ color:var(--muted); font-size:16px; margin:0 0 28px; max-width:62ch }
+h3{
+  font-family:var(--display); font-size:21px; font-weight:700;
+  color:var(--ink); margin:32px 0 10px;
+}
+
+/* ---------- reality banner ---------- */
+.reality{
+  background:var(--alert-bg); border:1px solid var(--alert-line);
+  border-radius:3px; padding:26px 28px; margin-top:36px;
+}
+.reality h2{ font-size:24px; margin-bottom:6px; color:var(--alert) }
+.reality p{ color:var(--body) }
+.reality p:last-child{ margin-bottom:0 }
+
+/* ---------- the journey thread ---------- */
+.journey{ position:relative; margin-top:36px }
+.journey::before{
+  content:""; position:absolute; top:14px; bottom:60px; right:23px;
+  width:2px; background:var(--thread);
+}
+@media (max-width:760px){ .journey::before{ right:17px } }
+
+.step{ position:relative; padding:0 68px 52px 0; }
+@media (max-width:760px){ .step{ padding-right:52px } }
+
+.dot{
+  position:absolute; right:0; top:6px;
+  width:48px; height:48px; border-radius:50%;
+  background:var(--surface); border:2px solid var(--thread);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--sans); font-weight:700; font-size:16px;
+  color:var(--ink); font-variant-numeric:tabular-nums; z-index:1;
+}
+@media (max-width:760px){ .dot{ width:36px; height:36px; font-size:14px } }
+.step.is-pay .dot{ border-color:var(--lamp-line); background:var(--lamp-bg); color:var(--lamp-ink) }
+.step.is-proof .dot{ border-color:var(--calm-line); background:var(--calm-bg); color:var(--calm) }
+
+.step-when{
+  font-size:12px; letter-spacing:.12em; font-weight:600;
+  color:var(--muted); margin-bottom:6px;
+}
+.step h3{ margin:0 0 14px; font-size:clamp(21px,2.6vw,26px) }
+
+.split{ display:grid; grid-template-columns:1fr; gap:22px }
+@media (min-width:980px){ .split{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:30px } }
+
+/* ---------- phone / chat ---------- */
+.phone{
+  background:var(--sunk); border:1px solid var(--hair);
+  border-radius:14px; padding:16px 14px;
+}
+.phone-top{
+  display:flex; align-items:center; gap:9px; padding:0 4px 12px;
+  border-bottom:1px solid var(--hair); margin-bottom:14px;
+}
+.avatar{
+  width:28px; height:28px; border-radius:50%; flex:none;
+  background:var(--night); color:var(--paper);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--display); font-size:14px; font-weight:700;
+}
+:root[data-theme="dark"] .avatar,
+:root:not([data-theme="light"]) .avatar{ }
+@media (prefers-color-scheme:dark){ .avatar{ background:#3C4468; color:#EAECF4 } }
+:root[data-theme="dark"] .avatar{ background:#3C4468; color:#EAECF4 }
+:root[data-theme="light"] .avatar{ background:#161A2E; color:#F3F4F8 }
+.phone-name{ font-size:14px; font-weight:700; color:var(--ink) }
+.phone-sub{ font-size:12px; color:var(--muted) }
+
+.msg{ margin-bottom:12px; max-width:88% }
+.msg-who{
+  font-size:11px; letter-spacing:.1em; font-weight:700;
+  color:var(--muted); margin-bottom:5px;
+}
+.bubble{
+  background:var(--adam-bubble); border:1px solid var(--adam-line);
+  border-radius:13px 13px 13px 4px;
+  padding:11px 14px; font-size:15.5px; line-height:1.7; color:var(--body);
+  white-space:pre-line;
+}
+.msg.mom{ margin-right:auto; margin-left:0; text-align:left; direction:rtl }
+.msg.mom .bubble{
+  background:var(--mom-bubble); border-color:var(--mom-line);
+  border-radius:13px 13px 4px 13px; text-align:right;
+}
+.msg.mom .msg-who{ text-align:left }
+.keys{ display:flex; flex-direction:column; gap:6px; margin-top:8px }
+.key{
+  background:var(--surface); border:1px solid var(--adam-line);
+  border-radius:8px; padding:9px 12px; font-size:14.5px;
+  color:var(--ink); text-align:center; font-weight:600;
+}
+.key.tapped{ border-color:var(--lamp-line); background:var(--lamp-bg); color:var(--lamp-ink) }
+.tapnote{ font-size:12.5px; color:var(--muted); margin-top:9px; text-align:center }
+.sys{
+  font-size:12.5px; color:var(--muted); text-align:center;
+  padding:7px 0; font-style:normal;
+}
+
+/* ---------- reasoning side ---------- */
+.why{ display:flex; flex-direction:column; gap:16px }
+.why-block .lbl{
+  font-size:11px; letter-spacing:.12em; font-weight:700;
+  color:var(--muted); margin-bottom:5px;
+}
+.why-block p{ margin:0; font-size:15.5px; line-height:1.7 }
+.why-block p + p{ margin-top:.6em }
+
+.tag{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:12.5px; font-weight:700; letter-spacing:.02em;
+  border-radius:100px; padding:4px 12px; border:1px solid;
+}
+.tag.free{ color:var(--calm); background:var(--calm-bg); border-color:var(--calm-line) }
+.tag.paid{ color:var(--lamp-ink); background:var(--lamp-bg); border-color:var(--lamp-line) }
+.tag.gap{ color:var(--alert); background:var(--alert-bg); border-color:var(--alert-line) }
+
+.flag{
+  border-right:3px solid var(--alert-line); background:var(--alert-bg);
+  padding:11px 14px; border-radius:0 3px 3px 0; font-size:14.5px; line-height:1.7;
+}
+.flag .flag-h{ font-weight:700; color:var(--alert); display:block; margin-bottom:2px }
+
+/* ---------- tables ---------- */
+.tablewrap{ overflow-x:auto; margin:22px 0; border:1px solid var(--line); border-radius:3px }
+table{ border-collapse:collapse; width:100%; min-width:520px; font-size:15px; background:var(--surface) }
+th,td{ text-align:right; padding:12px 16px; border-bottom:1px solid var(--hair); vertical-align:top }
+thead th{
+  background:var(--sunk); font-size:12px; letter-spacing:.1em;
+  color:var(--muted); font-weight:700; white-space:nowrap;
+}
+tbody tr:last-child td{ border-bottom:none }
+td strong{ color:var(--ink) }
+
+/* ---------- state map ---------- */
+.states{ display:grid; gap:14px; margin-top:26px }
+@media (min-width:820px){ .states{ grid-template-columns:1fr 1fr } }
+.state{
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:3px; padding:18px 20px;
+}
+.state.pay{ border-color:var(--lamp-line) }
+.state.exit{ border-color:var(--alert-line) }
+.state-h{ display:flex; align-items:baseline; gap:10px; margin-bottom:4px; flex-wrap:wrap }
+.state-id{
+  font-size:11px; font-weight:700; letter-spacing:.1em; color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.state-name{ font-family:var(--display); font-size:19px; font-weight:700; color:var(--ink) }
+.state dl{ margin:10px 0 0; font-size:14.5px; line-height:1.65 }
+.state dt{
+  font-size:11px; letter-spacing:.1em; font-weight:700;
+  color:var(--muted); margin-top:10px;
+}
+.state dd{ margin:2px 0 0 }
+.state dd em{ font-style:normal; color:var(--lamp-ink); font-weight:600 }
+
+/* ---------- rail (happy path) ---------- */
+.rail{
+  display:flex; flex-wrap:wrap; gap:8px; align-items:stretch;
+  margin:24px 0 8px; padding:20px; background:var(--sunk);
+  border:1px solid var(--hair); border-radius:3px;
+}
+.rail-node{
+  background:var(--surface); border:1px solid var(--line); border-radius:3px;
+  padding:9px 13px; font-size:14px; font-weight:600; color:var(--ink);
+  display:flex; align-items:center;
+}
+.rail-node.free{ border-color:var(--calm-line); background:var(--calm-bg); color:var(--calm) }
+.rail-node.pay{ border-color:var(--lamp-line); background:var(--lamp-bg); color:var(--lamp-ink) }
+.rail-arrow{ display:flex; align-items:center; color:var(--muted); font-size:15px; padding:0 1px }
+
+/* ---------- boundary two-col ---------- */
+.boundary{ display:grid; gap:16px; margin-top:24px }
+@media (min-width:820px){ .boundary{ grid-template-columns:1fr 1fr } }
+.col{ border:1px solid var(--line); border-radius:3px; overflow:hidden; background:var(--surface) }
+.col-h{ padding:14px 18px; font-weight:700; font-size:15px; border-bottom:1px solid var(--hair) }
+.col.free .col-h{ background:var(--calm-bg); color:var(--calm); border-bottom-color:var(--calm-line) }
+.col.paid .col-h{ background:var(--lamp-bg); color:var(--lamp-ink); border-bottom-color:var(--lamp-line) }
+.col ul{ margin:0; padding:14px 32px 16px 18px; font-size:15px; line-height:1.75 }
+.col li{ margin-bottom:8px }
+.col li:last-child{ margin-bottom:0 }
+
+/* ---------- callout ---------- */
+.pull{
+  border-right:3px solid var(--lamp-line); padding:4px 18px 4px 0;
+  margin:26px 0; font-family:var(--display); font-size:20px;
+  line-height:1.6; color:var(--ink); max-width:60ch;
+}
+
+.foot{
+  margin-top:72px; padding-top:26px; border-top:1px solid var(--line);
+  font-size:14px; color:var(--muted);
+}
+:focus-visible{ outline:2px solid var(--lamp-ink); outline-offset:2px }
+@media (prefers-reduced-motion:reduce){ *{ animation:none!important; transition:none!important } }
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <div class="kicker">شرح المنتج — من عين الأم، لا من عين المهندس</div>
+  <h1>ماذا يحدث فعلاً بين الأم وآدم، من أول فيديو إلى اليوم الثلاثين</h1>
+  <p class="standfirst">
+    لا معمارية، ولا قاعدة بيانات، ولا كود. فقط: ماذا ترى، وماذا تضغط،
+    وماذا يصلها، ولماذا، ومتى يظهر السعر — <em>وما الذي يعمل الليلة فعلاً وما الذي لا يعمل بعد.</em>
+  </p>
+</header>
+
+<div class="reality">
+  <h2>اقرأ هذا أولاً</h2>
+  <p>
+    طلبتَ أن تفهم المنتج قبل أن توافق عليه. لذلك لن أشرح لك صورة غير موجودة.
+    ما يلي هو <strong>المنتج كما صُمّم</strong> — وفي كل خطوة تحمل علامة
+    <span class="tag gap">فجوة</span> سأقول لك بوضوح إن كانت هذه الخطوة لا تعمل اليوم.
+  </p>
+  <p>
+    الخلاصة مقدَّماً: <strong>الرحلة المجانية كاملة تقريباً وتعمل. الجزء المدفوع لم يُبنَ بعد.</strong>
+    الميزة التي يُفترض أن تدفع الأم من أجلها — الاستباق — غير موجودة. أي أنه لا يوجد
+    اليوم شيء جاهز للبيع. هذه أهم جملة في الصفحة.
+  </p>
+</div>
+
+<section>
+  <h2>ما هو آدم، في فقرة واحدة</h2>
+  <p>
+    آدم رفيق يعيش في تيليجرام، يتحدث العربية، ويكلّم أمّاً منهكة عند الحادية عشرة ليلاً.
+    لا يعلّمها التربية. يساعدها على تجاوز هذه الليلة، ثم يسألها كل مساء سؤالاً واحداً
+    تجيبه بضغطة واحدة، ثم — بعد ثلاث ليالٍ فقط — يُريها نمطاً في طفلها لم تكن تراه.
+  </p>
+  <p>
+    هذا كله مجاني. المدفوع شيء واحد مختلف نوعياً: أن يتحدث آدم <strong>قبل</strong> اللحظة
+    الصعبة بدل أن يواسي بعدها، وأن يرافقها في فصل له هدف مقاس ونهاية وتقرير.
+  </p>
+  <p class="pull">
+    المجاني: مساعدة حين تطلب. المدفوع: مساعدة قبل أن تطلب، وتقدّم يمكن قياسه.
+    الحدّ ليس «كم» بل «متى».
+  </p>
+</section>
+
+<section>
+  <h2>الرحلة، خطوة بخطوة</h2>
+  <p class="dek">
+    الخيط الرأسي على اليمين مقصود: آدم واحد من أول رسالة إلى آخر فصل. الرحلات فصول داخله،
+    وليست منتجات منفصلة تُشترى.
+  </p>
+
+  <div class="journey">
+
+    <!-- 1 -->
+    <div class="step">
+      <div class="dot">١</div>
+      <div class="step-when">اليوم ٠ · إنستغرام</div>
+      <h3>الفيديو</h3>
+      <div class="split">
+        <div class="phone">
+          <div class="phone-top"><div class="avatar">▶</div>
+            <div><div class="phone-name">ريلز</div><div class="phone-sub">١٤ ثانية</div></div></div>
+          <div class="sys">مشهد: طفل يرفض النوم، والساعة ١١:٤٠</div>
+          <div class="msg"><div class="bubble">«ابنك يقاوم النوم كل ليلة؟
+الغلط مش فيكِ — وفي خطوة واحدة ممكن تجرّبيها الليلة.
+اكتبي "نوم" في الكومنت.»</div></div>
+        </div>
+        <div class="why">
+          <div class="why-block"><div class="lbl">ماذا تفعل</div>
+            <p>تكتب كلمة واحدة في التعليقات. لا رابط، لا تسجيل، لا تحميل.</p></div>
+          <div class="why-block"><div class="lbl">لماذا مشكلة الطفل لا تحوّل الأم</div>
+            <p>لأن الأم لا تستيقظ وهي تفكر «أريد أن أصبح أمّاً أهدأ». تستيقظ منهكة لأن ابنها لم ينم.
+            محتوى مشاكل الأطفال وصل في بياناتنا إلى ما يفوق محتوى تحوّل الأم بفارق هائل.
+            تحوّلها هو <strong>النتيجة</strong>، وليس الإعلان.</p></div>
+          <div class="why-block"><div class="lbl">التسعير</div><span class="tag free">مجاني</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="step">
+      <div class="dot">٢</div>
+      <div class="step-when">اليوم ٠ · بعد دقائق</div>
+      <h3>الانتقال إلى تيليجرام</h3>
+      <div class="split">
+        <div class="phone">
+          <div class="phone-top"><div class="avatar">م</div>
+            <div><div class="phone-name">رسالة خاصة</div><div class="phone-sub">إنستغرام</div></div></div>
+          <div class="msg"><div class="msg-who">آدم</div><div class="bubble">«أرسلتُ لكِ الخطوة هنا 👇
+اضغطي وسأكون معكِ خلال دقيقة.»</div>
+            <div class="keys"><div class="key">افتحي المحادثة مع آدم</div></div></div>
+        </div>
+        <div class="why">
+          <div class="why-block"><div class="lbl">لماذا ننقلها أصلاً</div>
+            <p>إنستغرام لا يصلح لعلاقة يومية: لا رسائل مجدولة، ولا أزرار، ولا ذاكرة طويلة.
+            تيليجرام يسمح بالثلاثة، وهو حيث يعيش آدم فعلاً.</p></div>
+          <div class="why-block"><div class="lbl">ماذا يحدث داخلياً</div>
+            <p>لا شيء بعد. الأم ليست معروفة للنظام إلى أن تضغط Start.</p></div>
+          <div class="why-block">
+            <div class="flag"><span class="flag-h">أكبر ثقب في القمع</span>
+            هنا نخسر أكبر نسبة، ولا نقيسها اليوم. لا نعرف كم واحدة من كل مئة تعبر من التعليق إلى تيليجرام.
+            هذا رقم يجب أن نعرفه قبل أن ننفق دينارًا على المحتوى.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="step">
+      <div class="dot">٣</div>
+      <div class="step-when">اليوم ٠ · ١١:٤٧ مساءً</div>
+      <h3>أول لحظة داخل المحادثة</h3>
+      <div class="split">
+        <div class="phone">
+          <div class="phone-top"><div class="avatar">آ</div>
+            <div><div class="phone-name">آدم</div><div class="phone-sub">بوت</div></div></div>
+          <div class="sys">شاشة فارغة وزر واحد</div>
+          <div class="msg mom"><div class="msg-who">الأم</div><div class="bubble">‏/start</div></div>
+          <div class="msg"><div class="msg-who">آدم</div><div class="bubble">«أنا آدم.
+قولي لي فقط: ما الذي يحدث الليلة؟»</div></div>
+        </div>
+        <div class="why">
+          <div class="why-block"><div class="lbl">لماذا لا يوجد استبيان</div>
+            <p>لأن الساعة ١١:٤٧ وهي منهكة. كل حقل نطلبه — الاسم، عمر الطفل، البلد —
+            يخسرنا نسبة من الأمهات مقابل معلومة يمكن أن نلتقطها لاحقاً من الحديث نفسه.</p>
+            <p>سؤال واحد مفتوح، ولا شيء آخر.</p></div>
+          <div class="why-block"><div class="lbl">ماذا يحدث داخلياً</div>
+            <p>تُنشأ صفحتها، ويُسجَّل من أين جاءت. لا شيء يُطلب منها.</p></div>
+          <div class="why-block"><div class="lbl">التسعير</div><span class="tag free">مجاني</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="step is-proof">
+      <div class="dot">٤</div>
+      <div class="step-when">اليوم ٠ · خلال دقيقتين</div>
+      <h3>الإنقاذ — أهم لحظة في المنتج كله</h3>
+      <div class="split">
+        <div class="phone">
+          <div class="phone-top"><div class="avatar">آ</div>
+            <div><div class="phone-name">آدم</div><div class="phone-sub">يكتب…</div></div></div>
+          <div class="msg mom"><div class="msg-who">الأم</div><div class="bubble">«يوسف عنده ٤ سنين وكل ليلة نفس القصة.
+ندخل الأوضة ٩ ونخرج ١٢. أنا تعبانة وبزعق وبعدين بعيّط.»</div></div>
+          <div class="msg"><div class="msg-who">آدم</div><div class="bubble">«اللي بيحصل ده مرهق فعلاً — وثلاث ساعات كل ليلة رقم كبير.
+
+الليلة، جرّبي حاجة واحدة بس:
+خلّي آخر ١٥ دقيقة قبل السرير بدون شاشة خالص، وبنور واطي.
+مش أكتر من كده.
+
+وبكرة بالليل هسألك: كانت إزاي؟»</div></div>
+        </div>
+        <div class="why">
+          <div class="why-block"><div class="lbl">لماذا خطوة واحدة فقط</div>
+            <p>لأن الأم لا تريد أن «تفهم» — تريد أن تنتهي هذه الليلة.
+            برنامج من سبع نقاط يُقرأ كواجب إضافي على امرأة لا تملك طاقة لواجب إضافي.</p>
+            <p>وخطوة واحدة قابلة للقياس. سبع خطوات لا يمكن معرفة أيّها نجح.</p></div>
+          <div class="why-block"><div class="lbl">لماذا هذا مجاني إلى الأبد</div>
+            <p>لأن هذه هي اللحظة التي تقرر فيها إن كان آدم حقيقياً أم لا.
+            لو وضعنا سعراً هنا لبعنا لها وعداً لم نُثبته بعد. ولأن حجب المساعدة عن أمّ في ليلة سيئة
+            ليس نموذج عمل.</p></div>
+          <div class="why-block"><div class="lbl">ماذا يحدث داخلياً</div>
+            <p>يُلتقط اسم الطفل «يوسف» من كلامها هي، وتُسجَّل الخطوة التي أعطاها آدم
+            حتى يستطيع أن يسأل عنها بالتحديد غداً.</p></div>
+          <div class="why-block"><div class="lbl">التسعير</div><span class="tag free">مجاني دائماً</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="step">
+      <div class="dot">٥</div>
+      <div class="step-when">اليوم ١ · ٩:٠٠ مساءً بتوقيتها</div>
+      <h3>أول سؤال ليلي</h3>
+      <div class="split">
+        <div class="phone">
+          <div class="phone-top"><div class="avatar">آ</div>
+            <div><div class="phone-name">آدم</div><div class="phone-sub">٩:٠٠ م</div></div></div>
+          <div class="msg"><div class="msg-who">آدم</div><div class="bubble">«كيف كانت محاولتكِ مع يوسف اليوم؟
+«آخر ١٥ دقيقة بدون شاشة، بنور واطي»</div>
+            <div class="keys">
+              <div class="key tapped">نجحت</div>
+              <div class="key">جرّبتِ وما نجحت</div>
+              <div class="key">ما جرّبتها</div>
+            </div>
+            <div class="tapnote">ضغطة واحدة — ولا شيء آخر مطلوب</div>
+          </div>
+        </div>
+        <div class="why">
+          <div class="why-block"><div class="lbl">لماذا زرّ وليس كتابة</div>
+            <p>لأن الأم لن تكتب تقريراً كل ليلة لثلاثين ليلة. الزر الواحد هو الفرق
+            بين قياس حقيقي وجدول فارغ. وكل ما نبنيه بعد ذلك — النمط، التقرير، التقدّم —
+            مشتقّ من هذه الضغطة.</p></div>
+          <div class="why-block"><div class="lbl">لماذا ٩:٠٠ بتوقيتها هي</div>
+            <p>لأن التاسعة في القاهرة ليست التاسعة في الجزائر. النسخة القديمة كانت تفترض
+            أن مصر على توقيت ثابت، فكانت ترسل لكل أمّ مصرية عند الثامنة — كل ليلة، لشهور.
+            النسخة الجديدة تحسب مساءها الحقيقي، وتغطي ثلاثين دولة لا ثلاثاً.</p></div>
+          <div class="why-block"><div class="lbl">التسعير</div><span class="tag free">مجاني</span></div>
+          <div class="why-block">
+            <div class="flag"><span class="flag-h">فجوة</span>
+            النسخة الصحيحة زمنياً مبنية ومختبَرة لكنها <strong>غير مفعّلة</strong>.
+            النسخة القديمة هي التي ترسل الليلة، بخطأ الساعة في مصر.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="step">
+      <div class="dot">٦</div>
+      <div class="step-when">الأيام ٢–٣</div>
+      <h3>ليلتان أخريان — ولا شيء يُباع</h3>
+      <div class="split">
+        <div class="phone">
+          <div class="phone-top"><div class="avatar">آ</div>
+            <div><div class="phone-name">آدم</div><div class="phone-sub">اليوم ٣</div></div></div>
+          <div class="msg"><div class="msg-who">آدم</div><div class="bubble">«كيف كانت الليلة مع يوسف؟»</div>
+            <div class="keys"><div class="key">هادئة</div><div class="key tapped">صعبة</div><div class="key">عادية</div></div></div>
+          <div class="msg"><div class="msg-who">آدم</div><div class="bubble">«ليلة صعبة تحصل. مش رجوع للوراء.
+نكمل بكرة.»</div></div>
+        </div>
+        <div class="why">
+          <div class="why-block"><div class="lbl">لماذا لا يوجد عرض هنا</div>
+            <p>في النموذج القديم أُرسل ثمانية عروض ولم يُضغط أيٌّ منها. صفر.
+            العرض قبل الدليل لا يُقرأ كدعوة — يُقرأ كإعلان، والأم تكتم البوت.</p></div>
+          <div class="why-block"><div class="lbl">لماذا يردّ آدم على «صعبة» بهذه البرودة</div>
+            <p>لأن أي حماس هنا يبدو كذباً. والأهم: الليلة الصعبة بيانات ثمينة —
+            هي التي ستصنع النمط بعد قليل.</p></div>
+          <div class="why-block"><div class="lbl">التسعير</div><span class="tag free">مجاني</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="step is-proof">
+      <div class="dot">٧</div>
+      <div class="step-when">بعد ٣ ليالٍ مسجّلة</div>
+      <h3>المرآة الأولى — أول شيء تراه ولم تكن تراه</h3>
+      <div class="split">
+        <div class="phone">
+          <div class="phone-top"><div class="avatar">آ</div>
+            <div><div class="phone-name">آدم</div><div class="phone-sub">صباحاً</div></div></div>
+          <div class="msg"><div class="msg-who">آدم</div><div class="bubble">«لاحظتُ شيئاً في ليالي يوسف.
+
+من ٣ ليالٍ سجّلتِها: ٢ هادئة و١ صعبة.
+الليلة الصعبة الوحيدة كانت اليوم الذي لم ينم فيه بعد الظهر.
+
+مش قاعدة أكيدة لحد دلوقتي — بس تستاهل نراقبها كمان كام ليلة.»</div></div>
+        </div>
+        <div class="why">
+          <div class="why-block"><div class="lbl">لماذا هذه اللحظة هي المنتج</div>
+            <p>هذه ليست نصيحة تربوية عامة تجدها في أي منشور. هذه <strong>هي</strong>،
+            وطفلها هو، وبياناتها هي. لا أحد آخر يستطيع أن يقول لها هذا.</p></div>
+          <div class="why-block"><div class="lbl">لماذا مجاني ولا تحمل سعراً</div>
+            <p>لأن هذا هو الدليل. الأم لن تدفع لوعد — تدفع بعد أن ترى أن آدم يعرف شيئاً حقيقياً.
+            المرآة ممنوعة من حمل أي سعر أو عرض بقيد في النظام نفسه، لا بأدب في الصياغة.</p></div>
+          <div class="why-block"><div class="lbl">لماذا الصياغة متحفّظة</div>
+            <p>«مش قاعدة أكيدة» — لأن ثلاث ليالٍ لا تُثبت شيئاً، والادّعاء الزائد يُفقد الثقة
+            حين تكذّبه الليلة الرابعة.</p></div>
+          <div class="why-block"><div class="lbl">التسعير</div><span class="tag free">مجاني</span></div>
+          <div class="why-block">
+            <div class="flag"><span class="flag-h">فجوة</span>
+            المرآة <strong>لم تُطلق ولا مرة واحدة في الإنتاج</strong>. مبنية ومختبَرة وغير مفعّلة.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="step is-pay">
+      <div class="dot">٨</div>
+      <div class="step-when">حين تدعم البيانات هدفاً — لا قبل ذلك</div>
+      <h3>اقتراح الفصل — وأول مرة يظهر فيها سعر</h3>
+      <div class="split">
+        <div class="phone">
+          <div class="phone-top"><div class="avatar">آ</div>
+            <div><div class="phone-name">آدم</div><div class="phone-sub">اليوم ٨</div></div></div>
+          <div class="msg"><div class="msg-who">آدم</div><div class="bubble">«بقالنا ٨ ليالي مع بعض، وبقى عندي صورة واضحة.
+
+أقترح نبدأ فصل اسمه «رحلة نوم يوسف».
+الهدف: ٥ ليالي هادية من ٧.
+
+يعني إيه: هبقى معاكِ كل يوم، وهكلمك <em>قبل</em> الوقت الصعب مش بعده،
+وفي الآخر هبعتلك تقرير بكل اللي اتغيّر.
+
+اللي إحنا فيه دلوقتي بيفضل زي ما هو ومجاني.
+الفصل ده بـ ٤٩٠ جنيه للشهر.»</div>
+            <div class="keys">
+              <div class="key">عايزة أعرف أكتر</div>
+              <div class="key">مش دلوقتي</div>
+            </div></div>
+        </div>
+        <div class="why">
+          <div class="why-block"><div class="lbl">لماذا الآن تحديداً</div>
+            <p>لأن ثلاثة شروط تحققت: رأت قيمة، وصار عندنا بيانات كافية لهدف <em>محدد</em>،
+            والهدف مرتبط بمشكلتها هي لا بعرض عام.</p></div>
+          <div class="why-block"><div class="lbl">لماذا الهدف رقم</div>
+            <p>«٥ من ٧» يمكن إثباته أو نفيه. «طفل أهدأ» لا يمكن. ولأن الرقم يجعل النهاية
+            واضحة — تعرف متى نجحنا، وتعرف متى لم ننجح.</p></div>
+          <div class="why-block"><div class="lbl">لماذا يُذكّرها أن المجاني يبقى</div>
+            <p>لأن أهم مخاوفها أن الرفض يعني فقدان آدم. لو ظنّت ذلك، فقرارها ليس شراءً — إنه ابتزاز.</p></div>
+          <div class="why-block"><div class="lbl">السعر</div>
+            <p>ما يعادل ١٠ دولارات بعملة بلدها، لشهر واحد. لا اشتراك متجدد تلقائياً،
+            ولا خصم بعد ذلك دون أن تطلب.</p></div>
+          <div class="why-block">
+            <div class="flag"><span class="flag-h">فجوة — الأكبر</span>
+            لا توجد <strong>أي</strong> رحلة معدّة اليوم. لا «رحلة نوم» ولا غيرها.
+            المحرك موجود والمحتوى غير موجود، أي أن هذا الاقتراح لا يمكن إرساله أصلاً.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9 -->
+    <div class="step is-pay">
+      <div class="dot">٩</div>
+      <div class="step-when">إن قالت نعم</div>
+      <h3>الدفع — كيف يحدث عملياً</h3>
+      <div class="split">
+        <div class="phone">
+          <div class="phone-top"><div class="avatar">آ</div>
+            <div><div class="phone-name">آدم</div><div class="phone-sub">الآن</div></div></div>
+          <div class="msg"><div class="msg-who">آدم</div><div class="bubble">«الدفع دلوقتي بيتم يدوي، عبد الرحمن هو اللي بيأكده بنفسه.
+
+ابعتيله هنا: ‎@Abdouleg
+هيديكِ طريقة الدفع في بلدكِ، وبعد ما تحوّلي ابعتي صورة الإيصال.
+
+عادةً بيتأكد خلال ساعات. ولو اتأخر، إحنا مكملين عادي —
+مش هيتوقف حاجة عندك لحد ما يتأكد.»</div></div>
+          <div class="sys">تنتقل إلى محادثة أخرى مع شخص حقيقي</div>
+        </div>
+        <div class="why">
+          <div class="why-block"><div class="lbl">الخطوات الفعلية</div>
+            <p><strong>١.</strong> تراسل حساب المؤسس على تيليجرام.<br>
+            <strong>٢.</strong> يعطيها طريقة الدفع المتاحة في بلدها — تحويل محلي.<br>
+            <strong>٣.</strong> تحوّل المبلغ.<br>
+            <strong>٤.</strong> ترسل صورة الإيصال.<br>
+            <strong>٥.</strong> يفتح المؤسس لوحة التحكم ويؤكد الدفعة يدوياً.<br>
+            <strong>٦.</strong> يبدأ الفصل.</p></div>
+          <div class="why-block"><div class="lbl">لماذا يدوي</div>
+            <p>لا يوجد مزوّد دفع. وأنت قررت أن اليدوي يكفي للبداية، وهذا صحيح
+            عند عميل أو عشرة. لكنه سقف صريح.</p></div>
+          <div class="why-block">
+            <div class="flag"><span class="flag-h">ثلاث مشاكل حقيقية في هذه الخطوة</span>
+            <strong>الثقة:</strong> نطلب من امرأة لا تعرفنا أن تحوّل مالاً إلى حساب شخصي.<br>
+            <strong>الانقطاع:</strong> نخرجها من محادثة آدم إلى محادثة مع غريب — وهنا يسقط كثيرون.<br>
+            <strong>السقف:</strong> كل دفعة تمرّ عبر شخص واحد. وأنت نائم أحياناً.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="step is-pay">
+      <div class="dot">١٠</div>
+      <div class="step-when">بعد التأكيد بدقائق</div>
+      <h3>ماذا يتغيّر فوراً</h3>
+      <div class="split">
+        <div class="phone">
+          <div class="phone-top"><div class="avatar">آ</div>
+            <div><div class="phone-name">آدم</div><div class="phone-sub">الآن</div></div></div>
+          <div class="msg"><div class="msg-who">آدم</div><div class="bubble">«وصل. بدأنا «رحلة نوم يوسف».
+
+الهدف: ٥ ليالي هادية من ٧.
+هفضل أسألك كل مساء زي ما إحنا عاملين —
+بس دلوقتي هبقى بكلّمك كمان قبل الوقت الصعب.
+
+حاجة مهمة: الشهر بيتحسب بالليالي اللي بتسجّليها،
+مش بأيام النتيجة. لو غبتِ أسبوع، مش هتخسري أسبوع.»</div></div>
+        </div>
+        <div class="why">
+          <div class="why-block"><div class="lbl">ما الذي تغيّر فعلاً</div>
+            <p>ليس «فُتحت ميزات». السؤال الليلي كان مجانياً ويبقى كما هو.
+            الذي أُضيف: رسائل الاستباق، وهدف مُعلن يُقاس، وتقرير في النهاية.</p></div>
+          <div class="why-block"><div class="lbl">لماذا الشهر بالليالي المسجّلة</div>
+            <p>لأن مرضاً أو سفراً أو رمضان يجعل ثلاثين يوماً تمرّ بلا قياس، فتشعر أنها دفعت
+            مقابل غيابها. العدّ بالليالي يجعل الوعد عادلاً في الاتجاهين — ويلغي الحاجة
+            إلى زر «إيقاف مؤقت» من الأساس.</p></div>
+          <div class="why-block"><div class="lbl">التسعير</div><span class="tag paid">بدأ المدفوع</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11 -->
+    <div class="step is-pay">
+      <div class="dot">١١</div>
+      <div class="step-when">كل يوم داخل الفصل</div>
+      <h3>الاستباق — الشيء الوحيد الذي تدفع مقابله فعلاً</h3>
+      <div class="split">
+        <div class="phone">
+          <div class="phone-top"><div class="avatar">آ</div>
+            <div><div class="phone-name">آدم</div><div class="phone-sub">٧:٣٠ م</div></div></div>
+          <div class="sys">قبل الوقت الصعب بساعة ونصف — لا بعده</div>
+          <div class="msg"><div class="msg-who">آدم</div><div class="bubble">«يوسف ما نامش بعد الضهر النهارده، صح؟
+
+الليالي اللي زي دي بتبقى أصعب عندكم.
+جرّبي تبدأي روتين النوم بدري ٢٠ دقيقة بس النهارده،
+وسيبي الحمّام لبكرة.»</div></div>
+          <div class="sys">٩:٠٠ م — السؤال الليلي المعتاد</div>
+        </div>
+        <div class="why">
+          <div class="why-block"><div class="lbl">لماذا هذا هو المدفوع</div>
+            <p>لأن الفرق بين رفيق ومرجع هو التوقيت. المواساة بعد ليلة سيئة متاحة في كل مكان
+            ومجانية. أن يعرف أحدهم أن الليلة ستكون صعبة <em>قبل</em> أن تبدأ — هذا ما لا يقدّمه أحد.</p>
+            <p>وهذا هو الشيء الوحيد الذي يستحق مالاً بضمير: لا نحجب مساعدة، بل نضيف استباقاً.</p></div>
+          <div class="why-block"><div class="lbl">من أين يعرف</div>
+            <p>من ضغطاتها هي على مدى الأيام السابقة — النمط الذي أراها إياه في المرآة.</p></div>
+          <div class="why-block"><div class="lbl">التسعير</div><span class="tag paid">مدفوع</span></div>
+          <div class="why-block">
+            <div class="flag"><span class="flag-h">فجوة — الأخطر</span>
+            <strong>الاستباق غير مبني إطلاقاً.</strong> لا سطر واحد منه.
+            وهو الميزة الوحيدة التي يقوم عليها المدفوع كله. بصيغة أوضح:
+            لو باع آدم اشتراكاً الليلة، فلن يستطيع تسليم ما باعه.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 12 -->
+    <div class="step is-pay">
+      <div class="dot">١٢</div>
+      <div class="step-when">كل ٧ ليالٍ مسجّلة</div>
+      <h3>المرايا الأسبوعية</h3>
+      <div class="split">
+        <div class="phone">
+          <div class="phone-top"><div class="avatar">آ</div>
+            <div><div class="phone-name">آدم</div><div class="phone-sub">الأسبوع ٢</div></div></div>
+          <div class="msg"><div class="msg-who">آدم</div><div class="bubble">«أسبوع تاني خلص.
+
+٤ ليالي هادية من ٧ — كانت ٢ الأسبوع اللي فات.
+الهدف ٥، وإحنا قرّبنا.
+
+والحاجة اللي مالهاش علاقة بيوسف:
+إنتِ زعّقتِ ليلتين بس الأسبوع ده. كانت ٥.»</div></div>
+        </div>
+        <div class="why">
+          <div class="why-block"><div class="lbl">لماذا الجملة الأخيرة في النهاية وبهدوء</div>
+            <p>لأن تحوّلها هو النتيجة الحقيقية، لكنه ليس ما جاءت من أجله.
+            لو صدّرناه لبدا وكأننا نقول لها إنها هي المشكلة. في الخلف، يصل.</p></div>
+          <div class="why-block"><div class="lbl">لماذا نعرض التراجع أيضاً</div>
+            <p>لأن مرآة لا تُري إلا الجميل ليست مرآة. ولو أخفينا أسبوعاً سيئاً، فقدت
+            كل الأسابيع الجيدة مصداقيتها.</p></div>
+          <div class="why-block"><div class="lbl">التسعير</div><span class="tag paid">المرآة الأولى مجانية · الأسبوعية داخل الفصل</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 13 -->
+    <div class="step is-pay">
+      <div class="dot">١٣</div>
+      <div class="step-when">حين يتحقق الهدف — أو يتضح أنه لن يتحقق</div>
+      <h3>نهاية الفصل والتقرير</h3>
+      <div class="split">
+        <div class="phone">
+          <div class="phone-top"><div class="avatar">آ</div>
+            <div><div class="phone-name">آدم</div><div class="phone-sub">اليوم ٣٠</div></div></div>
+          <div class="msg"><div class="msg-who">آدم</div><div class="bubble">««رحلة نوم يوسف» خلصت.
+
+بدأنا: ٣ ساعات كل ليلة، وليلة هادية واحدة من ٧.
+خلصنا: ٥ ليالي هادية من ٧. الهدف اتحقق.
+
+اللي اشتغل فعلاً: بدء الروتين بدري في الأيام اللي مفيهاش قيلولة.
+اللي ما اشتغلش: الحمّام قبل النوم — جرّبناه ٦ مرات وما فرقش.
+
+التقرير ده يفضل معاكِ، وآدم فاكر كل حاجة.»</div></div>
+        </div>
+        <div class="why">
+          <div class="why-block"><div class="lbl">لماذا نذكر ما لم ينجح</div>
+            <p>لأنه يجعل التقرير قابلاً للتصديق، ولأنه معلومة حقيقية توفّر عليها شهوراً
+            من تكرار شيء لا يعمل مع طفلها تحديداً.</p></div>
+          <div class="why-block"><div class="lbl">ماذا لو لم يتحقق الهدف</div>
+            <p>يقولها آدم صراحةً. التقرير يصدر في الحالتين، ويعرض ما تعلّمناه.
+            فصل فاشل بصدق يبني ثقة أكثر من نجاح مُدّعى.</p></div>
+          <div class="why-block"><div class="lbl">التسعير</div><span class="tag paid">مدفوع</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 14 -->
+    <div class="step">
+      <div class="dot">١٤</div>
+      <div class="step-when">بعد اليوم ٣٠</div>
+      <h3>ماذا بعد — ولماذا قد تدفع مرة ثانية</h3>
+      <div class="split">
+        <div class="phone">
+          <div class="phone-top"><div class="avatar">آ</div>
+            <div><div class="phone-name">آدم</div><div class="phone-sub">اليوم ٣١</div></div></div>
+          <div class="msg"><div class="msg-who">آدم</div><div class="bubble">«الفصل خلص، بس إحنا مخلصناش.
+
+هفضل أسألك كل مساء زي الأول — ده مجاني وبيفضل.
+
+ولو حبيتِ نفتح فصل جديد في أي وقت، قوليلي.
+لاحظتُ إن الأكل بقى موضوع متكرر عندكم الفترة الأخيرة.»</div></div>
+        </div>
+        <div class="why">
+          <div class="why-block"><div class="lbl">لماذا تدفع مرة ثانية</div>
+            <p>ليس لأن اشتراكاً انتهى — بل لأن <strong>مشكلة جديدة ظهرت</strong>، ولأنها رأت
+            بعينها أن الطريقة نجحت مع النوم. الفصل الثاني يُباع بنتيجة الفصل الأول، لا بتذكير بالدفع.</p></div>
+          <div class="why-block"><div class="lbl">ما الذي لن يحدث أبداً</div>
+            <p>لا رسائل «باقي ٥ أيام». لا تحصيل. لا تخفيض تلقائي.
+            هذه كانت آلة النموذج القديم، وقد أُزيلت بالكامل — بعد أن ضبطناها متلبّسة
+            وهي ترسل طلب دفع إلى أمّ لم تتحدث منذ شهر.</p></div>
+          <div class="why-block"><div class="lbl">لماذا يقترح موضوعاً بعينه</div>
+            <p>لأن العرض العام يُقرأ كإعلان. الملاحظة المبنية على كلامها تُقرأ كانتباه.</p></div>
+          <div class="why-block"><div class="lbl">التسعير</div><span class="tag free">عادت إلى المجاني — بلا خسارة</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2>الحدّ بين المجاني والمدفوع</h2>
+  <p class="dek">
+    القاعدة التي وضعتَها بنفسك: المدفوع لا يأتي أبداً من حجب المساعدة.
+    هذا ما يعنيه ذلك عملياً.
+  </p>
+  <div class="boundary">
+    <div class="col free">
+      <div class="col-h">مجاني إلى الأبد — لا يُسحب في أي حال</div>
+      <ul>
+        <li>المحادثة مع آدم في أي وقت</li>
+        <li>خطوة الإنقاذ لهذه الليلة</li>
+        <li>السؤال الليلي وزرّه</li>
+        <li>ذاكرة آدم عنها وعن طفلها</li>
+        <li>المرآة الأولى — أول نمط تراه</li>
+        <li><strong>كل ما يتعلق بأزمة أو خطر على طفل</strong></li>
+      </ul>
+    </div>
+    <div class="col paid">
+      <div class="col-h">مدفوع — إضافة، لا حجب</div>
+      <ul>
+        <li>الاستباق: رسالة قبل اللحظة الصعبة</li>
+        <li>فصل بهدف مُعلن ومقاس ونهاية</li>
+        <li>المرايا الأسبوعية المستمرة</li>
+        <li>التقرير النهائي المكتوب</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>إذا لم تدفع — ماذا تفقد وماذا لا تفقد</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>الأمر</th><th>إن لم تدفع</th></tr></thead>
+      <tbody>
+        <tr><td><strong>محادثتها مع آدم</strong></td><td>تبقى كما هي، بلا تغيير</td></tr>
+        <tr><td><strong>السؤال الليلي</strong></td><td>يستمر كل مساء</td></tr>
+        <tr><td><strong>ذاكرة آدم</strong></td><td>لا تُمسح ولا تُجمَّد — يظل يعرف يوسف</td></tr>
+        <tr><td><strong>أزمة أو خطر</strong></td><td>يُستجاب لها دائماً، ولا تُسعَّر إطلاقاً</td></tr>
+        <tr><td><strong>الاستباق</strong></td><td>لا يصلها — تصلها المساعدة حين تطلب لا قبلها</td></tr>
+        <tr><td><strong>هدف مقاس ونهاية</strong></td><td>لا يوجد فصل، فلا هدف ولا تقرير</td></tr>
+        <tr><td><strong>المرايا الأسبوعية</strong></td><td>ترى الأولى، ثم تتوقف الدورية</td></tr>
+        <tr><td><strong>نبرة آدم معها</strong></td><td>لا تتغيّر. لا عتاب ولا تذكير ولا برود</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="pull">
+    الأمّ التي لا تدفع أبداً يجب أن تظل سعيدة بآدم. لو صار المجاني مؤلماً
+    كي يدفع الناس، فقد بنينا شيئاً آخر.
+  </p>
+</section>
+
+<section>
+  <h2>خريطة المسار — كل الحالات والانتقالات</h2>
+  <p class="dek">المسار السعيد أولاً، ثم كل حالة بتفصيلها: كيف تدخلها، وماذا يحدث فيها، وكيف تخرج منها.</p>
+
+  <div class="rail">
+    <div class="rail-node">غريبة</div><div class="rail-arrow">←</div>
+    <div class="rail-node free">أول تواصل</div><div class="rail-arrow">←</div>
+    <div class="rail-node free">إنقاذ</div><div class="rail-arrow">←</div>
+    <div class="rail-node free">تسجيل ليلي</div><div class="rail-arrow">←</div>
+    <div class="rail-node free">مرآة أولى</div><div class="rail-arrow">←</div>
+    <div class="rail-node">اقتراح فصل</div><div class="rail-arrow">←</div>
+    <div class="rail-node pay">دفع معلّق</div><div class="rail-arrow">←</div>
+    <div class="rail-node pay">داخل فصل</div><div class="rail-arrow">←</div>
+    <div class="rail-node pay">تقرير</div><div class="rail-arrow">←</div>
+    <div class="rail-node free">مرافقة مستمرة</div>
+  </div>
+
+  <div class="states">
+
+    <div class="state">
+      <div class="state-h"><span class="state-id">ح ٠</span><span class="state-name">غريبة</span></div>
+      <dl>
+        <dt>تدخلها</dt><dd>رأت الفيديو. غير معروفة للنظام.</dd>
+        <dt>ماذا يحدث</dt><dd>لا شيء.</dd>
+        <dt>تخرج منها</dt><dd>تضغط Start في تيليجرام <em>← ح ١</em></dd>
+        <dt>أو</dt><dd>لا تعبر أبداً — وهذا أكبر تسرّب لدينا، وغير مقاس</dd>
+      </dl>
+    </div>
+
+    <div class="state">
+      <div class="state-h"><span class="state-id">ح ١</span><span class="state-name">أول تواصل</span></div>
+      <dl>
+        <dt>تدخلها</dt><dd>ضغطت Start</dd>
+        <dt>ماذا يحدث</dt><dd>سؤال واحد مفتوح. لا استبيان ولا تسجيل.</dd>
+        <dt>تخرج منها</dt><dd>تحكي مشكلتها <em>← ح ٢</em></dd>
+        <dt>أو</dt><dd>تصمت ولا تعود <em>← ح خ١ صامتة</em></dd>
+      </dl>
+    </div>
+
+    <div class="state">
+      <div class="state-h"><span class="state-id">ح ٢</span><span class="state-name">الإنقاذ</span></div>
+      <dl>
+        <dt>تدخلها</dt><dd>وصفت ما يحدث</dd>
+        <dt>ماذا يحدث</dt><dd>خطوة واحدة لهذه الليلة. يُلتقط اسم الطفل إن ذُكر.</dd>
+        <dt>تخرج منها</dt><dd>يحلّ المساء التالي <em>← ح ٣</em></dd>
+        <dt>التسعير</dt><dd>مجاني دائماً</dd>
+      </dl>
+    </div>
+
+    <div class="state">
+      <div class="state-h"><span class="state-id">ح ٣</span><span class="state-name">التسجيل الليلي</span></div>
+      <dl>
+        <dt>تدخلها</dt><dd>أول مساء بعد الإنقاذ</dd>
+        <dt>ماذا يحدث</dt><dd>سؤال واحد كل مساء بتوقيتها المحلي، يُجاب بضغطة</dd>
+        <dt>تخرج منها</dt><dd>٣ ليالٍ مسجّلة <em>← ح ٤</em></dd>
+        <dt>أو</dt><dd>تتجاهل ٥ مرات <em>← تصير أسبوعية</em> · ثم ٤ أخرى <em>← تتوقف</em></dd>
+        <dt>العودة</dt><dd>أي ردّ منها يُعيد كل شيء فوراً. لا عتاب.</dd>
+      </dl>
+    </div>
+
+    <div class="state">
+      <div class="state-h"><span class="state-id">ح ٤</span><span class="state-name">المرآة الأولى</span></div>
+      <dl>
+        <dt>تدخلها</dt><dd>٣ ليالٍ تحمل نتيجة</dd>
+        <dt>ماذا يحدث</dt><dd>نمط من بياناتها هي. ممنوع أن يحمل سعراً بقيد في النظام.</dd>
+        <dt>تخرج منها</dt><dd>البيانات تدعم هدفاً محدداً <em>← ح ٥</em></dd>
+        <dt>أو</dt><dd>لا تدعم — تبقى في ح ٣ بلا أي عرض</dd>
+      </dl>
+    </div>
+
+    <div class="state">
+      <div class="state-h"><span class="state-id">ح ٥</span><span class="state-name">اقتراح فصل</span></div>
+      <dl>
+        <dt>تدخلها</dt><dd>وجود هدف قابل للقياس، وضمن سقف تكرار صارم</dd>
+        <dt>ماذا يحدث</dt><dd>فصل مسمّى بهدف رقمي. أول ظهور للسعر.</dd>
+        <dt>تخرج منها</dt><dd>توافق <em>← ح ٦</em> · ترفض <em>← ح ٣ بلا تغيّر</em></dd>
+        <dt>حماية</dt><dd>الرفض لا يُتبَع بإلحاح. سقف صريح على عدد الاقتراحات.</dd>
+      </dl>
+    </div>
+
+    <div class="state pay">
+      <div class="state-h"><span class="state-id">ح ٦</span><span class="state-name">دفع معلّق</span></div>
+      <dl>
+        <dt>تدخلها</dt><dd>وافقت وذهبت لتدفع</dd>
+        <dt>ماذا يحدث</dt><dd>تراسل المؤسس، تحوّل، ترسل الإيصال. <strong>ولا يتوقف عنها شيء أثناء الانتظار.</strong></dd>
+        <dt>تخرج منها</dt><dd>يؤكد المؤسس <em>← ح ٧</em></dd>
+        <dt>أو</dt><dd>لا تُكمل — تعود إلى ح ٣ بلا أي إشارة إلى ذلك</dd>
+      </dl>
+    </div>
+
+    <div class="state pay">
+      <div class="state-h"><span class="state-id">ح ٧</span><span class="state-name">داخل الفصل</span></div>
+      <dl>
+        <dt>تدخلها</dt><dd>تأكيد الدفع</dd>
+        <dt>ماذا يحدث</dt><dd>السؤال الليلي كما هو + استباق قبل اللحظة الصعبة + مرايا أسبوعية</dd>
+        <dt>الساعة</dt><dd>تعدّ الليالي المسجّلة لا أيام النتيجة — الغياب لا يُكلّفها</dd>
+        <dt>تخرج منها</dt><dd>يتحقق الهدف أو يتضح تعذّره <em>← ح ٨</em></dd>
+      </dl>
+    </div>
+
+    <div class="state pay">
+      <div class="state-h"><span class="state-id">ح ٨</span><span class="state-name">التقرير</span></div>
+      <dl>
+        <dt>تدخلها</dt><dd>انتهى الفصل — نجح أو لم ينجح</dd>
+        <dt>ماذا يحدث</dt><dd>تقرير مكتوب: من أين بدأنا، وأين وصلنا، وما نجح، وما لم ينجح</dd>
+        <dt>تخرج منها</dt><dd>دائماً <em>← ح ٩</em></dd>
+      </dl>
+    </div>
+
+    <div class="state">
+      <div class="state-h"><span class="state-id">ح ٩</span><span class="state-name">مرافقة مستمرة</span></div>
+      <dl>
+        <dt>تدخلها</dt><dd>انتهى فصل</dd>
+        <dt>ماذا يحدث</dt><dd>تعود إلى المجاني كاملاً. الذاكرة تبقى. لا تحصيل ولا تذكير.</dd>
+        <dt>تخرج منها</dt><dd>مشكلة جديدة تظهر <em>← ح ٥ لفصل آخر</em></dd>
+        <dt>الاستمرار</dt><dd>قد تبقى هنا للأبد — وهذه نتيجة مقبولة تماماً</dd>
+      </dl>
+    </div>
+
+    <div class="state exit">
+      <div class="state-h"><span class="state-id">ح خ١</span><span class="state-name">صامتة</span></div>
+      <dl>
+        <dt>تدخلها</dt><dd>توقفت عن الردّ</dd>
+        <dt>ماذا يحدث</dt><dd>يقلّ الإيقاع ثم يتوقف. لا حملات استعادة.</dd>
+        <dt>تخرج منها</dt><dd>ترسل أي شيء <em>← تعود من حيث توقفت، بذاكرتها كاملة</em></dd>
+      </dl>
+    </div>
+
+    <div class="state exit">
+      <div class="state-h"><span class="state-id">ح خ٢</span><span class="state-name">أزمة</span></div>
+      <dl>
+        <dt>تدخلها</dt><dd>من <strong>أي</strong> حالة — يُذكر خطر أو أذى</dd>
+        <dt>ماذا يحدث</dt><dd>يتوقف كل شيء آخر: لا سؤال ليلي، ولا اقتراح، ولا سعر. لأسبوع على الأقل.</dd>
+        <dt>قاعدة مطلقة</dt><dd>الأزمة لا تُسعَّر أبداً، ولا تُستخدم مدخلاً لبيع</dd>
+        <dt>تخرج منها</dt><dd>بعد أن تهدأ <em>← تعود إلى حالتها السابقة</em></dd>
+      </dl>
+    </div>
+
+    <div class="state exit">
+      <div class="state-h"><span class="state-id">ح خ٣</span><span class="state-name">طلب المحو</span></div>
+      <dl>
+        <dt>تدخلها</dt><dd>تطلب حذف بياناتها</dd>
+        <dt>ماذا يحدث</dt><dd>تأكيد من خطوتين، ثم محو فعلي — لا «تعطيل»</dd>
+        <dt>تخرج منها</dt><dd>لا تعود. تصبح غريبة تماماً، كما لو لم تأتِ.</dd>
+      </dl>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2>ما الذي يعمل الليلة فعلاً</h2>
+  <p class="dek">نفس المسار أعلاه، لكن بعمود واحد إضافي: هل هو حيّ؟</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>الخطوة</th><th>الحالة الليلة</th><th>ما ينقص</th></tr></thead>
+      <tbody>
+        <tr><td>الفيديو ← تيليجرام</td><td><strong>يعمل</strong></td><td>غير مقاس إطلاقاً</td></tr>
+        <tr><td>أول تواصل والإنقاذ</td><td><strong>يعمل</strong></td><td>—</td></tr>
+        <tr><td>السؤال الليلي</td><td><strong>يعمل — بخطأ</strong></td><td>النسخة الصحيحة زمنياً مبنية وغير مفعّلة؛ مصر تُرسَل لها الساعة ٨ لا ٩</td></tr>
+        <tr><td>المرآة الأولى</td><td><span class="tag gap">لم تُطلق قط</span></td><td>مبنية، تنتظر التفعيل</td></tr>
+        <tr><td>اقتراح الفصل</td><td><span class="tag gap">مستحيل اليوم</span></td><td>لا توجد رحلة معدّة — المحرك بلا محتوى</td></tr>
+        <tr><td>الدفع</td><td><strong>يدوي، يعمل</strong></td><td>يمرّ عبر شخص واحد</td></tr>
+        <tr><td>الاستباق</td><td><span class="tag gap">غير مبني</span></td><td>الميزة المدفوعة الوحيدة — لا وجود لها</td></tr>
+        <tr><td>المرايا الأسبوعية</td><td><span class="tag gap">غير مبنية</span></td><td>الأولى فقط موجودة</td></tr>
+        <tr><td>التقرير النهائي</td><td><span class="tag gap">غير مبني</span></td><td>—</td></tr>
+        <tr><td>تصعيد الأزمة</td><td><span class="tag gap">بلا وجهة</span></td><td>يُرفع البلاغ إلى طابور لا يملكه أحد</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="reality">
+    <h2>الاستنتاج الذي يخصّك كمؤسس</h2>
+    <p>
+      المجاني كامل تقريباً: الإنقاذ والسؤال الليلي يعملان اليوم، والمرآة تنتظر ضغطة تفعيل.
+      هذا يكفي لاختبار السؤال الأهم — <strong>هل تعود الأم في الليلة الثالثة؟</strong>
+    </p>
+    <p>
+      المدفوع لا وجود له. لا رحلة معدّة، ولا استباق، ولا تقرير. أي أن السؤال
+      «هل تدفع؟» غير قابل للطرح بعد، لأنه لا يوجد ما يُسلَّم مقابل الدفع.
+    </p>
+    <p style="margin-bottom:0">
+      وهذا في رأيي ترتيب سليم لا مشكلة: شغّل المجاني، وانظر إن عادت الأمهات،
+      ثم ابنِ المدفوع لمن عاد. العكس — أن نبني الاستباق قبل أن نعرف أن أحداً يسجّل لياليه —
+      هو بناء في الظلام.
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2>أسئلة يجب أن تجيب عنها أنت، لا أنا</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>السؤال</th><th>لماذا يخصّك أنت</th></tr></thead>
+      <tbody>
+        <tr><td><strong>إلى أين يذهب بلاغ الأزمة؟</strong></td>
+            <td>هل أنت شخصياً؟ خلال كم ساعة؟ وماذا تفعل حين يصل؟ اليوم لا إجابة — وهذا واجب رعاية لا خيار منتج</td></tr>
+        <tr><td><strong>هل تقبل أن تكون أنت بوابة كل دفعة؟</strong></td>
+            <td>يكفي عند عشرة. ماذا عند مئة؟ ومن يؤكد الدفعات حين تنام؟</td></tr>
+        <tr><td><strong>هل السعر شهري أم لكل فصل؟</strong></td>
+            <td>الفرق جوهري: «شهر» يعني اشتراكاً، و«فصل» يعني نتيجة. المعمارية تقول فصلاً، والتسعير يقول شهراً</td></tr>
+        <tr><td><strong>ما أول رحلة نكتبها؟</strong></td>
+            <td>لا يمكن بيع شيء قبل وجودها. النوم هو المرشّح الأوضح من بياناتك</td></tr>
+        <tr><td><strong>هل تقبل ألا تدفع أغلبهن أبداً؟</strong></td>
+            <td>هذا نتيجة مباشرة لكون المجاني جيداً فعلاً. إن كان هذا غير مقبول تجارياً، فالحدّ يحتاج إعادة نظر — لا التنفيذ</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<p class="foot">
+  لا كود جديد حتى توافق. الرحلة أعلاه هي التي أوقفتُ التطوير عندها —
+  وأي تعديل تراه في التجربة نفسها الآن أرخص ألف مرة منه بعد البناء.
+</p>
+
+</div>
