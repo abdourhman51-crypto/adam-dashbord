@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "copywriting-tone-of-voice-creator": {
+      "source": "samber/cc-skills",
+      "sourceType": "github",
+      "skillPath": "skills/copywriting-tone-of-voice-creator/SKILL.md",
+      "computedHash": "f4880be34eeea3bdac7ac499cb5dd1f34e1c606fdec422ae89f11160eb88672b"
+    },
+    "discovery-process": {
+      "source": "deanpeters/product-manager-skills",
+      "sourceType": "github",
+      "skillPath": "skills/discovery-process/SKILL.md",
+      "computedHash": "501dffec798ac5bb7ecf07187fb688cdf867576c5b1666737ec03a85cd43c78e"
+    },
+    "jobs-to-be-done": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "skillPath": "jobs-to-be-done/SKILL.md",
+      "computedHash": "d2d74d9dafd1a2d7da3542fa330a907d465833689c11a6d6daf214ff4f265fb5"
+    },
+    "product-designer": {
+      "source": "borghei/claude-skills",
+      "sourceType": "github",
+      "skillPath": "product-team/product-designer/SKILL.md",
+      "computedHash": "6eead05d0c5b110e628095485983882bc3eb5ab2c519c188a51749d4f1beeb06"
+    },
+    "product-strategist": {
+      "source": "ncklrs/startup-os-skills",
+      "sourceType": "github",
+      "skillPath": "skills/product-strategist/SKILL.md",
+      "computedHash": "93a65b9a95009cc79b1a1f8dcbd6abc0482dd12e7d39aee8ff20d53c01484e71"
+    }
+  }
+}
