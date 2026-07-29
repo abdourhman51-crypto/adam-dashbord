@@ -124,26 +124,76 @@ Selling a program to a parent who has just disclosed hitting their child convert
 
 ## 3. The Journey architecture
 
+### 3.0 One ADAM — the governing constraint
+
+**A parent is never buying a product. She is continuing with ADAM.**
+
+Journeys are **chapters inside one lifelong relationship**, not items in a catalogue. This is not a naming preference — it changes six concrete design decisions, and any one of them left unchanged would leak the "separate products" feeling.
+
+| Decision | If Journeys are products | If Journeys are chapters *(correct)* |
+|---|---|---|
+| **Menu** | A list of Journeys with prices — a shop | **No catalogue exists.** ADAM proposes one thing at a time |
+| **Who chooses** | She browses and selects | **ADAM chooses**, explains why from her data, she confirms or redirects |
+| **Between chapters** | Relationship pauses; she is "not a customer" | **Nothing pauses.** The free rhythm never stops |
+| **The child's record** | Resets per Journey | **One record, growing forever**, across every chapter |
+| **Language of the ask** | "Buy the Sleep Journey" | **«نكمل»** — *we continue* |
+| **Time horizon** | Ends when the Journey ends | **Follows the child from 3 to 13** |
+
+**Arabic naming makes this structural:**
+- **رحلتنا** — *our journey* — the lifelong relationship. Singular. Never pluralised.
+- **مرحلة** — *a stage* — what they are working on now.
+- ADAM says: *«نحن في رحلة واحدة. الآن نقف عند مرحلة النوم.»*
+
+The product is never called "the Sleep Journey" in front of a parent. It is *"our stage right now."*
+
+### 3.0.1 The rule that keeps guidance from becoming selling
+
+Blueprint v1 banned proactive selling on hard evidence — 8 pushed offers, 0 clicks. But a companion who never guides is not a companion. The distinction:
+
+> **Guidance is free, proactive, and unconditional. The transaction is pull-only.**
+
+ADAM proactively tells her *what he thinks matters most next, and why*, with no price attached and no button. If she engages, the cost appears. If she says nothing, the guidance still stands and the free rhythm continues unchanged.
+
+This is what a doctor does: *"I think we should look at your knee next"* is care. Handing over an invoice unprompted is not.
+
 ### 3.1 Product shape
 
 ```
-FREE — always, everywhere, forever
-├── The Moment          rescue during any crisis, any topic
-├── Nightly log         one tap
-└── First Mirror        at 3 logged nights — the proof that earns the ask
-
-PAID — one Journey at a time
-├── Diagnosis           name the flashpoint, set the objective
-├── Phase 1  Observe    log without pressure to change
-├── Phase 2  Build      daily prep before the flashpoint + coaching
-├── Phase 3  Hold       ADAM fades; parent leads
-├── Mid Mirror          direction, not snapshot
-├── Final Report        child outcome + parent outcome
-└── Transition          evidence-based offer of the next Journey
-
-CUMULATIVE — free, unlocked by history
-└── Parent Mirror       after 2+ Journeys: the identity payoff
+ONE CONTINUOUS RELATIONSHIP  ── رحلتنا ──  never pauses, never resets
+│
+├─ ALWAYS FREE, EVERYWHERE, FOREVER
+│   ├── The Moment        rescue in any crisis, any topic, any stage
+│   ├── Nightly rhythm    one tap — continues between stages
+│   ├── First Mirror      at 3 logged nights
+│   ├── سجل الطفل         the child's record — one document, grows forever
+│   └── Parent Mirror     the identity payoff, after 2+ stages
+│
+└─ STAGES OF FOCUSED WORK  ── مرحلة ──  paid, one at a time
+    ├── ADAM proposes     from her data, free, no price attached
+    ├── Objective set     stated before she pays
+    ├── Phase 1 Observe   no pressure to change
+    ├── Phase 2 Build     daily anticipation + adaptive coaching
+    ├── Phase 3 Hold      ADAM fades; she leads
+    ├── Mid Mirror        direction
+    └── Stage report      child outcome + parent outcome
+         │
+         └──► rhythm continues free ──► ADAM proposes the next stage
 ```
+
+**The critical structural change:** a stage ending is not an exit. The nightly rhythm, the rescue, and the record all continue exactly as before. A stage is a period of **intensity**, not a period of **existence**.
+
+### 3.1.1 سجل الطفل — the record
+
+A single living document, free, that the parent can ask for at any time: *«سجل يوسف»*.
+
+| Contains | Source |
+|---|---|
+| What ADAM knows about this child | Every stage, every conversation |
+| Every stage completed, with its outcome | Stage reports |
+| What works for this child, and what doesn't | Pattern detection |
+| What changed, and when | Nightly logs |
+
+**Why this matters more than it looks.** Blueprint v1 struggled with a real problem: memory is the differentiator, yet *"nobody buys memory"* — your own prompt says so. The record solves it without selling it. It makes memory **a visible object she owns** rather than an invisible mechanism she is asked to pay for. It is the physical proof that this is one relationship, and it is free precisely because it must never feel like a hostage.
 
 ### 3.2 Anatomy of every Journey
 
@@ -224,17 +274,36 @@ This is a therapeutic mechanism, not a packaging limit: focus is what makes beha
 
 ---
 
-## 6. The transition — the growth engine
+## 6. The transition — continuity, not a sales cycle
 
-At a Journey's end, ADAM has been passively observing the *next* pattern all along, in free conversation and in logged hard-moments.
+At a stage's end, ADAM has been passively observing the *next* pattern all along, in free conversation and in logged hard-moments.
+
+**The sequence, and the timing, both matter:**
+
+| When | What happens | Paid? |
+|---|---|---|
+| Stage ends | Report delivered. **Nothing else.** | — |
+| That night, and every night after | Nightly rhythm continues, unchanged | **Free** |
+| Some days later, unprompted | ADAM names what he thinks matters next, **with no price and no button** | **Free** |
+| Only if she engages | What the stage involves, and its cost | Pull-only |
 
 ```
-«لاحظتُ شيئاً آخر يتكرر — في ٦ من ليالي هذه الرحلة، ذكرتِ شجاراً مع أخته.
-لم أتحدّث عنه لأننا كنّا نعمل على النوم.
-حين تكونين مستعدة، هذه رحلتنا القادمة.»
+«لاحظتُ شيئاً آخر يتكرّر — في ٦ من ليالي هذه المرحلة، ذكرتِ شجاراً مع أخته.
+لم أتحدّث عنه لأننا كنّا نعمل على النوم، والانتباه المقسوم لا يغيّر شيئاً.
+أرى أن هذا هو الأهم الآن.
+
+ولا شيء يتغيّر إن لم تكوني مستعدة — أنا هنا كل ليلة كما كنت.»
 ```
 
-**Why this is stronger than any upsell:** the offer is derived from her own logged data, arrives at a moment of success rather than distress, and names a problem she already knows she has. It is a diagnosis, not a pitch.
+**No price in that message. No button. No date.** It is a diagnosis delivered by someone who knows the child, and it stands whether or not she ever acts on it.
+
+**Why this is stronger than any upsell:** it derives from her own logged data, arrives at a moment of success rather than distress, names a problem she already knows she has, and costs her nothing to receive. She is not being sold a second product — she is being told what her child needs next by the companion who has been watching all along.
+
+### 6.1 The long arc
+
+Stages follow the child, not the customer. A 5-year-old's bedtime resistance becomes a 7-year-old's school mornings becomes a 9-year-old's screen conflict becomes a 12-year-old's withdrawal. **Same ADAM, same record, same relationship** — referencing what worked when the child was five.
+
+This is the honest retention story, and it is far stronger than a subscription: not "keep paying to retain access," but *"I have known your child since he was five."*
 
 ---
 
