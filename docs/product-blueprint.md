@@ -22,7 +22,7 @@
 | **D-F** | **Memory is derived from real signal**, never from a static content library | v1 did not forbid template content for proactive messages |
 | **D-G** | **Free is never deliberately degraded.** The free/paid difference is the *level of companionship*, never the quantity of memory or information | v1 §14 implied tiering by mechanism access |
 | **D-H** | **Paid value is expressed as outcome, never as technology.** No selling memory, reports, initiative, plans, or tracking | v1 §11.5 was literally a four-bullet feature list — the exact error v1 §4 diagnosed and then committed |
-| **D-I** | **Full-companionship discovery is deferred.** No discovery or gradual-selling system is designed now. TODO, no invention | v1 specified a "persistent quiet affordance" mechanism (F9) |
+| **D-I** | ~~Discovery is deferred~~ → **RESOLVED 2026-07-30. The discovery architecture is §33: four doors, no push, no product name, trust measured before conversion** | v1 specified a "persistent quiet affordance" with a conversion target (F9) |
 | **D-J** | **Telegram First.** Every interaction is audited for fewer taps: buttons, quick replies, pinned messages, menus, voice | v1 had the principle (P4) but no systematic audit |
 | **D-K** | **No implementation until this version is approved** | — |
 
@@ -65,6 +65,7 @@
 30. Decisions challenged and rejected
 31. Change log v1 → v2
 32. Open decisions requiring founder input
+33. **The discovery architecture (resolves D7)**
 
 ---
 
@@ -455,19 +456,23 @@ The last three follow the pattern this project has learned to trust: **make the 
 │  Carries no price and no offer, by constraint.      [T3]     │
 └──────────────────────────┬───────────────────────────────────┘
                            ▼
-┌─ ??? DISCOVERY OF FULL COMPANIONSHIP ────────────────────────┐
+┌─ DISCOVERY — four doors, no push (§33) ──────────────────────┐
 │                                                              │
-│   ███  TODO — DELIBERATELY UNDESIGNED (D-I)  ███             │
+│  Door 0  another parent mentions it        (highest trust)    │
+│  Door 1  bot menu + pinned line            (she looks)        │
+│  Door 2  she asks — about scope, or for    ← PRIMARY PATH     │
+│          work the free rhythm doesn't do                     │
+│  Door 3  ADAM says its own method isn't    (≤2 per lifetime)  │
+│          enough — free option offered first                  │
 │                                                              │
-│  How a parent learns full companionship exists is NOT        │
-│  specified. No trigger, no timing, no surfacing mechanism.   │
-│  If asked directly, ADAM answers (§11.8). Nothing initiates. │
-│  See §32 D7. No invention permitted here.                    │
+│  It has no product name. It is described, never announced.   │
+│  Test: remove the price — is the message still worth sending? │
 └──────────────────────────┬───────────────────────────────────┘
                            ▼
-┌─ FULL COMPANIONSHIP (paid) ──────────────────────────────────┐
+┌─ A MONTH AIMED AT ONE CHANGE (paid) ─────────────────────────┐
 │  Described in outcomes only (D-H). See §16.1 and §21.1.      │
 │  Manual payment → operator confirms → begins                 │
+│  The daily rhythm never pauses while payment is pending      │
 └──────────────────────────┬───────────────────────────────────┘
                            ▼
 ┌─ WEEKLY MIRRORS ─────────────────────────────────────────────┐
@@ -499,7 +504,7 @@ States are mutually exclusive except where marked orthogonal.
 | **S2** | `helped` | First step delivered | **Enough known to ground a Seed** | Enrol in the rhythm from the next morning |
 | **S3** | `in_rhythm` | First Seed sent | 3 Harvests logged | **Daily Seed + Harvest.** Learning the situation |
 | **S4** | `recognised` | First Mirror delivered | — | Rhythm continues; weekly cadence |
-| **S5** | *(discovery)* | **TODO — undesigned (D-I)** | — | **No system enters this state. §32 D7** |
+| **S5** | `considering` | **A door opened (§33)** — she asked, or Door 3 fired | She asks to proceed, or declines, or says nothing | Answer once, in outcomes. Then silence. **The rhythm continues unchanged** |
 | **S6** | `payment_claimed` | Parent states they paid | Operator confirms or 72h timeout | Warm acknowledgement; **rhythm uninterrupted** |
 | **S7** | `chapter_active` | Payment confirmed | Objective met, or month of logged days complete | Full companionship |
 | **S8** | `chapter_complete` | End-of-month delivered | — | Returns to S4 rhythm, fully intact |
@@ -522,7 +527,7 @@ States are mutually exclusive except where marked orthogonal.
 ### 10.3 State transition rules
 
 1. **No transition may skip S1→S2.** Value before any other behaviour. (P2)
-2. **Nothing may enter S5.** The discovery mechanism is undesigned. Any implementation that surfaces, hints at, or times an offer is out of scope until §32 D7 is answered. (D-I)
+2. **S5 may be entered only through a door in §33.** Doors 0–2 are parent-initiated. Door 3 is the sole system-initiated path and requires every condition in §33.4 — a scoring model that decides who is "ready" is explicitly banned, because that is what the Judge was. **A decline returns her to her prior state with nothing changed and no second mention, ever.**
 3. **X1 suppresses S6–S8 messaging and the daily rhythm** for the duration plus 7 days.
 4. **X2 never blocks S0–S4.** Payment geography gates S6 onward only. (P8)
 5. **S9 permits exactly one reactivation message per parent lifetime** — not one per dormancy.
@@ -685,33 +690,79 @@ ADAM: الشهر اكتمل.
 
 **Continuation, if any, is a separate message — never the same one.** Achievement and commerce do not share a bubble (P1).
 
-### 11.8 If asked about full companionship (D-H, D-I)
+### 11.8 When a door opens (D-H, and §33 for the architecture)
 
-**Nothing in the system initiates this.** No trigger, no timing, no hint, no button, no pinned mention. See §32 D7.
+Four doors exist, and only one of them is ADAM speaking first. Full trigger rules, conditions and bans are in **§33**. This section is the copy.
 
-**If the parent asks directly**, ADAM answers — in outcomes, never in contents:
+#### 11.8a — She asks for work the free rhythm does not do · **the primary path**
+
+This is the most valuable moment in the product, and the discipline is absolute: **answer the question completely and for free, first.**
 
 ```
-ADAM: المساحة التي نحن فيها الآن تبقى كما هي، دائماً، بلا مقابل.
+PARENT: إزاي أعرف إن الليلة دي هتكون صعبة قبل ما تبدأ؟
 
-      والمرافقة الكاملة شهر نمشيه معاً نحو حالة واحدة:
-      بيت تنتهي فيه الليلة دون معركة، ومعرفة ما يهدّئ يوسف قبل أن يبدأ.
+ADAM:   من أيامكم: الليالي الصعبة كلها تقريباً كانت في أيام
+        بلا قيلولة، أو بعد يوم خارج البيت.
 
-      {price} — مرة واحدة، لشهر.
-      وإن لم يتغيّر شيء ملموس، الشهر التالي عليّ.
+        فعلياً: لو مرّ اليوم بلا نوم بعد الظهر — توقّعي ليلة أطول،
+        وابدئي الروتين أبكر بعشرين دقيقة.
+
+        هذا ما أعرفه، وهو لكِ.
 ```
 
-**Compare with what v1 specified:**
+**Nothing further.** She asked how to know; she now knows. The answer is complete and free.
+
+Only if she then asks for the *doing* — *"تقدر تعمل ده كل يوم؟"* / *"ذكّرني بنفسك قبل الوقت الصعب"* — does ADAM name that the continuous version is a different arrangement:
+
+```
+ADAM: هذا ما أفعله في شهر موجَّه: أتكلم قبل الوقت الصعب لا بعده،
+      كل يوم، من دون أن تسألي.
+
+      الآن أنا معكِ حين تسألين — وهذا يبقى دائماً.
+      {price} للشهر، مرة واحدة.
+```
+
+> **The line this depends on: knowing is always free; doing it every day is the paid thing.**
+> No information is ever withheld. What costs money is labour, not knowledge. (§33.4)
+
+#### 11.8b — She asks about scope
+
+```
+PARENT: آدم مجاني بالكامل؟
+
+ADAM:   ما نحن فيه الآن مجاني ويبقى كذلك — الحديث في أي وقت،
+        وفكرة كل صباح، وسؤال كل مساء.
+
+        وهناك شهر موجَّه نحو حالة واحدة: بيت تنتهي فيه الليلة
+        دون معركة، ومعرفة ما يهدّئ يوسف قبل أن يبدأ.
+        {price} — مرة واحدة، لشهر.
+        وإن لم يتغيّر شيء ملموس، الشهر التالي عليّ.
+```
+
+Then stop. No follow-up, no second mention.
+
+#### 11.8c — Door 3, the honest limit
+
+Copy and the nine required conditions are in **§33.4**. It fires at most twice in a parent's lifetime, never after a hard night, and always carries a free alternative as the default.
+
+#### 11.8d — v1's version, kept on the page as the error to avoid
+
+v1 specified the offer as this:
 
 > أعرف طبع {child} وما يفجّر الموقف ومايهدّئه
 > خطوة كل يوم مفصّلة عليه هو
 > وفي نهاية الشهر، تقرير يريكِ بالضبط كم تغيّرتِ
 
-Three bullets: memory, a plan, a report. **That is a feature list — the precise error v1 §4 identified and then committed forty lines later.** No parent wants a report. They want the night to end without a fight.
+Three bullets: **memory, a plan, a report.** That is a feature list — the precise error v1 §4 identified and then committed forty lines later. No parent wants a report. They want the night to end without a fight.
+
+Two further defects in that copy, both now fixed:
+
+- It named the thing **"المرافقة الكاملة"** — implying what she already has is partial, which contradicts P15. It has no name now (§33.6).
+- It was **pushed** by a scoring model. Nothing pushes it now (§33).
 
 **The test every commercial sentence must pass (P16):** does it answer *"what will my life be like in a month?"* — or *"what is included?"* If the second, it is rewritten or deleted.
 
-**"ليس الآن" response:**
+**Any decline — a tap, a "not now", or silence:**
 ```
 ADAM: لا شيء يتغيّر بيننا. أنا هنا كل صباح ومساء كما كنت. 🌿
 ```
@@ -846,7 +897,7 @@ Every interaction, audited against: *can this be a tap instead of typing?*
 | **Harvest answer** | 3 inline buttons | Unchanged — already optimal | — |
 | **Hard-moment tag** | 6 inline buttons | Unchanged | — |
 | **View progress** | Type `/تقدمي` | **Bot menu command + pinned message** | Typing → 1 tap |
-| **Ask about companionship** | Type a question | **Bot menu entry** *(surfacing still TODO — D-I)* | Typing → 1 tap |
+| **Ask whether ADAM can do more** | Type a question | **Bot menu entry, worded as her own question** (Door 1, §33.4) | Typing → 1 tap |
 | **Claim payment** | Type + send image | **Send image only**; caption optional | 1 step removed |
 | **Pause messages** | Type `/إيقاف` | **Bot menu + a button on any proactive message** | Typing → 1 tap |
 | **Resume** | Any message | Unchanged | — |
@@ -1021,18 +1072,20 @@ Every feature answers four questions.
 | **Problem** | A father addressed as a mother learns in one message that the product was not built for him |
 | **Measure** | 100% of user-facing strings exist in three forms; 0 gendered strings sent to unknown-gender parents |
 
-### ~~F16 — Discovery of full companionship~~
+### F16 — The discovery architecture (**NEW**, resolves D7)
 
-> ### ███ TODO — NOT DESIGNED (D-I) ███
->
-> No trigger. No timing. No surfacing mechanism. No "quiet affordance."
->
-> v1 specified F9 as *"a persistent, quiet affordance, never pushed"* with a target of *"≥10% of S4 parents open it unprompted."* That is a designed discovery mechanism carrying a conversion target, and it is now out of scope.
->
-> **In scope:** if a parent asks directly, ADAM answers (§11.8).
-> **Out of scope:** anything that causes a parent to think to ask.
->
-> See §32 D7. **No invention permitted.**
+| | |
+|---|---|
+| **Why** | The paid layer is unreachable without it, and the old mechanism destroyed trust: 8 offers, 0 clicks, 4 of 8 never returned |
+| **Evidence** | *"انت طلعت بفلوس اخص عليك"* — the observed reaction to being surprised by a price inside an emotional relationship |
+| **Problem** | In a conversation there is no periphery to explore, so every discovery is an utterance. The problem is not *how to make it passive* but *which utterance a trustworthy companion would make anyway* |
+| **Measure** | **Trust first:** block/mute rate after any door ≤ baseline; dormancy after a decline ≤ baseline. **Conversion is observed and never targeted** |
+
+Four doors, specified in **§33**: another parent · the bot menu and pinned line · the parent asking (the primary path) · and, at most twice in a lifetime, ADAM saying its own method is not enough — with the free alternative offered first and set as the default.
+
+**It has no product name** (§33.6), which makes a pricing page impossible to build and forces every description into outcome language.
+
+**v1's F9 carried a conversion target** — *"≥10% of S4 parents open it unprompted."* A target on a discovery mechanism is an instruction to optimise it, and optimising discovery is how a companion becomes a funnel. **There is no conversion target anywhere in §33.**
 
 ---
 
@@ -1298,8 +1351,12 @@ NORTH STAR: Accompanied Parents
    │     Situation identified           ≥60% of S4
    │     Step-success rate trend
    │
+   ├── DISCOVERY  (§33 — observed, never targeted)
+   │     Door distribution 0/1/2a/2b/3  observe
+   │     Door 2b per 100 in rhythm      observe  (demand signal)
+   │     Conversion per door            observe  — ranked LAST, deliberately
+   │
    ├── MONETIZATION
-   │     (discovery metrics deliberately absent — D-I)
    │     Claim → confirmed              ≥95%
    │     Month completion               ≥70%
    │     Continuation                   ≥25%
@@ -1310,11 +1367,15 @@ NORTH STAR: Accompanied Parents
          Seeds sent in X1               0     (hard zero)
          Ungrounded Seeds               0     (hard zero)
          Gendered strings to unknown    0     (hard zero)
-         Block/mute rate                <2%
+         Second mention after decline   0     (hard zero)
+         Block/mute after any door      ≤ baseline
+         Block/mute after Door 3        < 2× baseline, else Door 3 OFF
+         Dormancy within 14d of decline ≤ baseline
+         Block/mute rate overall        <2%
          Hallucinated price incidents   0     (hard zero)
 ```
 
-**Note on the MONETIZATION branch.** v1 had `Mirror → ask opened ≥30%` and `Ask → payment claimed ≥20%`. Both presume the discovery mechanism D-I defers. They are **removed rather than retargeted**, because a metric for an undesigned system is an invitation to design it.
+**Note on the DISCOVERY branch (§33.8).** v1 had `Mirror → ask opened ≥30%` and `Ask → payment claimed ≥20%`. Both are **removed rather than retargeted.** Discovery now carries *no conversion target at all* — only observation — because a target on a discovery mechanism is a standing instruction to optimise it, and an optimised discovery mechanism is a funnel. The metrics that *are* targeted here are all counter-metrics: block rate, dormancy after a decline, Harvest rate after a decline. **Trust is the thing under test; conversion is merely reported.**
 
 ### Guardrail metrics — a breach halts the roadmap
 
@@ -1438,6 +1499,10 @@ Ordered by information value per day of effort.
 | **E7** | **Gulf concierge test** | Waitlisted high-ATP parents will pay | 0/10 pay | Days, no engineering |
 | **E8** | **Voice input** | Voice increases depth and activation | No lift | Medium |
 | **E9** | **Price test** | $10 is right for EG | Both arms <2% | Config |
+| **E10** | **Door 2b frequency** *(new)* | Parents spontaneously ask for continuous help often enough for Door 2 to carry the model | <2 occurrences per 100 parents in rhythm per month → Doors 0–2 cannot sustain revenue and §33.10's tension is worse than estimated | **Observation only — zero build** |
+| **E11** | **Door 3 trust cost** *(new)* | Naming ADAM's own insufficiency does not damage the relationship | Block/mute > 2× baseline, or dormancy-after-decline above baseline → **Door 3 switched off permanently** | Low — instrument before enabling |
+
+**E10 is free and should start the day the rhythm ships.** It requires no build: count how often parents ask for continuous help unprompted. That number determines whether Doors 0–2 can carry a business, and it is knowable *before* Door 3 is built. If it is high, Door 3 may never be needed — which would be the best possible outcome, since Door 3 is the only door that speaks first.
 
 **E1 is the most important experiment in this document.** The entire v2 thesis is that a *grounded* Seed is categorically different from a parenting tip. If a generic tip performs equally well, then P11 and D-C are wrong, memory is not the heart of the product, and the free rhythm is a content channel rather than a relationship. **That is worth knowing before building the memory layer F6 assumes.**
 
@@ -1480,7 +1545,8 @@ Ordered by information value per day of effort.
 | Item | Rationale |
 |---|---|
 | Weekly Mirror + end of month (F9, F10) | Completes the paid experience |
-| **Answer §32 D7, then design discovery** | The paid tier is unreachable until this exists |
+| **Discovery Doors 0–2 (§33)** | Menu entry, pinned line, and the Door 2 answers. **No new machinery — Door 2 is answering a question honestly** |
+| **Door 3, only after E11 instrumentation** | The single system-initiated path. Built last, enabled last, killable on evidence |
 | Situation depth (F8) | Multi-week pattern tracking |
 | Continuation offer | Real retention test |
 | Speech/development track | #3 theme (98 messages), entirely unserved |
@@ -1526,7 +1592,9 @@ Ordered by information value per day of effort.
 | **R2** | **The Seed becomes a tip library** — the path of least resistance whenever Knowledge is thin | 🔴 Critical | P11 as a hard block, `ungrounded_send_blocked` metric, 100% floor. **Prefer silence** |
 | **R3** | **Two proactive messages a day is too many** | 🟠 High | Ceiling of 2 (§13.3); `harvest_ignored` streaks; decay to weekly then stop |
 | **R4** | **Exposed credentials** — plaintext service-role key and bot tokens in workflow JSON | 🟠 High | Week 0, item 1 |
-| **R5** | **The paid tier is unreachable** — no discovery mechanism exists, by design | 🟠 High | Accepted deliberately. **Revenue stays ~0 until D7 is answered. This is a choice, not an oversight** |
+| **R5** | **Low conversion by construction.** The better the free rhythm is, the less often a parent hits a wall that makes the fuller arrangement obvious | 🟠 High | **Accepted, not mitigated.** §33.10. Free quality and conversion are in direct tension and the non-negotiables resolve it toward free quality. Size the business for a small paying minority |
+| **R13** | **Door 3 reads as "pay to fix your failure"** despite locating the fault in ADAM's method | 🟠 High | Never fires within 3 days of a hard night; free option first and default; E11 measures it; **kill switch at 2× baseline block rate** |
+| **R14** | **Door 2b never happens often enough** to carry revenue, leaving Door 3 as the only real path — which is the fragile one | 🟠 High | E10 measures this for free before Door 3 is built. If Door 2b is rare, the honest response is to revisit §16.1's boundary, **not to make Door 3 pushier** |
 | **R6** | **Free-everywhere burns cash** | 🟠 High | Weekly cost/parent monitoring; generous but finite fair-use |
 | **R7** | **Founder is the payment rail** | 🟠 High | Fine now; binding at ~50 customers |
 | **R8** | **Advice quality in violence-adjacent situations** | 🟠 High | Weekly human review sample; hardened refusals |
@@ -1537,7 +1605,9 @@ Ordered by information value per day of effort.
 
 **R2 is the risk most likely to actually happen.** When Knowledge is thin, generating a plausible generic tip is easy and sending nothing feels like failure. It is not: under P11, silence is correct. That is why the floor is a hard 100% and why `seed_skipped` carries reasons.
 
-**R5 is worth reading twice.** Deferring discovery means revenue stays near zero. That is the direct consequence of D-I, accepted knowingly.
+**R5 is worth reading twice, and it is no longer about deferral.** Discovery now exists (§33), and conversion is *still* expected to be low — because a companion that genuinely works rarely produces the moment where a fuller arrangement becomes obvious. That is the honest price of P15 and D-G, and §33.10 states it without softening.
+
+**R13 and R14 together define the one real decision left here.** If Door 2b is rare (E10) and Door 3 is costly (E11), then Doors 0–2 cannot fund the business, and the correct response is to revisit the free/paid boundary in §16.1 — a founder decision — rather than to add pressure to the doors, which is nobody's decision to make.
 
 ---
 
@@ -1556,7 +1626,10 @@ Ordered by information value per day of effort.
 | **The fixed 21:00 send hour** *(new)* | D-E. Asks about bedtime before bedtime |
 | **The mother-only default** *(new)* | D-A. 18.5% of the audience is male |
 | **The word الاحتواء in any user-facing string** *(new)* | D-B |
-| **Any "quiet affordance" offer mechanism** *(new)* | D-I. Deferred, not redesigned |
+| **Any scoring model that decides who is "ready" to be offered** *(new)* | This is what the Judge was. 8 offers, 0 clicks. Banned in §33.5 |
+| **The name "المرافقة الكاملة"** *(new)* | "Full" implies what she has is partial, contradicting P15. It has no name now (§33.6) |
+| **Any launch announcement to the existing 291 parents** *(new)* | It would be exactly the surprise §33 exists to prevent |
+| **Any conversion target on a discovery mechanism** *(new)* | A target is an instruction to optimise, and optimised discovery is a funnel (§33.8) |
 | `main_pain` fixed 8-value enum | Missed the #3 theme (98 messages) |
 | Uncapped reactivation | Re-engaging someone who left is how you get muted |
 | Hardcoded credentials in nodes | Bypasses RLS on intimate data |
@@ -1594,7 +1667,8 @@ Ordered by information value per day of effort.
 | End-of-month | NEXT | F10 |
 | Situation depth | NEXT | F8 |
 | Operator console | NEXT | F11 |
-| **Discovery of full companionship** | **BLOCKED** | §32 D7 |
+| Discovery Doors 0–2 | NEXT | F16, §33 |
+| Discovery Door 3 | NEXT — **built and enabled last**, after E11 | F16, §33.4 |
 
 ---
 
@@ -1608,7 +1682,10 @@ Ordered by information value per day of effort.
 | **Tier memory depth (free = 7 days)** *(new)* | **Deliberately crippling the product to create a reason to pay.** Violates P15 and D-G. Also self-defeating: shallow memory makes the free Seed generic, which breaks P11 |
 | **Send a generic tip when memory is thin** *(new)* | Converts the rhythm into a content channel and destroys the only differentiator (P11). Silence is correct |
 | **Ask gender at onboarding** *(new)* | Violates P2. Gender is inferable from the parent's own grammar; the neutral default costs nothing while unknown |
-| **Design discovery now anyway** *(new)* | Explicitly deferred (D-I). Inventing a mechanism the founder has not decided on is how v1 ended up with a "quiet affordance" nobody asked for |
+| **Pure passive discovery — "let them find it like an app feature"** *(new)* | **The founder's own framing, and it was adopted as the frame but rejected as the mechanism.** An app has periphery to wander into; a conversation has none — everything in it is foreground. So "passive" discovery in a chat is a category error. Telegram's menu and pinned message are the only real periphery, and they became Door 1 (§33.2) |
+| **A "quiet affordance" with a conversion target** | v1's F9. A target on a discovery mechanism is a standing instruction to optimise it, and optimised discovery is a funnel (§33.8) |
+| **Giving the paid arrangement a product name** *(new)* | Names belong to products that appeared. An extension of a relationship is described, in context, each time. Naming it also makes a pricing page buildable, and forces feature-list copy (§33.6) |
+| **Door 3 firing on a timer or a message count** *(new)* | That is the Judge with different arithmetic. It fires only on evidence that ADAM's own method is failing this family (§33.4) |
 | **Build a mobile app** | Adds a surface with no evidenced job |
 | **Sell a course** | Competes with our own free content; serves *knowing*, which is not the gap |
 | **Ads** | Destroys the no-judgement trust that is the moat |
@@ -1657,7 +1734,25 @@ Every section that changed, what changed, and which decision drove it.
 | **28** | Risks | **A1/A2 new, both fatal.** **R2 (the Seed becomes a tip library) is the most likely risk to materialise.** **R5 states plainly that revenue stays ~0 until D7 is answered** | D-C, D-D, D-I |
 | **29** | Remove/keep/build | Five new removals: feature-list copy, the fixed 21:00 hour, the mother-only default, الاحتواء in user strings, any quiet-affordance mechanism | D-A, B, E, H, I |
 | **30** | Rejected | **Four new rejections**, including *tier memory depth* and *send a generic tip when memory is thin* — the two shortcuts most likely to be proposed later | D-F, D-G, D-I |
-| **32** | Open decisions | **Three new: D7 discovery, D8 month-vs-chapter, D9 the DZD figure** | D-I |
+| **32** | Open decisions | **Three new: D7 discovery, D8 month-vs-objective, D9 the DZD figure** | D-I |
+
+### Revision 2026-07-30 — D7 resolved
+
+| § | What changed | Why |
+|---|---|---|
+| **0** | D-I struck through and marked **RESOLVED → §33** | Approved |
+| **9** | The TODO block in the journey replaced by the four doors | Integration |
+| **10** | **S5 is now a real state** (`considering`), enterable only through a door. Rule 2 rewritten: a decline returns her unchanged with **no second mention ever** | The four-of-eight who never returned |
+| **11.8** | **Split into 11.8a–d.** New 11.8a is the primary path — she asks for continuous help, ADAM answers the question fully and free *first*. New 11.8b scope answer. 11.8d keeps v1's feature-list offer on the page as the error to avoid | D-H + §33.4 |
+| **15** | **F16 is now a real feature** with trust-first measures, replacing the struck-through TODO. v1's ≥10% conversion target named as the defect | §33.8 |
+| **23** | **New DISCOVERY branch — observation only, no targets.** Four new guardrails including a Door 3 kill switch and dormancy-after-decline | §33.8 |
+| **26** | **E10 Door 2b frequency** (free, zero build, start immediately) and **E11 Door 3 trust cost** (instrument before enabling) | R13, R14 |
+| **27** | Doors 0–2 in NEXT; Door 3 built and enabled last | Risk ordering |
+| **28** | **R5 rewritten** — no longer about deferral, now about low conversion being structural. **R13** Door 3 misreading, **R14** Door 2b too rare | §33.10 |
+| **29** | Four new removals: scoring models, the name "المرافقة الكاملة", any launch announcement, any conversion target on discovery | §33.5 |
+| **30** | **The founder's own "discover it like an app feature" framing recorded as adopted-as-frame, rejected-as-mechanism**, with the reason. Plus: no product name, no timer-based Door 3 | §33.2, §33.6 |
+| **32** | D7 struck through. **D8 now carries a recommendation** — an objective with a month as its ceiling | — |
+| **33** | **New section: the discovery architecture** | D7 |
 
 **Sections unchanged in substance:** §19 growth loop.
 
@@ -1675,13 +1770,286 @@ These are **not** product decisions and I have deliberately not made them.
 | **D4** | **Which market to open first** if E7 succeeds — Saudi (highest ATP) or Iraq (largest volume) | Depends on access to a payment agent | Blocks post-E7 planning |
 | **D5** | **What happens to the existing 291 parents and 4,212 conversations** on migration — carry memory forward, or fresh start with continuity messaging? | Relationship decision, not technical | Blocks week 1 |
 | **D6** | **Whether ADAM ever says it is an AI.** One parent asked directly: *"هل انت ذكاء اصطناعي مجاني ام مدفوع"* | Positioning and ethics call | Should be settled before scale |
-| **D7** | **How a parent ever learns full companionship exists.** *(new — D-I)* No hint, no button, no timing, no mechanism is designed. Today only a direct question reaches it | You deferred this deliberately. Any mechanism I invent would be me deciding your commercial posture | **Blocks all revenue.** See R5 |
-| **D8** | **Is the paid unit a month, or a chapter with an objective?** *(new)* The architecture describes a chapter with a measured objective and an ending. The price is quoted monthly. A month implies a renewing subscription; a chapter implies a result | It determines what is being promised, which is a positioning decision | Blocks §11.8 copy and §16 naming |
+| ~~D7~~ | ~~How a parent learns the fuller arrangement exists~~ **RESOLVED 2026-07-30 → §33.** Four doors; no push; no product name; trust measured before conversion; Door 3 killable on evidence | Approved in principle | **No longer blocking** |
+| **D8** | **Is the paid unit a month, or an objective?** *(new)* The architecture describes an objective with an ending; the price is quoted monthly. A month implies a renewing subscription; an objective implies a result. **My recommendation: an objective, with a month as its ceiling** — "خمس ليالٍ هادئة من سبع، وسقفه شهر". It keeps the promise falsifiable, survives §33.6's no-name rule, and makes the end-of-month a verdict rather than an invoice. **But it means committing to an outcome you cannot fully control, which is a business-risk call, not a product one** | It determines what is promised | Blocks §11.8 copy |
 | **D9** | **Confirm the DZD price.** *(new)* Legacy code used 2,300 DZD, materially above $10 at the official rate | Pricing decision | Blocks week 0 |
 
-**D1 remains the true blocker for scale. D7 is the true blocker for revenue.** They are different kinds of blocked: D1 is a duty-of-care limit on how far the product may grow; D7 is a deliberate choice to have no sales mechanism until you decide what it should be.
+**D1 is now the only true blocker.** D7 is resolved in §33, so revenue is no longer architecturally unreachable — though §33.10 is explicit that it will be low by construction, and that is a consequence of your own non-negotiables rather than a flaw in the mechanism.
 
 Everything else can proceed in parallel.
+
+---
+
+## 33. The discovery architecture (resolves D7)
+
+**Status:** approved in principle 2026-07-30. This section replaces the deferral in D-I.
+
+### 33.1 The problem, stated precisely
+
+The old model produced *"انت طلعت بفلوس اخص عليك"* — "so you turned out to be after money, shame on you." Eight proactive offers, zero clicks on either button, and four of the eight parents never returned.
+
+That is **two** failures, not one:
+
+1. **Surprise.** The offer contradicted what the parent believed the relationship was.
+2. **Attribution.** It arrived because a scoring machine decided she was ready — not because anything in *her* situation called for it. She could feel the difference.
+
+Fixing only the wording fixes neither. The architecture has to make both impossible.
+
+### 33.2 Why passive discovery is impossible in a conversation
+
+The founder's instinct was: *let the parent discover it the way you discover features in an excellent app.*
+
+**The instinct is right. The analogy does not transfer.** An app has **periphery** — menus, settings screens, greyed-out controls, a "Pro" badge in a corner. A user can wander and find things at their own initiative, and nobody said anything.
+
+**A conversation has no periphery.** Everything in it is foreground. There is no elsewhere to wander into. Therefore, in a chat product, *every* discovery is an utterance, and every utterance has an initiator. "Passive discovery" in a conversation is a category error.
+
+So the design question is not *how do we make discovery passive.* It is:
+
+> **What utterance about a fuller arrangement would a trustworthy companion make anyway — even if there were nothing to sell?**
+
+Everything in this section follows from that reframe.
+
+**One genuine exception, and it is why Telegram matters.** Telegram gives ADAM two non-conversational surfaces: the **bot menu** and the **pinned message**. These are the only true periphery the product has. This is where the founder's instinct actually lands — and it lands *only* because of the channel.
+
+### 33.3 The test every discovery moment must pass
+
+> **Remove the price. Is the message still worth sending?**
+>
+> If no, it is a sales pitch wearing a companion's voice. Delete it.
+
+This test is what separates this architecture from the one that produced the betrayal. Every door below passes it. Door 3 passes it only because it carries a free alternative — remove the paid option and the message still helps.
+
+### 33.4 The four doors
+
+| Door | Who initiates | Frequency | Honest expectation |
+|---|---|---|---|
+| **Door 0 — Another parent** | A third party | Organic | Highest trust of all. Nobody with an interest is speaking |
+| **Door 1 — Ambient** | Nobody. It simply exists | Always available | **Low conversion. It is the ethical floor, not a growth lever** |
+| **Door 2 — Asked for** | The parent | Whenever it arises | **The primary path.** The parent has already described the thing |
+| **Door 3 — The honest limit** | ADAM, at most twice ever | Rare | Moderate, and the most fragile. Killable on evidence |
+
+---
+
+#### Door 0 — Another parent
+
+Already specified as the referral loop (§20). Named here because **it is the best discovery channel we have and it is not a sales mechanism at all.** A parent hearing it from another parent hears it from someone with nothing to gain.
+
+Nothing new is built. It is listed so that the discovery architecture is not mistaken for "the three things ADAM says."
+
+---
+
+#### Door 1 — Ambient (zero utterances)
+
+| Surface | Content | Rule |
+|---|---|---|
+| **Bot menu** | One entry, worded as the parent's own question | Never a product name |
+| **Pinned message** | The child's current situation and the rhythm, with one quiet closing line | Updated silently; never re-pinned as a notification |
+
+**The menu entry is worded as a question, not an offer:**
+
+```
+هل يمكن لآدم أن يرافقني أكثر؟
+```
+
+Not "الاشتراك", not "المرافقة الكاملة", not "الخطط". A parent who is curious recognises their own question. A parent who is not sees a line that makes no demand.
+
+**Honest expectation:** most parents will never open a bot menu. Door 1 converts close to nothing, and **that is not why it exists.** It exists so that (a) a self-directed parent can find out without having to ask a person, and (b) we never depend on "but we did tell her." Calling it a growth lever would be self-deception.
+
+---
+
+#### Door 2 — Asked for · **the primary path**
+
+Two kinds, and the second is the most valuable moment in the entire product.
+
+**2a — She asks about scope.** *"هل هناك نسخة مدفوعة؟"* · *"آدم مجاني بالكامل؟"*
+
+Answer honestly and completely, then stop. Copy in §11.8. No elaboration, no follow-up, no second mention.
+
+**2b — She asks for work the free rhythm does not do.**
+
+Real requests of this shape:
+
+- *"ذكّرني بكرة قبل المدرسة"*
+- *"تقدر تسألني الساعة ٦ قبل ما نخرج؟"*
+- *"خليك معايا في الموضوع ده شهر"*
+- *"إزاي أعرف إن الليلة دي هتكون صعبة قبل ما تبدأ؟"*
+
+**She has just described the paid arrangement in her own words.** Nothing was pitched. There is no surprise available, because the idea came from her. This is the highest-intent, lowest-pressure moment that exists, and it requires zero initiation from us.
+
+**The discipline that makes this safe — and it is absolute:**
+
+> **Answer the question fully and for free, first.** (P6)
+
+If she asks how to tell a hard night is coming, ADAM tells her — completely, with the actual pattern from her own data. Only *after* that, and only if what she asked for is **continuous doing** rather than **knowing**, does ADAM say that the continuous version is a different arrangement.
+
+This yields the line that defines the whole free/paid boundary:
+
+> ### Knowing is always free. Doing it for her, every day, is the paid thing.
+
+That line is defensible in a way "more features" never was. It withholds no information. It distinguishes **information from labour** — and labour is the only thing that can honestly cost money in a product whose entire moat is trust.
+
+It is also consistent with everything already decided: P15 (free never crippled), D-G (difference is the level of companionship), D-H (sell the destination), and §21.1 (never say memory, say the outcome).
+
+---
+
+#### Door 3 — The honest limit
+
+The one case where ADAM initiates. It exists because **silence is not always neutrality.** When ADAM can see that the way it is working is not enough for what this family is facing, saying nothing withholds something true and useful. A good companion says *"I don't think what I'm doing is helping enough."*
+
+**Every condition below is required. Any one missing, and it does not fire.**
+
+| Condition | Threshold | Why |
+|---|---|---|
+| Same Situation unresolved across | **≥12 Harvests** | Long enough to be a pattern, not a bad week |
+| Failure rate on that Situation | **≥60%** answered *"جرّبناها وما نجحت"* | The method is demonstrably not landing |
+| Days since the last hard night | **≥3** | **Never immediately after a failure.** Not harvesting a low moment |
+| Crisis state | Never in X1, and not for **14 days** after it clears | P1 |
+| Parent state | Not S9 dormant, not X4 paused | Respect the silence |
+| Per Situation | **Once** | — |
+| Per parent lifetime | **Maximum 2**, ≥90 days apart, and on a *different* Situation | — |
+| A free alternative in the same message | **Required** | §33.3 — without it, this is a pitch |
+| Never within the same conversation turn as a Mirror | Required | The Mirror must stay uncontaminated (§11.5) |
+
+**The message locates the insufficiency in ADAM, never in the parent:**
+
+```
+ADAM: أريد أن أقول شيئاً بصراحة.
+
+      منذ أسبوعين ونحن ندور حول نوم يوسف. فكرة كل صباح، وسؤال كل مساء —
+      وتسع مرات من اثنتي عشرة لم تنجح.
+
+      العيب في طريقتي لا فيكم: فكرة واحدة في اليوم لا تكفي لموقف
+      متجذّر مثل هذا.
+
+      أمامنا طريقان — والأول هو ما سأفعله إن لم يُقَل شيء:
+      نغيّر الموقف الذي نعمل عليه، ونعود إلى النوم لاحقاً.
+      أو شهر موجَّه لهذا وحده، أرافق فيه يوماً بيوم لا مرة في اليوم.
+
+      [نغيّر الموقف]   [أخبرني عن الشهر]   [نكمل كما نحن]
+```
+
+**Five deliberate choices in that message:**
+
+1. **"العيب في طريقتي لا فيكم"** — the insufficiency is ADAM's method, not the parent's effort. This inverts the usual dynamic: not *unlock more*, but *I have been under-serving you and here is the honest reason.* It is also simply true.
+2. **The free option is stated first, and is the default on silence.** Doing nothing gets her the free path, not the paid one.
+3. **Three buttons, one of which is "carry on unchanged."** Declining is a first-class outcome with a button of its own, not an absence.
+4. **No price in this message.** The price appears only if she taps to ask. Achievement, honesty, and commerce never share a bubble (P1).
+5. **It exceeds the 2–3 line ceiling (P6), knowingly.** This is the one structural message in the product where honesty needs more room, and it happens at most twice in a parent's lifetime. The exception is recorded here so it is not copied elsewhere.
+
+**Door 3 is the only killable door.** If block/mute rate in the 7 days after Door 3 exceeds 2× baseline, it is switched off and the architecture runs on Doors 0–2. That is not a fallback position to be embarrassed about — Doors 0–2 are the ones that respect the constraints most completely.
+
+### 33.5 Never permitted
+
+| Banned | Why |
+|---|---|
+| Any message whose only purpose is to mention the arrangement | §33.3 |
+| A second mention after a decline, ever | The old model's four-of-eight who never came back |
+| Mentioning it in the same message as a Mirror, a win, or an end-of-month | P1 — achievement and commerce never share a bubble |
+| Mentioning it within 14 days of a crisis | P1 |
+| Mentioning it during or right after a hard night | Harvesting distress |
+| A countdown, a limited window, a "special" price | P10 |
+| Any scoring model that decides who is "ready" | **This is precisely what the Judge did.** 8 offers, 0 clicks |
+| Degrading the free rhythm to make the paid one look better | P15, D-G |
+| A pricing page, a plans screen, a comparison table | §33.6 |
+| Announcing it to the existing 291 parents | It would be exactly the surprise this section exists to prevent |
+
+That last row matters operationally: **there is no launch announcement.** Existing parents encounter the doors the same way new ones do.
+
+### 33.6 It has no name — an architectural decision
+
+v1 and early v2 called it **"المرافقة الكاملة"** — *full companionship*. That phrasing is a defect, for two reasons:
+
+1. **"Full" implies what she has now is partial.** That directly contradicts P15 and D-G, which say the free tier is complete and never deliberately lessened. The name insults the free product.
+2. **A named product is a product that appeared.** Names are what things have when they are sold. An extension of a relationship is *described*, in context, each time.
+
+> **Rule: ADAM never gives it a proper name.** It is described, in this parent's own situation, every time it comes up.
+
+Four consequences, all desirable:
+
+- **A pricing page becomes impossible by construction.** There is no noun to put at the top of one.
+- **Every description is forced into outcome language** (D-H), because there is no name to hide behind. "شهر موجَّه لنوم يوسف" says what happens; "المرافقة الكاملة" says nothing.
+- **There is nothing to announce**, which removes the temptation at the root.
+- **The internal name stays `Chapter`** — team vocabulary, never user-facing (§3.6, the two lexicons).
+
+### 33.7 The handoff — discovery has to end well
+
+Discovery that succeeds and then collapses at payment is a failure of this section, not of §22. Payment is manual and requires leaving the conversation for a DM with a stranger, which the product walkthrough identified as the single largest drop and a live trust problem.
+
+| Rule | Why |
+|---|---|
+| ADAM names the handoff plainly, including that a human confirms it | Surprise is the thing we are eliminating; do not introduce a new one here |
+| **The rhythm continues, uninterrupted, during S6** | Already specified in §10. Restated because it is the whole point: nothing is held hostage to payment |
+| If unconfirmed after 72h, ADAM raises it — never silently drops it | A parent who paid and heard nothing is the worst outcome available |
+| A parent who starts and does not finish is never messaged about it | Not once. Abandoned payment is a decision |
+
+### 33.8 How this is measured — trust first, conversion second
+
+**The primary metrics for this section are counter-metrics.** That ordering is deliberate: a discovery architecture optimised for conversion becomes a funnel, which is the thing we are avoiding.
+
+| Metric | Target | Kind |
+|---|---|---|
+| Block/mute rate in 7 days after **any** door | **≤ baseline** | **Guardrail — halts the roadmap** |
+| Block/mute after Door 3 specifically | **< 2× baseline, or Door 3 is switched off** | **Kill switch** |
+| Dormancy within 14 days of a decline | **≤ baseline** | **Guardrail.** Catches the four-of-eight failure |
+| Harvest rate in the 7 days after a decline | **≤ 5 points below baseline** | Did declining damage the relationship? |
+| Door 2b occurrences per 100 parents in rhythm | Observe | **Demand signal, not a target** |
+| Door distribution (0/1/2a/2b/3) | Observe | Which doors actually work |
+| Conversion per door | Observe | Ranked **last**, deliberately |
+
+**No conversion target is set anywhere in this section.** v1's F9 carried *"≥10% of S4 parents open it unprompted"*, and a target on a discovery mechanism is an instruction to optimise it. Conversion is observed, reported, and never optimised against.
+
+### 33.9 Review pass — gaps found and closed
+
+Reviewed as an outside critic looking for holes. Five were real and are closed here.
+
+**Gap 1 — "Door 3 fires when free is failing 60% of the time. Isn't that just a bad product?"**
+
+Fair challenge, and the answer has to be structural or Door 3 is indefensible. The free rhythm is capped at **one suggestion per day** — not by stinginess but because two proactive messages is the honest ceiling before ADAM becomes noise (§13.3, R3). Some situations genuinely need more attention than one idea a day can give. So the limit Door 3 names is **architectural, not a quality defect**, and saying so is accurate. If instead the failure were caused by *bad* suggestions, the fix is F6 and the Seed, not an offer — and E1 is what tells the difference.
+
+**Gap 2 — The pinned message's "quiet closing line" was unspecified.** A gap that would have been filled by whoever built it. Specified now:
+
+```
+📌  يوسف · نعمل على: النوم
+    هذا الأسبوع: ٤ ليالٍ أهدأ من ٧
+
+    القائمة ☰ فيها كل ما يمكن أن نفعله معاً.
+```
+
+It points at the **menu**, not at a price or an arrangement. A parent who wants more looks; a parent who does not sees a line about a menu.
+
+**Gap 3 — Door 2 could fire too eagerly.** Distinguishing "she wants to know" from "she wants it done every day" is a judgment call, and an eager model will mention the paid arrangement on any question that merely *sounds* adjacent. Guard, now required:
+
+> **Door 2's paid mention requires an explicit request for recurring or continuous action** — a repetition word (*كل يوم*, *دايماً*, *شهر*, *باستمرار*) or a request for ADAM to initiate (*ذكّرني*, *اسألني*, *كلّمني قبل*).
+> A question about *how*, *why*, or *what* is answered and closed. **Never inferred from tone or enthusiasm.**
+
+Without this, Door 2 slowly becomes a push with extra steps.
+
+**Gap 4 — Does tapping through Door 3 count as a second mention?** It must not, or the rules contradict each other. Clarified:
+
+> **A door and its own follow-through are one event.** Door 3 → she taps *"أخبرني عن الشهر"* → the price answer: that is **one** mention. The no-second-mention rule (§33.5) applies to *new* events, not to completing one she chose to continue.
+
+**Gap 5 — What do the doors do in X2, where no payment rail exists?** Previously unhandled, and it matters: 48.4% of signups are in exactly this position. Naming an arrangement she cannot buy is a cruelty with no upside.
+
+| Door | Behaviour in X2 |
+|---|---|
+| **Door 1** | Menu entry hidden. Pinned line shows the rhythm only |
+| **Door 2** | Answered honestly: it is not available in her country yet, everything between us stays as it is, and she is told when it changes. **Recorded as demand evidence** (§25 `payment_blocked_country`) |
+| **Door 3** | **Never fires.** The free alternative is offered on its own, as a plain suggestion to change the situation — which is the useful half anyway |
+
+Door 3's behaviour in X2 is the cleanest proof that §33.3's test was applied honestly: **strip the paid option and the message still stands as help.** If it collapsed without the price, it was a pitch.
+
+### 33.10 The strategic consequence, stated plainly
+
+**This architecture converts poorly by construction, and that is the honest cost of the constraints.**
+
+Doors 0 and 1 convert near zero. Door 2 depends entirely on parents spontaneously asking for continuous help, which is a real behaviour but not a frequent one. Door 3 fires rarely by design and is the first thing to be switched off if it damages trust.
+
+**A companion that genuinely works has a weak sales mechanism, necessarily.** The better the free rhythm is, the less often a parent hits a wall that makes the fuller arrangement obvious. Free quality and conversion are in direct tension, and the founder's non-negotiables resolve that tension in favour of free quality.
+
+Two honest implications:
+
+1. **The business must be sized for low conversion and high retention** — a small paying minority subsidising a large free base, with content as the acquisition engine (§19). That is a viable shape, but it is a different business from the one a funnel would build.
+2. **If revenue proves insufficient, the constraint to revisit is the free/paid boundary (§16.1) — not this architecture.** Adding pressure here would break the trust that makes the product worth anything. Moving the boundary is a strategy decision and it is the founder's. Making the doors pushier is a betrayal and it is nobody's.
 
 ---
 
