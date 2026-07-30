@@ -180,11 +180,31 @@ Telegram requires the bot token **in the URL path**, so no n8n credential type c
 |---|---|
 | `get_rhythm_due()` | **Applied and tested** — 5 tests |
 | `record_seed_sent` · `record_harvest_sent` · `record_harvest_answer` | **Applied and tested** — 6 tests |
+| `situation_catalog` · `commit_situation` · `get_situation_batch` | **Applied and tested** — 6 tests |
 | **W3 Rhythm Sender** | **Built, 11 nodes, inactive** — `Vb4ADCkPsevPRWRN` |
+| **W2 situation detection** | **Built, 21 nodes, ACTIVE** — `7mTP12nVLS1Taokl` |
+| **All Telegram nodes → HTTP Request** | **Done** — §7 |
 | W1 Harvest handling | Not built |
-| W2 situation detection | Not built |
-| W4 rework | Not built |
+| W4 rework | Partially — Telegram node converted, gender-neutral copy fixed |
 | Legacy sender retirement | Blocked on W3 activation |
+
+### 9.3 W2 — classification, not invention
+
+The situation is what the entire timing model schedules against, so **the LLM classifies into a closed catalog and never creates one.**
+
+| Layer | Guard |
+|---|---|
+| Prompt | A closed list of seven tokens, with `none` as a first-class answer |
+| `SD - Validate Key` | Drops anything outside the catalog before it reaches the database |
+| `commit_situation()` | **Takes the window from the catalog, never from the caller** |
+
+**Three gates for one value, deliberately.** An invented situation would carry an invented window, and a wrong window means asking how bedtime went before bedtime happened — the exact defect §5.4 rule 2 exists to prevent. The database gate is the one that actually holds; the other two just keep bad turns out of the data.
+
+**`none` is not a failure.** The prompt says so explicitly, because a model that feels obliged to answer will guess, and a wrong situation is worse than no situation.
+
+**Promotion needs three independent observations** before a situation moves from `candidate` to `confirmed`. One passing remark should not set a family's daily rhythm.
+
+**Note on the credential warnings.** Validation flags hardcoded Supabase keys in `HW - Get Heart Batch`, `HW - Heart Commit` and `HW - Write Child Name`. Those are pre-existing nodes, not introduced here — they are week-0 item 1, and rewriting them is part of the credential rotation rather than this change.
 
 ### 9.1 W3 — what shipped
 
