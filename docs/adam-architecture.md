@@ -150,7 +150,12 @@ Binding at every transition: naming a goal (§9.5), the review session (§9.7), 
 | **Personalisation** | **Full** | **Identical** |
 | **Help when asked** | **Unlimited** | Unlimited |
 | **Daily rhythm** | Seed + Harvest | Seed + Harvest |
+| **Being known** (A1–A3) | **Continuously, for years** | Identical |
+| **Patterns noticed** (A4) | **Whenever one is real** | The same, **pursued toward a goal** |
+| **Anticipation as a daily practice** (A5) | *How* to anticipate, on request | **ADAM doing it every evening, unasked** |
 | **The difference** | — | **A named goal, driven daily until reached or honestly declared unreached** |
+
+**In one line:** free helps a parent **understand** their child every day; paid turns that understanding into a **journey to a measurable goal** (§3.8.1).
 
 **Why this is defensible:** it withholds no information. Ask how to predict a hard night and ADAM tells you, completely, free, from your own data. What costs money is **someone doing it with you, every day, until the goal lands.** Information versus labour is the only boundary that can honestly carry a price in a product whose moat is trust.
 
@@ -555,59 +560,111 @@ Sell · quote a price · mention a subscription · explain a payment method · *
 > **These are the moments that make a parent think *"this is different."***
 > **They are designed and intended. They are not allowed to be accidental.**
 
-If they are left to emerge on their own, they emerge unevenly: some parents get four in a week, others get none, and we would never know which. Naming them makes them buildable, countable, and testable.
+#### 3.8.1 Two classes, not one ladder
 
-#### 3.8.1 The six canonical moments
+Earlier versions treated A1–A6 as a single escalating sequence. That was wrong, and it blurred the business model: it implied the free tier was a partial version of the paid one, walking up the same steps and stopping early.
 
-| # | Moment | ADAM does | Requires | Magnitude |
-|---|---|---|---|---|
-| **A1** | **The name** | Calls the child by name **for the first time** | Name captured from the parent's own words | Small, and the first one they ever feel |
-| **A2** | **Yesterday → today** | Links something from yesterday to today | Two consecutive days of context | Small |
-| **A3** | **The unrepeated fact** | Recalls something the parent said once and never repeated | Long-horizon memory | **Medium — this is the first one that surprises** |
-| **A4** | **The unnoticed pattern** | Names a pattern the parent had not seen | ≥3 logged evenings + situation labels | High |
-| **A5** | **The prediction** | Anticipates a hard moment **before** it happens | A validated pattern + the timing model | **Highest — this is the one nothing else offers** |
-| **A6** | **The journey from their own data** | Builds a goal out of this family's history | A month of outcomes | High, and different in kind — it is about the future |
+**They are two different kinds of thing.**
 
-#### 3.8.2 The Aha ladder is the capability ladder, made visible
+| Class | Moments | What it does | Belongs to |
+|---|---|---|---|
+| **Free Value Moments** | **A1 · A2 · A3** | Prove ADAM is different. Build trust daily | **The free tier's actual job** |
+| **The hinge** | **A4** | Turns understanding into something aimable | **Free when it arises. The bridge, not the axis** |
+| **Premium Transformation Moments** | **A5 · A6** | Turn understanding into a driven result | **The journey** |
 
-The six are ordered by what ADAM must know, which means **the parent experiences §2.4 rather than being told about it.**
+**The separating principle, and it is the business model in one line:**
 
-```
-A1 name          ← knows who
-A2 yesterday     ← knows recent
-A3 unrepeated    ← knows deeply
-A4 pattern       ← knows more than the parent does
-A5 prediction    ← knows what happens next
-A6 journey       ← knows enough to aim at something
-```
+> **Free helps a parent understand their child, every day.**
+> **Paid turns that understanding into a personal journey that drives them to a clear, measurable parenting goal.**
 
-**This is why a journey cannot honestly be offered in week one.** A6 is not gated by a rule — it is gated by A1 through A5 actually having happened. **The commercial timing and the capability timing are the same timing**, which is what makes the offer feel earned rather than scheduled.
+Not more memory. Not more messages. Not a stronger model. **Understanding versus transformation.**
 
-#### 3.8.3 The first time is the Aha; afterwards it is trust
+#### 3.8.2 Free Value Moments — A1, A2, A3
 
-A1 firing on day two is a moment. A1 firing on day sixty is just how ADAM talks.
+These are **the free tier's job**, not a preview of something better. They do not sell anything; they prove ADAM is worth talking to.
 
-| | First occurrence | Every occurrence after |
+| # | Moment | ADAM does | Requires |
+|---|---|---|---|
+| **A1** | **The name** | Calls the child by name, naturally | Name captured from the parent's own words |
+| **A2** | **Yesterday → today** | Links something from yesterday to today | Two consecutive days of context |
+| **A3** | **The unrepeated fact** | Recalls something said once and never repeated | Long-horizon memory |
+
+**These must recur, not just happen once.** A1 is a moment the first time and a *standard* every time after. The free experience is built to produce them continuously — that is what makes *"آدم مختلف"* a repeated feeling rather than a first impression.
+
+> **A parent who never pays should experience A1–A3 for years.** If the free tier stops producing them, it has failed at its own job, independently of anything commercial.
+
+#### 3.8.3 A4 — the hinge
+
+**Pattern discovery sits between the two classes, and it belongs to neither cleanly.**
+
+| | |
+|---|---|
+| **What it is** | ADAM names a pattern the parent had not seen |
+| **Requires** | ≥3 logged evenings + situation labels |
+| **In free** | **Appears when a real pattern emerges.** Occasional, genuine, never withheld |
+| **In paid** | **Systematic.** Patterns are pursued, tested against a goal, and acted on weekly |
+| **Its role** | **The natural bridge** — it is the moment understanding becomes *aimable* |
+
+**The distinction is not access. It is what happens next.**
+
+> **In free, A4 is an observation. In paid, A4 is a lever.**
+
+Free gets the insight and can act on it alone. Paid gets the insight *pursued* — measured against a goal, adjusted when it fails, revisited weekly. **Nothing is hidden from the free parent; what they do not get is someone driving it.**
+
+**The first Mirror is free, permanently** (§5.5). It is the proof that ADAM sees things, and removing it would break both the value ladder and P15. **Recurring, goal-directed Mirrors are part of a journey** — a distinction that existed in earlier versions and was lost in restructuring.
+
+#### 3.8.4 Premium Transformation Moments — A5, A6
+
+**These are not extra features. They are the shift from understanding to companionship.**
+
+| # | Moment | Why it is not a free feature |
+|---|---|---|
+| **A5** | **The prediction** — speaking before the hard moment, not after | As a one-off it is a clever message. **As a daily practice it is labour**, and labour is precisely what §0.5 says is paid. Anticipating every evening, before every window, is work — not knowledge |
+| **A6** | **The journey from their own data** — a goal built out of this family's history | **This is the thing being bought.** Not information: a structure that drives to a measurable outcome, adjusts when it fails, and declares honestly whether it landed |
+
+**A5 is the sharpest test of §0.5's boundary.** Ask ADAM *how* to see a hard night coming and it tells you, free, completely, from your own data — that is knowledge. Having ADAM *do it for you, every evening, without being asked* is a different thing, and it is the only honest thing here that can carry a price.
+
+#### 3.8.5 Why this does not cripple the free tier
+
+**This is the section to read sceptically, because the decision could easily become a violation of P15.**
+
+| It would be a violation if | It is not, because |
+|---|---|
+| Pattern detection were **throttled** in free | It is not. **A4 fires in free whenever a real pattern emerges and is worth saying.** What free lacks is a system *pursuing* patterns toward a goal |
+| Free were denied **knowledge** it could act on | It is not. Every insight ADAM has is available on request, in full (§0.5) |
+| A5 were **withheld** as information | It is not. *How* to anticipate is answered freely; *doing it daily, unasked* is the labour |
+| Free were made worse over time to motivate upgrading | **Banned.** A1–A3 must recur for years, and their decay is a defect (§3.8.7) |
+
+> **The line is unchanged from §0.5: information is free, labour is paid.**
+> This decision does not move that line. It makes visible **which moments fall on which side of it** — which the single-ladder framing obscured.
+
+**The honest test:** a parent who never pays should keep saying *"آدم مختلف"* indefinitely. If this decision ever makes that false, it has been implemented wrongly.
+
+#### 3.8.6 First occurrence, and the asymmetry of losing one
+
+| | First occurrence | Every one after |
 |---|---|---|
 | **What it does** | **Creates** the feeling | **Sustains** it |
-| **Logged as** | `aha_moment` | Ordinary behaviour |
+| **Logged as** | `aha_moment` with `first_occurrence` | Ordinary behaviour |
 | **If it stops** | — | **Trust breaks.** Forgetting a name once undoes fifty uses of it |
 
-**The asymmetry matters.** The first is worth engineering for; the rest are worth protecting. A regression — a Seed that suddenly says "طفلك" — costs more than the original moment gained.
+**A1–A3 are the ones this matters most for**, because they are supposed to recur forever. A regression there is a trust incident (§14 R16), not a missed opportunity.
 
-#### 3.8.4 Design rules
+#### 3.8.7 Design rules
 
 | Rule | Why |
 |---|---|
-| **Never announce it** (P24) | *"أتذكّر أنك قلت…"* destroys the moment. The Aha works **because** it is demonstrated silently and the parent notices on their own |
-| **One per message, maximum** | Two in one message dilutes both and starts to read as a performance |
-| **Never manufacture the conditions** | Withholding the child's name for three days so the reveal lands harder is a **betrayal**, not a design. The conditions are earned, never staged |
-| **Must be true** | ADAM may only use a name it knows, predict a pattern that exists. Grounding in Knowledge makes honesty automatic (§2.5) |
+| **Never announce it** (P24) | *"أتذكّر أنك قلت…"* destroys the moment. It works **because** it is demonstrated silently |
+| **One per message, maximum** | Two dilutes both and starts to read as a performance |
+| **Never manufacture the conditions** | Withholding a child's name for three days so the reveal lands harder is a **betrayal**, not a design |
+| **Never throttle A1–A3** | They are the free tier's job. Their decay is a defect, not a lever |
+| **A4 is never withheld when real** | The bridge must be genuine or it is bait |
+| **Must be true** | Grounding in Knowledge makes honesty automatic (§2.5) |
 | **Never inside a commercial message** | An Aha next to an offer converts the moment into a technique, and the parent will feel it |
 | **Never at L3** | §3.6 |
-| **Silence beats a forced one** | If the conditions are not there, no Aha. Same rule as the Seed (§2.6) |
+| **Silence beats a forced one** | If the conditions are absent, no Aha |
 
-#### 3.8.5 What each moment sounds like
+#### 3.8.8 What each sounds like
 
 ```
 A1   كيف كانت الليلة مع يوسف؟
@@ -629,21 +686,19 @@ A6   الهدف الذي أراه: خمس ليالٍ هادئة من سبع.
      ← §9.5.
 ```
 
-**Note what is absent from all six:** any sentence about ADAM. No "I remember", no "I noticed that I", no "my memory". The moment is always about the child.
+**What is absent from all six:** any sentence about ADAM. No *"I remember"*, no *"I noticed that I"*. **The moment is always about the child.**
 
-#### 3.8.6 Ownership and instrumentation
+#### 3.8.9 Ownership and instrumentation
 
 | Concern | Owner |
 |---|---|
 | Whether the conditions exist | **Knowledge Engine** (§2) |
 | Designing and delivering the moment | **Conversation Engine** — here |
-| Counting them and treating them as the conversion signal | **Growth Engine** (§6.4) |
+| Counting them, and what they predict | **Growth Engine** (§6.4) |
 
-Each fires `aha_moment` with its kind (`A1`–`A6`) and a `first_occurrence` flag. **The first-occurrence count per parent is the real measure**; totals mostly count A1 and A2 repeating.
+Each fires `aha_moment` with its kind, its **class** (`free_value` / `hinge` / `premium`), and a `first_occurrence` flag.
 
-> **This is what makes §0.2 testable.** E10 asks whether Aha moments predict journeys started, independent of menu exposure. Without a canonical list there is nothing to count, and the claim that understanding drives revenue stays an opinion.
-
----
+> **The class field is what makes the model testable.** Free Value Moments should predict **retention**. The hinge should predict **journeys started**. Premium moments happen *after* payment, so they predict **completion and continuation** — and cannot predict conversion at all. §12 E10–E12.
 
 ## 4. Telegram Experience Engine
 
@@ -815,13 +870,20 @@ Discovery → Goal → Adaptive companionship → Daily progress → Review → 
 5. Unknown local evening → send nothing, surface for resolution. *56 parents have no resolvable timezone.*
 6. Quiet hours absolute: nothing proactive 23:00–07:00 local.
 
-### 5.5 The Mirror
+### 5.5 The Mirror — A4 delivered
 
-Fires when three Harvests carry a result. Data-gated, never day-gated. Shows a pattern from the family's own data.
+Shows a pattern from the family's own data. **Carries no price and no commercial content — enforced structurally, not by wording discipline.**
 
-**Carries no price and no commercial content — enforced structurally, not by wording discipline.**
+| | Free | In a journey |
+|---|---|---|
+| **The first Mirror** | **Free, permanently.** Fires at three logged evenings. Data-gated, never day-gated | — |
+| **Later Mirrors** | **When a genuinely new pattern emerges.** Never throttled, never scheduled | **Weekly and goal-directed** — measured against the goal, driving adjustment |
+
+**The difference is not access to patterns. It is whether a pattern gets pursued** (§3.8.3). A free parent sees what ADAM sees and can act on it alone. A journey turns the same insight into a lever: tested, adjusted when it fails, revisited.
 
 **Deliberately under-claims.** Three nights prove nothing; over-claiming loses trust the moment night four contradicts it.
+
+> **Restored distinction.** "First Mirror free / recurring Mirrors within a journey" existed in earlier versions and was lost during the v3 restructure, which left the value ladder saying simply "the Mirror" is free forever. That was an accident of editing, not a decision.
 
 ### 5.6 The review session — stages 1–3 (AD-3)
 
@@ -893,11 +955,19 @@ The points where a parent can learn something exists. **None is a message whose 
 | **A5** | *"It knew before I did"* |
 | **A6** | *"It built this out of us"* |
 
-**These are requirements, not aspirations.** A free experience producing none of them has failed at its actual job, however good its individual answers are.
+**They do not all do the same commercial work** (§3.8.1):
 
-**Target: ≥3 first-occurrence moments per parent in the first four weeks.** Repeat firings of A1 and A2 are healthy but are not the signal — the ladder climbing is.
+| Class | Moments | What it should predict |
+|---|---|---|
+| **Free Value** | A1 · A2 · A3 | **Retention.** A parent who feels known keeps coming back |
+| **The hinge** | A4 | **Journeys started.** It is the moment understanding becomes aimable |
+| **Premium** | A5 · A6 | **Completion and continuation** — they happen *after* payment and **cannot predict conversion at all** |
 
-> **This is the metric §0.2 stands or falls on.** If the parents who start journeys are not the parents who climbed further up the Aha ladder, then understanding is not the conversion engine and the architecture's priority order is wrong. **E10 is what makes that falsifiable rather than a belief.**
+> **This corrects an error in the previous version**, which expected A5 to predict conversion more strongly than A1. A5 is mostly a paid moment, so it occurs after the decision it was supposed to predict. **The hinge is what predicts conversion, and A4 alone carries that weight.**
+
+**These are requirements, not aspirations.** A free experience producing no A1–A3 has failed at its own job, however good its individual answers are — and that failure is independent of anything commercial.
+
+**Targets:** A1–A3 recurring **continuously, for years** · ≥1 A4 within the first four weeks · **zero regressions** (§14 R16).
 
 ### 6.5 The Value Ladder
 
@@ -905,11 +975,11 @@ The points where a parent can learn something exists. **None is a message whose 
 |---|---|---|---|
 | **0** | Instagram content | Free | None |
 | **1** | The rescue — unlimited conversation, voice, crisis presence | **Free forever, every country** | None |
-| **2** | The daily rhythm — Seed + Harvest, full memory, the Mirror | **Free forever** | Enough known to be personal |
-| **3** | A journey — a named goal, driven daily | **2,300 DZD · 490 EGP · 110 MAD** | A real goal exists + a payment rail |
+| **2** | The daily rhythm — Seed + Harvest, full memory, **being known (A1–A3), and the first Mirror** | **Free forever** | Enough known to be personal |
+| **3** | A journey — a named goal, driven daily, **with anticipation and patterns pursued (A4–A6)** | **2,300 DZD · 490 EGP · 110 MAD** | A real goal exists + a payment rail |
 | **4** | The next journey | Same | A completed journey and a discovered next goal |
 
-**Rung 2 is free and complete.** What is sold at rung 3 is not access — it is **direction**.
+**Rung 2 is free and complete**, and it is where the parent is *understood*. What is sold at rung 3 is not access to understanding — it is **understanding driven toward a goal** (§3.8.1).
 
 ### 6.6 The review session — stage 4
 
@@ -1321,7 +1391,7 @@ Every event carries `parent_id`, `timestamp`, `state`, `country`, `gender_form_u
 
 > **`aha_moment` is the most important event in this schema.** §0.2 claims understanding drives revenue; this is the only place that claim becomes falsifiable. **`first_occurrence` is the field that matters** — totals mostly count A1 and A2 repeating.
 
-> **`aha_regression` is the one to alert on.** Per §3.8.3, forgetting a child's name once undoes fifty uses of it. A regression is a trust incident, not a missed opportunity.
+> **`aha_regression` is the one to alert on.** Per §3.8.6, forgetting a child's name once undoes fifty uses of it. A regression is a trust incident, not a missed opportunity.
 
 **Journey:** `goal_named` · `journey_started` · `journey_adjusted` (**reason**) · `journey_goal_reached` · `journey_goal_missed` (**what was learned**) · `review_session_started` · `review_stage_delivered` (1–4) · `review_stage4_skipped` (**reason**) · `next_goal_identified` (from which evidence)
 
@@ -1348,14 +1418,17 @@ Every event carries `parent_id`, `timestamp`, `state`, `country`, `gender_form_u
 | **E7** | **Goal falsifiability** | A concrete goal beats a vague one | No difference in journeys started | Copy |
 | **E8** | **Gulf concierge** | Waitlisted high-ATP parents will pay | 0/10 pay | Days, no engineering |
 | **E9** | **Voice input** | Voice increases depth | No lift | Medium |
-| **E10** | **Understanding → conversion** | Parents who climb further up the Aha ladder (§3.8) start journeys at a higher rate, **independent of menu exposure** | **No relationship, or menu exposure predicts better** | Correlation only |
-| **E11** | **Which rung matters** *(new)* | Not all Aha moments are equal — **A5 (prediction) should predict conversion far more strongly than A1 (name)** | All six correlate equally → the ladder is not real, and §3.8.2 is a story rather than a structure | Correlation only |
+| **E10** | **Free moments → retention** | Parents receiving more A1–A3 stay engaged longer | No relationship → the free tier's stated job is not the job that matters | Correlation only |
+| **E11** | **The hinge → conversion** | **A4 predicts journeys started, independent of menu exposure** | **No relationship, or menu exposure predicts better** → §0.2 is wrong and the architecture's priority order with it | Correlation only |
+| **E12** | **Premium moments → completion** | A5 and A6 predict journey completion and continuation | No relationship → the paid experience is not delivering what it sold | Correlation only |
 
-**E1 and E10 are the two that matter most.**
+**E1 and E11 are the two that matter most.**
 
 **E1** tests whether a grounded Seed differs from a parenting tip. If not, P11 and Decision 003 are wrong, memory is not the foundation, and the free rhythm is a content channel rather than a relationship.
 
-**E10 tests §0.2 itself** — the claim that understanding drives revenue and therefore the lever is Knowledge, never louder surfaces. **If menu exposure predicts better than understanding does, this architecture is being managed on a belief.** It costs nothing beyond the events to check.
+**E11 tests §0.2 itself** — the claim that understanding drives revenue and therefore the lever is Knowledge, never louder surfaces. **If menu exposure predicts conversion better than A4 does, this architecture is being managed on a belief.** It costs nothing beyond the events to check.
+
+**E10, E11 and E12 together test the two-class split** (§3.8.1). Each class is claimed to do different commercial work, so each is checked against a different outcome. **If all three classes predict the same thing, the split is a story rather than a structure** — and §3.8 should collapse back into one ladder.
 
 ## 13. Roadmap
 
@@ -1429,7 +1502,9 @@ Peer presence *(only after retention is proven)* · multi-child *(currently 3 ch
 | **R13** | **Gendered copy leaks to fathers** | 🟡 Medium | Three-form requirement; `gender_form_fallback` |
 | **R14** | **Reply keyboard discourages free text** | 🟡 Medium | Three entries; collapsible; monitor free-text rate before and after |
 | **R15** | **Aha moments become a performance.** Once named and counted, the temptation is to engineer their timing — and a staged moment is detectable | 🟠 High | §3.8.4: conditions are earned never staged, one per message, never announced, never beside an offer. **`aha_suppressed` should be common — if it is near zero, they are being forced** |
-| **R16** | **Aha regression.** A name forgotten, a pattern dropped after a schema change | 🟠 High | `aha_regression` as a hard-zero alert. §3.8.3 — the first occurrence creates trust, every one after **protects** it, and losing one costs more than the first gained |
+| **R16** | **Aha regression.** A name forgotten, a pattern dropped after a schema change | 🟠 High | `aha_regression` as a hard-zero alert. §3.8.6 — the first occurrence creates trust, every one after **protects** it, and losing one costs more than the first gained |
+| **R17** | **The two-class split becomes a throttle.** "A4 is the hinge" is one bad decision away from "hold back A4 to drive conversion" — which would violate P15 and turn the bridge into bait | 🔴 Critical | §3.8.5 and §3.8.7: **A4 is never withheld when real.** Watch A4-per-free-parent; if it falls after the split ships, it is being throttled, deliberately or not |
+| **R18** | **The free tier quietly decays** once its job is defined as A1–A3 rather than "everything" | 🟠 High | A1–A3 must recur **for years**, and their decay is a defect. E10 is the check: if free-moment frequency drops over a cohort's lifetime, the tier is rotting |
 
 ## 15. Rejected decisions
 
@@ -1505,10 +1580,10 @@ Peer presence *(only after retention is proven)* · multi-child *(currently 3 ch
 | Area | What changed |
 |---|---|
 | **§3.8** | **New: the Aha Subsystem, inside Conversation Engine — not a separate engine.** An Aha is something ADAM *says*; Knowledge only makes it possible. **Six canonical moments A1–A6**, each with its trigger, requirement and magnitude |
-| **§3.8.2** | **The Aha ladder is the capability ladder made visible.** A1 knows who → A6 knows enough to aim at something. **This is why a journey cannot honestly be offered in week one: A6 is gated by A1–A5 actually happening, not by a rule.** Commercial timing and capability timing are the same timing |
-| **§3.8.3** | **First occurrence creates the feeling; every one after sustains it.** The asymmetry is the point — **forgetting a name once undoes fifty uses of it** |
-| **§3.8.4** | Design rules, including the one that matters most: **never manufacture the conditions.** Withholding a child's name for three days so the reveal lands harder is a betrayal, not a design |
-| **§3.8.5** | What each moment sounds like — and **what is absent from all six: any sentence about ADAM.** The moment is always about the child |
+| *(the ladder)* | **The Aha ladder is the capability ladder made visible.** A1 knows who → A6 knows enough to aim at something. **A journey cannot honestly be offered in week one: A6 is gated by A1–A5 actually happening, not by a rule.** *Superseded in v4.2 — the single ladder became two classes, but this gating still holds* |
+| *(first occurrence)* | **First occurrence creates the feeling; every one after sustains it** — now §3.8.6 |
+| *(design rules)* | **Never manufacture the conditions** — now §3.8.7 |
+| *(examples)* | **What is absent from all six: any sentence about ADAM** — now §3.8.8 |
 | **§1.4** | Ownership corrected: Conversation owns the subsystem; Knowledge supplies conditions; Growth counts |
 | **§6.4** | Growth no longer defines them — it counts them. Target restated as **first-occurrence moments**, since totals mostly count A1 and A2 repeating |
 | **§11** | Events rebuilt on the canonical kinds, plus **`aha_suppressed`** and **`aha_regression`** |
@@ -1516,6 +1591,25 @@ Peer presence *(only after retention is proven)* · multi-child *(currently 3 ch
 | **§14** | **R15 Aha becomes a performance** — `aha_suppressed` near zero means they are being forced. **R16 Aha regression** as a trust incident |
 
 **The sharpest consequence of naming them:** the commercial offer is no longer timed by anything commercial. **A6 fires when A1–A5 have actually happened**, which means the moment a journey becomes offerable is the moment ADAM genuinely became able to build one.
+
+### v4.1 → v4.2 — Aha moments split into two classes
+
+**Not an edit. The single-ladder framing implied the free tier was a partial version of the paid one, walking the same steps and stopping early. It is not.**
+
+| Area | What changed |
+|---|---|
+| **§3.8** | **Rewritten.** Two classes replace one ladder: **Free Value Moments (A1–A3)** are the free tier's actual job; **A4 is the hinge**; **A5–A6 are premium transformation**. The separating line is **understanding versus transformation**, not memory, messages, or model strength |
+| **§3.8.3** | **A4 belongs to neither cleanly, and that is the point.** *In free it is an observation; in paid it is a lever.* Free gets the insight and may act alone; paid gets it **pursued** — measured, adjusted, revisited |
+| **§3.8.4** | **A5 is the sharpest test of §0.5.** *How* to anticipate is knowledge and stays free. **ADAM doing it every evening, unasked, is labour** — the only honest thing here that can carry a price |
+| **§3.8.5** | **New, and written to be read sceptically** — the four ways this decision *could* have violated P15, and why it does not. **The line from §0.5 has not moved; this makes visible which moments fall on which side of it** |
+| **§0.5** | Boundary table gains three rows naming the classes. Free/paid restated: understand versus transform |
+| **§5.5** | **First Mirror free permanently; recurring goal-directed Mirrors belong to a journey.** *This distinction existed before v3 and was lost in restructuring* — an accident of editing, not a decision |
+| **§6.5** | Value ladder rung 2 now names *being known and the first Mirror*; rung 3 names *anticipation and patterns pursued* |
+| **§6.4** | **Corrects a logical error.** v4.1 expected A5 to predict conversion more strongly than A1 — but **A5 is mostly a paid moment, so it occurs after the decision it was meant to predict.** Each class now predicts a different outcome |
+| **§12** | E10 → free moments predict **retention** · **E11 → the hinge predicts conversion** · E12 → premium moments predict **completion**. If all three predict the same thing, the split is a story and §3.8 should collapse back |
+| **§14** | **R17 — the split becomes a throttle.** *"A4 is the hinge"* is one bad decision from *"hold back A4 to drive conversion"*. **R18 — the free tier quietly decays** once its job is named |
+
+**The test this decision must never fail:** a parent who never pays should keep saying *"آدم مختلف"* indefinitely. If it ever makes that false, it has been implemented wrongly.
 
 ---
 
