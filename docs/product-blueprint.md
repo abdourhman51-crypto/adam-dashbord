@@ -1,118 +1,174 @@
-# ADAM — Product Blueprint v2
+# ADAM — Product Blueprint v3
 
 **Date:** 2026-07-30
 **Status:** Specification for review. **No implementation. Awaiting approval.**
-**Supersedes:** v1 (2026-07-29), preserved in git history as `product-blueprint-v1.md`.
+**Supersedes:** v2 (2026-07-30) and v1 (2026-07-29), both in git history.
 
-**Rule for this document:** every feature carries *why it exists*, *the user evidence*, *the problem it solves*, and *how success is measured*. Anything that cannot answer all four was cut. Nothing is inherited from the current build because it exists.
+**Governing rule:** the twenty decisions in *PRODUCT DECISIONS v2* override anything that contradicts them. Where v2 conflicted, v2 is void. §0 records what changed and §26 lists every conflict resolved.
 
-**Rule for this revision:** the eleven decisions in §0 override anything that contradicts them, anywhere in this document. Where v1 conflicted, v1 is wrong.
-
----
-
-## 0. What changed in v2, and why
-
-| # | Decision | Overrides |
-|---|---|---|
-| **D-A** | **ADAM serves both parents**, not mothers only. All copy becomes gender-neutral | Every Arabic string in v1 §11 was feminine; Persona A was "The Exhausted Mother" |
-| **D-B** | **"الاحتواء" is internal team vocabulary only.** Never reaches a user | v1 used "containment mode" inside user-facing flow specs |
-| **D-C** | **Memory is the heart of the product** and must be used to the maximum, naturally | v1 treated memory as one feature (F8) among thirteen |
-| **D-D** | **New free retention system: a daily rhythm of Seed (morning) + Harvest (evening)**, always linked | v1 assumed the parent arrives only at the moment of trouble |
-| **D-E** | **Timing must follow the event.** Never ask about sleep at the start of the night, or about school after school ended | v1 fixed everything at 21:00 local |
-| **D-F** | **Memory is derived from real signal**, never from a static content library | v1 did not forbid template content for proactive messages |
-| **D-G** | **Free is never deliberately degraded.** The free/paid difference is the *level of companionship*, never the quantity of memory or information | v1 §14 implied tiering by mechanism access |
-| **D-H** | **Paid value is expressed as outcome, never as technology.** No selling memory, reports, initiative, plans, or tracking | v1 §11.5 was literally a four-bullet feature list — the exact error v1 §4 diagnosed and then committed |
-| **D-I** | ~~Discovery is deferred~~ → **RESOLVED 2026-07-30. The discovery architecture is §33: four doors, no push, no product name, trust measured before conversion** | v1 specified a "persistent quiet affordance" with a conversion target (F9) |
-| **D-J** | **Telegram First.** Every interaction is audited for fewer taps: buttons, quick replies, pinned messages, menus, voice | v1 had the principle (P4) but no systematic audit |
-| **D-K** | **No implementation until this version is approved** | — |
-
-**Section-by-section change log is at §31.**
+**Organising rule (Decision 020):** this document is structured around **five engines**, not a feature list. Nothing exists outside an engine.
 
 ---
 
 ## Table of contents
 
-0. What changed in v2, and why
-1. Product vision
-2. Product principles
+**Part I — The product**
+0. What changed, and the conflicts resolved
+1. Vision and philosophy
+2. Principles
 3. Positioning, voice, and the two lexicons
-4. Value proposition
-5. Customer transformation
-6. User personas
-7. Jobs To Be Done
-8. Information architecture
-9. Complete user journey
-10. Every user state
-11. Conversation flows
-12. The memory model
-13. The timing model
-14. Telegram-first interaction audit
-15. Feature map
-16. Value ladder
-17. Activation strategy
-18. Habit loop
-19. Growth loop
-20. Referral loop
-21. Monetization strategy
-22. Pricing strategy
-23. Success metrics
-24. North Star Metric
-25. Product analytics events
-26. Experiment roadmap
-27. Product roadmap
-28. Risks and assumptions
-29. Features to remove / keep / build
-30. Decisions challenged and rejected
-31. Change log v1 → v2
-32. Open decisions requiring founder input
-33. **The discovery architecture (resolves D7)**
+4. Personas and jobs
+5. The free/paid boundary
+6. The business unit: the Journey
+
+**Part II — The five engines**
+7. Knowledge Engine
+8. Conversation Engine
+9. Journey Engine
+10. Telegram Engine
+11. Growth Engine
+
+**Part III — The experience**
+12. Complete user journey
+13. Every user state
+14. Conversation flows
+15. Commerce: how it reaches the parent without selling
+
+**Part IV — Operating the product**
+16. North Star and metrics
+17. Analytics events
+18. Experiments
+19. Roadmap
+20. Risks and assumptions
+21. Rejected decisions
+22. Open decisions
+
+**Appendix**
+23. Change log
 
 ---
 
-## 1. Product vision
+# PART I — THE PRODUCT
 
-**Ten-year vision**
+## 0. What changed, and the conflicts resolved
 
-> Every Arab parent who wants to break a cycle of shouting has someone with them in the moment it matters — and proof, in their own hands, that they are changing.
+### 0.1 The twenty decisions
 
-**Three-year vision**
+| # | Decision | Effect here |
+|---|---|---|
+| 001 | ADAM is a long-term parenting companion driving a real outcome. **The conversation is not the product; the outcome is** | §1, §6 |
+| 002 | **Free and paid share the same intelligence, the same answer quality, the same understanding.** Free gives knowledge, understanding, daily companionship, personalisation. Paid leads the parent through a personal journey to a clear goal | §5 |
+| 003 | **Memory is the foundation of the whole product**, not a paid feature. Paid has no more memory — it uses memory to build a journey | §7 |
+| 004 | **No fixed plans.** Every plan is generated from this child, this parent, the history, the knowledge, the current problem, the goal. **No templates** | §9 |
+| 005 | Paid is described in outcomes. **Banned words: memory, reports, follow-up, plan, intelligence** | §3.5 |
+| 006 | **ADAM does not sell.** No prices, no subscription talk, no payment methods. Purchase moves to a specialised agent | §15 |
+| 007 | **All subscription and payment information lives in the Telegram Menu**, not in conversation. Supported countries see a payment method; others see a waitlist. **Prices: 2,300 DZD · 490 EGP · 110 MAD** | §10, §15 |
+| 008 | **Telegram is the product surface**, not a channel: Menu, Commands, Pinned, Inline Buttons, Reply Keyboard, Deep Links — at app quality | §10 |
+| 009 | The main menu is **fixed**. Exactly **one item changes** with the parent's stage | §10.3 |
+| 010 | Free has a daily rhythm: **Seed → Harvest**, and Harvest is an extension of Seed, never a separate question | §9.2 |
+| 011 | Timing follows the logic of the day, not fixed hours | §9.3 |
+| 012 | Every message uses what is known. The child's name appears naturally whenever useful | §7 |
+| 013 | Parents, not mothers. Neutral Arabic. Internal terms like **الاحتواء** never reach a user | §3.4, §3.6 |
+| 014 | **Hybrid conversation:** dynamic context-generated buttons + free conversation, always with a **"شيء آخر"** button. ADAM can create new buttons mid-dialogue | §8 |
+| 015 | **Supabase is the single source of truth. n8n is the nervous system. The LLM stores nothing.** Everything passes through the Knowledge Engine | §7 |
+| 016 | **The Journey is the business unit, not the subscription.** Each journey has a goal, progress, adjustment, outcome. The subscription lets journeys continue | §6 |
+| 017 | Country is core to the experience: payment, currency, commercial journeys, waitlist | §10.4 |
+| 018 | **Assume the parent believes ADAM is entirely free.** Do not rely on them asking, and do not rely on chance discovery. The commercial model must be integrated into the experience itself, naturally and gracefully, without sales pressure | §15 |
+| 019 | **Knowledge is free. Daily execution, follow-through, and the personal journey to an outcome are paid** | §5 |
+| 020 | **Build engines, not features.** Knowledge · Conversation · Journey · Telegram · Growth. Nothing outside them | Whole document |
+
+### 0.2 The one real contradiction, and how it is resolved
+
+**Decision 006 says ADAM never mentions price or subscription. Decision 018 says do not rely on the parent asking, and do not rely on chance discovery.**
+
+Taken literally, those two close every door: ADAM cannot speak about it, and the parent cannot be expected to ask. Something has to carry it.
+
+**Decisions 007 and 009 are the answer, and they are why this works:**
+
+> **The Menu is permanently visible from the first message.** It always contains what is possible and what it costs. Therefore the parent *cannot* be surprised — the commercial model was never hidden and was never announced either. There is nothing to "discover" because nothing was concealed.
+
+That yields the seam this product is built on:
+
+| Layer | Owns | Never does |
+|---|---|---|
+| **ADAM** | Naming the goal. *"نعمل على نوم يوسف — خمس ليالٍ هادئة من سبع."* Pure product | Never says a price, a currency, a payment method, or the word subscription |
+| **The Menu** | Turning a goal into a startable journey. Always visible, never announced | Never notifies, never badges, never nags |
+| **The sales agent** | Country, currency, price, payment, receipt, confirmation | Never gives parenting advice |
+
+**ADAM names goals. The Menu is the door. The agent is the cashier.** Naming a goal is a product act, not a sales act — which is precisely why ADAM can do it without breaking 006.
+
+### 0.3 Conflicts with v2, resolved in favour of the new decisions
+
+| v2 said | Now | Why the new decision wins |
+|---|---|---|
+| ADAM quotes `{price}` when asked (§11.8) | **ADAM never quotes a price** | 006 |
+| Discovery relies on the parent asking (Door 2 as primary path) | **The Menu carries it, permanently** | 018 |
+| Persistent reply keyboard **refused** | **Adopted** | 008 |
+| One-time purchase, not subscription (four evidenced reasons) | **Journey is the unit; subscription enables continuation** | 016 — see the risk in §20 R6 |
+| DZD price pending confirmation | **2,300 DZD confirmed** | 007 — closes v2's D9 |
+| The paid thing has no product name | **Still has no product name** — it is described as a journey toward a stated goal | Consistent with 005 |
+| Fixed button sets | **Dynamic, context-generated buttons + "شيء آخر"** | 014 |
+| Features F1–F16 | **Five engines** | 020 |
+
+---
+
+## 1. Vision and philosophy
+
+### 1.1 The philosophy shift (001)
+
+> **The conversation is not the product. The outcome is.**
+
+ADAM is not an assistant that answers parenting questions well. It is a companion that takes a parent from a real problem to a real result with their own child, and stays for the next one.
+
+Everything follows from that sentence. A brilliant answer that changes nothing is a failure. A modest suggestion that ends the bedtime fight is the product working.
+
+### 1.2 Vision
+
+**Ten-year**
+
+> Every Arab parent who wants to break a cycle of shouting has someone with them in the moment it matters — and a home that is measurably calmer because of it.
+
+**Three-year**
 
 > ADAM is the default companion for Arabic-speaking parents in the hardest moments of raising a child: present in seconds, free to anyone, and trusted enough that parents tell it what they hide from their own families.
 
-**One-year vision**
+**One-year**
 
 > A parent anywhere in the Arab world wakes up to one small thing worth trying with their own child, is asked that evening how it went, and after a month lives in a noticeably quieter home.
 
-**Note on the one-year vision (D-H).** v1 read *"…and after thirty days hold a report that shows exactly how much calmer their home became."* A report is machinery. The parent does not want a report; they want the quieter home. The report is how we prove it, never what we sell.
+### 1.3 What we are not building
 
-**What we are not building:** a parenting course, a content library, a diagnosis tool, a therapist replacement, or a child-behaviour tracker. Each was considered and rejected in §30.
+A parenting course · a content library · a diagnosis tool · a therapist replacement · a child-behaviour tracker · a chatbot that is impressive to talk to. Each rejected in §21.
 
 ---
 
-## 2. Product principles
+## 2. Principles
 
-Decision rules. When a build decision is ambiguous, these resolve it — in order.
+Decision rules, in priority order.
 
-| # | Principle | Rule in practice | Evidence |
-|---|---|---|---|
-| **P1** | **The crisis is never monetised** | No paywall, cap, or upsell may ever appear in a conversation where a parent is distressed | *"انت طلعت بفلوس اخص عليك"* — observed reaction to a paywall inside an emotional relationship |
-| **P2** | **Never ask before you give** | No profiling question may precede the first useful answer | 94.1% onboarding abandonment (271/289 stuck at step 0) |
-| **P3** | **They are tired, not guilty** | No output may attribute blame to the parent, even when factually true | Already encoded; 73 guilt messages in the corpus |
-| **P4** | **Fewest taps wins** | Any recurring interaction must be answerable with a tap. Typing is the fallback, never the requirement | Avg human message = 53 chars; parents are dysregulated when they write |
-| **P5** | **Show memory, never announce it** | Never say "I see in your file". Demonstrate continuity by using it | Announcing memory reads as surveillance |
-| **P6** | **Value per effort** | Every reply is 2–3 lines: one cause, one step, one measure | Matches an exhausted reader |
-| **P7** | **Honest limits** | Never promise a guaranteed child outcome | Protects trust, which is the moat |
-| **P8** | **Free forever, everywhere** | Geography may gate payment. It may never gate help | 140/289 signups blocked; 23,697 unserved audience |
-| **P9** | **Silence over harm** | When memory could reopen a wound, store nothing | *"الذاكرة الناقصة أرحم ألف مرة من الذاكرة التي تجرح"* |
-| **P10** | **No scarcity, ever** | No countdowns, limited seats, expiring offers | Incompatible with P1 and P3 |
-| **P11** | **Memory is the product** *(new, D-C)* | No proactive message may be generic. If ADAM cannot ground it in something it actually knows about *this* child, it does not send it | The one durable advantage; a generic tip is available free everywhere |
-| **P12** | **Written for both parents** *(new, D-A)* | Default to constructions that carry no gender. Where gender is known, render it. Never assume mother | 18.5% of the audience is male; 4 of 18 declared users are fathers |
-| **P13** | **A daily rhythm, not a crisis line** *(new, D-D)* | The free tier has a heartbeat: one small thing in the morning, one question in the evening, linked | Waiting for trouble means being remembered only as the trouble |
-| **P14** | **Timing follows the event** *(new, D-E)* | Every message is scheduled relative to the moment it concerns — never to a global clock | Asking about bedtime at 21:00 asks about a thing that has not happened |
-| **P15** | **Free is never crippled** *(new, D-G)* | No feature may be degraded solely to create a reason to pay | A deliberately worsened free tier is a trust cost with no product benefit |
-| **P16** | **Sell the destination, not the machinery** *(new, D-H)* | Every commercial sentence answers "what will my life be like in a month?" — never "what is included?" | *"لا أحد يشتري ذاكرة"* — our own prompt already concedes this |
+| # | Principle | Rule in practice |
+|---|---|---|
+| **P1** | **The crisis is never monetised** | No price, cap or commercial surface may appear in a conversation where a parent is distressed |
+| **P2** | **Never ask before you give** | No profiling question precedes the first useful answer. *94.1% onboarding abandonment* |
+| **P3** | **They are tired, not guilty** | No output may attribute blame, even when factually true. *73 guilt messages in the corpus* |
+| **P4** | **Fewest taps wins** | Any recurring interaction is answerable with a tap. *Avg human message = 53 chars* |
+| **P5** | **Show memory, never announce it** | Never "I see in your file". Demonstrate continuity by using it |
+| **P6** | **Value per effort** | 2–3 lines: one cause, one step, one measure |
+| **P7** | **Honest limits** | Never promise a guaranteed child outcome |
+| **P8** | **Free forever, everywhere** | Geography may gate payment. It may never gate help. *140/289 blocked; 23,697 unserved* |
+| **P9** | **Silence over harm** | When memory could reopen a wound, store nothing |
+| **P10** | **No scarcity, ever** | No countdowns, limited seats, expiring offers |
+| **P11** | **Memory is the foundation** (003) | No proactive message may be generic. Ungrounded in *this* child → not sent |
+| **P12** | **Written for both parents** (013) | Gender-free by default; rendered when known; never assume mother |
+| **P13** | **A daily rhythm, not a crisis line** (010) | Free has a heartbeat: Seed, then Harvest |
+| **P14** | **Timing follows the event** (011) | Scheduled relative to the moment it concerns |
+| **P15** | **Free is never crippled** (002) | Same intelligence, same answer quality, same understanding. No feature is degraded to create a reason to pay |
+| **P16** | **Sell the destination, never the machinery** (005) | Every commercial sentence answers *"what will my life be like in a month?"* |
+| **P17** | **ADAM never sells** (006) | ADAM names goals. It never names prices |
+| **P18** | **Nothing is generated from a template** (004) | Every plan, Seed and journey is generated from this family's actual knowledge |
+| **P19** | **Build engines, not features** (020) | No capability exists outside the five engines |
 
-**P1, P2, P8 and P15 override commercial considerations.** If a growth tactic conflicts with them, the tactic is wrong.
+**P1, P2, P8, P15 and P17 override commercial considerations.** A growth tactic that conflicts with them is wrong.
 
 ---
 
@@ -121,437 +177,299 @@ Decision rules. When a build decision is ambiguous, these resolve it — in orde
 ### 3.1 Positioning statement
 
 > **For** exhausted Arabic-speaking parents who already know what good parenting looks like but cannot reach it when they are angry,
-> **ADAM is** a companion present in the moment itself
-> **that** knows your child by name, offers one small thing each morning, asks how it went each evening, and month by month makes the house quieter.
+> **ADAM is** a companion that knows your child by name and walks with you to an actual result,
+> **that** offers one small thing each morning, asks how it went each evening, and takes you through a named goal until the house is quieter.
 > **Unlike** parenting content, courses, or general AI assistants,
-> **ADAM** is already in the middle of your family's story and never needs catching up.
+> **ADAM** is already in the middle of your family's story and measures whether things actually changed.
 
 ### 3.2 The category shift
 
-| | From (current) | To (proposed) |
+| | From | To |
 |---|---|---|
 | **Hero** | The child | The parent |
 | **Promise** | Understand what your child doesn't say | A quieter house, and you steadier in it |
 | **Proof** | ADAM explains | ADAM shows change that already happened |
-| **Category** | AI parenting advice | The companion who knows your family |
+| **Category** | AI parenting advice | The companion who gets you to a result |
 | **Moment of use** | Whenever curious | Every morning, every evening, and the moment of losing control |
 
-Note the last row. v1 said only *"the moment of losing control."* Under D-D, use is now daily and expected, not incident-driven.
+**Brand continuity:** keep the name, handle and identity. 41,100 followers and a 525,682-reach proof point. The promise evolves; the brand does not reset.
 
-### 3.3 Brand continuity — a deliberate constraint
-
-**Keep the name, handle, and visual identity.** "آدم | ما لا يقوله طفلك" carries ~41,100 followers and a 525,682-reach proof point. The promise evolves; the brand does not reset. Tagline shifts over one quarter, not overnight.
-
-### 3.4 Voice attributes
+### 3.3 Voice attributes
 
 | Attribute | Do | Don't |
 |---|---|---|
-| **Warm without excess** | "أنا هنا" | "حبيبتي", "قلبي", any pet name |
+| **Warm without excess** | "أنا هنا" | "حبيبتي", "قلبي", pet names |
 | **Never blaming** | "الخوف صار ضيفاً ثقيلاً في البيت" | "أنتِ أخفتِها", "بسببك" |
-| **Short** | 2–3 lines, phone-readable | Walls of text, numbered essays |
-| **Practical** | One cause, one step, one measure | Theory, philosophy, citations |
+| **Short** | 2–3 lines | Walls of text |
+| **Practical** | One cause, one step, one measure | Theory, citations |
 | **Honest** | "أمشي معكم ولا أعِد بطفلٍ مثالي" | "سيتوقف", "مضمون" |
-| **Plain Arabic** | Simplified MSA, light dialect touch | Foreign words, ornate metaphor, poetry |
-| **Specific to this family** *(new)* | "تجربة التنبيه مع يوسف" | "جرّب التنبيه المسبق مع طفلك" |
+| **Plain Arabic** | Simplified MSA, light dialect | Foreign words, ornate metaphor |
+| **Specific to this family** | "تجربة التنبيه مع يوسف" | "جرّب التنبيه المسبق مع طفلك" |
 
-**Absolute bans:** scarcity, urgency, expiring offers, intimate pet names, guilt attribution, guaranteed child outcomes, claiming to remember something never said, any link or phone number inside emotional messages, and — new under P11 — **any proactive message that would read identically to a different family.**
+### 3.4 Writing for both parents (013)
 
-### 3.5 Writing for both parents (D-A) — the actual technique
+Arabic has no neutral second-person imperative. Neutrality is achieved **structurally**.
 
-Arabic has no neutral second-person imperative. "أخبريني" and "أخبرني" are both gendered; there is no third option. Neutrality is therefore achieved **structurally, not lexically**.
-
-**Every user-facing string is authored in three forms:** masculine, feminine, and a **gender-free default** used whenever gender is unknown. The gender-free default is the primary form; the gendered variants are refinements.
-
-**Four techniques that produce genuinely gender-free Arabic:**
+**Every user-facing string exists in three forms:** masculine, feminine, and a **gender-free default** used when gender is unknown. The gender-free default is primary.
 
 | Technique | Instead of | Write |
 |---|---|---|
 | **Nominal sentence** | "أخبريني كيف كانت" | "والليلة: كيف كانت؟" |
-| **First-person plural for shared action** | "جرّبتِ وما نجحت" | "جرّبناها وما نجحت" |
+| **First-person plural** | "جرّبتِ وما نجحت" | "جرّبناها وما نجحت" |
 | **Button instead of imperative** | "اكتبي لي ما حدث" | `[ما حدث الليلة]` |
 | **Impersonal / passive** | "ستعرفين أنها نجحت إذا…" | "علامة النجاح: أن ينام دون نداء" |
 | **Respectful plural** | "أمشي معكِ" | "أمشي معكم" |
 
-**The first-person plural is a genuine upgrade, not a workaround.** "جرّبناها" ("we tried it") is warmer and more collaborative than "جرّبتِها" ("you tried it"), and it quietly removes the implication that success or failure belongs to the parent alone. The constraint improved the copy.
+**"جرّبناها" is an upgrade, not a workaround** — warmer than "جرّبتِها", and it stops implying the outcome belonged to the parent alone.
 
-**An honest limit — and why the three-form system is mandatory, not optional.**
+**Ranked preference for any new string:**
 
-The four structural techniques cover most copy, but **not all of it.** Some sentences genuinely require second person, and Arabic offers no truly neutral singular form. The masculine singular is often used as a generic default — and it is **not acceptable here**, because 57.6% of this audience is women and "أنت تعرف" addressed to a mother is exactly the defect D-A exists to remove, only pointing the other way.
+1. Nominal, impersonal, or first-person plural — no gendered form needed
+2. Respectful plural — acceptable as the unknown-gender form
+3. Three explicit forms rendered from known gender
+4. **Masculine singular as a generic — never.** 57.6% of this audience is women
 
-This was caught while drafting §11.8, §11.9 and §20 of this very document: all three had slipped into masculine second person under the label "gender-free". They were rewritten nominally. The lesson is structural, not editorial:
+**ADAM refers to himself in the masculine.** That is a name, not an assumption. Never infer the parent's gender from the child's, or from a name.
 
-> **Where a string cannot be written without second person, structural neutrality has failed and the three-form system is doing the work.** In that case the *unknown-gender* form must use the respectful plural, never the masculine singular.
+### 3.5 Banned and approved commercial vocabulary (005)
 
-Ranked preference for any new string:
+**Banned in any user-facing string — these describe machinery:**
 
-1. Nominal, impersonal, or first-person plural — **no gendered form needed at all**
-2. Respectful plural — acceptable for the unknown-gender form
-3. Three explicit forms with masculine/feminine rendered from `Parent.gender` — required whenever 1 and 2 are impossible
-4. **Masculine singular as a generic — never**
+`ذاكرة` · `تقارير` · `متابعة` · `خطة` · `ذكاء` · `اشتراك` (from ADAM) · `ميزات` · `نظام` · `تحليل`
 
-**Gender of ADAM:** ADAM always refers to himself in the masculine. That is a name, not an assumption about the user.
+**Approved — these describe a life:**
 
-**Where gender is known** — declared, or confidently inferred from the parent's own grammar — render the gendered variant. **Never infer gender from the child's gender, and never guess from a name.**
+`هدوء أكبر في البيت` · `عناد أقل` · `فهم الطفل` · `روتين يستقر` · `صراخ أقل` · `علاقة أفضل` · `ليلة تنتهي دون معركة`
 
-### 3.6 The two lexicons (D-B)
+**The test:** does the sentence answer *"what will my life be like in a month?"* — or *"what is included?"* If the second, rewrite or delete.
 
-Some of our most useful words are **diagnostic vocabulary for the team** and would be alienating or clinical if a parent saw them.
+### 3.6 The two lexicons (013)
 
-| Internal term | Never shown as | What the parent experiences instead |
-|---|---|---|
-| **الاحتواء** (containment) | — | ADAM simply stays, listens, and does not rush to advise |
-| Seed / Harvest | — | A morning thought and an evening question — no names, no labels |
-| Situation / flashpoint | — | The situation named plainly: "عند النوم" |
-| Chapter / Journey | *(pending §32 D8)* | Something with a beginning and an end, described in outcomes |
-| Mirror | — | ADAM noticing something |
-| Crisis state / X1 | — | Nothing. The parent must never sense a mode change |
-| Tier, free, paid, upgrade | — | *(see D-H and §21)* |
+Diagnostic vocabulary for the team that would be alienating if a parent saw it.
 
-**Hard rule:** these words appear in specifications, code, dashboards and team conversation. They appear in a user-facing string **never**. A user-facing string containing one is a defect, not a wording preference.
+| Internal term | What the parent experiences |
+|---|---|
+| **الاحتواء** (containment) | ADAM stays, listens, and does not rush to advise |
+| Seed / Harvest | A morning thought and an evening question — no names |
+| Situation | The situation named plainly: "عند النوم" |
+| Journey | "نعمل على نوم يوسف" — described, never labelled |
+| Mirror | ADAM noticing something |
+| Crisis state / X1 | Nothing. The parent never senses a mode change |
+| Engine, tier, funnel, conversion | Never, in any form |
 
-**Why this matters more than it sounds.** "الاحتواء" is a therapeutic term. A parent who reads it learns they are being handled according to a protocol — the exact opposite of the feeling the protocol exists to create.
+**Hard rule:** these appear in specs, code and team conversation. In a user-facing string, **never**. One in a live string is a defect, not a wording preference.
 
----
-
-## 4. Value proposition
-
-**Primary — gender-free, outcome-led**
-
-> **آدم يعرف طفلك بالاسم، ويمشي معك يوماً بيوم حتى يهدأ البيت.**
-> *ADAM knows your child by name, and walks with you day by day until the house is calmer.*
-
-v1's primary line was *"آدم معكِ في اللحظة الصعبة — ويريكِ بعد ثلاثين يوماً كم تغيّرتِ"* — feminine, and its second half sells a demonstration rather than a destination.
-
-**Layered by audience temperature**
-
-| Audience state | Message | Where used |
-|---|---|---|
-| Cold (content viewer) | "طفلك لا يحتاج صراخاً أكثر — يحتاج بيتاً يشعر فيه بالأمان" | Instagram (proven, 525k reach) |
-| Warm (in the moment) | "ما الذي حدث الآن؟ أنا هنا." | Bot first contact |
-| In the rhythm | "تجربة صغيرة اليوم مع يوسف…" | Morning Seed |
-| Engaged (3+ evenings) | "ثلاث ليالٍ من خمس كانت أهدأ. هذا ما بنيتموه." | First Mirror |
-| Considering | *(deferred — see D-I and §11.8)* | — |
-| Completed | "هنا كانت البداية. وهنا الآن." | End of month |
-
-**What we never say again:** "remembers every situation", "knows your child by name" *as a feature bullet*, or any feature list as the lead. Note the distinction: "knows your child by name" is excellent as a **demonstrated fact inside a message** and forbidden as a **claim inside an offer**.
+**Why "الاحتواء" specifically:** it is a therapeutic term. A parent who reads it learns they are being handled according to a protocol — the exact opposite of what the protocol exists to create.
 
 ---
 
-## 5. Customer transformation
+## 4. Personas and jobs
 
-The product exists to move a parent along one axis.
-
-```
-BEFORE                                          AFTER
-─────────────────────────────────────────────────────────────
-"I shout, then I hate myself."          →   "I caught myself, and I know it."
-"I have no idea why he does this."      →   "I know what sets him off."
-"I read a lot and change nothing."      →   "I did one small thing and it worked."
-"I'm alone in this."                    →   "Someone is with me, every day."
-"I might be a bad parent."              →   "The house is quieter, and I did that."
-```
-
-*(v1's final row read "I might be a bad mother" → "I have proof I'm becoming calmer." Both halves revised: the first for D-A, the second for D-H — "proof" is machinery; the quieter house is the outcome.)*
-
-**The transformation is measured, not claimed.** Measurement is how we know and how we show. It is not the thing being sold.
-
-**Transformation milestones — the product must make each one legible:**
-
-| # | Milestone | Trigger | Parent feels |
-|---|---|---|---|
-| **T1** | First relief | First usable step received | "Someone is here." |
-| **T2** | First win | First Harvest answered positively | "It actually worked." |
-| **T3** | First recognition | First Mirror at 3+ logged evenings | "It knows my child." |
-| **T4** | Named pattern | Recurring situation identified and confirmed | "I understand what's happening." |
-| **T5** | Identity shift | End of month | "My house is calmer, and I did that." |
-
----
-
-## 6. User personas
-
-### Persona A — والد منهك · "The Exhausted Parent" (primary)
+### 4.1 Persona A — والد منهك · The Exhausted Parent (primary)
 
 | | |
 |---|---|
-| **Who** | Parent, 25–44, DZ/EG/MA/IQ/SY and the wider Arab world, 1–3 children aged 2–11 |
-| **Size** | The core of the audience. Gender split: 57.6% women, 18.5% men, remainder undeclared |
-| **Trigger moment** | Late evening, after shouting or hitting, alone, flooded with shame |
-| **Current alternative** | Instagram reels, family advice, the bathroom door |
+| **Who** | Parent, 25–44, across the Arab world, 1–3 children aged 2–11 |
+| **Size** | The core. Gender split: 57.6% women, 18.5% men, remainder undeclared |
+| **Trigger** | Late evening, after shouting or hitting, alone, flooded with shame |
+| **Alternative today** | Instagram reels, family advice, the bathroom door |
 | **Job** | Stop being the angry parent; be seen without judgement |
 | **Evidence** | *"بنتي عمرها ٤ سنوات حاسة اني فاشله ف التربية"* · *"بس اريد اكون ام اسلوبها هادئ"* · *"انا بضرب"* |
 | **Blocker** | Cannot pay by card; may be in an unsupported country |
-| **Design implication** | Voice input, one-tap logging, zero forms, free rescue, **gender-free default copy** |
 
-**Two sub-variants — same job, different framing emphasis:**
+**Two sub-variants, one job:** **A1 الأم** (57.6%) names shame more explicitly; **A2 الأب** (18.5%) frames around authority and discipline alongside connection. **Not separate personas** — treating the father as an exception is what produced a mother-default product.
 
-| Sub-variant | Share | What differs |
-|---|---|---|
-| **A1 — الأم** | 57.6% of audience | Shame and self-judgement more often named explicitly |
-| **A2 — الأب** | 18.5% of audience | Authority and discipline framing appears alongside connection; less likely to name shame directly |
+### 4.2 Persona B — والد على القائمة · The Waitlisted Parent
 
-**These are not separate personas.** v1 made the father a separate persona (C), and that is precisely what produced a mother-default product with a father exception. The job is identical; only emphasis shifts. One product, gender-free by default.
+48.4% of signups (140/289); 57.6% of audience (23,697). Identical job. The Gulf sub-segment (~5,749) has materially higher ability to pay than all three current markets. **Serve free immediately; gate only payment** (P8, 017).
 
-### Persona B — والد على القائمة · "The Waitlisted Parent" (largest untapped)
+### 4.3 Persona C — والد في أزمة · The Crisis Parent
 
-| | |
-|---|---|
-| **Who** | Identical job to A, in IQ/SY/SA/JO/YE/OM/Gulf |
-| **Size** | 48.4% of signups (140/289); 57.6% of audience (23,697) |
-| **Distinguishing fact** | Gulf sub-segment (~5,749) has materially higher ability to pay than all three current markets |
-| **Evidence** | Country distribution in `followers` + Instagram audience data — two independent sources agreeing |
-| **Design implication** | **Serve free immediately. Gate only payment.** Collect proven demand for a future rail |
+Small, highest stakes. Disclosures of third-party abuse, bereavement, adolescent substance use, or the parent's own violence. *"حذرنا المعتدي سابقا"* · *"اكتشفت أنه يدخن ويتعاطى"* · *"انا بضرب"*. **The daily rhythm suspends entirely.** §14.6, §22 D1.
 
-### Persona C — والد في أزمة · "The Crisis Parent" (small, highest stakes)
+**Not a persona:** the curious browser. No evidence of a meaningful non-distressed segment.
 
-| | |
-|---|---|
-| **Who** | Parent disclosing third-party abuse, bereavement, adolescent substance use, or their own violence |
-| **Size** | Small but present across 2,086 messages |
-| **Evidence** | *"حذرنا المعتدي سابقا"* · *"اكتشفت أنه يدخن ويتعاطى"* · *"فقدنا أمنا منذ عام"* · *"انا بضرب"* |
-| **Design implication** | Detection + human escalation. Never automated advice. **The daily rhythm suspends entirely.** §11.9, §32 |
-
-**Explicitly not a persona:** the "curious browser." No evidence of a meaningful non-distressed segment. Do not design for them.
-
----
-
-## 7. Jobs To Be Done
-
-### Primary job
+### 4.4 The job
 
 > **When** my child does something I can't handle and I feel myself losing control,
 > **I want to** not become the parent I'm ashamed of,
 > **so that** my child remembers a home that was safe.
 
-### Job dimensions — all four must be served
-
 | Dimension | Job | Served by | Evidence |
 |---|---|---|---|
-| **Functional** | Interrupt escalation; give me one action now | The Moment | 168 "how do I" messages; 53-char avg |
-| **Emotional** | Stop feeling like a failure; be seen without judgement | Voice + no-blame discipline | *"عايزه حد يشوفنى حلوه من جوه من غير احكام"* |
-| **Social** | Be a parent whose children remember warmth | The Mirror + end of month | *"عندما يكبرون لا يذكرون الا الصراخ والتوبيخ"* |
-| **Relational** *(new, D-C/D-D)* | Have someone in this with me who doesn't need re-explaining | The daily Seed→Harvest rhythm + memory | *"خسارة انك لا تذكرني"* — an explicit complaint about discontinuity |
+| **Functional** | Interrupt escalation; one action now | Conversation Engine | 168 "how do I" messages |
+| **Emotional** | Stop feeling like a failure | Voice + no-blame discipline | *"عايزه حد يشوفنى حلوه من جوه من غير احكام"* |
+| **Social** | Be a parent whose children remember warmth | Journey Engine outcomes | *"عندما يكبرون لا يذكرون الا الصراخ والتوبيخ"* |
+| **Relational** | Someone in this with me who doesn't need re-explaining | Knowledge Engine | *"خسارة انك لا تذكرني"* |
 
-That last quote is the clearest single justification for D-C and D-D together. **A parent told us the discontinuity hurt.**
+That last quote is the clearest justification for making memory the foundation (003). **A parent told us the discontinuity hurt.**
 
-### Secondary jobs
+### 4.5 Forces of Progress
 
-| Job | Evidence | Served in |
-|---|---|---|
-| Interrupt intergenerational trauma | *"لا أريد أن تنتقل لهم الصدمات"* | Positioning + end of month |
-| Not be alone | 20,991 shares on one post | Later (peer presence) — not MVP |
-| Understand a specific worry (speech/development) | 98 messages — #3 theme | NEXT (§27) |
-
-### Forces of Progress — the design brief
-
-| Force | State | What the blueprint does about it |
+| Force | State | Answer |
 |---|---|---|
 | **Push** | 🟢 Very strong | Nothing needed — 73 guilt + 28 exhaustion messages |
-| **Pull** | 🟢 Strong | Preserve conversation quality; add the Mirror |
-| **Anxiety** | 🔴 Unaddressed | Permanent free guarantee; no recurring commitment; 30-day guarantee |
-| **Habit** | 🔴 Unaddressed → **now the Seed/Harvest rhythm** | v1 had no habit answer beyond a single evening ping. D-D makes the rhythm the answer |
-
-**Every feature in §15 exists to reduce Anxiety or Habit.** Adding more Pull is not the constraint.
+| **Pull** | 🟢 Strong | Preserve conversation quality; add visible change |
+| **Anxiety** | 🔴 | Free forever; no hidden commercial model; guarantee |
+| **Habit** | 🔴 → **answered** | The Seed/Harvest rhythm (010) |
 
 ---
 
-## 8. Information architecture
+## 5. The free/paid boundary
 
-A conversational product has no navigation tree. Its IA is: **entity model + state machine + interruption points.**
+### 5.1 The principle (002, 019)
 
-### 8.1 Entity model
+> **Knowledge is free. Daily execution, follow-through, and the personal journey to a result are paid.**
 
-```
-Parent ─┬─ 1:N ─ Child ─┬─ 1:N ─ Situation      (the recurring hard moment)
-        │               └─ 1:N ─ Pattern
-        ├─ 0:1 ─ Knowledge                      (what ADAM knows — derived)
-        ├─ 1:N ─ Moment                         (a rescue event)
-        ├─ 1:N ─ Day ─┬─ 1:1 ─ Seed             (morning)
-        │             └─ 0:1 ─ Harvest          (evening)
-        ├─ 1:N ─ Mirror
-        ├─ 0:1 ─ Chapter ─ 1:N ─ Payment
-        ├─ 1:N ─ Message
-        └─ 0:N ─ CrisisFlag
-```
+**Same intelligence. Same answer quality. Same understanding. Same memory.** Free is not a degraded product — it is a complete one with a different scope of *labour*.
 
-| Entity | Purpose | Why it exists |
+| | Free | Paid |
 |---|---|---|
-| **Parent** | The customer | Identity, state routing, **gender when known** |
-| **Child** | Who this is about | Name is the strongest continuity signal we have |
-| **Situation** | The recurring hard moment, with **a time-of-day window** | The unit of work. The window is what makes D-E possible |
-| **Knowledge** | Derived: what ADAM actually knows about this family | **New in v2.** Makes P11 enforceable — a Seed cannot be generated without reading it |
-| **Moment** | A rescue event | Measures the highest-value interaction |
-| **Day** | One Seed and its Harvest, as a single unit | **New in v2.** They are two halves of one thing (D-D) and must not be separable rows |
-| **Seed** | The morning suggestion, grounded in Knowledge | Records what it was derived from, so an ungrounded Seed is detectable |
-| **Harvest** | The evening answer to *that* Seed | Never a generic "how was your day" |
-| **Pattern** | Derived insight | What makes ADAM feel like it knows the child |
-| **Mirror** | A generated reflection | Must be a first-class object, not a message |
-| **Chapter** | The paid container | *(naming and duration pending §32 D8)* |
-| **Payment** | A transaction | Manual reconciliation |
-| **Message** | Conversation history | Memory + analysis corpus |
-| **CrisisFlag** | Safeguarding | Duty of care |
+| **Intelligence** | **Full** | **Identical** |
+| **Answer quality** | **Full** | **Identical** |
+| **Memory of the child** | **Full** | **Identical** |
+| **Personalisation** | **Full** | **Identical** |
+| **Help when asked** | **Unlimited** | Unlimited |
+| **Daily rhythm** | Seed + Harvest | Seed + Harvest |
+| **What is different** | — | **A named goal, driven daily until it is reached or honestly declared unreached** |
 
-**Renamed from v1:** `Flashpoint` → `Situation` (internal-lexicon hygiene per D-B: "flashpoint" has no natural Arabic rendering and kept leaking into draft copy). `Night` → `Day`, carrying an explicit Seed/Harvest pair. `Journey` → `Chapter`, pending D8.
+### 5.2 Why this line is defensible
 
-**Deleted:** `main_pain` as a fixed 8-value enum — it forced a taxonomy that missed the #3 theme (speech/development, 98 messages). Situation is free text with a derived label.
+It withholds **no information**. Ask ADAM how to predict a hard night and it tells you, completely, free, from your own data. What costs money is not knowing — it is **someone doing it with you, every day, until the goal lands.**
 
-**Correction to v1.** v1 §8.1 listed `weekly_plans` and `survey_responses` as deletable. The 2026-07-29 dependency audit found live writers for both. They are retained and marked deprecated in the database. **v1 was wrong because it predated the audit.**
+Information versus labour is the only boundary that can honestly carry a price in a product whose entire moat is trust.
 
-### 8.2 Data integrity rules (non-negotiable)
+### 5.3 Banned framings (P15)
 
-| Rule | Why |
+| Never | Why |
 |---|---|
-| Every conversation must resolve to a Parent row before the first reply | Otherwise the user is invisible to every downstream system |
-| Engagement counters must be derived, never incremented by a workflow | Incrementers silently fail — `message_count` sat frozen at 0 while parents actively conversed |
-| Agent context must never be persisted into stored user messages | Pollutes memory, inflates cost |
-| Every generated message must have a hard length ceiling | One stored message reached 169,230 chars |
-| Price must be injected from configuration, never inferred | The agent invented "150 EGP" against a real 490 |
-| **A Seed must record the Knowledge it was derived from** *(new)* | The only way to enforce P11 mechanically rather than by hoping the prompt behaves |
-| **A Harvest must reference its Seed** *(new)* | Enforces D-D's linkage structurally, so a generic evening question is impossible to send |
-| **Every user-facing string must exist in all three gender forms** *(new)* | Enforces D-A at the content layer, not per-message improvisation |
+| "Free remembers 7 days" | Crippling the product to manufacture a reason to pay. Also self-defeating: shallow memory makes the free Seed generic, breaking P11 |
+| "Free gets 3 messages a day" | Rationing help (P1, P8) |
+| "Unlock full memory / smarter answers" | Directly contradicts 002 |
+| "Paid gets more features" | Nobody wants more features. They want the house quieter |
 
-The last three follow the pattern this project has learned to trust: **make the rule an invariant of the data, not a convention in a prompt.**
+---
 
-### 8.3 Surfaces
+## 6. The business unit: the Journey (016)
 
-| Surface | Role | Notes |
+### 6.1 The unit of value is not the subscription
+
+> **A Journey is: a goal · progress · adjustment · an outcome.**
+>
+> The subscription is what lets journeys continue. It is the access mechanism, not the thing being bought.
+
+A parent does not buy "a month of ADAM." They start **the sleep journey with Yusuf**, aimed at five calm nights out of seven. That either happens or it does not, and ADAM says which.
+
+### 6.2 Anatomy of a Journey
+
+| Element | Rule |
+|---|---|
+| **Goal** | Concrete and falsifiable. "خمس ليالٍ هادئة من سبع" — never "نوم أفضل" |
+| **Generated, never templated** | From this child, this parent, the history, the current problem (004, P18) |
+| **Progress** | Derived from Harvests, never a stored counter |
+| **Adjustment** | When the approach is not working, the journey changes course — and says so |
+| **Outcome** | Declared honestly at the end, reached or not |
+| **Clock** | Counts **days actually logged**, not calendar days. Illness, travel and Ramadan cost the parent nothing |
+
+### 6.3 Honest declaration of failure
+
+A journey that misses its goal says so plainly, and says what was learned. **A failed journey stated honestly builds more trust than a success that was quietly redefined.** This is not a nicety — it is what makes the goal worth stating at all.
+
+### 6.4 The subscription's only role
+
+Journeys continue while the subscription is active. It buys **continuation**, not features, not memory, not intelligence.
+
+**Hard constraint carried forward from a live incident:** the old renewal machinery was found in production sending a parent — last active a month earlier — a demand for 2,300 DZD to a personal bank account, quoting Algerian pricing because her country field was empty, and asserting a "real turning point" assembled from empty fields.
+
+> **ADAM never sends a renewal, expiry, or payment message. Ever.** Continuation is surfaced in the Menu and handled by the sales agent (006, §15). Automated dunning is permanently banned.
+
+---
+
+# PART II — THE FIVE ENGINES
+
+*(Decision 020: nothing exists outside these five.)*
+
+## 7. Knowledge Engine
+
+**Owns:** everything ADAM knows about a family, and the enforcement that no message goes out ungrounded.
+
+### 7.1 The architecture rule (015)
+
+> **Supabase is the single source of truth.**
+> **n8n is the nervous system** — it moves and schedules, it does not decide what is true.
+> **The LLM stores nothing.** It receives knowledge, produces language, and forgets.
+
+Every proactive message reads from the Knowledge Engine before it is composed. No component holds its own private memory.
+
+### 7.2 What Knowledge is built from (012)
+
+Real signal only — **never a static content library** (P18):
+
+| Source | Contributes |
+|---|---|
+| Conversations | The presenting problem, the parent's own words, emotional state |
+| Child's name | Named in proactive messages whenever useful |
+| Child's age | Calibrates what is developmentally reasonable |
+| Recurring situations | Which moment of the day keeps failing, and its time window |
+| Prior outcomes | What worked and what did not — **for this child** |
+| Logged evenings | The calm/hard series over time |
+| Detected patterns | Correlations the parent has not noticed |
+| Country | Language register, and the commercial surface (017) |
+
+### 7.3 Gate: what each message must read before sending
+
+| Message | Must read | Refuses to send if |
 |---|---|---|
-| **Telegram chat** | The whole product | Text + voice notes + inline buttons + pinned message + bot menu |
-| **Instagram/Facebook** | Acquisition only | Never the product surface |
-| **Operator console** | Manual payment confirmation + crisis queue | Minimal internal tool |
+| **Seed** | Child name + (situation OR prior outcome OR pattern) | Any missing → no Seed; ask once instead |
+| **Harvest** | The Seed it belongs to | No Seed today → no Harvest |
+| **Mirror** | ≥3 results + situation labels | Fewer than 3 → does not fire |
+| **Journey step** | Goal + progress + last outcome | Missing → journey pauses, parent told plainly |
+| **Rescue reply** | Whatever exists; may be nothing | **Never refuses — the rescue is unconditional** |
 
-**No mobile app. No web dashboard. No email.**
+**Only the rescue is unconditional.** Everything proactive earns the right to interrupt by being specific.
 
----
+### 7.4 The test for any proactive message
 
-## 9. Complete user journey
+> **Could this exact message be sent to a different family?**
+> **If yes, it does not send.**
 
-```
-┌─ ACQUISITION ────────────────────────────────────────────────┐
-│  Instagram content — reach 150k–525k (already working)       │
-│  CTA reframed from product to moment                         │
-└──────────────────────────┬───────────────────────────────────┘
-                           ▼
-┌─ FIRST CONTACT ──────────────────────────────────────────────┐
-│  /start → NO country gate. NO form. NO questions.            │
-│  TARGET: usable step in < 60 seconds           [T1 relief]   │
-└──────────────────────────┬───────────────────────────────────┘
-                           ▼
-┌─ THE MOMENT (free, forever, everywhere) ─────────────────────┐
-│  One cause · one small thing for tonight · one way to know   │
-└──────────────────────────┬───────────────────────────────────┘
-                           ▼
-┌─ THE DAILY RHYTHM (free — the retention engine, D-D) ────────┐
-│                                                              │
-│   MORNING · Seed          →         EVENING · Harvest        │
-│   one small thing,                  how did *that* go?       │
-│   grounded in this child            one tap                  │
-│      └───────────── always the same subject ──────────┘      │
-│                                                              │
-│  Timed relative to the situation, never to a global clock    │
-│                                                   [T2 win]   │
-└──────────────────────────┬───────────────────────────────────┘
-                           ▼
-┌─ THE FIRST MIRROR (free — the recognition moment) ───────────┐
-│  Fires at 3 logged evenings. Data-gated, never day-gated.    │
-│  Carries no price and no offer, by constraint.      [T3]     │
-└──────────────────────────┬───────────────────────────────────┘
-                           ▼
-┌─ DISCOVERY — four doors, no push (§33) ──────────────────────┐
-│                                                              │
-│  Door 0  another parent mentions it        (highest trust)    │
-│  Door 1  bot menu + pinned line            (she looks)        │
-│  Door 2  she asks — about scope, or for    ← PRIMARY PATH     │
-│          work the free rhythm doesn't do                     │
-│  Door 3  ADAM says its own method isn't    (≤2 per lifetime)  │
-│          enough — free option offered first                  │
-│                                                              │
-│  It has no product name. It is described, never announced.   │
-│  Test: remove the price — is the message still worth sending? │
-└──────────────────────────┬───────────────────────────────────┘
-                           ▼
-┌─ A MONTH AIMED AT ONE CHANGE (paid) ─────────────────────────┐
-│  Described in outcomes only (D-H). See §16.1 and §21.1.      │
-│  Manual payment → operator confirms → begins                 │
-│  The daily rhythm never pauses while payment is pending      │
-└──────────────────────────┬───────────────────────────────────┘
-                           ▼
-┌─ WEEKLY MIRRORS ─────────────────────────────────────────────┐
-│  What changed, what's working, what's next                   │
-└──────────────────────────┬───────────────────────────────────┘
-                           ▼
-┌─ END OF MONTH ───────────────────────────────────────────────┐
-│  "هنا كانت البداية. وهنا الآن."                 [T5 identity] │
-└──────────────────────────┬───────────────────────────────────┘
-                           ▼
-      Continue  ·  Or return to the free rhythm, fully intact
-                  (nothing is taken away — P1, P15)
-```
+### 7.5 Show, never announce (P5)
 
-**The structural change from v1.** v1's free tier was a **corridor**: rescue → nightly ping → Mirror → ask. A parent whose day went fine had no reason to open Telegram. v2's free tier is a **loop that runs whether or not anything went wrong**, and the Mirror emerges from it rather than terminating it.
+| Wrong — announces | Right — demonstrates |
+|---|---|
+| "أتذكّر أنك أخبرتني عن يوسف" | "كيف كانت تجربة التنبيه مع يوسف اليوم؟" |
+| "بحسب سجلّك، ثلاث ليالٍ صعبة" | "الليلة الصعبة الوحيدة كانت في يوم بلا قيلولة" |
+| "لدي معلومات عن طفلك" | *(nothing — just use them)* |
+
+### 7.6 What is deliberately not remembered (P9)
+
+Content touching separation, violence, bereavement or abuse is **not** written to the memory feeding proactive messages. Two live rows settled this: a child-assault disclosure, and a pattern label revealing family separation — neither distinguishable from a safe label by pattern matching.
+
+> **The rule is provenance, not content filtering.** Proactive messages draw only on what ADAM authored or measured, never on what the parent disclosed.
 
 ---
 
-## 10. Every user state
+## 8. Conversation Engine
 
-States are mutually exclusive except where marked orthogonal.
+**Owns:** every exchange, and the hybrid button/free-text model.
 
-### 10.1 Primary lifecycle states
+### 8.1 The hybrid model (014)
 
-| # | State | Entry condition | Exit condition | System behaviour |
-|---|---|---|---|---|
-| **S0** | `new` | `/start` received | First user message | Greet; invite the moment; no questions |
-| **S1** | `first_moment` | First substantive message | First step delivered | Full attention; no logging prompts |
-| **S2** | `helped` | First step delivered | **Enough known to ground a Seed** | Enrol in the rhythm from the next morning |
-| **S3** | `in_rhythm` | First Seed sent | 3 Harvests logged | **Daily Seed + Harvest.** Learning the situation |
-| **S4** | `recognised` | First Mirror delivered | — | Rhythm continues; weekly cadence |
-| **S5** | `considering` | **A door opened (§33)** — she asked, or Door 3 fired | She asks to proceed, or declines, or says nothing | Answer once, in outcomes. Then silence. **The rhythm continues unchanged** |
-| **S6** | `payment_claimed` | Parent states they paid | Operator confirms or 72h timeout | Warm acknowledgement; **rhythm uninterrupted** |
-| **S7** | `chapter_active` | Payment confirmed | Objective met, or month of logged days complete | Full companionship |
-| **S8** | `chapter_complete` | End-of-month delivered | — | Returns to S4 rhythm, fully intact |
-| **S9** | `dormant` | 14 days no interaction | Any message received | Rhythm decays then stops. One reactivation, per lifetime |
-| **S10** | `returned` | Message after dormancy | Resolves within 1 turn | Acknowledge continuity, never guilt the absence |
+Neither a menu tree nor a bare chat box.
 
-**S2's exit condition changed (D-C, P11).** v1 entered the loop the moment a step was delivered. v2 requires *enough known to ground a Seed* — at minimum the child's name or the recurring situation. **A Seed that could be sent to anyone violates P11, so the state machine refuses to start the rhythm until it can be personal.**
+| Element | Rule |
+|---|---|
+| **Buttons are generated from context** | Never a fixed set. The options ADAM offers depend on what is happening now |
+| **"شيء آخر" is always present** | On every button set, without exception. The parent is never cornered |
+| **Buttons dissolve into free text** | Once their role is done, the conversation returns to open dialogue |
+| **ADAM may create new buttons mid-dialogue** | If a moment calls for structured choices, they appear |
+| **Free text is always available** | Buttons never block typing or voice |
 
-### 10.2 Orthogonal states
+**Why hybrid rather than either extreme.** Pure free text asks an exhausted parent to compose sentences at 23:00 — the average message is 53 characters, heavy with dialect and typos. Pure buttons cannot hold a real problem. The hybrid gives structure where structure helps and gets out of the way where it does not.
 
-| State | Entry | Effect | Priority |
-|---|---|---|---|
-| **X1** `in_crisis` | Crisis category detected | All commercial messaging suppressed. **Seed and Harvest suspended entirely.** Human queue | **Overrides everything** |
-| **X2** `payment_blocked` | Country has no payment rail | Free rhythm fully available; no offer surfaced | Never blocks help (P8) |
-| **X3** `voice_preferred` | ≥2 voice notes sent | Voice-friendly cadence; shorter text | Cosmetic |
-| **X4** `paused` | Parent asks for silence | All proactive messages stop; conversation remains | Honoured indefinitely |
+**Why "شيء آخر" is non-negotiable.** A button set without an escape is an interrogation. Its presence is what makes the buttons feel like an offer rather than a form.
 
-**X1 now suspends the rhythm.** A cheerful morning suggestion the day after a parent disclosed violence is worse than silence. v1 suppressed only *commercial* messaging in X1; that was insufficient.
-
-### 10.3 State transition rules
-
-1. **No transition may skip S1→S2.** Value before any other behaviour. (P2)
-2. **S5 may be entered only through a door in §33.** Doors 0–2 are parent-initiated. Door 3 is the sole system-initiated path and requires every condition in §33.4 — a scoring model that decides who is "ready" is explicitly banned, because that is what the Judge was. **A decline returns her to her prior state with nothing changed and no second mention, ever.**
-3. **X1 suppresses S6–S8 messaging and the daily rhythm** for the duration plus 7 days.
-4. **X2 never blocks S0–S4.** Payment geography gates S6 onward only. (P8)
-5. **S9 permits exactly one reactivation message per parent lifetime** — not one per dormancy.
-6. **S8 returns to S4 with nothing removed.** (P15)
-
----
-
-## 11. Conversation flows
-
-Scripts are specification, not suggestion. **All strings below are the gender-free default form** (§3.5); masculine and feminine variants are required at build time.
-
-### 11.1 First contact (S0 → S1)
-
-```
-ADAM: السلام عليكم 🌿
-      أنا آدم.
-      ماذا حدث؟ الكتابة أو التسجيل الصوتي — كلاهما يصل.
-```
-
-**Rules:** no name request, no country question, no age question, no menu. One line of identity, one invitation. Voice offered explicitly at first contact because that is when the parent is least able to type.
-
-*(v1: "احكيلي شنو صار — اكتبي، أو سجّلي صوتاً إذا كان أسهل" — two feminine imperatives. Rewritten nominally.)*
-
-### 11.2 The Moment — core response shape (S1 → S2)
+### 8.2 Response shape (P6)
 
 ```
 [one line: the cause, without blame]
@@ -559,7 +477,337 @@ ADAM: السلام عليكم 🌿
 [one line: how it will be recognisable]
 ```
 
-**Worked example:**
+Max 3 content lines. **Never withhold detail** — a direct "how exactly?" gets a complete answer. Knowledge is free (019).
+
+### 8.3 Voice
+
+Voice notes in are a primary input, especially at distress. Transcription below the confidence threshold falls back to text confirmation; above it, transcription is never mentioned.
+
+**Voice out is a candidate, not committed.** It may carry warmth text cannot — but a synthetic voice can unsettle. Test before adopting.
+
+### 8.4 What the Conversation Engine never does
+
+Sell · quote a price · mention a subscription · explain a payment method (006, P17). If a parent raises any of these, §15.4 governs the response.
+
+---
+
+## 9. Journey Engine
+
+**Owns:** the daily rhythm, goals, progress, adjustment, and outcomes.
+
+### 9.1 Everything is generated (004, P18)
+
+> **There are no plan templates.** Every goal, every day's suggestion, and every adjustment is generated from this family's knowledge.
+
+A template library would be indistinguishable from the free parenting content already available everywhere, and it would break P11 the moment it produced a message that could belong to any family.
+
+### 9.2 The daily rhythm: Seed → Harvest (010)
+
+**Seed — one small thing, grounded in this child.**
+
+| Rule | Why |
+|---|---|
+| Names the child | Strongest continuity signal |
+| Derives from Knowledge | A generic tip is free everywhere |
+| **One** thing only | Two halves the chance either is tried and makes the Harvest ambiguous |
+| Small enough for a bad day | Ambition is the enemy of measurement |
+| Sets up its own Harvest | The pair is the unit |
+| **Not sent if Knowledge is thin** | Silence beats a generic message |
+| Never in crisis | §13.2 |
+
+**Harvest — the same subject, that evening.**
+
+> **The Harvest is an extension of the Seed, never a separate question.**
+
+"كيف كان يومك؟" is a message from a stranger. "كيف كانت تجربة التنبيه مع يوسف؟" is from someone who was in the room this morning.
+
+**No Seed, no Harvest.** The pair is atomic. A standalone evening question is exactly the generic check-in this decision abolishes.
+
+### 9.3 Timing follows the logic of the day (011)
+
+Each situation carries a time window. The Seed arrives **before** it, the Harvest **after** it.
+
+| Situation | Occurs | Seed | Harvest |
+|---|---|---|---|
+| **النوم** | 20:00–22:00 | Late afternoon — while the evening can still change | After the window, ~22:30 |
+| **المدرسة** | 07:00–08:00, 16:00–18:00 | Evening before, or early morning | After homework time |
+| **الأكل** | Mealtimes | ~1h before the main meal | After it |
+| **الانتقالات** | Variable | Morning | Evening |
+| **وقت الشاشة** | Late afternoon–evening | Early afternoon | Evening |
+| **Unknown** | — | Mid-morning default | ~21:00 local default |
+
+**Hard rules:**
+
+1. A Seed must arrive with time to act. A bedtime Seed at 21:30 is useless.
+2. A Harvest must arrive after the window closes. **Asking at 20:00 how bedtime went asks about a thing that has not happened.**
+3. All times are the parent's true local time via IANA zones. *The legacy map had Egypt at +2 against a real +3 — the largest market messaged an hour early, nightly, for months.*
+4. **Ceiling: one Seed and one Harvest per day.** Two proactive messages is the maximum.
+5. Unknown local evening → send nothing, surface for resolution. *56 parents currently have no resolvable timezone.*
+6. Quiet hours absolute: nothing proactive 23:00–07:00 local.
+
+### 9.4 The Mirror
+
+Fires when three Harvests carry a result. Data-gated, never day-gated. Shows a pattern from the family's own data.
+
+**Carries no price and no commercial content — enforced structurally, not by wording discipline.**
+
+**Deliberately under-claims.** Three nights prove nothing; over-claiming loses trust the moment night four contradicts it.
+
+### 9.5 Journey progression
+
+| Stage | Behaviour |
+|---|---|
+| **Goal set** | Stated concretely and falsifiably |
+| **Daily drive** | Seed and Harvest aimed at the goal, not at the day in general |
+| **Adjustment** | When the approach is not landing, the journey changes course and says so |
+| **Outcome** | Declared honestly — reached, or not, with what was learned |
+| **Next** | A new goal may follow. Nothing is taken away in between |
+
+---
+
+## 10. Telegram Engine
+
+**Owns:** every surface. Telegram is not a channel — it is the product (008).
+
+### 10.1 Surfaces in use
+
+| Surface | Role |
+|---|---|
+| **Inline buttons** | Dynamic, context-generated (§8.1) |
+| **Reply keyboard** | **Persistent bottom bar** — the always-available actions |
+| **Bot menu / commands** | The structured entry to everything, including commerce (007) |
+| **Pinned message** | Live state: the child, the current goal, this week's progress |
+| **Deep links** | Instagram → a specific starting context, without a form |
+| **Voice notes** | Primary input at distress |
+| **Message reactions** | Zero-tap acknowledgement of a Mirror |
+| **Reply-to-message** | The Harvest threads as a reply to its own Seed |
+
+**On the reply keyboard — reversing v2.** v2 refused it, arguing it occupies the input area and discourages free text. Decision 008 overrides that, and the objection is answerable: the keyboard carries **three** entries, collapses on demand, and typing remains available at all times. The gain — permanently visible actions with zero recall burden — outweighs a partly-occupied input area for an exhausted user.
+
+**On deep links.** An Instagram post about bedtime opens ADAM *already in the bedtime context*, with no form and no question. This is the cleanest fix available for the 0.7% audience→bot conversion, and it needs no new product — only a link parameter.
+
+### 10.2 The reply keyboard
+
+```
+┌──────────────────┬──────────────────┬──────────────────┐
+│   ما حدث الآن     │    كيف نتقدّم     │      القائمة ☰    │
+└──────────────────┴──────────────────┴──────────────────┘
+```
+
+Three entries: the rescue, progress, and the menu. Never more.
+
+### 10.3 The menu — fixed, with exactly one changing item (009)
+
+> **The main menu is stable. Exactly one item changes with the parent's stage.**
+
+Stability is what makes it trustworthy; the single changing item is what makes ADAM feel like it is moving with them.
+
+```
+☰  القائمة
+
+   يوسف                        ← the child, always
+   كيف نتقدّم                   ← progress, always
+   ما الذي يمكن أن نعمل عليه؟    ← ★ THE CHANGING ITEM
+   إعدادات الرسائل               ← quiet hours, pause, always
+   الخصوصية وحذف البيانات        ← always
+```
+
+**The changing item by stage:**
+
+| Stage | The item reads | What it opens |
+|---|---|---|
+| New / no goal yet | "ما الذي يمكن أن نعمل عليه؟" | The situations ADAM can see, and how journeys work |
+| A goal is visible | "ابدأ رحلة نوم يوسف" | The journey, its goal — and, for supported countries, how to begin |
+| Journey active | "رحلة نوم يوسف" | Goal, progress, what's next |
+| Journey complete | "ما بعد النوم؟" | The next goal worth taking |
+| Unsupported country | "متى يصل آدم إلى بلدي؟" | The waitlist |
+
+**This single item is the entire commercial surface.** It is never a notification, never badged, never announced. It is simply always there, and it changes as the relationship changes.
+
+### 10.4 Country in the experience (017)
+
+Country determines payment availability, currency, which journeys can be started commercially, and waitlist membership. It is resolved from the parent's own signals, never demanded up front (P2).
+
+| Country state | Menu item | Free experience |
+|---|---|---|
+| **Supported** (DZ, EG, MA) | Shows how to begin a journey | Full |
+| **Unsupported** | Shows the waitlist | **Full, identical** |
+
+**Unsupported countries lose nothing except the ability to pay.** 48.4% of signups are in this position, and their free experience is complete (P8).
+
+### 10.5 The pinned message
+
+```
+📌  يوسف · نعمل على: النوم
+    هذا الأسبوع: ٤ ليالٍ أهدأ من ٧
+
+    القائمة ☰ فيها كل ما يمكن أن نفعله معاً.
+```
+
+Updated silently. Never re-pinned as a notification. Points at the menu, never at a price.
+
+---
+
+## 11. Growth Engine
+
+**Owns:** acquisition, the content bridge, and referral.
+
+### 11.1 The loop
+
+```
+Content naming a parenting pain  (525,682 reach, 20,991 shares)
+        │
+        ▼
+Deep link into the exact context      ← the bridge, currently 0.7%
+        │
+        ▼
+Value in < 60 seconds
+        │
+        ▼
+Daily rhythm → recognition → a goal → a result
+        │
+        ▼
+Parent tells another parent, AND generates new content raw material
+        │
+        └──► feeds content ──┘
+```
+
+**The compounding asset:** every conversation teaches which pains are most common in which countries, which informs the next post.
+
+**The break point is the bridge.** 0.7% of the audience has reached the bot. Deep links (§10.1) plus moment-framed CTAs are the highest-ROI work available in the business.
+
+### 11.2 Referral — share the insight, never the scorecard
+
+Sharing "3 of 5 nights calm" also discloses two hard nights. In a shame-loaded context that is a disincentive. But parents already share at enormous volume — 20,991 shares on one post. **They share the insight, not themselves.**
+
+```
+┌──────────────────────────────┐
+│  الرفض عند النوم              │
+│  ليس عناداً —                 │
+│  هو خوف من الانفصال في الظلام.│
+│              آدم 🌿           │
+└──────────────────────────────┘
+```
+
+**No incentive, no reward, no referral code.** Paying for referrals in a trust-based product corrupts the motive. Offered once, at a moment of pride, never repeated.
+
+**Referral is also the highest-trust commercial surface we have** — a parent hearing about journeys from another parent hears it from someone with nothing to gain.
+
+---
+
+# PART III — THE EXPERIENCE
+
+## 12. Complete user journey
+
+```
+┌─ ACQUISITION ────────────────────────────────────────────────┐
+│  Instagram content → deep link into the exact context        │
+└──────────────────────────┬───────────────────────────────────┘
+                           ▼
+┌─ FIRST CONTACT ──────────────────────────────────────────────┐
+│  No country gate. No form. No questions.                     │
+│  Reply keyboard + menu visible from message one              │
+│  ★ The commercial model is already visible, never announced  │
+└──────────────────────────┬───────────────────────────────────┘
+                           ▼
+┌─ THE RESCUE (free, everywhere, unconditional) ───────────────┐
+│  One cause · one small thing for tonight · one way to know   │
+└──────────────────────────┬───────────────────────────────────┘
+                           ▼
+┌─ THE DAILY RHYTHM (free) ────────────────────────────────────┐
+│   MORNING · Seed        →        EVENING · Harvest           │
+│   grounded in this child          the same subject, one tap  │
+│   Timed to the situation, never to a global clock            │
+└──────────────────────────┬───────────────────────────────────┘
+                           ▼
+┌─ THE MIRROR (free) ──────────────────────────────────────────┐
+│  At 3 logged evenings. A pattern from their own data.        │
+│  No price, no commercial content — structurally              │
+└──────────────────────────┬───────────────────────────────────┘
+                           ▼
+┌─ A GOAL BECOMES VISIBLE ─────────────────────────────────────┐
+│  ADAM names it: "خمس ليالٍ هادئة من سبع"                      │
+│  This is PRODUCT, not sales. ADAM says no price.             │
+│  The menu item changes to: "ابدأ رحلة نوم يوسف"               │
+└──────────────────────────┬───────────────────────────────────┘
+                           ▼
+┌─ THE MENU → THE AGENT (only if the parent taps) ─────────────┐
+│  Country · currency · price · payment · receipt              │
+│  Handled by the sales agent. ADAM is not in this room.       │
+│  The daily rhythm continues untouched throughout             │
+└──────────────────────────┬───────────────────────────────────┘
+                           ▼
+┌─ THE JOURNEY (paid) ─────────────────────────────────────────┐
+│  Goal · daily drive · adjustment when it isn't landing       │
+│  Clock counts logged days, not calendar days                 │
+└──────────────────────────┬───────────────────────────────────┘
+                           ▼
+┌─ OUTCOME, DECLARED HONESTLY ─────────────────────────────────┐
+│  Reached, or not — and what was learned either way           │
+└──────────────────────────┬───────────────────────────────────┘
+                           ▼
+        Next goal  ·  Or back to the free rhythm, complete
+                    (nothing is taken away — P1, P15)
+```
+
+## 13. Every user state
+
+### 13.1 Primary states
+
+| # | State | Entry | Exit | Behaviour |
+|---|---|---|---|---|
+| **S0** | `new` | First contact | First message | Greet; invite; no questions. **Menu and keyboard live immediately** |
+| **S1** | `first_moment` | First substantive message | First step delivered | Full attention |
+| **S2** | `helped` | Step delivered | Enough known to ground a Seed | Enrol in the rhythm |
+| **S3** | `in_rhythm` | First Seed sent | 3 Harvests logged | Daily Seed + Harvest |
+| **S4** | `recognised` | Mirror delivered | A goal becomes visible | Rhythm continues |
+| **S5** | `goal_visible` | ADAM names a concrete goal | Parent starts, or does not | **Menu item changes. ADAM says nothing further** |
+| **S6** | `with_agent` | Parent taps to begin | Agent confirms, or parent leaves | **Rhythm continues untouched.** ADAM absent from this |
+| **S7** | `journey_active` | Payment confirmed | Goal reached, or honestly declared unreached | Daily drive toward the goal |
+| **S8** | `journey_complete` | Outcome delivered | — | Returns to S4 rhythm, complete |
+| **S9** | `dormant` | 14 days silent | Any message | Rhythm decays, then stops. One reactivation per lifetime |
+| **S10** | `returned` | Message after dormancy | Resolves in 1 turn | Acknowledge continuity, never guilt the absence |
+
+**S5 is the critical state.** ADAM names a goal — a product act — and then stops. The menu carries the rest. **No message follows. No reminder. No second mention.**
+
+### 13.2 Orthogonal states
+
+| State | Effect |
+|---|---|
+| **X1** `in_crisis` | **Everything commercial suppressed. Seed and Harvest suspended. The changing menu item reverts to neutral.** Human queue. Overrides all |
+| **X2** `payment_blocked` | Free experience identical. Menu item shows the waitlist |
+| **X3** `voice_preferred` | Voice-friendly cadence |
+| **X4** `paused` | All proactive messages stop; conversation remains |
+
+**X1 reverting the menu item is deliberate.** A parent who has just disclosed violence must not open the menu and find an invitation to start a paid journey.
+
+### 13.3 Transition rules
+
+1. No transition may skip S1→S2. Value before anything else (P2).
+2. **S5 is entered only when a concrete, falsifiable goal exists** — never on a timer, a message count, or a readiness score. **A scoring model that decides who is "ready" is banned: that is what the Judge was, and it produced 8 offers and 0 clicks.**
+3. X1 suppresses S5–S8 behaviour and the rhythm, for the duration plus 7 days.
+4. X2 never blocks S0–S5. Only S6 onward.
+5. S9 permits exactly one reactivation per parent lifetime.
+6. S8 returns to S4 with nothing removed (P15).
+
+---
+
+## 14. Conversation flows
+
+All strings are the **gender-free default**; masculine and feminine variants are required at build time (§3.4).
+
+### 14.1 First contact
+
+```
+ADAM: السلام عليكم 🌿
+      أنا آدم.
+      ماذا حدث؟ الكتابة أو التسجيل الصوتي — كلاهما يصل.
+```
+
+No name request, no country question, no age question. **The reply keyboard and menu are visible from this moment** — which is what makes the commercial model impossible to be surprised by later.
+
+### 14.2 The rescue
+
 ```
 ADAM: الرفض عند النوم غالباً ليس عناداً — هو خوف من الانفصال في الظلام.
 
@@ -567,15 +815,13 @@ ADAM: الرفض عند النوم غالباً ليس عناداً — هو خ�
       بلا شرح — الجلوس وحده.
 
       علامة النجاح: أن ينام دون نداء أكثر من مرة.
+
+      [كيف أفعلها بالضبط؟]  [شيء آخر]
 ```
 
-**Constraints:** max 3 content lines. Never withhold detail — a direct "how exactly?" gets a full answer (P6). Never mention payment unless asked first (P1).
+Buttons generated from context; **"شيء آخر" always present** (014).
 
-**No closing hook.** v1 ended this message with *"أخبريني الليلة كيف كانت"* — a feminine imperative, and now redundant: the Harvest arrives on its own (§11.4), timed to the situation. One fewer promise for the copy to keep.
-
-### 11.3 The Seed — morning (D-D) · **NEW**
-
-One message. One small thing. Grounded in this child.
+### 14.3 The Seed
 
 ```
 ADAM: صباح الخير 🌿
@@ -586,1471 +832,429 @@ ADAM: صباح الخير 🌿
       مساءً نتكلم عنها.
 ```
 
-**Hard constraints:**
-
-| Rule | Why |
-|---|---|
-| Must name the child | The single strongest continuity signal (P11) |
-| Must derive from Knowledge (§12) — a recurring situation, a prior outcome, or an observed pattern | A generic tip is free everywhere; ours must not be (P11) |
-| Must be **one** thing | Two suggestions halve the chance either is tried, and make the Harvest ambiguous |
-| Must be small enough to do on a bad day | The parent is tired; ambition is the enemy of measurement |
-| Must be answerable in the evening | It sets up its own Harvest (D-D) |
-| **Never sent if Knowledge is insufficient** | Silence beats a generic message. See fallback below |
-| Never sent in X1 | §10.2 |
-| Timed per §13 | Not a global morning hour (D-E, P14) |
-
-**If Knowledge is insufficient**, no Seed is sent. Instead, one question — asked once, never repeated daily:
+**If Knowledge is thin**, no Seed. Instead, once — never repeated daily:
 ```
 ADAM: صباح الخير 🌿
       حتى تكون التجربة على مقاس ابنك: ما اسمه، وكم عمره؟
 ```
-This is the one place a question precedes value, and it is permitted because value was already delivered in §11.2. P2 is satisfied.
 
-**Explicitly banned:** a rotating library of parenting tips. **A Seed that could be sent to a different family is a defect** (P11, D-F).
-
-### 11.4 The Harvest — evening (D-D) · **NEW, replaces v1's nightly check-in**
-
-The Harvest asks about **the Seed** — never about the day in general.
+### 14.4 The Harvest
 
 ```
 ADAM: كيف كانت تجربة التنبيه مع يوسف اليوم؟
 
-      [نجحت]  [جرّبناها وما نجحت]  [ما صارت الفرصة]
+      [نجحت]  [جرّبناها وما نجحت]  [ما صارت الفرصة]  [شيء آخر]
 ```
 
-**The linkage is the whole point.** "كيف كان يومك؟" is a message from a stranger. "كيف كانت تجربة التنبيه مع يوسف؟" is a message from someone who was already in the room this morning.
-
-**Replies — never neutral, never effusive:**
-
-| Answer | ADAM replies |
+| Answer | Reply |
 |---|---|
 | نجحت | "هذه خطوة حقيقية. نبني عليها غداً." |
 | جرّبناها وما نجحت | "المحاولة نفسها تغيّر شيئاً. غداً زاوية أخرى." |
 | ما صارت الفرصة | "لا بأس. ليس كل يوم يحتمل تجربة." |
 
-**If nothing was tried, or the day was hard** — one optional follow-up, a tap, never a text box:
-```
-ADAM: وأصعب لحظة اليوم؟
+**"ما صارت الفرصة" must never carry disappointment.** A parent who feels judged for not trying stops answering, and the Harvest is the entire proof engine.
 
-      [عند النوم] [عند الأكل] [عند الخروج]
-      [وقت الشاشة] [عند الدراسة] [موقف آخر]
-```
+### 14.5 A goal becomes visible — S5
 
-**Critical:** "ما صارت الفرصة" must never carry disappointment. A parent who feels judged for not trying stops answering, and the Harvest is the entire proof engine.
-
-**No Seed, no Harvest.** If no Seed was sent, no Harvest is sent. The pair is atomic (§8.1). A standalone evening question is exactly the generic "how was your day" that D-D exists to abolish.
-
-### 11.5 The Mirror (S3 → S4)
-
-Fires when three Harvests carry a result. Data-gated, never day-gated.
+**The single most important message in the commercial model, and it contains no commerce.**
 
 ```
-ADAM: لاحظتُ شيئاً في أيام يوسف 🌿
+ADAM: صار عندي صورة واضحة عن ليالي يوسف.
 
-      من ثلاث ليالٍ مسجّلة: ليلتان أهدأ، وواحدة صعبة.
-      والليلة الصعبة الوحيدة كانت في يوم بلا قيلولة.
+      الليالي الصعبة كلها تقريباً في أيام بلا قيلولة.
+      وهذا شيء يمكن تغييره.
 
-      ليست قاعدة مؤكدة بعد — لكنها تستحق المراقبة أياماً أخرى.
+      الهدف الذي أراه: خمس ليالٍ هادئة من سبع.
+      نمشي إليه يوماً بيوم حتى نصل — أو حتى نعرف أنه لا يصلح، وأقولها.
+
+      [كيف نبدأ؟]   [ليس الآن]   [شيء آخر]
 ```
 
-**Why this lands where a feature list does not:** it is evidence about *this family*, from *their* data, that they could not have assembled alone.
+**Five deliberate properties:**
 
-**Carries no price and no offer** — enforced by database constraint, not by wording discipline.
+1. **No price. No currency. No subscription. No payment method.** (006)
+2. **The goal is falsifiable** — five of seven, not "better sleep"
+3. **Failure is pre-committed** — "أو حتى نعرف أنه لا يصلح، وأقولها" (§6.3)
+4. **"كيف نبدأ؟" opens the Menu**, not a pitch. ADAM's part ends there
+5. **"ليس الآن" costs nothing** and is never followed up
 
-**Deliberately under-claims.** Three nights prove nothing; over-claiming loses trust the moment night four contradicts it.
-
-### 11.6 Weekly Mirror
-
+**On tapping "كيف نبدأ؟"** — ADAM hands off and says so plainly:
 ```
-ADAM: أسبوع آخر اكتمل.
-
-      أربع ليالٍ أهدأ من سبع — كانت اثنتين الأسبوع الماضي.
-
-      وشيء آخر، بعيد عن يوسف:
-      ليلتان فيهما صراخ هذا الأسبوع. كانت خمساً.
+ADAM: كل تفاصيل البدء في القائمة ☰ — البلد، والطريقة، والباقي.
+      وأنا هنا كما أنا، مهما كان القرار.
 ```
 
-**The last line is the parent's own change — placed last, stated quietly.** It is the real outcome, but it is not what they came for; leading with it reads as blame (P3).
+That is the last thing ADAM says about it. **Ever, unless asked.**
 
-**Regression is shown too.** A mirror that only reflects progress is not a mirror, and hiding a bad week retroactively discredits every good one.
+### 14.6 Crisis (X1) — overrides everything
 
-### 11.7 End of month
+**Categories:** self-harm or suicidal ideation · domestic violence · child abuse by a third party · the parent's own escalating violence · bereavement · substance use in a minor.
 
-```
-ADAM: الشهر اكتمل.
-
-      هنا كانت البداية:  ▓░░░░░░░░░   ليلة واحدة هادئة من عشر
-      وهنا الآن:        ▓▓▓▓▓▓▓░░░   سبع من عشر
-
-      الموقف الذي كان يهزم البيت: عند النوم
-      اليوم: ست ليالٍ متتالية دون معركة
-
-      وما عرفناه عن يوسف: يحتاج تنبيهاً قبل الانتقال، لا أوامر مباشرة.
-```
-
-**Continuation, if any, is a separate message — never the same one.** Achievement and commerce do not share a bubble (P1).
-
-### 11.8 When a door opens (D-H, and §33 for the architecture)
-
-Four doors exist, and only one of them is ADAM speaking first. Full trigger rules, conditions and bans are in **§33**. This section is the copy.
-
-#### 11.8a — She asks for work the free rhythm does not do · **the primary path**
-
-This is the most valuable moment in the product, and the discipline is absolute: **answer the question completely and for free, first.**
-
-```
-PARENT: إزاي أعرف إن الليلة دي هتكون صعبة قبل ما تبدأ؟
-
-ADAM:   من أيامكم: الليالي الصعبة كلها تقريباً كانت في أيام
-        بلا قيلولة، أو بعد يوم خارج البيت.
-
-        فعلياً: لو مرّ اليوم بلا نوم بعد الظهر — توقّعي ليلة أطول،
-        وابدئي الروتين أبكر بعشرين دقيقة.
-
-        هذا ما أعرفه، وهو لكِ.
-```
-
-**Nothing further.** She asked how to know; she now knows. The answer is complete and free.
-
-Only if she then asks for the *doing* — *"تقدر تعمل ده كل يوم؟"* / *"ذكّرني بنفسك قبل الوقت الصعب"* — does ADAM name that the continuous version is a different arrangement:
-
-```
-ADAM: هذا ما أفعله في شهر موجَّه: أتكلم قبل الوقت الصعب لا بعده،
-      كل يوم، من دون أن تسألي.
-
-      الآن أنا معكِ حين تسألين — وهذا يبقى دائماً.
-      {price} للشهر، مرة واحدة.
-```
-
-> **The line this depends on: knowing is always free; doing it every day is the paid thing.**
-> No information is ever withheld. What costs money is labour, not knowledge. (§33.4)
-
-#### 11.8b — She asks about scope
-
-```
-PARENT: آدم مجاني بالكامل؟
-
-ADAM:   ما نحن فيه الآن مجاني ويبقى كذلك — الحديث في أي وقت،
-        وفكرة كل صباح، وسؤال كل مساء.
-
-        وهناك شهر موجَّه نحو حالة واحدة: بيت تنتهي فيه الليلة
-        دون معركة، ومعرفة ما يهدّئ يوسف قبل أن يبدأ.
-        {price} — مرة واحدة، لشهر.
-        وإن لم يتغيّر شيء ملموس، الشهر التالي عليّ.
-```
-
-Then stop. No follow-up, no second mention.
-
-#### 11.8c — Door 3, the honest limit
-
-Copy and the nine required conditions are in **§33.4**. It fires at most twice in a parent's lifetime, never after a hard night, and always carries a free alternative as the default.
-
-#### 11.8d — v1's version, kept on the page as the error to avoid
-
-v1 specified the offer as this:
-
-> أعرف طبع {child} وما يفجّر الموقف ومايهدّئه
-> خطوة كل يوم مفصّلة عليه هو
-> وفي نهاية الشهر، تقرير يريكِ بالضبط كم تغيّرتِ
-
-Three bullets: **memory, a plan, a report.** That is a feature list — the precise error v1 §4 identified and then committed forty lines later. No parent wants a report. They want the night to end without a fight.
-
-Two further defects in that copy, both now fixed:
-
-- It named the thing **"المرافقة الكاملة"** — implying what she already has is partial, which contradicts P15. It has no name now (§33.6).
-- It was **pushed** by a scoring model. Nothing pushes it now (§33).
-
-**The test every commercial sentence must pass (P16):** does it answer *"what will my life be like in a month?"* — or *"what is included?"* If the second, it is rewritten or deleted.
-
-**Any decline — a tap, a "not now", or silence:**
-```
-ADAM: لا شيء يتغيّر بيننا. أنا هنا كل صباح ومساء كما كنت. 🌿
-```
-Then never raised again unprompted, ever.
-
-**Price is injected from configuration, never generated** (§8.2).
-
-### 11.9 Crisis path (X1) — overrides everything
-
-**Detection categories:** self-harm or suicidal ideation · domestic violence · child physical/sexual abuse by a third party · parent's own escalating violence · bereavement · substance use in a minor.
-
-**Behaviour on detection:**
-
-1. Suppress all commercial messaging — this conversation + 7 days
-2. **Suspend Seed and Harvest entirely** for the same window
-3. Suppress memory write for the sensitive content (P9)
-4. Stay, and do not advise:
+1. Suppress everything commercial — conversation + 7 days
+2. **Suspend Seed and Harvest**
+3. **Revert the changing menu item to neutral**
+4. Suppress memory write for the sensitive content (P9)
+5. Stay, and do not advise:
 ```
 ADAM: أنا هنا.
       هذا الحِمل أثقل من أن يُحمل وحده.
       [line specific to the category]
       أنا هنا. ولا شيء مطلوب الآن.
 ```
-5. Raise CrisisFlag → human queue
-6. Never give clinical, legal, or safeguarding instructions
+6. Raise to the human queue
+7. Never give clinical, legal, or safeguarding instructions
 
-**On vocabulary (D-B).** The internal name for step 4 is **الاحتواء**. The parent must never see that word, never sense a mode change, and never be told they have been categorised. What they experience is that ADAM went quiet, stayed, and stopped suggesting things.
+**The one exception to Decision 014.** Crisis messages carry **no buttons at all** — not even "شيء آخر". Offering a parent who has just disclosed violence a set of options turns a moment of being heard into a form to complete. The escape hatch that "شيء آخر" provides everywhere else is, here, the whole message: nothing is asked of them.
 
-**This is the one area where the product must not act autonomously.** The escalation destination is a founder decision — §32 D1.
+This is the only place in the product where a button set is absent, and it is recorded so that nobody adds one to satisfy 014.
+
+**Vocabulary (013):** the internal name for step 5 is **الاحتواء**. The parent never sees that word and never senses a mode change.
+
+**This is the one area where the product must not act autonomously.** §22 D1.
 
 ---
 
-## 12. The memory model (D-C, D-F) · **NEW SECTION**
+## 15. Commerce: how it reaches the parent without selling
 
-Memory is not a feature. It is the reason a proactive message is welcome rather than spam. This section exists because v1 gave memory one row in a feature table and then wrote proactive messages that did not use it.
+### 15.1 The problem (018)
 
-### 12.1 What Knowledge is built from
+Assume the parent believes ADAM is entirely free. Do not rely on them asking. Do not rely on chance discovery. And ADAM may not sell (006).
 
-Derived only from real signal — **never from a static content library** (D-F):
+**The old model failed by surprise.** Eight proactive offers, zero clicks, four of eight never returned, and *"انت طلعت بفلوس اخص عليك"* — "so you turned out to be after money, shame on you."
 
-| Source | Contributes |
-|---|---|
-| **Conversations** | The presenting problem, the parent's own words, emotional state |
-| **Child's name** | Named in every proactive message |
-| **Child's age** | Calibrates what is developmentally reasonable to suggest |
-| **Recurring situations** | Which moment of the day keeps failing, and its time window |
-| **Prior outcomes** | Which suggestions worked and which did not — for *this* child |
-| **Logged evenings** | The calm/hard series over time |
-| **Detected patterns** | Correlations the parent has not noticed |
+### 15.2 The resolution: nothing was ever hidden
 
-### 12.2 What each message type must read before sending
+> **The commercial model is visible from the first message and announced at no message.**
 
-| Message | Must read | Refuses to send if |
+A parent cannot be surprised by something that was in the menu the whole time. This is the entire mechanism, and it is why 006 and 018 are compatible rather than contradictory.
+
+| Layer | Owns | Never |
 |---|---|---|
-| **Seed** | Child name + (recurring situation OR prior outcome OR pattern) | Any missing → no Seed; ask once instead (§11.3) |
-| **Harvest** | The Seed it belongs to | No Seed today → no Harvest |
-| **Mirror** | ≥3 results + situation labels | Fewer than 3 → does not fire |
-| **The Moment** | Whatever exists; may be nothing | **Never refuses — the rescue is unconditional** |
+| **ADAM** | Names a goal (§14.5). Pure product | Price, currency, payment, the word subscription |
+| **The Menu** | Turns the goal into something startable. Permanently visible | Notify, badge, nag, expire |
+| **The sales agent** | Country, currency, price, payment, receipt, confirmation | Parenting advice |
 
-**Only the rescue is unconditional.** Everything proactive must earn the right to interrupt by being specific.
+**The seam is the design.** Naming a goal is a product act. Handling money is a separate role in a separate room.
 
-### 12.3 How memory is used — the discipline
+### 15.3 Why this is not a funnel
 
-**Show, never announce (P5).** The difference is total:
-
-| Wrong — announces | Right — demonstrates |
+| Funnel property | Here |
 |---|---|
-| "أتذكّر أنك أخبرتني عن يوسف" | "كيف كانت تجربة التنبيه مع يوسف اليوم؟" |
-| "بحسب سجلّك، ثلاث ليالٍ صعبة" | "الليلة الصعبة الوحيدة كانت في يوم بلا قيلولة" |
-| "لدي معلومات عن طفلك" | *(nothing — just use them)* |
+| Triggered by a readiness score | **Banned** (§13.3). Triggered by a real, falsifiable goal existing |
+| Escalating pressure | One mention, ever. No follow-up |
+| Urgency or scarcity | Banned (P10) |
+| Optimised for conversion | **No conversion target exists anywhere in this document** (§16.4) |
+| Free degraded to motivate upgrade | Banned (P15, 002) |
+| Value withheld pending payment | Knowledge is free and complete (019) |
 
-The left column reads as a system with a file. The right reads as someone who was there.
+### 15.4 If the parent raises money directly
 
-### 12.4 The test for any proactive message
+ADAM answers honestly and hands off — without quoting anything:
 
-> **Could this exact message be sent to a different family?**
->
-> If yes, it does not send.
+```
+PARENT: بكام الاشتراك؟
 
-This is P11 made checkable. It applies to the Seed above all, because the Seed is the message with the greatest temptation to become a tip library.
+ADAM:   التفاصيل كلها في القائمة ☰ — أدقّ من أن أقولها هنا،
+        وتختلف حسب البلد.
 
-### 12.5 What is deliberately not remembered
+        وما بيننا الآن لا يتغيّر بأي حال.
+```
 
-Per P9, and validated against live data: content touching separation, violence, bereavement, or abuse is **not** written to the memory that feeds proactive messages. Two live rows settled this — a child-assault disclosure and a pattern label revealing family separation — neither distinguishable from a safe label by pattern matching.
+**ADAM does not name a number, even when asked directly.** (006)
 
-**Therefore the rule is provenance, not content filtering:** proactive messages draw only on what ADAM authored or measured, never on what the parent disclosed. Already enforced in the database.
+### 15.5 Payment (007)
 
----
-
-## 13. The timing model (D-E, P14) · **NEW SECTION**
-
-v1 sent everything at 21:00 local. That is wrong in both directions: it asks about bedtime before bedtime, and about school long after school.
-
-### 13.1 The rule
-
-> Every message arrives **relative to the situation it concerns** — the Seed before it, the Harvest after it.
-
-### 13.2 Situation time windows
-
-Each Situation carries a window. Seed and Harvest are scheduled from it:
-
-| Situation | Typically occurs | Seed arrives | Harvest arrives |
-|---|---|---|---|
-| **النوم** | 20:00–22:00 | Late afternoon — while there is still time to change the evening | After the window closes, ~22:30 |
-| **المدرسة / الدراسة** | 07:00–08:00 and 16:00–18:00 | The evening *before*, or early morning | After homework time, early evening |
-| **الأكل** | Mealtimes | ~1h before the main meal | After it |
-| **الخروج / الانتقالات** | Variable | Morning, general | Evening |
-| **وقت الشاشة** | Late afternoon–evening | Early afternoon | Evening |
-| **Unknown** | — | Mid-morning default | ~21:00 local default |
-
-The final row is the honest fallback: with no known situation there is no better answer than a sensible default. But it is a fallback, **not the design**.
-
-### 13.3 Hard timing rules
-
-1. **A Seed must arrive with time to act.** A bedtime Seed at 21:30 is useless — the window has closed.
-2. **A Harvest must arrive after the window closes.** Asking at 20:00 how bedtime went asks about a thing that has not happened. This is the specific defect D-E names.
-3. **All times are the parent's true local time**, via IANA zones. The legacy hardcoded map had Egypt at +2 when the real offset is +3, so every Egyptian parent — the largest market — was messaged an hour early, every night, for months.
-4. **Never more than one Seed and one Harvest per day.** Two proactive messages is the ceiling for the free rhythm.
-5. **Where local evening is unknown, send nothing** and surface the parent for resolution. 56 parents currently have no resolvable timezone. Guessing an hour is how ADAM becomes the thing they mute.
-6. **Quiet hours are absolute:** nothing proactive between 23:00 and 07:00 local.
-
----
-
-## 14. Telegram-first interaction audit (D-J) · **NEW SECTION**
-
-Every interaction, audited against: *can this be a tap instead of typing?*
-
-| Interaction | v1 | v2 | Effort saved |
-|---|---|---|---|
-| First contact | Type freely | Unchanged — **must** stay open text | 0, correctly |
-| Describe a moment | Type or voice | Unchanged + voice promoted at first contact | Voice removes typing entirely |
-| **Harvest answer** | 3 inline buttons | Unchanged — already optimal | — |
-| **Hard-moment tag** | 6 inline buttons | Unchanged | — |
-| **View progress** | Type `/تقدمي` | **Bot menu command + pinned message** | Typing → 1 tap |
-| **Ask whether ADAM can do more** | Type a question | **Bot menu entry, worded as her own question** (Door 1, §33.4) | Typing → 1 tap |
-| **Claim payment** | Type + send image | **Send image only**; caption optional | 1 step removed |
-| **Pause messages** | Type `/إيقاف` | **Bot menu + a button on any proactive message** | Typing → 1 tap |
-| **Resume** | Any message | Unchanged | — |
-| **Give the child's name** | Type | Type *(unavoidable — it is a name)* | 0, correctly |
-
-### 14.1 Telegram capabilities to use
-
-| Capability | Use | Why |
+| Country | Menu shows | Price |
 |---|---|---|
-| **Inline keyboards** | Every recurring answer | Already the backbone (P4) |
-| **Bot menu (command list)** | Progress, pause, ask, help | Discoverable without memorising slash commands |
-| **Pinned message** | The child's current situation + progress at a glance | Persistent state without a dashboard |
-| **Voice notes in** | Primary input at distress | 53-char avg messages, heavy dialect |
-| **Voice notes out** | *Candidate, not committed* | May carry warmth text cannot — but unproven, and a synthetic voice can unsettle. Test before adopting |
-| **Message reactions** | Lightest possible acknowledgement of a Mirror | Zero-tap feedback signal |
-| **Reply-to-message** | Harvest replies to the Seed message | Makes the Seed→Harvest link visible in the UI itself |
+| **الجزائر** | Payment method | **2,300 دج** |
+| **مصر** | Payment method | **490 جنيه** |
+| **المغرب** | Payment method | **110 درهم** |
+| **Other** | Waitlist | — |
 
-**The reply-to-message point is the neatest win here.** Threading the Harvest as a reply to the morning Seed makes D-D's linkage visible in Telegram's own UI, with no extra copy at all.
+Collection is manual and handled by the sales agent. **The rhythm never pauses while payment is pending** — nothing is held hostage.
 
-### 14.2 What we will not use
+If unconfirmed after 72h, the agent raises it. **A parent who paid and heard nothing is the worst outcome available.**
 
-| Capability | Why not |
+A parent who starts and does not finish is **never messaged about it.** Abandoned payment is a decision.
+
+### 15.6 Never permitted
+
+| Banned | Why |
 |---|---|
-| Persistent reply keyboard | Occupies the input area permanently; makes free text feel discouraged |
-| Web app / mini app | A new surface with no evidenced job |
-| Polls / quizzes | Reads as engagement mechanics; incompatible with the tone |
-| Stickers, animations | Wrong register for a parent at 23:00 |
-| Groups / channels | Community is deferred (§30) |
+| Any message from ADAM whose purpose is commercial | 006, P17 |
+| A price spoken by ADAM, even on direct request | 006 |
+| A second mention after "ليس الآن" | The four-of-eight who never returned |
+| Commerce in the same message as a Mirror, a win, or an outcome | P1 |
+| Anything commercial within 14 days of a crisis | P1 |
+| A scoring model deciding who is "ready" | This was the Judge |
+| Countdown, limited window, special price | P10 |
+| Degrading free to make paid attractive | P15, 002 |
+| **A launch announcement to the existing 291 parents** | It would be exactly the surprise this section prevents |
+
+**There is no launch announcement.** Existing parents meet the menu the same way new ones do.
 
 ---
 
-## 15. Feature map
+# PART IV — OPERATING THE PRODUCT
 
-Every feature answers four questions.
+## 16. North Star and metrics
 
-### F1 — The Moment (free, core)
+### 16.1 North Star
 
-| | |
-|---|---|
-| **Why** | The highest-value, zero-coverage need: help *during* escalation |
-| **Evidence** | 132 hitting / 78 anger / 42 screaming messages |
-| **Problem** | They know what to do and cannot reach it while dysregulated |
-| **Measure** | Time-to-first-step < 60s (p50); Moment → rhythm entry ≥ 40% |
+> ## Parents Reaching Outcomes
+> **Parents who completed ≥3 Seed→Harvest pairs in the trailing 7 days, plus parents whose journey reached its stated goal.**
 
-### F2 — The Seed (free, **NEW**, D-D)
+**Why the pair, not the night.** A logged night can be produced by a generic ping — it measures the parent's compliance. A completed **pair** cannot rise unless ADAM's morning message was worth answering. **It is the only metric that holds us accountable rather than the parent.**
 
-| | |
-|---|---|
-| **Why** | Gives the free tier a heartbeat, so ADAM is not remembered only as the emergency |
-| **Evidence** | *"خسارة انك لا تذكرني"* — discontinuity named as a loss by a parent |
-| **Problem** | A companion who only appears at disasters becomes associated with disasters |
-| **Measure** | Seeds grounded in child-specific Knowledge: **hard floor 100%** — an ungrounded Seed is a defect, not a miss. Seed→Harvest ≥50% |
+**Why goals reached are included (001).** The conversation is not the product; the outcome is. A metric that counts only engagement would let us succeed while nothing changed in anyone's house.
 
-### F3 — The Harvest (free, **NEW**, replaces v1's nightly check-in)
-
-| | |
-|---|---|
-| **Why** | Closes the loop on the morning's suggestion and generates all proof data |
-| **Evidence** | Button interaction already works; 53-char avg messages |
-| **Problem** | "How was your day?" is a stranger's question and produces no measurable answer |
-| **Measure** | ≥50% of parents in rhythm complete ≥3 Seed→Harvest pairs in the first 7 days |
-
-### F4 — Voice input (free)
-
-| | |
-|---|---|
-| **Why** | Removes the effort tax at peak distress; handles dialect |
-| **Evidence** | 53-char avg; heavy dialect/typos (*"مبعرف"*, *"شو العمل😭"*) |
-| **Problem** | Typing is hard when shaking with anger; MSA-biased input mis-serves dialect |
-| **Measure** | ≥25% of first messages are voice within 30d |
-
-### F5 — The First Mirror (free)
-
-| | |
-|---|---|
-| **Why** | Makes recognition visible — ADAM demonstrably knows this child |
-| **Evidence** | Built, data-gated at 3+, **fired zero times in production** |
-| **Problem** | Memory is invisible and unsellable; recognition is felt immediately |
-| **Measure** | Reaction rate; **retention of Mirror recipients vs non-recipients at day 14** |
-
-**Measure changed (D-I).** v1 measured the Mirror by *"≥30% open the Journey ask"* — which presumes the discovery mechanism D-I defers, and quietly turns the Mirror into a sales instrument. It is measured by retention now.
-
-### F6 — Memory / Knowledge layer (free, **elevated**, D-C)
-
-| | |
-|---|---|
-| **Why** | The precondition for every proactive message. Without it, P11 forbids sending |
-| **Evidence** | `light_memory` already populated for 129 parents; child name already extracted without asking |
-| **Problem** | Generic advice is a commodity; a message about *يوسف* is not |
-| **Measure** | ≥70% of parents in rhythm have a child name captured **without being asked**; 0 ungrounded proactive messages |
-
-*(v1 had this as F8 "Child identity", scoped to name + age. D-C makes it the substrate of the product.)*
-
-### F7 — Timing engine (free, **NEW**, D-E)
-
-| | |
-|---|---|
-| **Why** | A correctly-worded message at the wrong hour is still wrong |
-| **Evidence** | Legacy map put Egypt at +2 against a real +3 — the largest market messaged an hour early, nightly |
-| **Problem** | Asking about bedtime before bedtime |
-| **Measure** | 0 Harvests sent before their situation window closes; 0 sends in quiet hours |
-
-### F8 — Situation learning (free → deepens paid)
-
-| | |
-|---|---|
-| **Why** | Turns scattered complaints into one named, trackable problem with a time window |
-| **Evidence** | `hard_moment` taxonomy validated; top themes are all situational |
-| **Problem** | "My child is difficult" is unsolvable; "bedtime transitions" is solvable |
-| **Measure** | ≥60% of S4 parents have a confirmed situation **with a time window** |
-
-### F9 — Weekly Mirror (paid)
-
-| | |
-|---|---|
-| **Why** | Sustains felt value between purchase and end of month |
-| **Evidence** | Continuity explicitly wanted |
-| **Problem** | A month-long purchase with no mid-point proof feels like a gamble |
-| **Measure** | ≥70% of paid parents still answering Harvests at day 21 |
-
-### F10 — End-of-month reflection (paid)
-
-| | |
-|---|---|
-| **Why** | Delivers T5 and is the repurchase trigger |
-| **Evidence** | Transformation milestones §5 |
-| **Problem** | Repurchase needs evidence of change, not a calendar reminder |
-| **Measure** | ≥25% continuation |
-
-### F11 — Manual payment + operator console
-
-| | |
-|---|---|
-| **Why** | The only rail available; founder confirms it is sufficient to start |
-| **Evidence** | One confirmed payment (490 EGP) came through exactly this path |
-| **Problem** | No card infrastructure in target markets |
-| **Measure** | Claim→confirm < 6h (p50); zero unconfirmed >72h |
-
-### F12 — Crisis detection + human escalation
-
-| | |
-|---|---|
-| **Why** | Duty of care |
-| **Evidence** | Abuse, bereavement, substance use, parental violence present in corpus |
-| **Problem** | An AI advising into a violence situation is a real harm risk |
-| **Measure** | 100% of flagged conversations reach human review < 24h; 0 commercial messages and **0 Seeds** sent in X1 |
-
-### F13 — Free-everywhere access
-
-| | |
-|---|---|
-| **Why** | Half of demand is discarded for no benefit |
-| **Evidence** | 140/289 blocked; 23,697 unserved |
-| **Problem** | Gating *usage* by geography costs the audience, the data, and the word-of-mouth |
-| **Measure** | Unserved-country signups ≥40% of new |
-
-### F14 — Content→product bridge
-
-| | |
-|---|---|
-| **Why** | Highest-ROI hour available in the business |
-| **Evidence** | 525,682 reach vs 445–770; ~0.7% audience→bot |
-| **Problem** | Enormous audience, almost no door |
-| **Measure** | 0.7% → ≥2% on bridged posts |
-
-### F15 — Gender-neutral content system (**NEW**, D-A)
-
-| | |
-|---|---|
-| **Why** | 18.5% of the audience is male and the product currently addresses them in the feminine |
-| **Evidence** | Audience gender split; the Heart Writer prompt hardcodes *"أمٍّ"* |
-| **Problem** | A father addressed as a mother learns in one message that the product was not built for him |
-| **Measure** | 100% of user-facing strings exist in three forms; 0 gendered strings sent to unknown-gender parents |
-
-### F16 — The discovery architecture (**NEW**, resolves D7)
-
-| | |
-|---|---|
-| **Why** | The paid layer is unreachable without it, and the old mechanism destroyed trust: 8 offers, 0 clicks, 4 of 8 never returned |
-| **Evidence** | *"انت طلعت بفلوس اخص عليك"* — the observed reaction to being surprised by a price inside an emotional relationship |
-| **Problem** | In a conversation there is no periphery to explore, so every discovery is an utterance. The problem is not *how to make it passive* but *which utterance a trustworthy companion would make anyway* |
-| **Measure** | **Trust first:** block/mute rate after any door ≤ baseline; dormancy after a decline ≤ baseline. **Conversion is observed and never targeted** |
-
-Four doors, specified in **§33**: another parent · the bot menu and pinned line · the parent asking (the primary path) · and, at most twice in a lifetime, ADAM saying its own method is not enough — with the free alternative offered first and set as the default.
-
-**It has no product name** (§33.6), which makes a pricing page impossible to build and forces every description into outcome language.
-
-**v1's F9 carried a conversion target** — *"≥10% of S4 parents open it unprompted."* A target on a discovery mechanism is an instruction to optimise it, and optimising discovery is how a companion becomes a funnel. **There is no conversion target anywhere in §33.**
-
----
-
-## 16. Value ladder
-
-| Rung | Offer | Price | Gate |
-|---|---|---|---|
-| **0** | Instagram content | Free | None |
-| **1** | **The Moment** — unlimited conversation, voice, crisis presence | **Free forever, every country** | None |
-| **2** | **The daily rhythm** — Seed + Harvest, full memory, the First Mirror | **Free forever** | Enough known to be personal (§10, S2) |
-| **3** | **Full companionship** — described in outcomes (§21.1) | **$10 equivalent** | Parent-initiated + a payment rail |
-| **4** | **Continuation** | **~$6–7 equivalent** | Completed a month |
-| **5** | *(Later)* Peer presence | TBD | Not in scope |
-
-### 16.1 The difference between rung 2 and rung 3 (D-G)
-
-**It is not the amount of memory. It is not the number of features. It is the level of companionship.**
-
-| | Free (rungs 1–2) | Paid (rung 3) |
-|---|---|---|
-| **Memory** | **Full. Identical.** ADAM knows the child equally well | **Full. Identical.** |
-| **Help when asked** | **Unlimited** | Unlimited |
-| **Daily rhythm** | Seed + Harvest, every day | Seed + Harvest, every day |
-| **Nature of the relationship** | Present, responsive, remembers | **Directed at one agreed outcome, with someone watching whether it happens** |
-| **What the parent is buying** | — | **A month aimed at a specific change, and the accountability that it arrives** |
-
-**Explicitly banned framings (D-G):**
-
-| Never | Why |
-|---|---|
-| "Free remembers one day / seven days" | Deliberately crippling memory to manufacture a reason to pay (P15). Also self-defeating: shallow memory makes the free Seed generic, which breaks P11 |
-| "Free gets 3 messages a day" | Rationing help (P1, P8) |
-| "Unlock full memory" | Memory is not a product; it is the precondition for the product being any good |
-| "Paid gets more features" | Nobody wants more features. They want the house quieter (P16) |
-
-**The ladder's load-bearing choice:** rung 2 is free **and complete**. The recognition moment is given away, and the memory behind it is not throttled. What is sold is not access — it is **direction**.
-
----
-
-## 17. Activation strategy
-
-### Definitions
-
-| Term | Definition | Why this threshold |
-|---|---|---|
-| **First Value** | Received a usable step in the first session | The relief moment (T1) |
-| **In rhythm** | Received a personalised Seed | Proves Knowledge is sufficient to be personal |
-| **Activated** | Completed **3 Seed→Harvest pairs** | The proof moment (T3) and the Mirror gate |
-| **Habituated** | ≥8 Harvests in the first 14 days | The loop has become automatic |
-
-*(v1 defined Activated as "3 nights logged AND received First Mirror". v2 requires the linked pair, since an unlinked evening log no longer exists.)*
-
-### Activation funnel with targets
-
-| Step | Target | Current baseline |
-|---|---|---|
-| `/start` → first message | ≥80% | 62.6% (understated — counter bug) |
-| First message → First Value | ≥90% | Not measured |
-| First Value → in rhythm | ≥70% | **New — does not exist yet** |
-| In rhythm → 1 Harvest | ≥60% | Not measured |
-| 1 → 3 pairs (**Activated**) | ≥50% | Not measured |
-
-### The activation interventions
-
-1. **Delete the onboarding form.** 94.1% abandonment. Fields are inferred from conversation.
-2. **Delete the country gate on usage.** 48.4% blocked at the door (P8).
-3. **Fire the First Mirror.** Built, data-gated, fired zero times.
-4. **Start the daily rhythm** *(new)*. The only item requiring genuine new product — and the one that addresses Habit, the force v1 left unanswered.
-
----
-
-## 18. Habit loop
-
-Two linked triggers per day, not one.
+### 16.2 The tree
 
 ```
-┌─ MORNING ─────────────────────────────────────────────────┐
-│  TRIGGER   Seed arrives, timed before the situation       │
-│  ACTION    Read. Optionally try one small thing.          │
-│  REWARD    Being known — it names the child and the       │
-│            actual problem, not parenting in general       │
-└──────────────────────────┬────────────────────────────────┘
-                           │  the same subject, all day
-                           ▼
-┌─ EVENING ─────────────────────────────────────────────────┐
-│  TRIGGER   Harvest arrives, after the window closes       │
-│  ACTION    One tap                                        │
-│  REWARD    Variable:                                      │
-│              • recognition ("هذه خطوة حقيقية")             │
-│              • a new angle for tomorrow                   │
-│              • a pattern noticed                          │
-│              • occasionally the Mirror — the jackpot      │
-└──────────────────────────┬────────────────────────────────┘
-                           ▼
-┌─ INVESTMENT ──────────────────────────────────────────────┐
-│  Each answered Harvest sharpens tomorrow's Seed.          │
-│  The parent is training something about their own child.  │
-│  → loads tomorrow's trigger                               │
-└───────────────────────────────────────────────────────────┘
-```
-
-**Why the two-trigger structure is stronger than v1's one.** A single evening ping asks for effort and returns acknowledgement. The pair **gives first** (a suggestion, in the morning) and asks second (how did it go). The morning message earns the evening tap. v1 asked without giving, once a day, and called it a habit loop.
-
-**Why investment is the strategic core:** answered Harvests are not telemetry — they are the parent's accumulating knowledge of their own child. Leaving costs them something real, which is honest rather than manipulative.
-
-**Anti-patterns explicitly banned:** streak-shaming, guilt-based re-engagement, notification escalation, "you haven't logged in 3 days!", and — new — **sending a Seed when there is nothing personal to say**, which converts the loop into noise and is the fastest way to lose it.
-
----
-
-## 19. Growth loop
-
-```
-   Content naming a parenting pain  (525,682 reach, 20,991 shares)
-                    │
-                    ▼
-   Moment-framed CTA  (the bridge — currently 0.7%)
-                    │
-                    ▼
-   Value in < 60 seconds
-                    │
-                    ▼
-   Daily rhythm → recognition → retention
-                    │
-                    ▼
-   Parent tells another parent
-   AND generates new content raw material
-                    │
-                    └──► feeds content ──┘
-```
-
-**The compounding asset:** every conversation teaches which pains are most common in which countries, which informs the next post. The product feeds the content engine that feeds the product. That is a genuine loop, not a funnel.
-
-**Current break point:** the bridge. 0.7% of the audience has reached the bot. Fixing it is a copy change on existing high-performing posts.
-
----
-
-## 20. Referral loop
-
-### The constraint discovered in the evidence
-
-The obvious mechanic — "share your progress" — is **wrong for this audience.** Sharing "3 of 5 nights calm" also discloses two hard nights. In a shame-loaded context that is a disincentive.
-
-**But** parents already share at enormous volume: 20,991 shares on one post. They share **the insight, not themselves.**
-
-### The mechanic — share the insight, never the scorecard
-
-```
-┌──────────────────────────────┐
-│  الرفض عند النوم              │
-│  ليس عناداً —                 │
-│  هو خوف من الانفصال في الظلام.│
-│                              │
-│              آدم 🌿           │
-└──────────────────────────────┘
-```
-
-Shared because it makes the parent look insightful, not because it exposes their struggle.
-
-**Second mechanic — the direct pass:**
-```
-ADAM: أحدٌ قريب يمرّ بهذا الآن؟
-      هذا له. سأكون معه كما كنت هنا. [مشاركة]
-```
-
-**No incentive, no reward, no referral code.** Paying for referrals in a trust-based, shame-adjacent product corrupts the motive. Offered once, at a moment of pride, never repeated.
-
-**Success measure:** ≥15% of month-completers share; referred share of new signups ≥10% by month 3.
-
----
-
-## 21. Monetization strategy
-
-### Model: **Free companionship + Paid direction**
-
-| Layer | What it is | Price | Available |
-|---|---|---|---|
-| **Free** | Unlimited conversation, voice, the Moment, the daily rhythm, full memory, the First Mirror, crisis presence | **Free forever** | **Every country** |
-| **Paid** | A month aimed at one agreed change, with someone watching whether it happens | **$10 equivalent** | Where a rail exists |
-| **Continuation** | The next month | **~$6–7 equivalent** | After a completed month |
-
-**Note the shape (D-G).** The free row is longer than the paid row. That is correct and deliberate: **free is where the features are; paid is where the direction is.**
-
-### 21.1 How the paid layer is described (D-H)
-
-**Never in terms of contents. Always in terms of the state the parent arrives at.**
-
-| Never say | Say |
-|---|---|
-| "ذاكرة كاملة عن طفلك" | "تعرف ما يهدّئ يوسف قبل أن يبدأ" |
-| "تقرير في نهاية الشهر" | "بيت تنتهي فيه الليلة دون معركة" |
-| "خطة يومية مفصّلة" | "لم تعد تخترع حلاً كل ليلة" |
-| "متابعة وتتبّع للتقدّم" | "تعرف أن ما تفعله يعمل" |
-| "مبادرة من آدم" | "لست وحدك في هذا" |
-
-Left column: five technologies. Right column: five ways a life is different. **The left column is what v1 shipped.**
-
-### 21.2 Why one-time, not subscription
-
-1. **It matches the actual rail.** Payment is collected manually. A "subscription" collected by manual bank transfer is a one-time purchase in a costume — and an entire workflow existed solely to manage that costume. It has been deleted.
-2. **It removes renewal anxiety** — directly attacks the unaddressed Anxiety force (§7).
-3. **It makes the end-of-month reflection the moment of decision**, triggered by demonstrated change rather than a calendar date.
-4. **It resolves the betrayal.** When the month ends, nothing is confiscated; the free rhythm continues identically. Directly answers *"انت طلعت بفلوس اخص عليك"*.
-
-**Evidence that reason 1 is not theoretical.** The renewal machinery was found still running on 2026-07-29. That morning it had sent a real parent — last active a month earlier — a request for 2,300 DZD to a personal bank account, quoting Algerian pricing because her country field was empty, and asserting a "real turning point" assembled from empty fields. **That is the subscription costume failing in production.**
-
-### 21.3 What is never monetised
-
-- The moment of crisis (P1)
-- Any conversation in X1 (P1, F12)
-- Access to ADAM at all, in any country (P8)
-- Memory, or its depth (P15, D-G)
-- Emotional availability
-
----
-
-## 22. Pricing strategy
-
-| Offer | Price | Basis |
-|---|---|---|
-| **First month** | $10 equivalent — 490 EGP / 110 MAD / DZD **pending confirmation** | The only real datapoint is a completed 490 EGP payment |
-| **Continuation** | ~$6–7 equivalent | Rewards demonstrated progress |
-| **Free** | Free, permanently | Ethical floor + acquisition engine |
-
-**On the DZD figure.** Legacy code used 2,300 DZD, materially above $10 at the official rate. Since the pricing table is now the single sanctioned source, the intended figure needs confirming rather than inheriting. Flagged as §32 D9.
-
-### Pricing rules (non-negotiable)
-
-1. **Price is injected from configuration.** The agent must never generate a number. *(It invented "150 EGP" against a real 490 — a broken promise, trivially preventable.)*
-2. **One published price per market.** Never improvised, never negotiated in conversation.
-3. **Keep the 30-day guarantee.** Strongest available Anxiety-reducer, near-zero cost at these volumes.
-4. **Never discount to a parent in distress.** Blurring this teaches parents to negotiate while suffering, which is corrosive for both sides.
-
-### On the affordability objection
-
-*"صراحة ما بقدر على الاشتراك"* is real and will not go away. **The answer is not a lower price — it is that nobody ever needs to pay to be helped tonight, or to be accompanied daily.** Under D-G the free tier answers affordability completely. The paid month is for parents ready to aim at one change, and that will always be a minority. It only needs to be a viable minority.
-
----
-
-## 23. Success metrics
-
-```
-NORTH STAR: Accompanied Parents
-(parents who completed ≥3 Seed→Harvest pairs in the trailing 7 days)
+NORTH STAR: Parents Reaching Outcomes
    │
    ├── ACQUISITION
-   │     Audience→bot conversion        ≥2%    (now 0.7%)
-   │     Unserved-country share         ≥40%
+   │     Audience→bot (deep links)    ≥2%   (now 0.7%)
+   │     Unserved-country share       ≥40%
    │
    ├── ACTIVATION
-   │     /start → first message         ≥80%
-   │     First message → First Value    ≥90%
-   │     First Value → in rhythm        ≥70%
-   │     1 → 3 pairs                    ≥50%
+   │     First message → first value  ≥90%
+   │     First value → in rhythm      ≥70%
+   │     1 → 3 pairs                  ≥50%
    │
-   ├── THE RHYTHM  (new — the retention engine)
-   │     Seed→Harvest completion        ≥50%
-   │     Seeds grounded in Knowledge     100%  (hard floor)
-   │     Pairs / parent / week          ≥4
-   │     Harvest-ignored streaks        watch
+   ├── THE RHYTHM
+   │     Seed→Harvest completion      ≥50%
+   │     Seeds grounded in Knowledge  100%  (hard floor)
+   │     Pairs / parent / week        ≥4
    │
-   ├── TRANSFORMATION  (the real output)
+   ├── OUTCOMES  (the product's real output)
+   │     Journeys reaching their goal  observe, then target
+   │     Journeys honestly declared unreached  observe — a healthy number is not zero
    │     Calm ratio, week 1 → week 4
-   │     Situation identified           ≥60% of S4
-   │     Step-success rate trend
    │
-   ├── DISCOVERY  (§33 — observed, never targeted)
-   │     Door distribution 0/1/2a/2b/3  observe
-   │     Door 2b per 100 in rhythm      observe  (demand signal)
-   │     Conversion per door            observe  — ranked LAST, deliberately
+   ├── COMMERCE  (observed, never targeted)
+   │     Menu opens / parent
+   │     Goal-visible → journey started    observe
+   │     Claim → confirmed            ≥95%
    │
-   ├── MONETIZATION
-   │     Claim → confirmed              ≥95%
-   │     Month completion               ≥70%
-   │     Continuation                   ≥25%
-   │
-   └── TRUST  (guardrails)
-         Crisis flags → human < 24h     100%
-         Commercial messages in X1      0     (hard zero)
-         Seeds sent in X1               0     (hard zero)
-         Ungrounded Seeds               0     (hard zero)
-         Gendered strings to unknown    0     (hard zero)
-         Second mention after decline   0     (hard zero)
-         Block/mute after any door      ≤ baseline
-         Block/mute after Door 3        < 2× baseline, else Door 3 OFF
-         Dormancy within 14d of decline ≤ baseline
-         Block/mute rate overall        <2%
-         Hallucinated price incidents   0     (hard zero)
+   └── TRUST  (guardrails — a breach halts the roadmap)
+         Prices spoken by ADAM         0    (hard zero)
+         Commercial content in X1      0    (hard zero)
+         Seeds in X1                   0    (hard zero)
+         Ungrounded Seeds              0    (hard zero)
+         Gendered strings to unknown   0    (hard zero)
+         Second mention after decline  0    (hard zero)
+         Banned vocabulary in output   0    (hard zero)
+         Crisis flags → human < 24h    100%
+         Block/mute rate               < 2%
+         Median reply latency          < 15s
 ```
 
-**Note on the DISCOVERY branch (§33.8).** v1 had `Mirror → ask opened ≥30%` and `Ask → payment claimed ≥20%`. Both are **removed rather than retargeted.** Discovery now carries *no conversion target at all* — only observation — because a target on a discovery mechanism is a standing instruction to optimise it, and an optimised discovery mechanism is a funnel. The metrics that *are* targeted here are all counter-metrics: block rate, dormancy after a decline, Harvest rate after a decline. **Trust is the thing under test; conversion is merely reported.**
+### 16.3 A healthy number of failed journeys is not zero
 
-### Guardrail metrics — a breach halts the roadmap
+If every journey reaches its goal, the goals are too easy or the outcome is being quietly redefined. §6.3 requires honest declaration; this metric is how we check it is happening.
 
-| Guardrail | Threshold | Rationale |
-|---|---|---|
-| Commercial message during crisis | **0, always** | P1 |
-| Seed or Harvest sent during crisis | **0, always** | §10.2 |
-| Ungrounded proactive message | **0** | P11 |
-| Gendered string to unknown-gender parent | **0** | P12 |
-| Crisis flag unreviewed > 24h | **0** | Duty of care |
-| Hallucinated price | **0** | Trust is the moat |
-| Block/mute rate | **< 2%** | Early signal of over-messaging |
-| Median reply latency | **< 15s** | The moment doesn't wait |
+### 16.4 No conversion target, anywhere
+
+A target on a commercial mechanism is a standing instruction to optimise it, and optimised commerce is a funnel. Conversion is **observed, reported, and never optimised against.** The metrics that *are* targeted are the trust guardrails.
 
 ---
 
-## 24. North Star Metric
+## 17. Analytics events
 
-> ## Accompanied Parents
-> **The number of parents who completed ≥3 Seed→Harvest pairs in the trailing 7 days.**
+Every event carries `parent_id`, `timestamp`, `state`, `country`, `gender_form_used`.
 
-### Why this metric
+**Lifecycle:** `parent_started` · `parent_state_changed` · `parent_dormant` · `parent_returned`
 
-| Criterion | Assessment |
-|---|---|
-| **Reflects delivered value** | ✅ A completed pair means ADAM said something specific enough to act on, and the parent came back to close it |
-| **Leads revenue** | ✅ 3 pairs is the Mirror gate, and the Mirror is what makes ADAM feel like it knows the child |
-| **Team can move it** | ✅ Directly improved by Seed quality, timing correctness, and memory depth |
-| **Hard to game without real value** | ✅ Requires ADAM to be specific *and* the parent to return voluntarily |
-| **Honest** | ✅ Rises only if the rhythm is genuinely wanted |
+**Conversation:** `message_received` (channel, char_count) · `first_value_delivered` · `buttons_generated` (count, context) · `something_else_tapped` · `crisis_detected` · `crisis_reviewed`
 
-**Why the pair and not the night.** v1's *Tracked Parents* counted logged nights. A logged night can be produced by a generic ping — it measures the parent's compliance. A completed **pair** measures both sides: it cannot rise unless ADAM's morning message was worth answering. **It is the only metric here that holds us accountable rather than the parent.**
+**Rhythm:** `seed_sent` (situation, knowledge_sources[], scheduled_offset) · `seed_skipped` (**reason**) · `harvest_sent` · `harvest_answered` · `harvest_ignored` · `pair_completed` · `situation_identified`
 
-### Rejected alternatives
+> **`seed_skipped` matters as much as `seed_sent`.** Silence is correct when there is nothing personal to say, so principled silence must be distinguishable from a broken scheduler.
 
-| Candidate | Why rejected |
-|---|---|
-| Total messages | Rewards verbosity; AI verbosity is already 363 vs 53 chars |
-| Weekly active users | Doesn't distinguish a passer-by from a parent doing the work |
-| Revenue | Lags too far; n=1 payment gives no signal |
-| Calm-night ratio | An *outcome* we must not incentivise gaming — no parent should feel pressure to report calm |
-| Nights logged (v1) | Measures compliance, not whether we were worth answering |
-| Seeds sent | Pure output. Trivially gamed by sending more |
+**Journey:** `goal_named` · `journey_started` · `journey_adjusted` (**reason**) · `journey_goal_reached` · `journey_goal_missed` (**what was learned**)
 
-**Guardrail:** counts *participation*, deliberately not *calm nights*. Optimising for reported calm would pressure parents to misreport, corrupting the data and the trust.
+**Telegram:** `menu_opened` · `menu_item_changed` (from, to) · `keyboard_action` · `deep_link_opened` (source post)
+
+**Commerce:** `agent_handoff` · `payment_claimed` · `payment_confirmed` (hours) · `payment_blocked_country` · `waitlist_joined`
+
+**Quality guardrails:** `ungrounded_send_blocked` · `gender_form_fallback` · `banned_vocabulary_blocked` · `price_mention_blocked`
+
+**Never tracked:** message content, anything from an X1 conversation, any field letting an operator browse disclosures casually.
 
 ---
 
-## 25. Product analytics events
-
-Every event carries `parent_id`, `timestamp`, `state`, `country`, `tier`, **`gender_form_used`**.
-
-### Lifecycle
-| Event | Properties |
-|---|---|
-| `parent_started` | source, campaign |
-| `parent_state_changed` | from, to, reason |
-| `parent_dormant` | days_inactive, last_state |
-| `parent_returned` | days_away |
-
-### Conversation
-| Event | Properties |
-|---|---|
-| `message_received` | channel(text/voice), char_count, is_first |
-| `first_value_delivered` | seconds_since_start |
-| `crisis_detected` | category, confidence |
-| `crisis_reviewed` | hours_to_review, outcome |
-
-### The rhythm (**new**)
-| Event | Properties | Answers |
-|---|---|---|
-| `seed_sent` | situation, knowledge_sources[], scheduled_offset, local_hour | Is it grounded, and on time? |
-| `seed_skipped` | reason(no_knowledge / crisis / paused / quiet_hours) | **Why are we silent?** |
-| `harvest_sent` | seed_id, local_hour, after_window | Timed correctly? |
-| `harvest_answered` | seed_id, outcome, seconds_to_answer | Feeds the North Star |
-| `harvest_ignored` | consecutive_count | Over-messaging? |
-| `pair_completed` | day_index | **The North Star event** |
-| `situation_identified` | label, time_window, days_to_identify | How fast do we get useful? |
-
-**`seed_skipped` matters as much as `seed_sent`.** Under P11, silence is correct behaviour when there is nothing personal to say — so we must be able to distinguish *principled silence* from *a broken scheduler*.
-
-### Proof
-| Event | Properties |
-|---|---|
-| `mirror_generated` | kind, pairs_included, calm_ratio |
-| `mirror_delivered` | kind |
-| `mirror_reacted` | reaction_type |
-
-### Commerce
-| Event | Properties |
-|---|---|
-| `companionship_asked_about` | trigger(**user_initiated only**) |
-| `payment_claimed` | amount, currency, method |
-| `payment_confirmed` | hours_to_confirm |
-| `month_started` / `month_completed` | pairs_completed, calm_delta |
-| `continuation_purchased` | — |
-| `payment_blocked_country` | country |
-
-### Quality guardrails (**new**)
-| Event | Properties | Answers |
-|---|---|---|
-| `ungrounded_send_blocked` | message_type, missing_knowledge | Is P11 holding? |
-| `gender_form_fallback` | string_id | Which strings lack all three forms? |
-
-**Explicitly not tracked:** message content, anything from an X1 conversation, any field letting an operator browse disclosures casually. Analytics gets counts and categories, never intimate text.
-
----
-
-## 26. Experiment roadmap
-
-Ordered by information value per day of effort.
+## 18. Experiments
 
 | # | Experiment | Hypothesis | Kill signal | Effort |
 |---|---|---|---|---|
-| **E1** | **Seed grounding test** | A memory-grounded Seed outperforms a generic tip | Grounded ≤ generic on Harvest rate | Low — same pipeline, two arms |
-| **E2** | **Fire the First Mirror** | Recognition drives retention | No retention lift at day 14 | Switch-on |
+| **E1** | **Seed grounding** | A memory-grounded Seed beats a generic tip | Grounded ≤ generic on Harvest rate | Low — two arms, same pipeline |
+| **E2** | **Deep links** | Context-preserving links beat generic CTAs | No lift over 0.7% | Link parameter only |
 | **E3** | **Delete onboarding** | The form is pure loss | Extraction materially worse | Deletion |
-| **E4** | **Free-everywhere** | Serving all countries grows more than it costs | Cost outruns signal | Deletion |
-| **E5** | **Content bridge** | Moment-framed CTA beats product CTA | No lift over 0.7% | Copy only |
-| **E6** | **Timing test** | Situation-relative beats fixed-hour | No difference in Harvest rate | Config |
-| **E7** | **Gulf concierge test** | Waitlisted high-ATP parents will pay | 0/10 pay | Days, no engineering |
-| **E8** | **Voice input** | Voice increases depth and activation | No lift | Medium |
-| **E9** | **Price test** | $10 is right for EG | Both arms <2% | Config |
-| **E10** | **Door 2b frequency** *(new)* | Parents spontaneously ask for continuous help often enough for Door 2 to carry the model | <2 occurrences per 100 parents in rhythm per month → Doors 0–2 cannot sustain revenue and §33.10's tension is worse than estimated | **Observation only — zero build** |
-| **E11** | **Door 3 trust cost** *(new)* | Naming ADAM's own insufficiency does not damage the relationship | Block/mute > 2× baseline, or dormancy-after-decline above baseline → **Door 3 switched off permanently** | Low — instrument before enabling |
+| **E4** | **Free everywhere** | Serving all countries returns more than it costs | Cost outruns signal | Deletion |
+| **E5** | **Menu visibility** | Parents who open the menu early are *more* trusting, not less | Block rate rises with menu exposure | Observation |
+| **E6** | **Timing** | Situation-relative beats fixed-hour | No difference in Harvest rate | Config |
+| **E7** | **Goal falsifiability** | A concrete goal ("5 of 7") outperforms a vague one | No difference in journeys started | Copy |
+| **E8** | **Gulf concierge** | Waitlisted high-ATP parents will pay | 0/10 pay | Days, no engineering |
+| **E9** | **Voice input** | Voice increases depth | No lift | Medium |
 
-**E10 is free and should start the day the rhythm ships.** It requires no build: count how often parents ask for continuous help unprompted. That number determines whether Doors 0–2 can carry a business, and it is knowable *before* Door 3 is built. If it is high, Door 3 may never be needed — which would be the best possible outcome, since Door 3 is the only door that speaks first.
+**E1 is the most important experiment in this document.** The whole thesis is that a grounded Seed is categorically different from a parenting tip. If a generic tip performs equally well, then P11 and Decision 003 are wrong, memory is not the foundation, and the free rhythm is a content channel rather than a relationship. **Worth knowing before building the Knowledge Engine everything else assumes.**
 
-**E1 is the most important experiment in this document.** The entire v2 thesis is that a *grounded* Seed is categorically different from a parenting tip. If a generic tip performs equally well, then P11 and D-C are wrong, memory is not the heart of the product, and the free rhythm is a content channel rather than a relationship. **That is worth knowing before building the memory layer F6 assumes.**
-
-**E6 is nearly free and tests D-E directly** — fixed-hour vs situation-relative, same content.
-
-**Removed from v1:** *"E8 Pride vs guilt copy at the ask"* — the ask is deferred (D-I), so there is nothing to split-test.
+**E5 is the honest test of §15.2.** The entire commerce design rests on the claim that permanent visibility builds trust rather than eroding it. If parents who see the menu early are *more* likely to leave, the claim is wrong and §15 needs rework.
 
 ---
 
-## 27. Product roadmap
+## 19. Roadmap
 
 ### NOW — weeks 0–4
 
 **Week 0 — nothing ships until these are done**
 1. Rotate exposed credentials *(service-role key and bot tokens sit in plaintext in workflow JSON)*
-2. Restore the dashboard source *(`lib/` and `components/` were never committed; the dashboard cannot build)*
-3. Confirm the pricing table, DZD included (§32 D9)
+2. Restore the dashboard source *(`lib/` and `components/` were never committed; it cannot build)*
 
-**Weeks 1–2 — deletions and switch-ons (no new product)**
-4. Remove the country gate on usage (F13)
-5. Remove the onboarding form (§17)
-6. Activate the timezone-correct sender (F7); retire the legacy one
-7. Fire the First Mirror (F5)
-8. Content→product bridge on the top 3 posts (F14)
-9. **Gender-neutral rewrite of every existing user-facing string** (F15) — including the Heart Writer prompt that hardcodes *"أمٍّ"*
+**Weeks 1–2 — deletions, switch-ons, and surfaces**
+3. Remove the country gate on usage
+4. Remove the onboarding form
+5. Activate the timezone-correct sender; retire the legacy one
+6. Fire the Mirror *(built, data-gated, has fired zero times)*
+7. **Gender-neutral rewrite of every existing string**, including the prompt that hardcodes *"أمٍّ"*
+8. **Telegram Engine: reply keyboard, menu, pinned message, deep links** — the commerce surface must exist before any goal is named
 
-**Weeks 3–4 — the new core**
-10. The Knowledge layer (F6) — the precondition for everything below
-11. The Seed (F2), grounded, with `seed_skipped` instrumented from day one
-12. The Harvest (F3), linked to its Seed
-13. The timing engine (F7) with situation windows
-14. Voice input (F4)
-15. Crisis detection + human queue (F12) — **gated on §32 D1**
-16. **E1 runs from the first day the Seed exists**
+**Weeks 3–4 — the engines**
+9. **Knowledge Engine** — the precondition for everything
+10. **Conversation Engine** — hybrid buttons, "شيء آخر", dynamic generation
+11. **Journey Engine** — Seed, Harvest, timing windows
+12. Voice input
+13. Crisis detection + human queue — **gated on §22 D1**
+14. **E1 runs from the first day the Seed exists**
 
-**Decision gate at week 4:** grounded Seeds beat generic on Harvest rate, **and** ≥50% of parents in rhythm complete 3 pairs → proceed. If grounded is not better, stop and revisit §1 — because the memory thesis *is* the product thesis.
+**Decision gate at week 4:** grounded Seeds beat generic on Harvest rate, **and** ≥50% of parents in rhythm complete 3 pairs. If grounded is not better, stop and revisit §1 — the memory thesis *is* the product thesis.
 
 ### NEXT — months 2–3
 
-| Item | Rationale |
-|---|---|
-| Weekly Mirror + end of month (F9, F10) | Completes the paid experience |
-| **Discovery Doors 0–2 (§33)** | Menu entry, pinned line, and the Door 2 answers. **No new machinery — Door 2 is answering a question honestly** |
-| **Door 3, only after E11 instrumentation** | The single system-initiated path. Built last, enabled last, killable on evidence |
-| Situation depth (F8) | Multi-week pattern tracking |
-| Continuation offer | Real retention test |
-| Speech/development track | #3 theme (98 messages), entirely unserved |
-| Referral: shareable insight cards (§20) | Growth loop closes |
-| Operator console v1 | Founder is currently the bottleneck |
-| Global payment rail | Unlocks 23,697 |
+Journey goals and honest outcomes · the sales agent · commercial journeys in supported countries · situation depth · shareable insight cards · operator console · global payment rail
 
 ### LATER — months 4+
 
-| Item | Precondition |
-|---|---|
-| Peer presence / community | Only after retention is proven; large build, moderation risk |
-| Multi-child support | Only when data shows demand — currently 3 children rows |
-| Collective intelligence | A genuine long-term moat; needs privacy design first |
-| Additional markets | Requires a rail; E7 evidence justifies |
-| Voice output | Only if tested and it does not unsettle (§14.1) |
+Peer presence *(only after retention is proven)* · multi-child *(currently 3 children rows)* · collective intelligence *(needs privacy design first)* · additional markets *(requires a rail)* · voice output *(only if tested and it does not unsettle)*
 
 ---
 
-## 28. Risks and assumptions
+## 20. Risks and assumptions
 
-### Assumptions requiring validation, ranked by damage-if-wrong
+### Assumptions, ranked by damage if wrong
 
-| # | Assumption | Test | Damage if wrong |
+| # | Assumption | Test | Damage |
 |---|---|---|---|
-| **A1** | **A grounded Seed is categorically better than a generic tip** | E1 | **Fatal** — the v2 thesis, and the reason memory is the product |
-| **A2** | **Parents want a daily rhythm rather than an on-call helper** | E1 + Harvest rates | **Fatal** — D-D would be wrong |
-| **A3** | Parents pay for direction, not access | Continuation rate | **Fatal** — the business model |
-| **A4** | Situation-relative timing beats a fixed hour | E6 | Medium — recoverable by config |
-| **A5** | Waitlisted (Gulf) parents will pay | E7 | High — the growth thesis |
-| **A6** | Free-everywhere costs less than it returns | E4 | High — unit economics |
-| **A7** | $10 is right for this audience | E9 | Medium — recoverable |
-| **A8** | Voice materially lifts engagement | E8 | Low |
-| **A9** | Removing onboarding doesn't degrade personalisation | E3 | Low — reversible |
-
-**A1 and A2 are new and both fatal.** v1's fatal assumption was that visible progress converts better than memory. v2's is stronger and cheaper to test: that **specificity** is what makes a proactive message welcome. E1 tests it directly.
+| **A1** | A grounded Seed is categorically better than a generic tip | E1 | **Fatal** — the product thesis |
+| **A2** | Parents want a daily rhythm, not an on-call helper | E1 + Harvest rates | **Fatal** |
+| **A3** | **Permanent menu visibility builds trust rather than eroding it** | E5 | **Fatal** — the entire commerce design rests on it |
+| **A4** | Parents pay for a driven outcome, not for access | Journeys started | **Fatal** — the business model |
+| **A5** | A concrete goal is more compelling than a vague one | E7 | Medium |
+| **A6** | Situation-relative timing beats a fixed hour | E6 | Medium |
+| **A7** | Waitlisted Gulf parents will pay | E8 | High |
+| **A8** | Free-everywhere costs less than it returns | E4 | High |
 
 ### Risk register
 
 | # | Risk | Severity | Mitigation |
 |---|---|---|---|
-| **R1** | **Safeguarding** — parents disclose abuse and their own violence with no escalation path | 🔴 Critical | F12 + human protocol **before scale**. §32 D1 |
-| **R2** | **The Seed becomes a tip library** — the path of least resistance whenever Knowledge is thin | 🔴 Critical | P11 as a hard block, `ungrounded_send_blocked` metric, 100% floor. **Prefer silence** |
-| **R3** | **Two proactive messages a day is too many** | 🟠 High | Ceiling of 2 (§13.3); `harvest_ignored` streaks; decay to weekly then stop |
-| **R4** | **Exposed credentials** — plaintext service-role key and bot tokens in workflow JSON | 🟠 High | Week 0, item 1 |
-| **R5** | **Low conversion by construction.** The better the free rhythm is, the less often a parent hits a wall that makes the fuller arrangement obvious | 🟠 High | **Accepted, not mitigated.** §33.10. Free quality and conversion are in direct tension and the non-negotiables resolve it toward free quality. Size the business for a small paying minority |
-| **R13** | **Door 3 reads as "pay to fix your failure"** despite locating the fault in ADAM's method | 🟠 High | Never fires within 3 days of a hard night; free option first and default; E11 measures it; **kill switch at 2× baseline block rate** |
-| **R14** | **Door 2b never happens often enough** to carry revenue, leaving Door 3 as the only real path — which is the fragile one | 🟠 High | E10 measures this for free before Door 3 is built. If Door 2b is rare, the honest response is to revisit §16.1's boundary, **not to make Door 3 pushier** |
-| **R6** | **Free-everywhere burns cash** | 🟠 High | Weekly cost/parent monitoring; generous but finite fair-use |
-| **R7** | **Founder is the payment rail** | 🟠 High | Fine now; binding at ~50 customers |
-| **R8** | **Advice quality in violence-adjacent situations** | 🟠 High | Weekly human review sample; hardened refusals |
-| **R9** | **Gendered copy leaks to fathers** | 🟡 Medium | Three-form requirement (§8.2); `gender_form_fallback` metric |
-| **R10** | **Retention unproven** — oldest cohort ~4 weeks | 🟡 Medium | The rhythm *is* the test |
-| **R11** | **Trust collapse from one bad interaction** in a shame-loaded context | 🟡 Medium | The no-blame discipline is excellent — protect it absolutely |
-| **R12** | **Voice transcription fails on dialect** | 🟡 Medium | Confidence threshold + text fallback |
+| **R1** | **Safeguarding** — disclosures of abuse and the parent's own violence with no escalation path | 🔴 Critical | Crisis detection + human protocol **before scale**. §22 D1 |
+| **R2** | **The Seed becomes a tip library** — the easy path whenever Knowledge is thin | 🔴 Critical | P11 as a hard block; `ungrounded_send_blocked`; 100% floor. **Prefer silence** |
+| **R3** | **Nobody opens the menu**, so the commerce model is invisible in practice and §15.2 fails silently | 🔴 Critical | `menu_opened` from day one. If low, the changing item must become more legible — **never a message** |
+| **R4** | **Subscription + manual payment reproduces the dunning machine** | 🟠 High | **ADAM never sends a renewal or expiry message (§6.4).** The agent owns continuation. Automated dunning permanently banned |
+| **R5** | **Two roles confuse the parent** — ADAM warm, agent transactional, and the seam feels like a bait-and-switch | 🟠 High | ADAM names the handoff plainly (§14.5). Agent never gives advice. Monitor block rate at handoff |
+| **R6** | **Low conversion by construction** — the better free works, the less often a goal feels urgent | 🟠 High | **Accepted, not mitigated.** Size the business for a small paying minority. §20.1 |
+| **R7** | **Exposed credentials** — plaintext service-role key and bot tokens | 🟠 High | Week 0 |
+| **R8** | **Dynamic buttons produce nonsense options** under a weak model | 🟠 High | "شيء آخر" always present as the escape; log `something_else_tapped` as the quality signal |
+| **R9** | **Generated journeys drift into generic advice** without templates to anchor them | 🟠 High | Every journey step reads Knowledge (§7.3) and is blocked if ungrounded |
+| **R10** | **Founder is the payment rail** | 🟠 High | Fine now; binding at ~50 customers |
+| **R11** | **Gendered copy leaks to fathers** | 🟡 Medium | Three-form requirement; `gender_form_fallback` |
+| **R12** | **Reply keyboard discourages free text** — v2's original objection, now overridden | 🟡 Medium | Three entries only; collapsible; monitor free-text rate before and after |
 
-**R2 is the risk most likely to actually happen.** When Knowledge is thin, generating a plausible generic tip is easy and sending nothing feels like failure. It is not: under P11, silence is correct. That is why the floor is a hard 100% and why `seed_skipped` carries reasons.
+### 20.1 The strategic consequence, stated plainly
 
-**R5 is worth reading twice, and it is no longer about deferral.** Discovery now exists (§33), and conversion is *still* expected to be low — because a companion that genuinely works rarely produces the moment where a fuller arrangement becomes obvious. That is the honest price of P15 and D-G, and §33.10 states it without softening.
+**This model converts poorly by construction, and that is the honest cost of the constraints.**
 
-**R13 and R14 together define the one real decision left here.** If Door 2b is rare (E10) and Door 3 is costly (E11), then Doors 0–2 cannot fund the business, and the correct response is to revisit the free/paid boundary in §16.1 — a founder decision — rather than to add pressure to the doors, which is nobody's decision to make.
+ADAM cannot sell. The menu does not push. No conversion target exists. And the better the free rhythm works, the less often a parent feels the need for a driven goal.
 
----
+Two implications, neither of which should be softened:
 
-## 29. Features to remove / keep / build
-
-### REMOVE
-
-| Feature | Why |
-|---|---|
-| Country gate on **usage** | Discards half of demand for zero gain |
-| 6-step onboarding form | Asks before giving; 94.1% abandonment |
-| The Judge, Silent Seller, Renewal Guard | Scoring and pushing an unwanted pitch. 8 offers → 0 clicks. *Already archived 2026-07-29* |
-| "Subscription" framing | Doesn't match a manual rail |
-| Selling memory / reports / tracking as the benefit | D-H. Nobody buys machinery |
-| **Feature-list ask copy** *(new)* | v1 §11.5 was a four-bullet list — the error v1 itself diagnosed |
-| **The fixed 21:00 send hour** *(new)* | D-E. Asks about bedtime before bedtime |
-| **The mother-only default** *(new)* | D-A. 18.5% of the audience is male |
-| **The word الاحتواء in any user-facing string** *(new)* | D-B |
-| **Any scoring model that decides who is "ready" to be offered** *(new)* | This is what the Judge was. 8 offers, 0 clicks. Banned in §33.5 |
-| **The name "المرافقة الكاملة"** *(new)* | "Full" implies what she has is partial, contradicting P15. It has no name now (§33.6) |
-| **Any launch announcement to the existing 291 parents** *(new)* | It would be exactly the surprise §33 exists to prevent |
-| **Any conversion target on a discovery mechanism** *(new)* | A target is an instruction to optimise, and optimised discovery is a funnel (§33.8) |
-| `main_pain` fixed 8-value enum | Missed the #3 theme (98 messages) |
-| Uncapped reactivation | Re-engaging someone who left is how you get muted |
-| Hardcoded credentials in nodes | Bypasses RLS on intimate data |
-
-### KEEP (and protect)
-
-| Feature | Why it must not be touched |
-|---|---|
-| **The no-blame prompt discipline** | *"هي متعبة لا مذنبة"* — this is the moat |
-| **Heart Writer safety rule** | *"الذاكرة الناقصة أرحم ألف مرة من الذاكرة التي تجرح"* — exemplary |
-| **2–3 line response constraint** | Correctly matched to an exhausted reader |
-| **Full prescription, never withheld** | *"الحبس مقابل الدفع هو أكبر قاتل للقيمة"* |
-| **One-tap answering** | The habit engine |
-| **Show-don't-announce memory** | Announcing memory reads as surveillance |
-| **Ban on scarcity and urgency** | Incompatible with the trust position |
-| **The Mirror's structural ban on prices** | Enforced by constraint, not wording |
-| **Provenance-based memory redaction** | The only safe rule for Arabic free text |
-| **Brand name and identity** | 41,100 followers; 525k-reach proof |
-
-### BUILD
-
-| Feature | Priority | Ref |
-|---|---|---|
-| Gender-neutral content system | **NOW** | F15 |
-| Knowledge layer | **NOW** | F6 |
-| The Seed | **NOW** | F2 |
-| The Harvest | **NOW** | F3 |
-| Timing engine | **NOW** | F7 |
-| First Mirror **firing** | NOW | F5 |
-| Voice input | NOW | F4 |
-| Crisis detection + queue | NOW *(gated on D1)* | F12 |
-| Free-everywhere | NOW | F13 |
-| Content bridge | NOW | F14 |
-| Weekly Mirror | NEXT | F9 |
-| End-of-month | NEXT | F10 |
-| Situation depth | NEXT | F8 |
-| Operator console | NEXT | F11 |
-| Discovery Doors 0–2 | NEXT | F16, §33 |
-| Discovery Door 3 | NEXT — **built and enabled last**, after E11 | F16, §33.4 |
+1. **Size the business for a small paying minority subsidising a large free base**, with content as the acquisition engine. That is a viable shape, but it is a different business from what a funnel would build.
+2. **If revenue proves insufficient, the thing to revisit is the free/paid boundary (§5) — a founder decision — not the pressure in §15.** Moving the boundary is strategy. Making the menu pushier is a betrayal, and it is nobody's call.
 
 ---
 
-## 30. Decisions challenged and rejected
+## 21. Rejected decisions
 
 | Considered | Rejected because |
 |---|---|
-| **Keep the subscription model** | Manual collection makes every renewal a friction event. The machine built to fight that friction was found dunning a dormant parent |
-| **Lower the price to ~$3** | The only real datapoint is a completed $10-equivalent payment. Free answers affordability; discounting forfeits the one proof |
-| **Freemium with message caps** | Paywalls the crisis. Violates P1 |
-| **Tier memory depth (free = 7 days)** *(new)* | **Deliberately crippling the product to create a reason to pay.** Violates P15 and D-G. Also self-defeating: shallow memory makes the free Seed generic, which breaks P11 |
-| **Send a generic tip when memory is thin** *(new)* | Converts the rhythm into a content channel and destroys the only differentiator (P11). Silence is correct |
-| **Ask gender at onboarding** *(new)* | Violates P2. Gender is inferable from the parent's own grammar; the neutral default costs nothing while unknown |
-| **Pure passive discovery — "let them find it like an app feature"** *(new)* | **The founder's own framing, and it was adopted as the frame but rejected as the mechanism.** An app has periphery to wander into; a conversation has none — everything in it is foreground. So "passive" discovery in a chat is a category error. Telegram's menu and pinned message are the only real periphery, and they became Door 1 (§33.2) |
-| **A "quiet affordance" with a conversion target** | v1's F9. A target on a discovery mechanism is a standing instruction to optimise it, and optimised discovery is a funnel (§33.8) |
-| **Giving the paid arrangement a product name** *(new)* | Names belong to products that appeared. An extension of a relationship is described, in context, each time. Naming it also makes a pricing page buildable, and forces feature-list copy (§33.6) |
-| **Door 3 firing on a timer or a message count** *(new)* | That is the Judge with different arithmetic. It fires only on evidence that ADAM's own method is failing this family (§33.4) |
-| **Build a mobile app** | Adds a surface with no evidenced job |
-| **Sell a course** | Competes with our own free content; serves *knowing*, which is not the gap |
+| **Keep the subscription as the business unit** | Decision 016. The journey is the unit; the subscription only permits continuation |
+| **ADAM quotes the price when asked** | Decision 006. Even on direct request, ADAM points at the menu |
+| **Announce the commercial model to existing parents** | It is exactly the surprise §15 exists to prevent |
+| **Tier memory or intelligence** | Decision 002 and P15. Also self-defeating: shallow memory makes the free Seed generic, breaking P11 |
+| **A library of parenting tips for the Seed** | Decision 004. Converts the rhythm into a content channel and destroys the only differentiator |
+| **Plan templates for journeys** | Decision 004. A template is indistinguishable from the free content already everywhere |
+| **Pure passive discovery — "let them find it like an app feature"** | An app has periphery to wander into; a conversation has none. Telegram's menu and keyboard *are* that periphery, which is why §10 carries the commerce rather than a message |
+| **A "quiet affordance" with a conversion target** | A target on a commercial mechanism is an instruction to optimise it |
+| **A readiness score deciding when to surface commerce** | This was the Judge. 8 offers, 0 clicks, 4 of 8 gone |
+| **Ask country and gender at onboarding** | P2. Both are inferable; the neutral default costs nothing meanwhile |
+| **A mobile app** | Telegram is the product surface (008). A second surface serves no evidenced job |
+| **A course** | Competes with our own free content; serves *knowing*, which is not the gap |
 | **Ads** | Destroys the no-judgement trust that is the moat |
 | **B2B / schools / clinics** | Almost no evidence in 2,086 messages |
 | **Community in MVP** | Real job, large build, moderation risk in a shame-loaded context |
-| **Gamified streaks** | Streak-shaming a parent after a hard night violates P3 catastrophically |
+| **Gamified streaks** | Streak-shaming after a hard night violates P3 catastrophically |
 | **Incentivised referral** | Corrupts the motive in a trust-based product |
-| **Child-behaviour tracking as the hero** | Points the product at the child; the job is the parent's |
 | **Rename the brand** | 41,100 followers and a 525k-reach proof point |
 
 ---
 
-## 31. Change log v1 → v2
-
-Every section that changed, what changed, and which decision drove it.
-
-| § | Section | What changed | Driver |
-|---|---|---|---|
-| **0** | *What changed* | **New.** The eleven decisions, stated as overrides | D-K |
-| **1** | Product vision | One-year vision no longer promises "a report" — it promises a quieter home | D-H |
-| **2** | Principles | **Six new: P11 memory is the product · P12 both parents · P13 daily rhythm · P14 timing follows the event · P15 free never crippled · P16 sell the destination.** P4 broadened to "fewest taps". P3 de-gendered | D-A, C, D, E, G, H, J |
-| **3** | Positioning + voice | **New §3.5** the gender-free Arabic technique (nominal sentences, first-person plural, buttons, impersonal). **New §3.6** the two lexicons — الاحتواء and six other internal terms banned from user strings. Voice table gains "specific to this family". Moment-of-use is now daily | D-A, D-B, D-C |
-| **4** | Value proposition | Primary line rewritten gender-free and outcome-led. Audience table gains "in the rhythm"; "considering" row emptied and marked deferred | D-A, D-H, D-I |
-| **5** | Transformation | "bad mother" → "bad parent"; "I have proof I'm becoming calmer" → "the house is quieter, and I did that". T3 renamed *First recognition* | D-A, D-H |
-| **6** | Personas | **Persona A is now "The Exhausted Parent"** with mother/father as sub-variants A1/A2. v1's separate father persona deleted — a separate persona is exactly what produced a mother-default product with a father exception | D-A |
-| **7** | JTBD | **New fourth dimension: Relational** — "someone in this with me who doesn't need re-explaining", evidenced by *"خسارة انك لا تذكرني"*. The Habit force is now answered by the rhythm | D-C, D-D |
-| **8** | Information architecture | **New entities `Knowledge` and `Day` (Seed+Harvest as one atomic unit).** `Flashpoint`→`Situation` with a time window; `Night`→`Day`; `Journey`→`Chapter`. **Three new integrity rules** making P11, D-D and D-A enforceable in data rather than prompts. Corrected v1's claim that `weekly_plans`/`survey_responses` were dead | D-C, D-D, D-E, D-A |
-| **9** | User journey | Redrawn. The free tier is now a **loop that runs whether or not anything went wrong**, not a corridor. Discovery step replaced by an explicit TODO block | D-D, D-I |
-| **10** | User states | S3 `logging`→`in_rhythm`. **S2's exit now requires enough Knowledge to ground a Seed.** S5 emptied — nothing may enter it. **X1 now suspends the rhythm**, not just commercial messaging | D-C, D-D, D-I |
-| **11** | Conversation flows | **Every Arabic string rewritten gender-free.** **New §11.3 The Seed** and **§11.4 The Harvest**, replacing v1's nightly check-in. §11.8 the ask **completely rewritten in outcome language**, with v1's four-bullet feature list quoted as the error. §11.2 loses its feminine closing hook. §11.9 notes الاحتواء is internal-only | D-A, D-B, D-D, D-H, D-I |
-| **12** | **The memory model** | **New section.** What Knowledge is built from; what each message type must read before sending; the show-don't-announce table; **the test — could this exact message go to another family? If yes, it does not send** | D-C, D-F |
-| **13** | **The timing model** | **New section.** Situation time windows, Seed before / Harvest after, six hard rules including quiet hours and the two-message ceiling | D-E |
-| **14** | **Telegram-first audit** | **New section.** Every interaction audited for effort saved; capability inventory (menu, pinned message, reactions, reply-threading); explicit list of capabilities refused | D-J |
-| **15** | Feature map | **F2 Seed, F3 Harvest, F7 timing engine, F15 gender-neutral content — all new.** F6 memory elevated from "child identity" to the substrate. F5 Mirror measured by **retention, not ask-opens**. **F16 discovery struck through as TODO** | D-C, D-D, D-E, D-A, D-I |
-| **16** | Value ladder | **New §16.1: the free/paid difference is the level of companionship, not the amount of memory.** Table shows memory as *identical* in both tiers. Four framings explicitly banned | D-G |
-| **17** | Activation | "Activated" = 3 **pairs**, not 3 nights. New funnel step "First Value → in rhythm". Fourth intervention: start the rhythm | D-D |
-| **18** | Habit loop | Rebuilt around **two linked triggers** — morning gives, evening asks — instead of one evening ping. New anti-pattern: sending a Seed with nothing personal to say | D-D, D-C |
-| **20** | Referral | Direct-pass copy de-gendered | D-A |
-| **21** | Monetization | Model renamed **Free companionship + Paid direction**. **New §21.1: a five-row never-say/say table.** Adds the live evidence of the renewal machinery dunning a dormant parent | D-G, D-H |
-| **22** | Pricing | DZD figure flagged as needing confirmation rather than inherited from 2,300 | — |
-| **23** | Metrics | **New RHYTHM branch.** Monetization discovery metrics **removed, not retargeted**. Four new hard-zero guardrails: Seeds in crisis, ungrounded Seeds, gendered strings, plus existing | D-D, D-I, D-A, D-C |
-| **24** | North Star | **Tracked Parents → Accompanied Parents** (≥3 completed pairs). Rationale: a logged night measures the parent's compliance; a completed pair measures whether *we* were worth answering | D-D |
-| **25** | Analytics events | **New rhythm block** including `seed_skipped` with reasons — so principled silence is distinguishable from a broken scheduler. New quality-guardrail events. All events carry `gender_form_used` | D-C, D-D, D-A |
-| **26** | Experiments | **E1 is now Seed grounding — the most important experiment in the document.** New E6 timing test. v1's "pride vs guilt at the ask" removed, since the ask is deferred | D-C, D-E, D-I |
-| **27** | Roadmap | Week 0 adds restoring the dashboard source and confirming pricing. Weeks 1–2 add the gender-neutral rewrite. Weeks 3–4 are Knowledge → Seed → Harvest → timing. **Decision gate is now: do grounded Seeds beat generic?** | D-A, D-C, D-D, D-E |
-| **28** | Risks | **A1/A2 new, both fatal.** **R2 (the Seed becomes a tip library) is the most likely risk to materialise.** **R5 states plainly that revenue stays ~0 until D7 is answered** | D-C, D-D, D-I |
-| **29** | Remove/keep/build | Five new removals: feature-list copy, the fixed 21:00 hour, the mother-only default, الاحتواء in user strings, any quiet-affordance mechanism | D-A, B, E, H, I |
-| **30** | Rejected | **Four new rejections**, including *tier memory depth* and *send a generic tip when memory is thin* — the two shortcuts most likely to be proposed later | D-F, D-G, D-I |
-| **32** | Open decisions | **Three new: D7 discovery, D8 month-vs-objective, D9 the DZD figure** | D-I |
-
-### Revision 2026-07-30 — D7 resolved
-
-| § | What changed | Why |
-|---|---|---|
-| **0** | D-I struck through and marked **RESOLVED → §33** | Approved |
-| **9** | The TODO block in the journey replaced by the four doors | Integration |
-| **10** | **S5 is now a real state** (`considering`), enterable only through a door. Rule 2 rewritten: a decline returns her unchanged with **no second mention ever** | The four-of-eight who never returned |
-| **11.8** | **Split into 11.8a–d.** New 11.8a is the primary path — she asks for continuous help, ADAM answers the question fully and free *first*. New 11.8b scope answer. 11.8d keeps v1's feature-list offer on the page as the error to avoid | D-H + §33.4 |
-| **15** | **F16 is now a real feature** with trust-first measures, replacing the struck-through TODO. v1's ≥10% conversion target named as the defect | §33.8 |
-| **23** | **New DISCOVERY branch — observation only, no targets.** Four new guardrails including a Door 3 kill switch and dormancy-after-decline | §33.8 |
-| **26** | **E10 Door 2b frequency** (free, zero build, start immediately) and **E11 Door 3 trust cost** (instrument before enabling) | R13, R14 |
-| **27** | Doors 0–2 in NEXT; Door 3 built and enabled last | Risk ordering |
-| **28** | **R5 rewritten** — no longer about deferral, now about low conversion being structural. **R13** Door 3 misreading, **R14** Door 2b too rare | §33.10 |
-| **29** | Four new removals: scoring models, the name "المرافقة الكاملة", any launch announcement, any conversion target on discovery | §33.5 |
-| **30** | **The founder's own "discover it like an app feature" framing recorded as adopted-as-frame, rejected-as-mechanism**, with the reason. Plus: no product name, no timer-based Door 3 | §33.2, §33.6 |
-| **32** | D7 struck through. **D8 now carries a recommendation** — an objective with a month as its ceiling | — |
-| **33** | **New section: the discovery architecture** | D7 |
-
-**Sections unchanged in substance:** §19 growth loop.
-
----
-
-## 32. Open decisions requiring founder input
-
-These are **not** product decisions and I have deliberately not made them.
+## 22. Open decisions
 
 | # | Decision | Why it's yours | Blocking |
 |---|---|---|---|
-| **D1** | **Crisis escalation destination.** When a parent discloses abuse, suicidal ideation, or their own violence — what happens? A human replies? A referral to a named local service? A stated boundary? | Duty of care, legal exposure, your capacity. No defensible automated answer exists | **Blocks F12 and therefore scale** |
-| **D2** | **Who staffs the crisis queue, within what SLA?** | Depends on your team and hours | Blocks F12 |
-| **D3** | **Fair-use ceiling for the free tier.** Unlimited is the principle; some finite ceiling is the reality | Depends on your cost tolerance | Blocks F13 rollout |
-| **D4** | **Which market to open first** if E7 succeeds — Saudi (highest ATP) or Iraq (largest volume) | Depends on access to a payment agent | Blocks post-E7 planning |
-| **D5** | **What happens to the existing 291 parents and 4,212 conversations** on migration — carry memory forward, or fresh start with continuity messaging? | Relationship decision, not technical | Blocks week 1 |
-| **D6** | **Whether ADAM ever says it is an AI.** One parent asked directly: *"هل انت ذكاء اصطناعي مجاني ام مدفوع"* | Positioning and ethics call | Should be settled before scale |
-| ~~D7~~ | ~~How a parent learns the fuller arrangement exists~~ **RESOLVED 2026-07-30 → §33.** Four doors; no push; no product name; trust measured before conversion; Door 3 killable on evidence | Approved in principle | **No longer blocking** |
-| **D8** | **Is the paid unit a month, or an objective?** *(new)* The architecture describes an objective with an ending; the price is quoted monthly. A month implies a renewing subscription; an objective implies a result. **My recommendation: an objective, with a month as its ceiling** — "خمس ليالٍ هادئة من سبع، وسقفه شهر". It keeps the promise falsifiable, survives §33.6's no-name rule, and makes the end-of-month a verdict rather than an invoice. **But it means committing to an outcome you cannot fully control, which is a business-risk call, not a product one** | It determines what is promised | Blocks §11.8 copy |
-| **D9** | **Confirm the DZD price.** *(new)* Legacy code used 2,300 DZD, materially above $10 at the official rate | Pricing decision | Blocks week 0 |
+| **D1** | **Crisis escalation destination.** A parent discloses abuse, suicidal ideation, or their own violence — what happens? | Duty of care, legal exposure, your capacity | **Blocks crisis detection and therefore scale** |
+| **D2** | **Who staffs the crisis queue, within what SLA?** | Your team and hours | Blocks the same |
+| **D3** | **Fair-use ceiling for free.** Unlimited is the principle; some finite ceiling is the reality | Your cost tolerance | Blocks free-everywhere rollout |
+| **D4** | **Is the sales agent a human, or an automated agent?** *(new)* Decision 006 moves purchase to "a specialised agent" without saying which. A human is warmer and does not scale; an automated one scales and must never sound like a bot closing a sale | Positioning and staffing | **Blocks the commerce build** |
+| **D5** | **Does the subscription auto-expire, or lapse silently?** *(new)* Expiry implies a notification, and ADAM may not send one (§6.4). The honest option is silent lapse plus a menu state | It determines whether continuation is a nudge or a choice | Blocks the Journey Engine's end state |
+| **D6** | **Which market to open first** if E8 succeeds — Saudi (highest ATP) or Iraq (largest volume) | Access to a payment agent | Blocks post-E8 planning |
+| **D7** | **The existing 291 parents and 4,212 conversations** — carry memory forward, or fresh start with continuity messaging? | Relationship decision | Blocks week 1 |
+| **D8** | **Whether ADAM ever says it is an AI.** One parent asked directly: *"هل انت ذكاء اصطناعي مجاني ام مدفوع"* | Positioning and ethics | Before scale |
 
-**D1 is now the only true blocker.** D7 is resolved in §33, so revenue is no longer architecturally unreachable — though §33.10 is explicit that it will be low by construction, and that is a consequence of your own non-negotiables rather than a flaw in the mechanism.
-
-Everything else can proceed in parallel.
+**D1 remains the only blocker on scale. D4 is the new blocker on revenue** — the seam in §15.2 cannot be built until we know who is standing on the other side of it.
 
 ---
 
-## 33. The discovery architecture (resolves D7)
+## 23. Change log
 
-**Status:** approved in principle 2026-07-30. This section replaces the deferral in D-I.
+### v2 → v3 (2026-07-30) — PRODUCT DECISIONS v2
 
-### 33.1 The problem, stated precisely
-
-The old model produced *"انت طلعت بفلوس اخص عليك"* — "so you turned out to be after money, shame on you." Eight proactive offers, zero clicks on either button, and four of the eight parents never returned.
-
-That is **two** failures, not one:
-
-1. **Surprise.** The offer contradicted what the parent believed the relationship was.
-2. **Attribution.** It arrived because a scoring machine decided she was ready — not because anything in *her* situation called for it. She could feel the difference.
-
-Fixing only the wording fixes neither. The architecture has to make both impossible.
-
-### 33.2 Why passive discovery is impossible in a conversation
-
-The founder's instinct was: *let the parent discover it the way you discover features in an excellent app.*
-
-**The instinct is right. The analogy does not transfer.** An app has **periphery** — menus, settings screens, greyed-out controls, a "Pro" badge in a corner. A user can wander and find things at their own initiative, and nobody said anything.
-
-**A conversation has no periphery.** Everything in it is foreground. There is no elsewhere to wander into. Therefore, in a chat product, *every* discovery is an utterance, and every utterance has an initiator. "Passive discovery" in a conversation is a category error.
-
-So the design question is not *how do we make discovery passive.* It is:
-
-> **What utterance about a fuller arrangement would a trustworthy companion make anyway — even if there were nothing to sell?**
-
-Everything in this section follows from that reframe.
-
-**One genuine exception, and it is why Telegram matters.** Telegram gives ADAM two non-conversational surfaces: the **bot menu** and the **pinned message**. These are the only true periphery the product has. This is where the founder's instinct actually lands — and it lands *only* because of the channel.
-
-### 33.3 The test every discovery moment must pass
-
-> **Remove the price. Is the message still worth sending?**
->
-> If no, it is a sales pitch wearing a companion's voice. Delete it.
-
-This test is what separates this architecture from the one that produced the betrayal. Every door below passes it. Door 3 passes it only because it carries a free alternative — remove the paid option and the message still helps.
-
-### 33.4 The four doors
-
-| Door | Who initiates | Frequency | Honest expectation |
-|---|---|---|---|
-| **Door 0 — Another parent** | A third party | Organic | Highest trust of all. Nobody with an interest is speaking |
-| **Door 1 — Ambient** | Nobody. It simply exists | Always available | **Low conversion. It is the ethical floor, not a growth lever** |
-| **Door 2 — Asked for** | The parent | Whenever it arises | **The primary path.** The parent has already described the thing |
-| **Door 3 — The honest limit** | ADAM, at most twice ever | Rare | Moderate, and the most fragile. Killable on evidence |
-
----
-
-#### Door 0 — Another parent
-
-Already specified as the referral loop (§20). Named here because **it is the best discovery channel we have and it is not a sales mechanism at all.** A parent hearing it from another parent hears it from someone with nothing to gain.
-
-Nothing new is built. It is listed so that the discovery architecture is not mistaken for "the three things ADAM says."
-
----
-
-#### Door 1 — Ambient (zero utterances)
-
-| Surface | Content | Rule |
+| Area | What changed | Decision |
 |---|---|---|
-| **Bot menu** | One entry, worded as the parent's own question | Never a product name |
-| **Pinned message** | The child's current situation and the rhythm, with one quiet closing line | Updated silently; never re-pinned as a notification |
+| **Whole document** | **Restructured around five engines.** Features F1–F16 dissolved into Knowledge, Conversation, Journey, Telegram, Growth. Four parts: product, engines, experience, operations | 020 |
+| **§0** | New — the twenty decisions, the 006/018 contradiction and its resolution, and every v2 conflict | All |
+| **§1** | Philosophy stated first: **the conversation is not the product, the outcome is** | 001 |
+| **§2** | **P15 rewritten** — free and paid share the same intelligence, quality and understanding. **P17 ADAM never sells. P18 nothing from a template. P19 engines not features** | 002, 004, 006, 020 |
+| **§3.5** | **New: banned and approved commercial vocabulary.** ذاكرة، تقارير، متابعة، خطة، ذكاء all banned in user-facing strings | 005 |
+| **§5** | **The boundary rewritten: knowledge free, execution and the driven journey paid.** Table shows intelligence, quality, memory and personalisation as *identical* | 002, 019 |
+| **§6** | **New section: the Journey is the business unit.** Goal, progress, adjustment, outcome. Subscription only permits continuation. **ADAM never sends a renewal message** | 016 |
+| **§7** | **New: Knowledge Engine.** Supabase the only truth, n8n the nervous system, **the LLM stores nothing** | 003, 012, 015 |
+| **§8** | **New: Conversation Engine.** Hybrid dynamic buttons + free text, **"شيء آخر" mandatory on every set**, buttons creatable mid-dialogue | 014 |
+| **§9** | **New: Journey Engine.** Everything generated, no templates. Seed→Harvest with Harvest as an extension. Timing by the logic of the day | 004, 010, 011 |
+| **§10** | **New: Telegram Engine.** **Reply keyboard adopted, reversing v2's explicit refusal.** Deep links added. **Menu fixed with exactly one changing item** — and that item is the entire commercial surface | 007, 008, 009, 017 |
+| **§11** | **New: Growth Engine.** Deep links become the bridge fix | 008 |
+| **§13** | **S5 `goal_visible` replaces v2's discovery state.** ADAM names a goal and stops; the menu carries the rest. **S6 `with_agent` — ADAM is absent from the money conversation.** X1 now reverts the menu item | 006, 018 |
+| **§14.5** | **Rewritten: the goal message contains no commerce.** No price, no currency, no subscription. Falsifiable goal, pre-committed honest failure | 005, 006 |
+| **§15** | **Rewritten.** v2's four-door discovery model is replaced: the commercial model is **visible from message one and announced at no message**. ADAM names goals · the Menu is the door · the agent is the cashier. **ADAM will not quote a price even when asked directly** | 006, 007, 018 |
+| **§16** | North Star becomes **Parents Reaching Outcomes** — engagement plus goals actually reached. **A healthy number of failed journeys is not zero.** New hard-zero guardrails for prices spoken by ADAM and banned vocabulary | 001, 005, 006 |
+| **§18** | **E5 menu visibility** — the honest test of §15.2. **E7 goal falsifiability.** E2 deep links | 008, 018 |
+| **§20** | **R3 nobody opens the menu** (critical — §15 fails silently). **R4 subscription reproduces dunning. R5 the two-role seam. R8 nonsense dynamic buttons. R9 generated journeys drifting generic. R12 reply keyboard** | 008, 014, 016 |
+| **§22** | v2's D7 and D9 closed. **New D4 — is the sales agent human or automated?** (now the revenue blocker). **New D5 — silent lapse or expiry?** | 006, 007 |
 
-**The menu entry is worded as a question, not an offer:**
-
-```
-هل يمكن لآدم أن يرافقني أكثر؟
-```
-
-Not "الاشتراك", not "المرافقة الكاملة", not "الخطط". A parent who is curious recognises their own question. A parent who is not sees a line that makes no demand.
-
-**Honest expectation:** most parents will never open a bot menu. Door 1 converts close to nothing, and **that is not why it exists.** It exists so that (a) a self-directed parent can find out without having to ask a person, and (b) we never depend on "but we did tell her." Calling it a growth lever would be self-deception.
-
----
-
-#### Door 2 — Asked for · **the primary path**
-
-Two kinds, and the second is the most valuable moment in the entire product.
-
-**2a — She asks about scope.** *"هل هناك نسخة مدفوعة؟"* · *"آدم مجاني بالكامل؟"*
-
-Answer honestly and completely, then stop. Copy in §11.8. No elaboration, no follow-up, no second mention.
-
-**2b — She asks for work the free rhythm does not do.**
-
-Real requests of this shape:
-
-- *"ذكّرني بكرة قبل المدرسة"*
-- *"تقدر تسألني الساعة ٦ قبل ما نخرج؟"*
-- *"خليك معايا في الموضوع ده شهر"*
-- *"إزاي أعرف إن الليلة دي هتكون صعبة قبل ما تبدأ؟"*
-
-**She has just described the paid arrangement in her own words.** Nothing was pitched. There is no surprise available, because the idea came from her. This is the highest-intent, lowest-pressure moment that exists, and it requires zero initiation from us.
-
-**The discipline that makes this safe — and it is absolute:**
-
-> **Answer the question fully and for free, first.** (P6)
-
-If she asks how to tell a hard night is coming, ADAM tells her — completely, with the actual pattern from her own data. Only *after* that, and only if what she asked for is **continuous doing** rather than **knowing**, does ADAM say that the continuous version is a different arrangement.
-
-This yields the line that defines the whole free/paid boundary:
-
-> ### Knowing is always free. Doing it for her, every day, is the paid thing.
-
-That line is defensible in a way "more features" never was. It withholds no information. It distinguishes **information from labour** — and labour is the only thing that can honestly cost money in a product whose entire moat is trust.
-
-It is also consistent with everything already decided: P15 (free never crippled), D-G (difference is the level of companionship), D-H (sell the destination), and §21.1 (never say memory, say the outcome).
+**Prices confirmed and no longer open:** 2,300 DZD · 490 EGP · 110 MAD (Decision 007) — this closes v2's D9.
 
 ---
 
-#### Door 3 — The honest limit
-
-The one case where ADAM initiates. It exists because **silence is not always neutrality.** When ADAM can see that the way it is working is not enough for what this family is facing, saying nothing withholds something true and useful. A good companion says *"I don't think what I'm doing is helping enough."*
-
-**Every condition below is required. Any one missing, and it does not fire.**
-
-| Condition | Threshold | Why |
-|---|---|---|
-| Same Situation unresolved across | **≥12 Harvests** | Long enough to be a pattern, not a bad week |
-| Failure rate on that Situation | **≥60%** answered *"جرّبناها وما نجحت"* | The method is demonstrably not landing |
-| Days since the last hard night | **≥3** | **Never immediately after a failure.** Not harvesting a low moment |
-| Crisis state | Never in X1, and not for **14 days** after it clears | P1 |
-| Parent state | Not S9 dormant, not X4 paused | Respect the silence |
-| Per Situation | **Once** | — |
-| Per parent lifetime | **Maximum 2**, ≥90 days apart, and on a *different* Situation | — |
-| A free alternative in the same message | **Required** | §33.3 — without it, this is a pitch |
-| Never within the same conversation turn as a Mirror | Required | The Mirror must stay uncontaminated (§11.5) |
-
-**The message locates the insufficiency in ADAM, never in the parent:**
-
-```
-ADAM: أريد أن أقول شيئاً بصراحة.
-
-      منذ أسبوعين ونحن ندور حول نوم يوسف. فكرة كل صباح، وسؤال كل مساء —
-      وتسع مرات من اثنتي عشرة لم تنجح.
-
-      العيب في طريقتي لا فيكم: فكرة واحدة في اليوم لا تكفي لموقف
-      متجذّر مثل هذا.
-
-      أمامنا طريقان — والأول هو ما سأفعله إن لم يُقَل شيء:
-      نغيّر الموقف الذي نعمل عليه، ونعود إلى النوم لاحقاً.
-      أو شهر موجَّه لهذا وحده، أرافق فيه يوماً بيوم لا مرة في اليوم.
-
-      [نغيّر الموقف]   [أخبرني عن الشهر]   [نكمل كما نحن]
-```
-
-**Five deliberate choices in that message:**
-
-1. **"العيب في طريقتي لا فيكم"** — the insufficiency is ADAM's method, not the parent's effort. This inverts the usual dynamic: not *unlock more*, but *I have been under-serving you and here is the honest reason.* It is also simply true.
-2. **The free option is stated first, and is the default on silence.** Doing nothing gets her the free path, not the paid one.
-3. **Three buttons, one of which is "carry on unchanged."** Declining is a first-class outcome with a button of its own, not an absence.
-4. **No price in this message.** The price appears only if she taps to ask. Achievement, honesty, and commerce never share a bubble (P1).
-5. **It exceeds the 2–3 line ceiling (P6), knowingly.** This is the one structural message in the product where honesty needs more room, and it happens at most twice in a parent's lifetime. The exception is recorded here so it is not copied elsewhere.
-
-**Door 3 is the only killable door.** If block/mute rate in the 7 days after Door 3 exceeds 2× baseline, it is switched off and the architecture runs on Doors 0–2. That is not a fallback position to be embarrassed about — Doors 0–2 are the ones that respect the constraints most completely.
-
-### 33.5 Never permitted
-
-| Banned | Why |
-|---|---|
-| Any message whose only purpose is to mention the arrangement | §33.3 |
-| A second mention after a decline, ever | The old model's four-of-eight who never came back |
-| Mentioning it in the same message as a Mirror, a win, or an end-of-month | P1 — achievement and commerce never share a bubble |
-| Mentioning it within 14 days of a crisis | P1 |
-| Mentioning it during or right after a hard night | Harvesting distress |
-| A countdown, a limited window, a "special" price | P10 |
-| Any scoring model that decides who is "ready" | **This is precisely what the Judge did.** 8 offers, 0 clicks |
-| Degrading the free rhythm to make the paid one look better | P15, D-G |
-| A pricing page, a plans screen, a comparison table | §33.6 |
-| Announcing it to the existing 291 parents | It would be exactly the surprise this section exists to prevent |
-
-That last row matters operationally: **there is no launch announcement.** Existing parents encounter the doors the same way new ones do.
-
-### 33.6 It has no name — an architectural decision
-
-v1 and early v2 called it **"المرافقة الكاملة"** — *full companionship*. That phrasing is a defect, for two reasons:
-
-1. **"Full" implies what she has now is partial.** That directly contradicts P15 and D-G, which say the free tier is complete and never deliberately lessened. The name insults the free product.
-2. **A named product is a product that appeared.** Names are what things have when they are sold. An extension of a relationship is *described*, in context, each time.
-
-> **Rule: ADAM never gives it a proper name.** It is described, in this parent's own situation, every time it comes up.
-
-Four consequences, all desirable:
-
-- **A pricing page becomes impossible by construction.** There is no noun to put at the top of one.
-- **Every description is forced into outcome language** (D-H), because there is no name to hide behind. "شهر موجَّه لنوم يوسف" says what happens; "المرافقة الكاملة" says nothing.
-- **There is nothing to announce**, which removes the temptation at the root.
-- **The internal name stays `Chapter`** — team vocabulary, never user-facing (§3.6, the two lexicons).
-
-### 33.7 The handoff — discovery has to end well
-
-Discovery that succeeds and then collapses at payment is a failure of this section, not of §22. Payment is manual and requires leaving the conversation for a DM with a stranger, which the product walkthrough identified as the single largest drop and a live trust problem.
-
-| Rule | Why |
-|---|---|
-| ADAM names the handoff plainly, including that a human confirms it | Surprise is the thing we are eliminating; do not introduce a new one here |
-| **The rhythm continues, uninterrupted, during S6** | Already specified in §10. Restated because it is the whole point: nothing is held hostage to payment |
-| If unconfirmed after 72h, ADAM raises it — never silently drops it | A parent who paid and heard nothing is the worst outcome available |
-| A parent who starts and does not finish is never messaged about it | Not once. Abandoned payment is a decision |
-
-### 33.8 How this is measured — trust first, conversion second
-
-**The primary metrics for this section are counter-metrics.** That ordering is deliberate: a discovery architecture optimised for conversion becomes a funnel, which is the thing we are avoiding.
-
-| Metric | Target | Kind |
-|---|---|---|
-| Block/mute rate in 7 days after **any** door | **≤ baseline** | **Guardrail — halts the roadmap** |
-| Block/mute after Door 3 specifically | **< 2× baseline, or Door 3 is switched off** | **Kill switch** |
-| Dormancy within 14 days of a decline | **≤ baseline** | **Guardrail.** Catches the four-of-eight failure |
-| Harvest rate in the 7 days after a decline | **≤ 5 points below baseline** | Did declining damage the relationship? |
-| Door 2b occurrences per 100 parents in rhythm | Observe | **Demand signal, not a target** |
-| Door distribution (0/1/2a/2b/3) | Observe | Which doors actually work |
-| Conversion per door | Observe | Ranked **last**, deliberately |
-
-**No conversion target is set anywhere in this section.** v1's F9 carried *"≥10% of S4 parents open it unprompted"*, and a target on a discovery mechanism is an instruction to optimise it. Conversion is observed, reported, and never optimised against.
-
-### 33.9 Review pass — gaps found and closed
-
-Reviewed as an outside critic looking for holes. Five were real and are closed here.
-
-**Gap 1 — "Door 3 fires when free is failing 60% of the time. Isn't that just a bad product?"**
-
-Fair challenge, and the answer has to be structural or Door 3 is indefensible. The free rhythm is capped at **one suggestion per day** — not by stinginess but because two proactive messages is the honest ceiling before ADAM becomes noise (§13.3, R3). Some situations genuinely need more attention than one idea a day can give. So the limit Door 3 names is **architectural, not a quality defect**, and saying so is accurate. If instead the failure were caused by *bad* suggestions, the fix is F6 and the Seed, not an offer — and E1 is what tells the difference.
-
-**Gap 2 — The pinned message's "quiet closing line" was unspecified.** A gap that would have been filled by whoever built it. Specified now:
-
-```
-📌  يوسف · نعمل على: النوم
-    هذا الأسبوع: ٤ ليالٍ أهدأ من ٧
-
-    القائمة ☰ فيها كل ما يمكن أن نفعله معاً.
-```
-
-It points at the **menu**, not at a price or an arrangement. A parent who wants more looks; a parent who does not sees a line about a menu.
-
-**Gap 3 — Door 2 could fire too eagerly.** Distinguishing "she wants to know" from "she wants it done every day" is a judgment call, and an eager model will mention the paid arrangement on any question that merely *sounds* adjacent. Guard, now required:
-
-> **Door 2's paid mention requires an explicit request for recurring or continuous action** — a repetition word (*كل يوم*, *دايماً*, *شهر*, *باستمرار*) or a request for ADAM to initiate (*ذكّرني*, *اسألني*, *كلّمني قبل*).
-> A question about *how*, *why*, or *what* is answered and closed. **Never inferred from tone or enthusiasm.**
-
-Without this, Door 2 slowly becomes a push with extra steps.
-
-**Gap 4 — Does tapping through Door 3 count as a second mention?** It must not, or the rules contradict each other. Clarified:
-
-> **A door and its own follow-through are one event.** Door 3 → she taps *"أخبرني عن الشهر"* → the price answer: that is **one** mention. The no-second-mention rule (§33.5) applies to *new* events, not to completing one she chose to continue.
-
-**Gap 5 — What do the doors do in X2, where no payment rail exists?** Previously unhandled, and it matters: 48.4% of signups are in exactly this position. Naming an arrangement she cannot buy is a cruelty with no upside.
-
-| Door | Behaviour in X2 |
-|---|---|
-| **Door 1** | Menu entry hidden. Pinned line shows the rhythm only |
-| **Door 2** | Answered honestly: it is not available in her country yet, everything between us stays as it is, and she is told when it changes. **Recorded as demand evidence** (§25 `payment_blocked_country`) |
-| **Door 3** | **Never fires.** The free alternative is offered on its own, as a plain suggestion to change the situation — which is the useful half anyway |
-
-Door 3's behaviour in X2 is the cleanest proof that §33.3's test was applied honestly: **strip the paid option and the message still stands as help.** If it collapsed without the price, it was a pitch.
-
-### 33.10 The strategic consequence, stated plainly
-
-**This architecture converts poorly by construction, and that is the honest cost of the constraints.**
-
-Doors 0 and 1 convert near zero. Door 2 depends entirely on parents spontaneously asking for continuous help, which is a real behaviour but not a frequent one. Door 3 fires rarely by design and is the first thing to be switched off if it damages trust.
-
-**A companion that genuinely works has a weak sales mechanism, necessarily.** The better the free rhythm is, the less often a parent hits a wall that makes the fuller arrangement obvious. Free quality and conversion are in direct tension, and the founder's non-negotiables resolve that tension in favour of free quality.
-
-Two honest implications:
-
-1. **The business must be sized for low conversion and high retention** — a small paying minority subsidising a large free base, with content as the acquisition engine (§19). That is a viable shape, but it is a different business from the one a funnel would build.
-2. **If revenue proves insufficient, the constraint to revisit is the free/paid boundary (§16.1) — not this architecture.** Adding pressure here would break the trust that makes the product worth anything. Moving the boundary is a strategy decision and it is the founder's. Making the doors pushier is a betrayal and it is nobody's.
-
----
-
-**End of blueprint v2. No implementation has begun. Awaiting your approval.**
+**End of blueprint v3. No implementation has begun. Awaiting your approval.**
