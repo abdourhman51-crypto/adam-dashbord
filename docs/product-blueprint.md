@@ -77,6 +77,22 @@
 | 019 | **Knowledge is free. Daily execution, follow-through, and the personal journey to an outcome are paid** | §5 |
 | 020 | **Build engines, not features.** Knowledge · Conversation · Journey · Telegram · Growth. Nothing outside them | Whole document |
 
+### 0.1b Three architecture decisions, final (2026-07-30)
+
+| # | Decision | Effect here |
+|---|---|---|
+| **AD-1** | **The sales agent is "فريق آدم"** — brand identity, never the founder's. Handle `t.me/Abdouleg`. ADAM refers and withdraws | §10.3, §14.5, §15 |
+| **AD-2** | **Crisis has three levels, not two:** normal · high strain · real danger. Each has different behaviour, and the return is gradual | §13.2, §14.6 |
+| **AD-3** | **A journey ends in a review session**, in four stages: celebrate · assess honestly · **discover the next goal from the data** · leave the decision to the parent | §6.5, §9.5, §14.7 |
+
+And one principle and one test, both now binding:
+
+> **P20 — Every move to a new journey comes from value ADAM found in this family's data.** Never from a journey ending. Never from a revenue need. **The next journey is an extension of raising the child, not an extension of the subscription.**
+
+> **The price-deletion test — applied at every transition point in the product:**
+> **Delete the price from the message. Is it still useful to the parent?**
+> Yes → the message is sound. No → it is a sales message and must be redesigned.
+
 ### 0.2 The one real contradiction, and how it is resolved
 
 **Decision 006 says ADAM never mentions price or subscription. Decision 018 says do not rely on the parent asking, and do not rely on chance discovery.**
@@ -167,8 +183,20 @@ Decision rules, in priority order.
 | **P17** | **ADAM never sells** (006) | ADAM names goals. It never names prices |
 | **P18** | **Nothing is generated from a template** (004) | Every plan, Seed and journey is generated from this family's actual knowledge |
 | **P19** | **Build engines, not features** (020) | No capability exists outside the five engines |
+| **P20** | **The next journey comes from discovered value** (AD-3) | A new journey is proposed only because ADAM found something real in this family's data — never because a journey ended, never because revenue is needed. **An extension of raising the child, not of the subscription** |
 
 **P1, P2, P8, P15 and P17 override commercial considerations.** A growth tactic that conflicts with them is wrong.
+
+### 2.1 The price-deletion test — binding at every transition
+
+> **Delete the price from the message. Is it still useful to the parent?**
+>
+> **Yes** → the message is sound.
+> **No** → it is a sales message wearing a companion's voice. Redesign it.
+
+Applied at every transition point in the product: naming a goal (§14.5), the review session (§14.7), the menu's changing item (§10.3), and any handoff to فريق آدم (§15).
+
+**This test is why §14.7's review session is structured as it is.** Stages 1–3 — celebration, honest assessment, and the next goal discovered from the data — survive the test completely: they are worth delivering to a parent who will never pay, in a country with no payment rail. Only stage 4 mentions a journey at all. **If stages 1–3 ever become a preamble to stage 4, the test has been failed and the session must be rebuilt.**
 
 ---
 
@@ -254,7 +282,7 @@ Diagnostic vocabulary for the team that would be alienating if a parent saw it.
 | Situation | The situation named plainly: "عند النوم" |
 | Journey | "نعمل على نوم يوسف" — described, never labelled |
 | Mirror | ADAM noticing something |
-| Crisis state / X1 | Nothing. The parent never senses a mode change |
+| Strain levels L1 / L2 / L3 | Nothing. The parent never senses a mode change and is never told which level they are in |
 | Engine, tier, funnel, conversion | Never, in any form |
 
 **Hard rule:** these appear in specs, code and team conversation. In a user-facing string, **never**. One in a live string is a defect, not a wording preference.
@@ -375,7 +403,24 @@ A parent does not buy "a month of ADAM." They start **the sleep journey with Yus
 
 A journey that misses its goal says so plainly, and says what was learned. **A failed journey stated honestly builds more trust than a success that was quietly redefined.** This is not a nicety — it is what makes the goal worth stating at all.
 
-### 6.4 The subscription's only role
+### 6.4 A journey ends in a review session, not an expiry (AD-3)
+
+> **The end of a journey is not the end of a subscription, not a renewal moment, and not a sales moment. It is a professional review session.**
+
+Four stages, in order:
+
+| # | Stage | What happens | What must never happen |
+|---|---|---|---|
+| **1** | **Celebration** | What was achieved, measured against where this started | Inflating a result that did not occur |
+| **2** | **Honest assessment** | What improved, and what still needs work — both stated plainly | Hiding the unfinished half |
+| **3** | **Discovering the next goal** | ADAM uses what it learned *during the journey* to identify the biggest next opportunity. **This is analysis, not an offer** | Proposing a purchase. Naming a price. Framing it as "what's next in the programme" |
+| **4** | **The parent decides** | Only now, and plainly: this could be a journey, or the free daily companionship continues exactly as it is | Pressure, urgency, a follow-up, a second mention |
+
+**Stage 3 is the whole design.** The old model treated the end of a subscription as the trigger for the next sale. Here the trigger is **a real pattern ADAM found while working**: bedtime got calmer, and the most frequent remaining friction is now defiance around instructions. That observation is worth having whether or not anyone ever pays for it.
+
+**The structural guarantee:** stages 1–3 run **in full for every parent**, including the 48.4% in countries with no payment rail where stage 4 cannot happen at all. If those stages only made sense when stage 4 followed, they were a preamble to a sale, not a review. Running them for parents who cannot buy is what proves they are not (§2.1).
+
+### 6.5 The subscription's only role
 
 Journeys continue while the subscription is active. It buys **continuation**, not features, not memory, not intelligence.
 
@@ -624,6 +669,10 @@ Stability is what makes it trustworthy; the single changing item is what makes A
 
 **This single item is the entire commercial surface.** It is never a notification, never badged, never announced. It is simply always there, and it changes as the relationship changes.
 
+**Where the item leads (AD-1).** It opens a short description of the goal and what the journey aims at — in outcome language, no price — and a single link to **فريق آدم** (`t.me/Abdouleg`) for country, price and payment. **The menu describes; the agent transacts.**
+
+**At L2 and L3 the item reverts to neutral** (§13.2). A parent under strain who opens the menu finds nothing to buy.
+
 ### 10.4 Country in the experience (017)
 
 Country determines payment availability, currency, which journeys can be started commercially, and waitlist membership. It is resolved from the parent's own signals, never demanded up front (P2).
@@ -772,20 +821,33 @@ Sharing "3 of 5 nights calm" also discloses two hard nights. In a shame-loaded c
 
 ### 13.2 Orthogonal states
 
-| State | Effect |
+**Three levels of strain, not two (AD-2).** The binary crisis flag was too blunt: it treated an exhausted, overwhelmed parent the same as a safe parent, right up until a danger keyword appeared.
+
+| Level | Trigger | Rhythm | Journeys | Commerce | Menu item |
+|---|---|---|---|---|---|
+| **L1 — normal** | Default | Runs | Run | Available | Normal |
+| **L2 — high strain** | Sustained distress, despair, exhaustion, hopelessness — **no danger** | **Support-shaped.** Seed becomes gentler or is skipped | **Paused. No journey suggestion of any kind** | **Deferred entirely** | **Reverts to neutral** |
+| **L3 — real danger** | Violence · harm to a child · self-harm · abuse · immediate risk | **Suspended** | **Stopped** | **Stopped** | **Neutral** |
+
+**L2 is the important addition.** A parent who is drowning but not in danger was previously getting cheerful morning suggestions and a menu item inviting them to start a paid journey. That is the wrong register, and it is a far more common state than L3.
+
+**L2 defers rather than blocks.** Nothing is lost — the journey and the commercial surface return when the strain lifts. The parent is never told they were categorised.
+
+| Other states | Effect |
 |---|---|
-| **X1** `in_crisis` | **Everything commercial suppressed. Seed and Harvest suspended. The changing menu item reverts to neutral.** Human queue. Overrides all |
 | **X2** `payment_blocked` | Free experience identical. Menu item shows the waitlist |
 | **X3** `voice_preferred` | Voice-friendly cadence |
 | **X4** `paused` | All proactive messages stop; conversation remains |
 
-**X1 reverting the menu item is deliberate.** A parent who has just disclosed violence must not open the menu and find an invitation to start a paid journey.
+**Reverting the menu item at L2 and L3 is deliberate.** A parent who has just disclosed violence — or who is simply at the end of their rope — must not open the menu and find an invitation to buy.
+
+**Return is gradual, never a switch.** From L3: safety confirmed → L2 for at least 7 days → L1. From L2: the rhythm resumes first; **journeys and the commercial surface return last.** The parent should never experience commerce reappearing the day after a hard disclosure.
 
 ### 13.3 Transition rules
 
 1. No transition may skip S1→S2. Value before anything else (P2).
 2. **S5 is entered only when a concrete, falsifiable goal exists** — never on a timer, a message count, or a readiness score. **A scoring model that decides who is "ready" is banned: that is what the Judge was, and it produced 8 offers and 0 clicks.**
-3. X1 suppresses S5–S8 behaviour and the rhythm, for the duration plus 7 days.
+3. **L2 defers S5–S8 behaviour; L3 stops it.** Return is graded (§13.2), never a switch.
 4. X2 never blocks S0–S5. Only S6 onward.
 5. S9 permits exactly one reactivation per parent lifetime.
 6. S8 returns to S4 with nothing removed (P15).
@@ -880,37 +942,126 @@ ADAM: صار عندي صورة واضحة عن ليالي يوسف.
 
 **On tapping "كيف نبدأ؟"** — ADAM hands off and says so plainly:
 ```
-ADAM: كل تفاصيل البدء في القائمة ☰ — البلد، والطريقة، والباقي.
+ADAM: تفاصيل البدء عند فريق آدم — البلد، والطريقة، والباقي:
+      https://t.me/Abdouleg
+
       وأنا هنا كما أنا، مهما كان القرار.
 ```
 
 That is the last thing ADAM says about it. **Ever, unless asked.**
 
-### 14.6 Crisis (X1) — overrides everything
+### 14.6 Strain and danger — three levels (AD-2)
 
-**Categories:** self-harm or suicidal ideation · domestic violence · child abuse by a third party · the parent's own escalating violence · bereavement · substance use in a minor.
+#### L2 — high strain, no danger
 
-1. Suppress everything commercial — conversation + 7 days
-2. **Suspend Seed and Harvest**
-3. **Revert the changing menu item to neutral**
-4. Suppress memory write for the sensitive content (P9)
-5. Stay, and do not advise:
+**Signals:** sustained exhaustion, despair, hopelessness, "I can't do this any more" — without any indication of danger to anyone.
+
+ADAM shifts to support and **stops suggesting anything**:
+
+```
+ADAM: هذا كثير على شخص واحد.
+
+      لا شيء مطلوب اليوم — لا تجربة ولا خطوة.
+      أنا هنا فقط.
+```
+
+**No Seed the next morning. No journey suggestion. No commercial surface.** The menu's changing item goes neutral. Nothing is announced.
+
+**Why this level exists:** the previous binary model gave this parent a cheerful morning suggestion and a menu inviting them to buy. L2 is far more common than L3, and getting it wrong is how ADAM becomes the thing they mute.
+
+#### L3 — real danger
+
+**Categories:** self-harm or suicidal ideation · domestic violence · child abuse by a third party · the parent's own escalating violence · immediate risk to a child.
+
+1. **Stop everything:** journeys, rhythm, any commercial surface
+2. **Revert the menu item to neutral**
+3. Suppress memory write for the sensitive content (P9)
+4. Focus on safety only:
 ```
 ADAM: أنا هنا.
       هذا الحِمل أثقل من أن يُحمل وحده.
       [line specific to the category]
       أنا هنا. ولا شيء مطلوب الآن.
 ```
-6. Raise to the human queue
-7. Never give clinical, legal, or safeguarding instructions
+5. **Refer to a specialist or an appropriate support body when needed** — from a vetted, country-specific list
+6. Never give clinical, legal, or safeguarding instructions
 
-**The one exception to Decision 014.** Crisis messages carry **no buttons at all** — not even "شيء آخر". Offering a parent who has just disclosed violence a set of options turns a moment of being heard into a form to complete. The escape hatch that "شيء آخر" provides everywhere else is, here, the whole message: nothing is asked of them.
+**On the referral (AD-2).** This is a real architectural change: the model is **refer outward**, not *a human on our side answers*. It requires a **vetted, real, country-specific directory of support services** before L3 can ship.
+
+> **ADAM must never invent a helpline, an organisation, or a number.** A wrong number given to a parent in danger is worse than no number. If no vetted service exists for that country, ADAM stays and says plainly that it cannot direct them further — it does not guess.
+
+The directory itself is operational content the founder must supply per market. §22 D2.
+
+#### The one exception to Decision 014
+
+**Crisis messages carry no buttons at all** — not even "شيء آخر". Offering a parent who has just disclosed violence a set of options turns a moment of being heard into a form to complete. The escape hatch that "شيء آخر" provides everywhere else is, here, the whole message: nothing is asked of them.
 
 This is the only place in the product where a button set is absent, and it is recorded so that nobody adds one to satisfy 014.
 
-**Vocabulary (013):** the internal name for step 5 is **الاحتواء**. The parent never sees that word and never senses a mode change.
+#### Return
+
+Graded, never a switch. L3 → safety confirmed → **L2 for at least 7 days** → L1. Within L2, the rhythm resumes first; **journeys and commerce return last.**
+
+**Vocabulary (013):** the internal name for the L3 posture is **الاحتواء**. The parent never sees that word and never senses a mode change. The same applies to "L2" and "L3" — the parent is never told which level they are in.
 
 **This is the one area where the product must not act autonomously.** §22 D1.
+
+### 14.7 The review session — how a journey ends (AD-3)
+
+Four stages, delivered as separate messages, never as one wall.
+
+**Stage 1 — celebration**
+```
+ADAM: رحلة نوم يوسف اكتملت.
+
+      هنا كانت البداية:  ▓░░░░░░░░░   ليلة هادئة واحدة من عشر
+      وهنا الآن:        ▓▓▓▓▓▓▓░░░   سبع من عشر
+```
+
+**Stage 2 — honest assessment**
+```
+ADAM: ما استقرّ فعلاً: بدء الروتين أبكر في الأيام بلا قيلولة.
+      ست ليالٍ متتالية دون معركة.
+
+      وما زال يحتاج عملاً: الاستيقاظ في منتصف الليل — تحسّن قليلاً،
+      لكنه لم يُحلّ.
+```
+
+**Stage 3 — the next goal, discovered from the data**
+```
+ADAM: وشيء آخر لاحظته أثناء الشهر.
+
+      بعد أن هدأ وقت النوم، صار أكثر موقف يتكرر عندكم هو العناد
+      عند تنفيذ التعليمات — ظهر في إحدى عشرة ليلة من الثلاثين.
+
+      غالباً هذا ما سيصنع أكبر فرق في الفترة القادمة.
+```
+
+> **Stage 3 carries no offer, no price, and no mention of a journey.** It is an observation the parent can act on alone, and it is delivered in full to parents who cannot pay at all. That is what makes it analysis rather than a preamble (§2.1, §6.4).
+
+**Stage 4 — the parent decides**
+```
+ADAM: إن أحببت أن نعمل على هذا أيضاً، يمكننا أن نبني له رحلة
+      تناسب وضعكم الآن.
+
+      وإن اكتفيت بالمرافقة اليومية، أبقى معك كما كنت تماماً.
+
+      [نعم، نعمل عليه]   [نكمل كما نحن]   [شيء آخر]
+```
+
+**Rules for the review session:**
+
+| Rule | Why |
+|---|---|
+| Stages 1–3 run for **every** parent, including X2 countries with no payment rail | The structural proof this is a review, not a sale (§6.4) |
+| **Stage 4 is skipped entirely in X2** — and stages 1–3 are unchanged | Naming something unbuyable is a cruelty with no upside |
+| Stage 4 is skipped entirely at **L2 and L3** | §14.6 |
+| No price anywhere, at any stage | P17, 006 |
+| "نكمل كما نحن" is a first-class outcome | Declining costs nothing |
+| **No follow-up. No second mention. Ever** | The four-of-eight who never returned |
+| A journey that **missed** its goal still gets all four stages | §6.3 — honest failure builds more trust than a redefined success |
+
+**On a missed goal:** stage 1 celebrates what did move, stage 2 says plainly the goal was not reached, and stage 3 is often *more* valuable — because a journey that failed teaches something specific about this child that a successful one does not.
 
 ---
 
@@ -930,11 +1081,40 @@ A parent cannot be surprised by something that was in the menu the whole time. T
 
 | Layer | Owns | Never |
 |---|---|---|
-| **ADAM** | Names a goal (§14.5). Pure product | Price, currency, payment, the word subscription |
+| **ADAM** | Names a goal (§14.5). Pure product | Price, currency, payment, receipts, the word subscription |
 | **The Menu** | Turns the goal into something startable. Permanently visible | Notify, badge, nag, expire |
-| **The sales agent** | Country, currency, price, payment, receipt, confirmation | Parenting advice |
+| **فريق آدم** — the agent | Country, currency, price, payment, receipts, confirmation | Parenting advice |
 
 **The seam is the design.** Naming a goal is a product act. Handling money is a separate role in a separate room.
+
+### 15.2b فريق آدم — the agent's identity (AD-1)
+
+| | |
+|---|---|
+| **Name shown to the parent** | **فريق آدم** |
+| **Handle** | `https://t.me/Abdouleg` |
+| **Identity** | **The brand's, never the founder's** |
+| **Owns** | Journey details, prices, payment methods, transfers, receipts, confirmation |
+| **Never** | Gives parenting advice, or speaks in ADAM's voice |
+
+**Why brand identity and not the founder's — this is a real requirement, not a preference.** A parent who has spent three weeks with ADAM and then lands in a DM with a personal account experiences a bait-and-switch: the companion turned out to be one person selling something. "فريق آدم" keeps the relationship with the product.
+
+> **Operational prerequisite:** the Telegram account behind that handle must display **فريق آدم** — name, photo and bio. Until it does, AD-1 is not implemented, only described. **A parent clicking through to a personal profile undermines the entire separation.** §22 D2b.
+
+**ADAM's referral message**, used only when needed:
+
+```
+ADAM: تفاصيل الرحلة والأسعار وطرق الدفع — فريق آدم يسعده مساعدتك:
+      https://t.me/Abdouleg
+
+      وأنا أبقى معك في كل ما يخصّ علاقتك بيوسف.
+```
+
+Three deliberate choices in that wording:
+
+1. **"يخصّ علاقتك بيوسف"** — the child's name, not the generic "طفلك". ADAM stays specific even while handing off (P11).
+2. **No price, no currency, no "subscription".** ADAM points; it does not describe (006, P17).
+3. **The last line is the point.** The handoff is a division of labour, not an exit. ADAM is not leaving.
 
 ### 15.3 Why this is not a funnel
 
@@ -954,13 +1134,16 @@ ADAM answers honestly and hands off — without quoting anything:
 ```
 PARENT: بكام الاشتراك؟
 
-ADAM:   التفاصيل كلها في القائمة ☰ — أدقّ من أن أقولها هنا،
-        وتختلف حسب البلد.
+ADAM:   الأسعار وطرق الدفع عند فريق آدم — هم أدقّ منّي في هذا،
+        وتختلف حسب البلد:
+        https://t.me/Abdouleg
 
         وما بيننا الآن لا يتغيّر بأي حال.
 ```
 
-**ADAM does not name a number, even when asked directly.** (006)
+**ADAM does not name a number, even when asked directly.** (006, P17)
+
+**"هم أدقّ منّي في هذا" is doing real work.** It is true — prices are country-specific and ADAM has no price data by design. It also gives an honest reason for the handoff rather than a deflection, which is the difference between a referral and a brush-off. *(A live incident makes this concrete: the agent once invented "150 EGP" against a real 490. ADAM having no price data is a safeguard, not a limitation.)*
 
 ### 15.5 Payment (007)
 
@@ -1039,8 +1222,10 @@ NORTH STAR: Parents Reaching Outcomes
    │
    └── TRUST  (guardrails — a breach halts the roadmap)
          Prices spoken by ADAM         0    (hard zero)
-         Commercial content in X1      0    (hard zero)
-         Seeds in X1                   0    (hard zero)
+         Commercial content at L2/L3   0    (hard zero)
+         Seeds at L3                   0    (hard zero)
+         Journey suggested at L2/L3    0    (hard zero)
+         Stage 4 shown in X2           0    (hard zero)
          Ungrounded Seeds              0    (hard zero)
          Gendered strings to unknown   0    (hard zero)
          Second mention after decline  0    (hard zero)
@@ -1080,7 +1265,11 @@ Every event carries `parent_id`, `timestamp`, `state`, `country`, `gender_form_u
 
 **Quality guardrails:** `ungrounded_send_blocked` · `gender_form_fallback` · `banned_vocabulary_blocked` · `price_mention_blocked`
 
-**Never tracked:** message content, anything from an X1 conversation, any field letting an operator browse disclosures casually.
+**Never tracked:** message content, anything from an L3 conversation, any field letting an operator browse disclosures casually.
+
+**Strain and review events (new):** `strain_level_changed` (from, to, **reason**) · `strain_return_started` · `review_session_started` · `review_stage_delivered` (stage 1–4) · `review_stage4_skipped` (**reason: x2 / L2 / L3**) · `next_goal_identified` (from which evidence) · `next_journey_started` · `next_journey_declined`
+
+> **`review_stage4_skipped` is a health metric, not an error.** A high count means stages 1–3 are reaching parents who cannot buy — which is the design working (§6.4), not failing.
 
 ---
 
@@ -1125,14 +1314,16 @@ Every event carries `parent_id`, `timestamp`, `state`, `country`, `gender_form_u
 10. **Conversation Engine** — hybrid buttons, "شيء آخر", dynamic generation
 11. **Journey Engine** — Seed, Harvest, timing windows
 12. Voice input
-13. Crisis detection + human queue — **gated on §22 D1**
+13. **Strain detection, three levels** (§14.6). **L1 and L2 ship now** — L2 costs nothing but restraint and prevents the most common wrong-register failure. **L3 is gated on the referral directory** (§22 D2)
 14. **E1 runs from the first day the Seed exists**
 
 **Decision gate at week 4:** grounded Seeds beat generic on Harvest rate, **and** ≥50% of parents in rhythm complete 3 pairs. If grounded is not better, stop and revisit §1 — the memory thesis *is* the product thesis.
 
 ### NEXT — months 2–3
 
-Journey goals and honest outcomes · the sales agent · commercial journeys in supported countries · situation depth · shareable insight cards · operator console · global payment rail
+Journey goals and honest outcomes · **the review session (§14.7)** · **فريق آدم set up under brand identity (§22 D2b)** · commercial journeys in supported countries · L3 referral directory · situation depth · shareable insight cards · operator console · global payment rail
+
+**Ordering note.** The review session (§14.7) cannot be built before journeys exist, but its **stages 1–3 are pure product** and should ship with the first journey — not held back until commerce is ready. Building stage 4 first would invert the design.
 
 ### LATER — months 4+
 
@@ -1214,16 +1405,22 @@ Two implications, neither of which should be softened:
 
 | # | Decision | Why it's yours | Blocking |
 |---|---|---|---|
-| **D1** | **Crisis escalation destination.** A parent discloses abuse, suicidal ideation, or their own violence — what happens? | Duty of care, legal exposure, your capacity | **Blocks crisis detection and therefore scale** |
-| **D2** | **Who staffs the crisis queue, within what SLA?** | Your team and hours | Blocks the same |
+| ~~D1~~ | ~~Crisis escalation destination~~ **RESOLVED → AD-2, §14.6.** Three levels; at L3 ADAM focuses on safety and **refers outward** to a specialist or support body. The model is referral, not a staffed queue on our side | Decided | **No longer blocking** |
+| **D2** | **The referral directory.** AD-2 changed the model from *a human answers* to *ADAM refers outward* — which needs a **vetted, real, country-specific list** of support services. **ADAM must never invent a helpline; a wrong number given to a parent in danger is worse than none.** This is content only you can supply and verify | Requires real-world verification per market | **Blocks L3 only.** L1 and L2 ship without it |
+| **D2b** | **Rename the Telegram account behind `t.me/Abdouleg` to فريق آدم** — name, photo, bio | AD-1 requires brand identity, not the founder's. Until this is done, AD-1 is described but not implemented | **Blocks every commercial handoff** |
 | **D3** | **Fair-use ceiling for free.** Unlimited is the principle; some finite ceiling is the reality | Your cost tolerance | Blocks free-everywhere rollout |
-| **D4** | **Is the sales agent a human, or an automated agent?** *(new)* Decision 006 moves purchase to "a specialised agent" without saying which. A human is warmer and does not scale; an automated one scales and must never sound like a bot closing a sale | Positioning and staffing | **Blocks the commerce build** |
-| **D5** | **Does the subscription auto-expire, or lapse silently?** *(new)* Expiry implies a notification, and ADAM may not send one (§6.4). The honest option is silent lapse plus a menu state | It determines whether continuation is a nudge or a choice | Blocks the Journey Engine's end state |
+| ~~D4~~ | ~~Is the sales agent human or automated?~~ **RESOLVED → AD-1, §15.2b.** **فريق آدم**, brand identity, `t.me/Abdouleg`. ADAM refers and withdraws | Decided | **No longer blocking** *(but see D2b)* |
+| ~~D5~~ | ~~Expiry or silent lapse?~~ **RESOLVED → AD-3, §6.4 and §14.7.** Neither: a journey ends in a **review session**, not an expiry. There is no expiry notification because there is no expiry event — the journey completes and is reviewed | Decided | **No longer blocking** |
 | **D6** | **Which market to open first** if E8 succeeds — Saudi (highest ATP) or Iraq (largest volume) | Access to a payment agent | Blocks post-E8 planning |
 | **D7** | **The existing 291 parents and 4,212 conversations** — carry memory forward, or fresh start with continuity messaging? | Relationship decision | Blocks week 1 |
 | **D8** | **Whether ADAM ever says it is an AI.** One parent asked directly: *"هل انت ذكاء اصطناعي مجاني ام مدفوع"* | Positioning and ethics | Before scale |
 
-**D1 remains the only blocker on scale. D4 is the new blocker on revenue** — the seam in §15.2 cannot be built until we know who is standing on the other side of it.
+**Three of the eight are now resolved (AD-1, AD-2, AD-3).** What remains blocking is smaller and more concrete:
+
+- **D2b** — renaming the Telegram account to فريق آدم. **A five-minute task that blocks every commercial handoff.** Until it is done, a parent clicking through lands on a personal profile, which is the exact bait-and-switch AD-1 exists to prevent.
+- **D2** — the referral directory. Blocks **L3 only**. L1 and L2 ship without it, and L2 is the level that prevents the most common failure.
+
+Nothing else gates the build.
 
 ---
 
@@ -1254,6 +1451,26 @@ Two implications, neither of which should be softened:
 | **§22** | v2's D7 and D9 closed. **New D4 — is the sales agent human or automated?** (now the revenue blocker). **New D5 — silent lapse or expiry?** | 006, 007 |
 
 **Prices confirmed and no longer open:** 2,300 DZD · 490 EGP · 110 MAD (Decision 007) — this closes v2's D9.
+
+### v3 → v3.1 (2026-07-30) — three architecture decisions
+
+| Area | What changed | Decision |
+|---|---|---|
+| **§0.1b** | New — AD-1, AD-2, AD-3 recorded as final, plus **P20** and the **price-deletion test** | All three |
+| **§2** | **P20 added:** a new journey comes from discovered value, never from a journey ending or a revenue need | AD-3 |
+| **§2.1** | **The price-deletion test restored as a binding, named test** — it existed in v2 and was lost in the v3 restructure. Now applied at every transition | Mandatory test |
+| **§6.4** | **New: a journey ends in a review session, not an expiry.** Four stages, with stage 3 (the next goal, from the data) as the design's centre | AD-3 |
+| **§10.3** | The changing menu item now leads to a description plus one link to **فريق آدم**. **The menu describes; the agent transacts.** Reverts to neutral at L2/L3 | AD-1, AD-2 |
+| **§13.2** | **Crisis becomes three levels.** L2 (high strain, no danger) is new and is the more common state — previously such a parent got a cheerful Seed and a menu inviting them to buy. **Return is graded, never a switch** | AD-2 |
+| **§14.5** | Handoff now names فريق آدم with the link, instead of pointing only at the menu | AD-1 |
+| **§14.6** | **Rewritten into three levels.** L3 adds **referral outward** to a vetted specialist — with a hard ban on inventing a helpline | AD-2 |
+| **§14.7** | **New: the full review-session flow**, four stages with copy. **Stages 1–3 run for every parent including those who cannot pay; stage 4 is skipped in X2, L2 and L3.** A missed goal still gets all four stages | AD-3 |
+| **§15.2b** | **New: فريق آدم's identity.** Brand, never the founder's. Referral copy, and the operational prerequisite of renaming the account | AD-1 |
+| **§15.4** | Direct money questions now route to فريق آدم by name and link. ADAM still never says a number | AD-1 |
+| **§19** | **L1 and L2 ship in weeks 3–4; L3 gated on the referral directory.** Review-session stages 1–3 ship with the first journey, not held for commerce | AD-2, AD-3 |
+| **§22** | **D1, D4, D5 resolved.** New **D2** (referral directory, blocks L3 only) and **D2b** (rename the account — blocks every handoff) | All three |
+
+**The one thing worth noting as a correction:** the price-deletion test was present in v2 and **disappeared during the v3 restructure**. It is now §2.1 and binding, and §6.4 and §14.7 are explicitly built to pass it.
 
 ---
 
