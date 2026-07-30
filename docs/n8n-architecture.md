@@ -124,11 +124,40 @@ It was written, tested and left inactive pending a credential. Between then and 
 
 ---
 
-## 7. Credentials
+## 7. Telegram sending: HTTP Request, never the Telegram node
 
-Every HTTP node uses a stored credential. **No hardcoded tokens.**
+**All outbound Telegram messages go through `httpRequest` to the Bot API directly.** The `n8n-nodes-base.telegram` node is banned from this project.
 
-The live workflows currently embed the Supabase service-role key and Telegram bot tokens in plaintext inside workflow JSON — which is week-0 item 1 and still open. W3 and W4 are built with credentials from the start; W1 and W2 are cleaned during their evolution.
+**Why.** The Telegram node appends *"This message was sent automatically with n8n"* to messages. Setting `additionalFields.appendAttribution: false` does not reliably suppress it — verified against this instance. One line of platform boilerplate at the bottom of a Seed would undo the voice work in §0.7 and tell a parent, at the worst possible moment, that they are talking to an automation.
+
+**This is not a workaround.** Every live production workflow already sends via `httpRequest`; the Telegram node was the exception, introduced by workflows built in this session. The convention is now uniform.
+
+| Workflow | Was | Now |
+|---|---|---|
+| W3 Rhythm Sender | 2 Telegram nodes | 2 HTTP Request nodes |
+| W4 Mirror Sender | 1 Telegram node | 1 HTTP Request node |
+| Legacy Nightly Checkin | Already HTTP Request | Unchanged |
+| W1 Router | `telegramTrigger` + HTTP Request | Unchanged — the trigger appends nothing |
+
+### 7.1 The bot identity, now confirmed
+
+Resolved from a real execution payload rather than guessed: the ADAM bot is **`8840311808`**, display name **ادم**, username **`adam_os_brain_bot`**. The long-standing "which Telegram credential is the ADAM bot" question is closed — and it no longer matters for sending, because the HTTP nodes address the bot directly.
+
+### 7.2 The credential tradeoff, stated honestly
+
+Telegram requires the bot token **in the URL path**, so no n8n credential type can inject it. That leaves three options, and none is clean:
+
+| Option | Verdict |
+|---|---|
+| Telegram node with a credential | **Rejected** — appends attribution |
+| `$env.ADAM_BOT_TOKEN` in the URL | **Correct long-term**, but fails silently if the variable is unset on the instance |
+| Token literal in the URL | **What is built** — matches every existing production workflow, and is proven to work here |
+
+**The token is in n8n's workflow JSON and is deliberately kept out of this repository.** It is the same exposure the live workflows already carry, not a new one — but it is still exposure.
+
+> **The right sequence is: rotate the token (week-0 item 1), set it as an instance environment variable, then switch all five URLs to `$env`.** Doing that before rotation would just move an already-compromised secret to a tidier place.
+
+**Supabase HTTP nodes are unaffected** — they use `predefinedCredentialType: supabaseApi`, which works because the key travels in a header.
 
 ---
 
