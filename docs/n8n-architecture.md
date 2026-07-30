@@ -149,9 +149,32 @@ The live workflows currently embed the Supabase service-role key and Telegram bo
 
 | Item | State |
 |---|---|
-| `get_rhythm_due()` | **Applied and tested** |
-| W3 Rhythm Sender | Not built |
+| `get_rhythm_due()` | **Applied and tested** — 5 tests |
+| `record_seed_sent` · `record_harvest_sent` · `record_harvest_answer` | **Applied and tested** — 6 tests |
+| **W3 Rhythm Sender** | **Built, 11 nodes, inactive** — `Vb4ADCkPsevPRWRN` |
 | W1 Harvest handling | Not built |
 | W2 situation detection | Not built |
 | W4 rework | Not built |
-| Legacy sender retirement | Blocked on W3 |
+| Legacy sender retirement | Blocked on W3 activation |
+
+### 9.1 W3 — what shipped
+
+**The workflow decides nothing.** It calls `get_rhythm_due()`, branches on the returned `action`, and delivers. Every rule — timezone, window, strain, quiet hours, the daily ceiling, the Knowledge gate — is in SQL where both halves share it.
+
+**Two details worth recording:**
+
+**`appendAttribution` is explicitly false.** The Telegram node defaults it to *true*, which would append *"This message was sent automatically with n8n"* to every Seed and Harvest. Left at its default it would have undone the voice work in one line.
+
+**The Harvest reuses the existing `ck_step_*` callbacks** rather than introducing new ones. The live router already handles them, so the buttons work the moment W3 activates — no window where a parent taps a dead button while W1 catches up. The pair still closes correctly because the constraint only requires that a Seed was sent. W1's evolution then upgrades the handler to route through `record_harvest_answer()`, which adds the Aha logging and the consent reset.
+
+### 9.2 Before W3 can run
+
+| Step | Owner |
+|---|---|
+| Attach **adam Supabase** to 3 HTTP nodes: `Who Is Due Now`, `Record Seed Sent`, `Record Harvest Sent` | **Founder** |
+| Confirm **Telegram account** is the ADAM bot, not the survey bot | **Founder** |
+| Activate, watch one cycle, then deactivate `Adam - Nightly Checkin` | **Founder** |
+
+The MCP refuses to attach `supabaseApi` to an HTTP Request node although n8n supports it — the live legacy sender uses exactly that pattern in production. It is a tool limitation, not an n8n one, and substituting a credential whose contents cannot be verified risks 401s against live data to save three clicks.
+
+**Nothing will send on activation until a situation exists**, because `can_ground_seed()` returns false for every parent today. That is the correct behaviour, and it makes W2's situation detection the next thing that matters.

@@ -1,0 +1,9 @@
+-- Write side of the rhythm. Sending and recording happen in one
+-- transaction: their separation is what left 23 of 25 days with no result.
+-- Full bodies applied via Supabase migration `rhythm_write_side`.
+-- record_seed_sent      : the only sanctioned way a Seed becomes a fact.
+--                         Rejects an ungrounded Seed (P11) and logs A1/A2.
+-- record_harvest_sent   : returns false rather than raising, so an hourly
+--                         trigger firing twice cannot double-send.
+-- record_harvest_answer : the parent's tap. Refuses when no Seed went out
+--                         that day, and resets the consent-decay counter.
