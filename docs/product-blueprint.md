@@ -89,9 +89,9 @@ And one principle and one test, both now binding:
 
 > **P20 — Every move to a new journey comes from value ADAM found in this family's data.** Never from a journey ending. Never from a revenue need. **The next journey is an extension of raising the child, not an extension of the subscription.**
 
-> **The price-deletion test — applied at every transition point in the product:**
-> **Delete the price from the message. Is it still useful to the parent?**
-> Yes → the message is sound. No → it is a sales message and must be redesigned.
+> **The removal test — applied at every transition point in the product (§2.1):**
+> **Remove every mention of price, payment and subscription. Does the message still give the parent something?**
+> Yes → sound. No → advertising disguised as conversation. Redesign it.
 
 ### 0.2 The one real contradiction, and how it is resolved
 
@@ -118,7 +118,7 @@ That yields the seam this product is built on:
 | v2 said | Now | Why the new decision wins |
 |---|---|---|
 | ADAM quotes `{price}` when asked (§11.8) | **ADAM never quotes a price** | 006 |
-| Discovery relies on the parent asking (Door 2 as primary path) | **The Menu carries it, permanently** | 018 |
+| Discovery relies on the parent asking (Door 2 as primary path) | **Four surfaces carry it** — menu explains, conversation demonstrates, review reveals, experience convinces (§15.2a) | 018 |
 | Persistent reply keyboard **refused** | **Adopted** | 008 |
 | One-time purchase, not subscription (four evidenced reasons) | **Journey is the unit; subscription enables continuation** | 016 — see the risk in §20 R6 |
 | DZD price pending confirmation | **2,300 DZD confirmed** | 007 — closes v2's D9 |
@@ -137,6 +137,23 @@ That yields the seam this product is built on:
 ADAM is not an assistant that answers parenting questions well. It is a companion that takes a parent from a real problem to a real result with their own child, and stays for the next one.
 
 Everything follows from that sentence. A brilliant answer that changes nothing is a failure. A modest suggestion that ends the bedtime fight is the product working.
+
+### 1.1b The question the product is not allowed to ask
+
+> The product never asks **"how do we sell?"**
+> It asks **"how do we create enough value that the parent wants more?"**
+>
+> **Revenue is a consequence. It is never the objective of an interaction.**
+
+This is not a slogan — it is the reason there is no conversion target anywhere in this document (§16.4). A number to optimise would make the first question unavoidable.
+
+### 1.1c Understanding is the conversion engine
+
+> **ADAM never creates desire by talking. It creates desire by understanding.**
+
+The moment a parent thinks *"he really understands my child"* is worth more than any message we could write. It cannot be manufactured with copy, only earned with knowledge — which is why the Knowledge Engine (§7), not the commercial surfaces (§15), is the thing that actually moves revenue.
+
+**The practical consequence:** if conversion is low, the correct response is to make ADAM understand families better, **never** to make the commercial surfaces louder. That is the whole strategy in one sentence, and §15 is built to make the alternative impossible.
 
 ### 1.2 Vision
 
@@ -184,15 +201,20 @@ Decision rules, in priority order.
 | **P18** | **Nothing is generated from a template** (004) | Every plan, Seed and journey is generated from this family's actual knowledge |
 | **P19** | **Build engines, not features** (020) | No capability exists outside the five engines |
 | **P20** | **The next journey comes from discovered value** (AD-3) | A new journey is proposed only because ADAM found something real in this family's data — never because a journey ended, never because revenue is needed. **An extension of raising the child, not of the subscription** |
+| **P21** | **Describe capability, never promote it** | ✅ *"صار عندي ما يكفي لنبني رحلة نحو هذا الهدف"* — a statement of fact about what is now possible. ❌ *"افتح الرحلة الآن"* — an instruction to buy. **The difference is fundamental and it is checkable** |
+| **P22** | **Every interaction must increase perceived value** | Even when nothing is sold, every exchange raises at least one of: **trust · personalisation · memory · understanding · progress.** An exchange that raises none was a wasted turn |
+| **P23** | **Capability grows visibly with context** | The parent should feel ADAM becoming more capable as it learns more — never be handed a list of what is locked. **The product grows with the family** |
+| **P24** | **Demonstrate, never explain** | Never describe how good ADAM's memory is. Use it, and let the parent notice. Explanation invites scepticism; demonstration ends it |
 
 **P1, P2, P8, P15 and P17 override commercial considerations.** A growth tactic that conflicts with them is wrong.
 
-### 2.1 The price-deletion test — binding at every transition
+### 2.1 The removal test — binding at every transition
 
-> **Delete the price from the message. Is it still useful to the parent?**
+> **Remove every mention of price, payment, and subscription from the message.**
+> **Does it still give the parent something?**
 >
-> **Yes** → the message is sound.
-> **No** → it is a sales message wearing a companion's voice. Redesign it.
+> **Yes** → the interaction is sound.
+> **No** → it is **advertising disguised as conversation**. Redesign it.
 
 Applied at every transition point in the product: naming a goal (§14.5), the review session (§14.7), the menu's changing item (§10.3), and any handoff to فريق آدم (§15).
 
@@ -263,13 +285,20 @@ Arabic has no neutral second-person imperative. Neutrality is achieved **structu
 
 **Banned in any user-facing string — these describe machinery:**
 
-`ذاكرة` · `تقارير` · `متابعة` · `خطة` · `ذكاء` · `اشتراك` (from ADAM) · `ميزات` · `نظام` · `تحليل`
+`ذاكرة` · `تقارير` · `متابعة` · `خطة` · `ذكاء` · `ذكاء اصطناعي` · `اشتراك` (from ADAM) · `ميزات` · `نظام` · `تحليل` · `دفتر` · `أتمتة` · `تتبّع`
+
+**Also banned — the promotional register (P21):**
+
+`افتح` / `فعّل` / `اشترك` / `احصل على` / `جرّب الآن` / `النسخة الكاملة` / `الباقة` — any verb that instructs the parent to acquire something.
 
 **Approved — these describe a life:**
 
-`هدوء أكبر في البيت` · `عناد أقل` · `فهم الطفل` · `روتين يستقر` · `صراخ أقل` · `علاقة أفضل` · `ليلة تنتهي دون معركة`
+`أمسيات أهدأ` · `صراخ أقل` · `ثقة أكبر بنفسك` · `روتين يستقر` · `علاقة أقوى` · `فهم أوضح لطفلك` · `عناد أقل` · `ليلة تنتهي دون معركة`
 
-**The test:** does the sentence answer *"what will my life be like in a month?"* — or *"what is included?"* If the second, rewrite or delete.
+**Two tests, both binding:**
+
+1. Does the sentence answer *"what will my life be like in a month?"* — or *"what is included?"* If the second, rewrite or delete.
+2. **Is it describing a capability, or instructing a purchase?** (P21) *"صار عندي ما يكفي لنبني رحلة نحو هذا"* describes. *"افتح الرحلة"* instructs. Only the first is permitted.
 
 ### 3.6 The two lexicons (013)
 
@@ -361,6 +390,24 @@ That last quote is the clearest justification for making memory the foundation (
 | **Daily rhythm** | Seed + Harvest | Seed + Harvest |
 | **What is different** | — | **A named goal, driven daily until it is reached or honestly declared unreached** |
 
+### 5.1b The free tier's real job: repeated moments of being understood
+
+The free product is not a sample. **Its job is to produce, again and again, the moment a parent thinks *"this is different."*** That moment is the conversion engine (§1.1c), and it is produced entirely by the Knowledge Engine — not by anything commercial.
+
+**The five recurring moments, and where each is produced:**
+
+| Moment the parent feels | Produced by | Engine |
+|---|---|---|
+| *"It knows my child's name"* | The name appears naturally, never announced | §7 |
+| *"It remembers yesterday"* | The Harvest references this morning's Seed | §9.2 |
+| *"It's asking about the exact thing we tried"* | Seed→Harvest linkage | §9.2 |
+| *"It noticed something I hadn't"* | The Mirror | §9.4 |
+| *"It changed its advice because of us"* | Prior outcomes feed the next Seed | §7.2 |
+
+**These are requirements, not aspirations.** A free experience that produces none of them has failed at its actual job, no matter how good its individual answers are.
+
+**And the ordering matters:** every one is a *demonstration*, never a claim (P24). ADAM never says "I remember your child" — it uses the name and lets the parent notice. Explanation invites scepticism; demonstration ends it.
+
 ### 5.2 Why this line is defensible
 
 It withholds **no information**. Ask ADAM how to predict a hard night and it tells you, completely, free, from your own data. What costs money is not knowing — it is **someone doing it with you, every day, until the goal lands.**
@@ -437,6 +484,24 @@ Journeys continue while the subscription is active. It buys **continuation**, no
 ## 7. Knowledge Engine
 
 **Owns:** everything ADAM knows about a family, and the enforcement that no message goes out ungrounded.
+
+> **This engine is the conversion engine** (§1.1c). Not §15, which merely makes a next step visible. If revenue is low, this is where the work is — understanding families better, never talking louder.
+
+### 7.0 Capability grows visibly with context (P23)
+
+ADAM should feel like it becomes more capable as it learns more — because it genuinely does.
+
+| What ADAM knows | What becomes possible |
+|---|---|
+| Nothing yet | Answer this moment, fully and well |
+| The child's name | Speak about *يوسف*, not "your child" |
+| A recurring situation | A Seed aimed at the thing that keeps failing |
+| Three logged evenings | Notice a pattern the parent had not seen |
+| A month of outcomes | Identify which approach works **for this child**, and name a goal worth pursuing |
+
+**The parent is never shown this table, and never told what is locked.** They simply notice that ADAM keeps getting sharper. **The product grows with the family** — that is what makes a later goal feel earned rather than sold.
+
+> **This is the honest reason a journey becomes possible only later.** Not a gate, not a drip, not a trial expiring: ADAM genuinely could not have named a real goal in week one, because it did not yet know the child. **The constraint is real, which is why it does not feel like a tactic.**
 
 ### 7.1 The architecture rule (015)
 
@@ -530,9 +595,28 @@ Voice notes in are a primary input, especially at distress. Transcription below 
 
 **Voice out is a candidate, not committed.** It may carry warmth text cannot — but a synthetic voice can unsettle. Test before adopting.
 
-### 8.4 What the Conversation Engine never does
+### 8.4 Every turn must add value (P22)
 
-Sell · quote a price · mention a subscription · explain a payment method (006, P17). If a parent raises any of these, §15.4 governs the response.
+> **Every exchange raises at least one of: trust · personalisation · memory · understanding · progress.**
+> An exchange that raises none was a wasted turn.
+
+This is a design constraint on the conversation, not an aspiration. It is why filler acknowledgements ("حسناً، فهمت") are not neutral — they consume a turn and add nothing. Either the reply carries something, or it should be shorter.
+
+**The commercial consequence is the whole strategy:** if every turn adds value, perceived value rises continuously whether or not anything is ever sold. That is what makes a later goal feel like a natural next step instead of an interruption.
+
+### 8.5 Describe, never promote (P21)
+
+| ✅ Describes a capability | ❌ Promotes a purchase |
+|---|---|
+| "صار عندي ما يكفي لنبني رحلة نحو هذا الهدف" | "افتح الرحلة الآن" |
+| "هذا ما يمكن أن نعمل عليه معاً" | "احصل على النسخة الكاملة" |
+| "أعرف الآن ما يهدّئ يوسف" | "فعّل الذاكرة الكاملة" |
+
+The left column states what is now true. The right instructs the parent to acquire something. **The difference is fundamental, and it is mechanically checkable** — the promotional register has its own banned verb list (§3.5).
+
+### 8.6 What the Conversation Engine never does
+
+Sell · quote a price · mention a subscription · explain a payment method (006, P17) · **explain how capable ADAM is** (P24). If a parent raises money, §15.4 governs the response.
 
 ---
 
@@ -667,7 +751,9 @@ Stability is what makes it trustworthy; the single changing item is what makes A
 | Journey complete | "ما بعد النوم؟" | The next goal worth taking |
 | Unsupported country | "متى يصل آدم إلى بلدي؟" | The waitlist |
 
-**This single item is the entire commercial surface.** It is never a notification, never badged, never announced. It is simply always there, and it changes as the relationship changes.
+**This item is where the commercial model is *explained*** — but it is not the whole of it. Four surfaces share the work, and none of them works alone (§15.2). The menu's job is explanation; the conversation, the review session and the accumulated experience do the rest.
+
+It is never a notification, never badged, never announced. It is simply always there, and it changes as the relationship changes — which is itself the point: **the parent watches ADAM become more capable rather than being told what is locked** (P23).
 
 **Where the item leads (AD-1).** It opens a short description of the goal and what the journey aims at — in outcome language, no price — and a single link to **فريق آدم** (`t.me/Abdouleg`) for country, price and payment. **The menu describes; the agent transacts.**
 
@@ -927,10 +1013,15 @@ ADAM: صار عندي صورة واضحة عن ليالي يوسف.
       وهذا شيء يمكن تغييره.
 
       الهدف الذي أراه: خمس ليالٍ هادئة من سبع.
-      نمشي إليه يوماً بيوم حتى نصل — أو حتى نعرف أنه لا يصلح، وأقولها.
+      وصار عندي ما يكفي لنمشي إليه يوماً بيوم — حتى نصل،
+      أو حتى نعرف أنه لا يصلح، وأقولها.
 
       [كيف نبدأ؟]   [ليس الآن]   [شيء آخر]
 ```
+
+**"وصار عندي ما يكفي" is the pivot of the whole commercial model (P21, P23).** It describes a capability that genuinely did not exist three weeks ago, because ADAM did not yet know this child. It is a statement of fact, not an instruction to buy — and the reason it does not feel like a tactic is that **the constraint is real**.
+
+Compare the banned form: *"افتح الرحلة الآن"* — same moment, same goal, and it instructs a purchase. The difference is fundamental.
 
 **Five deliberate properties:**
 
@@ -1087,6 +1178,28 @@ A parent cannot be surprised by something that was in the menu the whole time. T
 
 **The seam is the design.** Naming a goal is a product act. Handling money is a separate role in a separate room.
 
+### 15.2a Four surfaces, none of which works alone (P7)
+
+The menu is **not** the only commercial surface. Four surfaces carry different parts of the same job, and any one of them in isolation fails.
+
+| Surface | Its verb | What it actually does |
+|---|---|---|
+| **The Menu** | **Explains** | What is possible, in outcome language, always visible, never announced |
+| **The conversation** | **Demonstrates** | Every exchange shows a capability rather than describing one (P24) |
+| **The review session** | **Reveals** | Names the next real opportunity, found in the family's own data (§14.7) |
+| **The accumulated experience** | **Convinces** | Weeks of being understood. The only thing that actually persuades |
+
+**Why none works alone:**
+
+- **The menu alone** is a price list nobody opens.
+- **The conversation alone** demonstrates capability but never makes a next step visible.
+- **The review session alone** would be a well-timed pitch — which is what it is *not* (§6.4).
+- **The experience alone** builds trust with nowhere for it to go.
+
+**Only the fourth actually converts.** The first three make a decision *possible*; weeks of accurate understanding make it *wanted*. This is §1.1c restated operationally: **understanding is the engine, and these surfaces are only the transmission.**
+
+**The failure mode this prevents.** If conversion disappoints, the reachable levers look like the menu and the review session — make the item louder, add a nudge. Both are banned (§15.6), and both would be treating a transmission problem as if it were an engine problem. **The lever is §7.**
+
 ### 15.2b فريق آدم — the agent's identity (AD-1)
 
 | | |
@@ -1215,6 +1328,13 @@ NORTH STAR: Parents Reaching Outcomes
    │     Journeys honestly declared unreached  observe — a healthy number is not zero
    │     Calm ratio, week 1 → week 4
    │
+   ├── UNDERSTANDING  (the conversion engine — §1.1c)
+   │     Aha moments produced / parent / week   ≥3   (§5.1b)
+   │     Child name used where useful           ≥90%
+   │     Harvest references its own Seed        100%  (hard floor)
+   │     Advice changed by prior outcomes       observe
+   │     Turns adding no value                  observe, drive down  (P22)
+   │
    ├── COMMERCE  (observed, never targeted)
    │     Menu opens / parent
    │     Goal-visible → journey started    observe
@@ -1230,6 +1350,8 @@ NORTH STAR: Parents Reaching Outcomes
          Gendered strings to unknown   0    (hard zero)
          Second mention after decline  0    (hard zero)
          Banned vocabulary in output   0    (hard zero)
+         Promotional verbs in output   0    (hard zero — P21)
+         Capability explained not shown 0   (hard zero — P24)
          Crisis flags → human < 24h    100%
          Block/mute rate               < 2%
          Median reply latency          < 15s
@@ -1263,7 +1385,11 @@ Every event carries `parent_id`, `timestamp`, `state`, `country`, `gender_form_u
 
 **Commerce:** `agent_handoff` · `payment_claimed` · `payment_confirmed` (hours) · `payment_blocked_country` · `waitlist_joined`
 
-**Quality guardrails:** `ungrounded_send_blocked` · `gender_form_fallback` · `banned_vocabulary_blocked` · `price_mention_blocked`
+**Quality guardrails:** `ungrounded_send_blocked` · `gender_form_fallback` · `banned_vocabulary_blocked` · `price_mention_blocked` · `promotional_verb_blocked` · `capability_explained_blocked`
+
+**Understanding (the conversion engine):** `aha_moment` (**kind:** name_used / remembered_yesterday / asked_about_experiment / pattern_noticed / advice_adapted) · `turn_value_added` (**which of:** trust / personalisation / memory / understanding / progress) · `turn_value_none`
+
+> **`aha_moment` is the most important event in this schema.** §1.1c says understanding drives revenue; this is the only place that claim becomes falsifiable. If parents who convert do not show more Aha moments than those who do not, the thesis is wrong and §15 needs rebuilding on a different foundation.
 
 **Never tracked:** message content, anything from an L3 conversation, any field letting an operator browse disclosures casually.
 
@@ -1290,6 +1416,18 @@ Every event carries `parent_id`, `timestamp`, `state`, `country`, `gender_form_u
 **E1 is the most important experiment in this document.** The whole thesis is that a grounded Seed is categorically different from a parenting tip. If a generic tip performs equally well, then P11 and Decision 003 are wrong, memory is not the foundation, and the free rhythm is a content channel rather than a relationship. **Worth knowing before building the Knowledge Engine everything else assumes.**
 
 **E5 is the honest test of §15.2.** The entire commerce design rests on the claim that permanent visibility builds trust rather than eroding it. If parents who see the menu early are *more* likely to leave, the claim is wrong and §15 needs rework.
+
+### E10 — Does understanding actually drive conversion?
+
+| | |
+|---|---|
+| **Hypothesis** | Parents who experience more Aha moments (§5.1b) start journeys at a materially higher rate than parents who experience fewer — **independent of how many times they saw a commercial surface** |
+| **Method** | Correlate `aha_moment` counts against `next_journey_started`, controlling for `menu_opened` |
+| **Kill signal** | **No relationship, or menu exposure predicts better than understanding does** |
+| **If killed** | §1.1c is wrong. Understanding is not the conversion engine, and the strategy of "improve §7, never amplify §15" has no evidence behind it. **The whole constitution would need rethinking, not the copy** |
+| **Effort** | Correlation only — zero build beyond the events |
+
+**This is the single most consequential experiment in the document**, because §1.1c is the claim everything else rests on: that the correct response to weak revenue is better understanding rather than louder surfaces. If it is false, the product is being managed on a belief rather than evidence — and it is cheap to check.
 
 ---
 
@@ -1398,6 +1536,10 @@ Two implications, neither of which should be softened:
 | **Gamified streaks** | Streak-shaming after a hard night violates P3 catastrophically |
 | **Incentivised referral** | Corrupts the motive in a trust-based product |
 | **Rename the brand** | 41,100 followers and a 525k-reach proof point |
+| **"Upgrade to unlock" framing, in any form** | P21. It instructs a purchase instead of describing a capability, and it implies the free product is a locked version of the paid one — which contradicts 002 and P15 |
+| **Explaining how good ADAM's memory is** | P24. Explanation invites scepticism; demonstration ends it. Use the child's name, do not describe the fact that you can |
+| **A premium feature list, at any surface** | P23. The parent should watch capability grow, never read what is withheld |
+| **Amplifying the commercial surfaces when conversion disappoints** | §15.2a. That treats a transmission problem as an engine problem. The lever is §7 |
 
 ---
 
@@ -1440,7 +1582,7 @@ Nothing else gates the build.
 | **§7** | **New: Knowledge Engine.** Supabase the only truth, n8n the nervous system, **the LLM stores nothing** | 003, 012, 015 |
 | **§8** | **New: Conversation Engine.** Hybrid dynamic buttons + free text, **"شيء آخر" mandatory on every set**, buttons creatable mid-dialogue | 014 |
 | **§9** | **New: Journey Engine.** Everything generated, no templates. Seed→Harvest with Harvest as an extension. Timing by the logic of the day | 004, 010, 011 |
-| **§10** | **New: Telegram Engine.** **Reply keyboard adopted, reversing v2's explicit refusal.** Deep links added. **Menu fixed with exactly one changing item** — and that item is the entire commercial surface | 007, 008, 009, 017 |
+| **§10** | **New: Telegram Engine.** **Reply keyboard adopted, reversing v2's explicit refusal.** Deep links added. **Menu fixed with exactly one changing item** — ~~and that item is the entire commercial surface~~ *(superseded in v3.2: the menu explains, three other surfaces do the rest — §15.2a)* | 007, 008, 009, 017 |
 | **§11** | **New: Growth Engine.** Deep links become the bridge fix | 008 |
 | **§13** | **S5 `goal_visible` replaces v2's discovery state.** ADAM names a goal and stops; the menu carries the rest. **S6 `with_agent` — ADAM is absent from the money conversation.** X1 now reverts the menu item | 006, 018 |
 | **§14.5** | **Rewritten: the goal message contains no commerce.** No price, no currency, no subscription. Falsifiable goal, pre-committed honest failure | 005, 006 |
@@ -1470,7 +1612,29 @@ Nothing else gates the build.
 | **§19** | **L1 and L2 ship in weeks 3–4; L3 gated on the referral directory.** Review-session stages 1–3 ship with the first journey, not held for commerce | AD-2, AD-3 |
 | **§22** | **D1, D4, D5 resolved.** New **D2** (referral directory, blocks L3 only) and **D2b** (rename the account — blocks every handoff) | All three |
 
-**The one thing worth noting as a correction:** the price-deletion test was present in v2 and **disappeared during the v3 restructure**. It is now §2.1 and binding, and §6.4 and §14.7 are explicitly built to pass it.
+**The one thing worth noting as a correction:** the removal test was present in v2 and **disappeared during the v3 restructure**. It is now §2.1 and binding, and §6.4 and §14.7 are explicitly built to pass it.
+
+### v3.1 → v3.2 (2026-07-30) — the Conversion Experience Constitution
+
+Merged into the product, not appended. The thirteen principles landed as follows.
+
+| Constitution principle | Where it lives now | What it changed |
+|---|---|---|
+| **1** — never ask "how do we sell" | **§1.1b** | Stated as a founding constraint, and it is why §16.4 forbids a conversion target |
+| **2** — desire comes from understanding, not talking | **§1.1c**, **§7** header | **The Knowledge Engine is now named the conversion engine.** If revenue is weak, the lever is §7 — never louder surfaces |
+| **3** — repeated Aha moments | **§5.1b (new)** | Five named moments with the engine that produces each. Now a **requirement** on the free tier, and a metric |
+| **4** — demonstrate, never explain | **P24**, §5.1b, §8.6 | Explaining ADAM's capability is now a hard-zero guardrail |
+| **5** — progressive discovery, capability grows with context | **P23**, **§7.0 (new)** | A capability-by-knowledge table the parent never sees. **The reason a journey appears late is that the constraint is real, which is why it does not read as a tactic** |
+| **6** — every interaction increases perceived value | **P22**, **§8.4 (new)** | Every turn must raise trust, personalisation, memory, understanding or progress. Filler replies are not neutral |
+| **7** — the Menu is not the only commercial surface | **§15.2a (new)** | **Resolved a direct contradiction.** §10.3 previously said the menu item was "the entire commercial surface". Now four surfaces — menu explains, conversation demonstrates, review reveals, experience convinces — and each fails alone |
+| **8** — describe capability, never promote it | **P21**, **§8.5 (new)**, §14.5 | A promotional-verb ban in §3.5, and the goal message now pivots on *"وصار عندي ما يكفي"* |
+| **9** — the parent is always in control | Already P9/§14.5 | Reinforced: ADAM makes the next step obvious and stops |
+| **10** — transitions from evidence, never timing | Already P20/§13.3 | Reinforced: never a rule, never seven days |
+| **11** — free stays genuinely useful forever | Already P15/002 | Reinforced in §5.1b |
+| **12** — sell transformation, not technology | **§3.5 expanded** | Added `ذكاء اصطناعي`, `دفتر`, `أتمتة`, `تتبّع` to the ban, plus the whole promotional register |
+| **13** — the removal test | **§2.1 broadened** | Now removes price **and payment and subscription**, and the failure verdict is named: *advertising disguised as conversation* |
+
+**Also added: E10**, which makes §1.1c falsifiable — do Aha moments predict journeys started, controlling for menu exposure? If menu exposure predicts better, the constitution's central claim is wrong and the strategy has no evidence behind it.
 
 ---
 
