@@ -361,7 +361,7 @@ Most ownership is obvious. Four seams are not, and unstated seams are where syst
 |---|---|---|
 | **The review session** | **Split, deliberately** | **Journey owns stages 1–3** (celebrate, assess, discover the next goal) — pure product. **Growth owns stage 4** (the decision). The seam falls exactly where the removal test does: stages 1–3 survive it, stage 4 is where commerce enters |
 | **The menu** | **Split** | **Telegram owns rendering** — layout, pinning, the fixed items. **Growth owns the changing item's meaning** at each stage |
-| **Aha moments** | **Three engines, in sequence** | **Knowledge produces** them (it knows the name, the pattern). **Conversation delivers** them. **Growth measures** them and treats them as the conversion signal |
+| **Aha moments** | **Conversation Engine owns them** (§3.8) | It is a **subsystem, not an engine** — an Aha is something ADAM *says*. **Knowledge supplies** the conditions, **Conversation designs and delivers**, **Growth counts** them as the conversion signal. Six canonical moments, A1–A6 |
 | **The Seed** | **Journey decides, Knowledge gates, Conversation writes** | Journey decides today's suggestion serves the goal; Knowledge refuses to let it send ungrounded; Conversation renders the language |
 | **Strain levels** | **Conversation detects, all engines obey** | Detection is a conversation-analysis job. The consequences — rhythm suspended, journeys paused, menu neutral — are enforced by each engine |
 
@@ -545,6 +545,103 @@ Detection lives here; consequences are enforced by every engine.
 ### 3.7 Never
 
 Sell · quote a price · mention a subscription · explain a payment method · **explain how capable ADAM is** (P24).
+
+---
+
+### 3.8 The Aha Subsystem
+
+**Not a separate engine.** It lives here, because an Aha moment is something ADAM *says* — Knowledge only makes it possible.
+
+> **These are the moments that make a parent think *"this is different."***
+> **They are designed and intended. They are not allowed to be accidental.**
+
+If they are left to emerge on their own, they emerge unevenly: some parents get four in a week, others get none, and we would never know which. Naming them makes them buildable, countable, and testable.
+
+#### 3.8.1 The six canonical moments
+
+| # | Moment | ADAM does | Requires | Magnitude |
+|---|---|---|---|---|
+| **A1** | **The name** | Calls the child by name **for the first time** | Name captured from the parent's own words | Small, and the first one they ever feel |
+| **A2** | **Yesterday → today** | Links something from yesterday to today | Two consecutive days of context | Small |
+| **A3** | **The unrepeated fact** | Recalls something the parent said once and never repeated | Long-horizon memory | **Medium — this is the first one that surprises** |
+| **A4** | **The unnoticed pattern** | Names a pattern the parent had not seen | ≥3 logged evenings + situation labels | High |
+| **A5** | **The prediction** | Anticipates a hard moment **before** it happens | A validated pattern + the timing model | **Highest — this is the one nothing else offers** |
+| **A6** | **The journey from their own data** | Builds a goal out of this family's history | A month of outcomes | High, and different in kind — it is about the future |
+
+#### 3.8.2 The Aha ladder is the capability ladder, made visible
+
+The six are ordered by what ADAM must know, which means **the parent experiences §2.4 rather than being told about it.**
+
+```
+A1 name          ← knows who
+A2 yesterday     ← knows recent
+A3 unrepeated    ← knows deeply
+A4 pattern       ← knows more than the parent does
+A5 prediction    ← knows what happens next
+A6 journey       ← knows enough to aim at something
+```
+
+**This is why a journey cannot honestly be offered in week one.** A6 is not gated by a rule — it is gated by A1 through A5 actually having happened. **The commercial timing and the capability timing are the same timing**, which is what makes the offer feel earned rather than scheduled.
+
+#### 3.8.3 The first time is the Aha; afterwards it is trust
+
+A1 firing on day two is a moment. A1 firing on day sixty is just how ADAM talks.
+
+| | First occurrence | Every occurrence after |
+|---|---|---|
+| **What it does** | **Creates** the feeling | **Sustains** it |
+| **Logged as** | `aha_moment` | Ordinary behaviour |
+| **If it stops** | — | **Trust breaks.** Forgetting a name once undoes fifty uses of it |
+
+**The asymmetry matters.** The first is worth engineering for; the rest are worth protecting. A regression — a Seed that suddenly says "طفلك" — costs more than the original moment gained.
+
+#### 3.8.4 Design rules
+
+| Rule | Why |
+|---|---|
+| **Never announce it** (P24) | *"أتذكّر أنك قلت…"* destroys the moment. The Aha works **because** it is demonstrated silently and the parent notices on their own |
+| **One per message, maximum** | Two in one message dilutes both and starts to read as a performance |
+| **Never manufacture the conditions** | Withholding the child's name for three days so the reveal lands harder is a **betrayal**, not a design. The conditions are earned, never staged |
+| **Must be true** | ADAM may only use a name it knows, predict a pattern that exists. Grounding in Knowledge makes honesty automatic (§2.5) |
+| **Never inside a commercial message** | An Aha next to an offer converts the moment into a technique, and the parent will feel it |
+| **Never at L3** | §3.6 |
+| **Silence beats a forced one** | If the conditions are not there, no Aha. Same rule as the Seed (§2.6) |
+
+#### 3.8.5 What each moment sounds like
+
+```
+A1   كيف كانت الليلة مع يوسف؟
+     ← not "مع طفلك". The whole moment is one word.
+
+A2   جرّبنا التنبيه أمس ونجح — نبني عليه اليوم.
+
+A3   ذكرتَ مرة أن الحمّام كان أصعب جزء. هل ما زال؟
+     ← said once, weeks ago, never repeated.
+
+A4   الليلة الصعبة الوحيدة كانت في يوم بلا قيلولة.
+     ← the parent had the data. They did not have the pattern.
+
+A5   يوسف ما نامش بعد الضهر النهارده.
+     الليالي زي دي بتبقى أصعب — نبدأ الروتين بدري ٢٠ دقيقة.
+     ← before the evening, not after it.
+
+A6   الهدف الذي أراه: خمس ليالٍ هادئة من سبع.
+     ← §9.5.
+```
+
+**Note what is absent from all six:** any sentence about ADAM. No "I remember", no "I noticed that I", no "my memory". The moment is always about the child.
+
+#### 3.8.6 Ownership and instrumentation
+
+| Concern | Owner |
+|---|---|
+| Whether the conditions exist | **Knowledge Engine** (§2) |
+| Designing and delivering the moment | **Conversation Engine** — here |
+| Counting them and treating them as the conversion signal | **Growth Engine** (§6.4) |
+
+Each fires `aha_moment` with its kind (`A1`–`A6`) and a `first_occurrence` flag. **The first-occurrence count per parent is the real measure**; totals mostly count A1 and A2 repeating.
+
+> **This is what makes §0.2 testable.** E10 asks whether Aha moments predict journeys started, independent of menu exposure. Without a canonical list there is nothing to count, and the claim that understanding drives revenue stays an opinion.
 
 ---
 
@@ -785,19 +882,22 @@ The points where a parent can learn something exists. **None is a message whose 
 
 ### 6.4 Aha Moments — the conversion signal
 
-Produced by Knowledge, delivered by Conversation, **measured here** (§1.4).
+**Defined and delivered in §3.8** (Conversation Engine). Growth does not design them — it counts them and treats them as the thing that actually moves revenue.
 
-| Moment the parent feels | Produced by |
+| | The parent feels |
 |---|---|
-| *"It knows my child's name"* | The name used naturally, never announced |
-| *"It remembers yesterday"* | The Harvest references this morning's Seed |
-| *"It's asking about the exact thing we tried"* | Seed→Harvest linkage |
-| *"It noticed something I hadn't"* | The Mirror |
-| *"It changed its advice because of us"* | Prior outcomes feeding the next Seed |
+| **A1** | *"It knows my child's name"* |
+| **A2** | *"It remembers yesterday"* |
+| **A3** | *"It remembered something I only said once"* |
+| **A4** | *"It noticed something I hadn't"* |
+| **A5** | *"It knew before I did"* |
+| **A6** | *"It built this out of us"* |
 
 **These are requirements, not aspirations.** A free experience producing none of them has failed at its actual job, however good its individual answers are.
 
-**Target: ≥3 per parent per week.** This is the metric §0.2 stands or falls on, and E10 makes it falsifiable.
+**Target: ≥3 first-occurrence moments per parent in the first four weeks.** Repeat firings of A1 and A2 are healthy but are not the signal — the ladder climbing is.
+
+> **This is the metric §0.2 stands or falls on.** If the parents who start journeys are not the parents who climbed further up the Aha ladder, then understanding is not the conversion engine and the architecture's priority order is wrong. **E10 is what makes that falsifiable rather than a belief.**
 
 ### 6.5 The Value Ladder
 
@@ -1167,7 +1267,8 @@ NORTH STAR: Parents Reaching Outcomes
    │     Pairs / parent / week         ≥4
    │
    ├── UNDERSTANDING  (the conversion engine — §0.2)
-   │     Aha moments / parent / week   ≥3
+   │     Aha ladder climbed (A1→A6)    ≥3 first-occurrences in 4 weeks
+   │     Aha regressions                0    (hard zero — trust incident)
    │     Child name used where useful  ≥90%
    │     Harvest references its Seed   100%  (hard floor)
    │     Advice changed by outcomes    observe
@@ -1216,9 +1317,11 @@ Every event carries `parent_id`, `timestamp`, `state`, `country`, `gender_form_u
 
 > **`seed_skipped` matters as much as `seed_sent`.** Silence is correct when there is nothing personal to say, so **principled silence must be distinguishable from a broken scheduler.**
 
-**Understanding:** `aha_moment` (**kind:** name_used / remembered_yesterday / asked_about_experiment / pattern_noticed / advice_adapted) · `turn_value_added` (which of the five) · `turn_value_none`
+**Understanding:** `aha_moment` (**kind:** `A1_name` / `A2_yesterday` / `A3_unrepeated` / `A4_pattern` / `A5_prediction` / `A6_journey`, plus **`first_occurrence`** boolean) · `aha_suppressed` (**reason:** conditions_absent / already_one_in_message / commercial_context / L3) · `aha_regression` (**kind** — a moment that previously fired and has stopped) · `turn_value_added` (which of the five) · `turn_value_none`
 
-> **`aha_moment` is the most important event in this schema.** §0.2 claims understanding drives revenue; this is the only place that claim becomes falsifiable.
+> **`aha_moment` is the most important event in this schema.** §0.2 claims understanding drives revenue; this is the only place that claim becomes falsifiable. **`first_occurrence` is the field that matters** — totals mostly count A1 and A2 repeating.
+
+> **`aha_regression` is the one to alert on.** Per §3.8.3, forgetting a child's name once undoes fifty uses of it. A regression is a trust incident, not a missed opportunity.
 
 **Journey:** `goal_named` · `journey_started` · `journey_adjusted` (**reason**) · `journey_goal_reached` · `journey_goal_missed` (**what was learned**) · `review_session_started` · `review_stage_delivered` (1–4) · `review_stage4_skipped` (**reason**) · `next_goal_identified` (from which evidence)
 
@@ -1245,7 +1348,8 @@ Every event carries `parent_id`, `timestamp`, `state`, `country`, `gender_form_u
 | **E7** | **Goal falsifiability** | A concrete goal beats a vague one | No difference in journeys started | Copy |
 | **E8** | **Gulf concierge** | Waitlisted high-ATP parents will pay | 0/10 pay | Days, no engineering |
 | **E9** | **Voice input** | Voice increases depth | No lift | Medium |
-| **E10** | **Understanding → conversion** | More Aha moments predict more journeys started, **independent of menu exposure** | **No relationship, or menu exposure predicts better** | Correlation only |
+| **E10** | **Understanding → conversion** | Parents who climb further up the Aha ladder (§3.8) start journeys at a higher rate, **independent of menu exposure** | **No relationship, or menu exposure predicts better** | Correlation only |
+| **E11** | **Which rung matters** *(new)* | Not all Aha moments are equal — **A5 (prediction) should predict conversion far more strongly than A1 (name)** | All six correlate equally → the ladder is not real, and §3.8.2 is a story rather than a structure | Correlation only |
 
 **E1 and E10 are the two that matter most.**
 
@@ -1324,6 +1428,8 @@ Peer presence *(only after retention is proven)* · multi-child *(currently 3 ch
 | **R12** | **Founder is the payment rail** | 🟠 High | Fine now; binding at ~50 customers |
 | **R13** | **Gendered copy leaks to fathers** | 🟡 Medium | Three-form requirement; `gender_form_fallback` |
 | **R14** | **Reply keyboard discourages free text** | 🟡 Medium | Three entries; collapsible; monitor free-text rate before and after |
+| **R15** | **Aha moments become a performance.** Once named and counted, the temptation is to engineer their timing — and a staged moment is detectable | 🟠 High | §3.8.4: conditions are earned never staged, one per message, never announced, never beside an offer. **`aha_suppressed` should be common — if it is near zero, they are being forced** |
+| **R16** | **Aha regression.** A name forgotten, a pattern dropped after a schema change | 🟠 High | `aha_regression` as a hard-zero alert. §3.8.3 — the first occurrence creates trust, every one after **protects** it, and losing one costs more than the first gained |
 
 ## 15. Rejected decisions
 
@@ -1393,6 +1499,23 @@ Peer presence *(only after retention is proven)* · multi-child *(currently 3 ch
 | **§16** | Reduced to six, only two blocking |
 
 **Two things were recovered in this pass:** the **Value Ladder**, absent since v3, and an explicit statement of **what each engine may not do** — both casualties of restructuring rather than decisions.
+
+### v4 → v4.1 — the Aha Subsystem
+
+| Area | What changed |
+|---|---|
+| **§3.8** | **New: the Aha Subsystem, inside Conversation Engine — not a separate engine.** An Aha is something ADAM *says*; Knowledge only makes it possible. **Six canonical moments A1–A6**, each with its trigger, requirement and magnitude |
+| **§3.8.2** | **The Aha ladder is the capability ladder made visible.** A1 knows who → A6 knows enough to aim at something. **This is why a journey cannot honestly be offered in week one: A6 is gated by A1–A5 actually happening, not by a rule.** Commercial timing and capability timing are the same timing |
+| **§3.8.3** | **First occurrence creates the feeling; every one after sustains it.** The asymmetry is the point — **forgetting a name once undoes fifty uses of it** |
+| **§3.8.4** | Design rules, including the one that matters most: **never manufacture the conditions.** Withholding a child's name for three days so the reveal lands harder is a betrayal, not a design |
+| **§3.8.5** | What each moment sounds like — and **what is absent from all six: any sentence about ADAM.** The moment is always about the child |
+| **§1.4** | Ownership corrected: Conversation owns the subsystem; Knowledge supplies conditions; Growth counts |
+| **§6.4** | Growth no longer defines them — it counts them. Target restated as **first-occurrence moments**, since totals mostly count A1 and A2 repeating |
+| **§11** | Events rebuilt on the canonical kinds, plus **`aha_suppressed`** and **`aha_regression`** |
+| **§12** | **E11 — which rung matters.** If all six correlate equally with conversion, the ladder is a story rather than a structure |
+| **§14** | **R15 Aha becomes a performance** — `aha_suppressed` near zero means they are being forced. **R16 Aha regression** as a trust incident |
+
+**The sharpest consequence of naming them:** the commercial offer is no longer timed by anything commercial. **A6 fires when A1–A5 have actually happened**, which means the moment a journey becomes offerable is the moment ADAM genuinely became able to build one.
 
 ---
 
