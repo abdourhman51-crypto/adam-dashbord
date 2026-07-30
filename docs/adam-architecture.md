@@ -1537,7 +1537,7 @@ Peer presence *(only after retention is proven)* · multi-child *(currently 3 ch
 | # | Decision | Why it's yours | Blocking |
 |---|---|---|---|
 | **D2** | **The referral directory.** A vetted, real, country-specific list of support services. **ADAM must never invent a helpline** | Requires real-world verification per market | **Blocks L3 only.** L1 and L2 ship without it |
-| **D2b** | **Rename the Telegram account behind `t.me/Abdouleg` to فريق آدم** — name, photo, bio | AD-1 requires brand identity | **Blocks every commercial handoff.** A five-minute task |
+| ~~D2b~~ | ~~Rename the Telegram account to فريق آدم~~ **DONE 2026-07-30.** AD-1 is now implemented, not merely described | — | **No longer blocking** |
 | **D3** | **Fair-use ceiling for free.** Unlimited is the principle; some finite ceiling is the reality | Your cost tolerance | Blocks free-everywhere rollout |
 | **D6** | **Which market to open first** if E8 succeeds — Saudi (highest ATP) or Iraq (largest volume) | Access to a payment agent | Blocks post-E8 planning |
 | **D7** | **The existing 291 parents and 4,212 conversations** — carry memory forward, or fresh start with continuity messaging? | Relationship decision | Blocks week 1 |
