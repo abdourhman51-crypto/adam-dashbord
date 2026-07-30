@@ -184,9 +184,33 @@ Telegram requires the bot token **in the URL path**, so no n8n credential type c
 | **W3 Rhythm Sender** | **Built, 11 nodes, inactive** — `Vb4ADCkPsevPRWRN` |
 | **W2 situation detection** | **Built, 21 nodes, ACTIVE** — `7mTP12nVLS1Taokl` |
 | **All Telegram nodes → HTTP Request** | **Done** — §7 |
-| W1 Harvest handling | Not built |
+| **W1 Harvest handling** | **Done** — `CK - Update Step Status` now calls `record_harvest_answer()` |
 | W4 rework | Partially — Telegram node converted, gender-neutral copy fixed |
 | Legacy sender retirement | Blocked on W3 activation |
+
+### 9.4 W1 — a live bug found while wiring the Harvest
+
+`CK - Update Step Status` was doing:
+
+```
+PATCH /daily_logs?follower_id=eq.<id>&order=id.desc&limit=1
+```
+
+**That targets the newest row by `id`, not today's row.** A parent whose latest row is from a previous day gets *that* row overwritten when they answer tonight — the answer lands on the wrong date, and today's day is left with no result.
+
+This is a strong candidate for why **23 of 25 rows carry no result** while the check-in was demonstrably being delivered. The answers were arriving; they were being written somewhere else.
+
+**Replaced with `record_harvest_answer()`**, which targets `log_date = today in the parent's local timezone` and refuses unless a Seed was actually sent.
+
+**Why this edit was safe on a live 89-node workflow serving parents right now:**
+
+| Risk | Mitigation |
+|---|---|
+| A "no seed today" case erroring and breaking the reply chain | **Verified**: it returns `{recorded:false, reason:"no_seed_today"}` with HTTP 200, so `CK - Reply Step` still fires and the parent still gets their reply |
+| Switching auth and logic together | **Auth deliberately left unchanged.** The node keeps its existing header credentials. Changing two things at once on a live system is how you get an outage you cannot diagnose — credential migration happens for all nodes at once during the week-0 rotation |
+| Silent behaviour change | The old path was already failing to record; the new one records correctly or says why |
+
+**Not yet migrated:** `CK - Save Night Result` (handles `ck_gen_*` from the legacy sender) and `CK - Save Hard Moment` carry the same wrong-row pattern. They die with the legacy sender rather than being rewritten, since the rhythm has no general "how was your night" question.
 
 ### 9.3 W2 — classification, not invention
 
