@@ -68,14 +68,16 @@ Expected: **21 + 37 + 25 + 29, zero failures.**
 
 From `docs/adam-experience-principles.md` Part 4:
 
-1. `sendChatAction: typing` before every agent reply
-2. `/start` sends the greeting only; defer the pin until it has content
-3. Refresh the pinned message via `editMessageText` after each Harvest — **it is currently written once and never updated, so it reads "nothing logged yet" forever**
+1. ✅ done — typing indicator
+2. ✅ done — `/start` is one message
+3. ✅ done — pin created on the first logged evening, edited in place thereafter
 4. Derive the reply keyboard from state like every other surface
 5. Menu body carries the surface content
 6. Harvest reply composed + uniqueness-tested — the Peak-End moment is currently one fixed string
 
-**1–3 change what a parent feels this week. 6 changes what she remembers.**
+**1–3 are live. 6 changes what she remembers and is the next one worth doing.**
+
+**Credential still to attach in the n8n UI:** `Pin - Load`, `Pin - Surface`, `Pin - Remember` (plus the earlier fifteen).
 
 Open founder decision: «شيء آخر» on every button set — see Part 3 F9.
 

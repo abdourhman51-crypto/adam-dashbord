@@ -1,6 +1,6 @@
 # ADAM — Experience Principles, and a review against them
 
-**Status:** proposal. Nothing here is applied. Part 2 is candidate constitution text; Part 3 reviews live behaviour and criticises work shipped hours ago, including my own.
+**Status:** E1–E13 are a proposal. **Part 4 items 1–3 are applied** (2026-07-31); the rest is not. Part 2 is candidate constitution text; Part 3 reviews live behaviour and criticises work shipped hours ago, including my own.
 
 ---
 
@@ -205,9 +205,9 @@ Sequenced by (parent-felt improvement) ÷ (work), not by severity.
 
 | # | Change | Principle | Effort |
 |---|---|---|---|
-| 1 | `sendChatAction: typing` before every agent reply | E6 | one node |
-| 2 | `/start` sends the greeting only; pin deferred until it has content | E1, E4 | rewire, delete 2 sends |
-| 3 | Pinned message refreshed via `editMessageText` after each Harvest | E9 | store `message_id` + one node |
+| 1 | ✅ **Applied** — `Show Typing` fires on the `normal` route before any lookup | E6 | one node |
+| 2 | ✅ **Applied** — `/start` is one message. `Send Pinned` / `Pin It` disabled | E1, E4 | rewire |
+| 3 | ✅ **Applied** — `Pin - Load → Surface → Exists? → Edit \| Create → Attach → Remember` | E9 | 7 nodes + a column |
 | 4 | Keyboard derived from state like everything else | E2 | one function change |
 | 5 | Menu body carries the surface content | E4 | one expression |
 | 6 | Harvest reply composed and uniqueness-tested | E7 | agent + gate |
