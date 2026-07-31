@@ -187,8 +187,10 @@ begin
   where ct.code = v_country;
   v_local_date := coalesce(v_local_date, current_date);
 
+  -- "has a payment rail" = active market carrying complete pricing.
+  -- There is no is_supported column; assuming one cost execution 5456.
   select coalesce(bool_or(coalesce(sc.is_active, false)
-                      and coalesce(sc.is_supported, false)), false)
+                      and sc.price_display_full is not null), false)
     into v_supported
   from public.supported_countries sc
   where sc.code = v_country;

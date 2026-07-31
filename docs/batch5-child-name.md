@@ -60,3 +60,37 @@ A classic n8n data-flow error: reading `$json` across an HTTP node instead of re
 - `HW - Write Child Name` needs the **`adam Supabase`** credential attached in the UI, like the fifteen W1 nodes. The MCP cannot bind `supabaseApi` to `httpRequest`.
 - `HW - Get Heart Batch` and `HW - Heart Commit` still carry the plaintext service key.
 - `get_heart_batch()` filters `cohort='new' AND funnel_stage='free_conversation'` — 225 of 299 parents. The 63 `legacy` parents are excluded from memory *and* from name capture. Whether that is still wanted is a founder call.
+
+---
+
+## Follow-up 1 — legacy cohort included
+
+`get_heart_batch()` no longer filters `cohort='new'`. Two changes make "gradually" real:
+
+- **`p_limit` (default 40)** caps a run, and the scan now `exit`s once the limit is hit instead of building the conversation text for every follower first.
+- **Staleness order** — never-assessed first, then oldest-assessed. The previous `ORDER BY platform_user_id` was an alphabetical queue a returning parent could sit behind indefinitely.
+
+The old zero-argument overload was **dropped**: `create or replace` with a new default parameter creates a *second* function, and PostgREST's `{}` call would have kept resolving to the old one.
+
+First run after the change returns 37 parents, **35 of them legacy** — the backlog draining first, as intended.
+
+Still narrowed to `funnel_stage = 'free_conversation'`, so the 12 paid/offer-presented parents get no memory refresh. Separate question, not touched.
+
+## Follow-up 2 — execution 5456
+
+```
+400 42703 — column sc.is_supported does not exist
+Get Surface → rpc/get_telegram_surface
+```
+
+**Every `/start` was failing.** `get_telegram_surface` read `supported_countries.is_supported`. That column does not exist and never did — it was inferred from a migration *comment* that described the concept.
+
+The reason it reached production: **the local fixture invented the column.** All 21 surface assertions passed against a table that agreed with the code instead of with the schema. This is precisely the fixture-drift risk named in `docs/knowledge-engine.md` §7, now realised.
+
+**Fix:** "has a payment rail" is `is_active AND price_display_full is not null` — which `chk_active_market_has_pricing` already ties together. Applied to production and verified against the real parent from 5456.
+
+**The more important fix:** `fixture_minimal.sql` now mirrors `supported_countries` column-for-column with a comment recording why. A fixture that invents a column tests the fixture, not the schema.
+
+Also confirmed from the execution trace: the Supabase credentials **are** attached to the new W1 nodes, and the redesigned reception path runs — Router → Route Switch → Get Follower → Follower Exists? → Resolve Parent all succeeded before the failing call.
+
+**All four suites re-run after the correction: 21 + 37 + 25 + 29, zero failures.**

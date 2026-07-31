@@ -33,10 +33,17 @@ create table public.country_timezone (
   code text primary key, iana_tz text not null, name_ar text
 );
 
+-- Columns copied from production. There is NO is_supported column: an
+-- earlier fixture invented one, the tests passed, and every production call
+-- to get_telegram_surface returned 42703 (execution 5456). A fixture that
+-- invents a column tests the fixture, not the schema.
 create table public.supported_countries (
   code text primary key,
+  name_ar text, currency text,
+  price_subscription numeric, price_comeback numeric, price_continuation numeric,
+  price_display_full text, price_display_short text, price_continuation_display text,
   is_active boolean default false,
-  is_supported boolean default false
+  created_at timestamptz default now()
 );
 
 create table public.situations (
@@ -170,5 +177,6 @@ $$;
 insert into public.country_timezone (code, iana_tz) values
   ('DZ','Africa/Algiers'), ('EG','Africa/Cairo'), ('MA','Africa/Casablanca'),
   ('SA','Asia/Riyadh');
-insert into public.supported_countries (code, is_active, is_supported) values
-  ('DZ',true,true), ('EG',true,true), ('MA',true,true), ('SA',false,false);
+insert into public.supported_countries (code, is_active, price_display_full) values
+  ('DZ',true,'2,300 دينار جزائري'), ('EG',true,'490 جنيهاً مصرياً'),
+  ('MA',true,'110 دراهم مغربية'), ('SA',false,null);
