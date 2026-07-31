@@ -4,6 +4,3 @@ out/
 .env*.local
 *.tsbuildinfo
 next-env.d.ts
-
-# Local design tooling installed via uipro-cli; not part of the product
-.claude/skills/ui-ux-pro-max/
