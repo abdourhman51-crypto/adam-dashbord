@@ -747,7 +747,7 @@ Stability makes it trustworthy; the single changing item makes ADAM feel like it
    الخصوصية وحذف البيانات        ← always
 ```
 
-**Telegram renders it. Growth decides what the changing item means at each stage** (§6.5, §1.4).
+**Telegram renders it. Growth decides what the changing item means at each stage** (§6.5, §1.4). The seam is the `meaning` string returned by `get_telegram_surface()` — `resume` \| `lighten_load` \| `waitlist` \| `journey_progress` \| `next_goal` \| `open_question` — so neither engine reads the other's code. Modifiers outrank state when choosing it: a paused or strained parent is never offered a goal, however much ADAM knows (`docs/telegram-ux.md` §3).
 
 ### 4.4 The pinned message
 
@@ -776,6 +776,8 @@ The states where most bots feel broken. Each is a design surface, not an error.
 | **Dormant, returned after weeks** | Continuity acknowledged, absence never mentioned | "لم نرك منذ ٣ أسابيع!" |
 
 > **The empty state is the honest state.** A product that fabricates content to avoid looking empty is a product that will fabricate content elsewhere. *"نجمع الصورة — ليلتان حتى الآن"* is better than a fake chart, and it is consistent with P11.
+
+**These eight are not one list.** The table above reads as if a parent occupies exactly one row. Real parents do not: paused *and* still gathering, unsupported country *and* mid-journey. The UX layer splits them into an exclusive **state** ladder (what ADAM knows) and orthogonal **modifiers** (the parent's circumstances — paused, dormant, strain, country). **Unsupported country is a modifier, not a state** — a state would replace the others and contradict §4.7's *"full, identical"*. See `docs/telegram-ux.md` §2.
 
 ### 4.6 Navigation model
 
