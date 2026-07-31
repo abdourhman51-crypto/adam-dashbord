@@ -54,16 +54,31 @@ create table public.stages (
   parent_id uuid references public.followers(id) on delete cascade,
   child_id uuid,
   problem_key text,
+  objective_text text,
   status text
 );
 
 create table public.daily_logs (
   id uuid primary key default gen_random_uuid(),
   follower_id uuid references public.followers(id) on delete cascade,
+  child_id uuid,
   log_date date not null,
   night_result text,
   step_status text,
+  step_given text,
+  hard_moment text,
+  seed_sent_at timestamptz,
+  harvest_sent_at timestamptz,
   unique (follower_id, log_date)
+);
+
+create table public.child_patterns (
+  id uuid primary key default gen_random_uuid(),
+  child_id uuid references public.children(id) on delete cascade,
+  pattern_label text,
+  status text,
+  evidence_count integer default 1,
+  safe_for_record boolean not null default false
 );
 
 create table public.checkin_state (
@@ -110,6 +125,42 @@ left join chat c on c.key = f.platform_user_id
 left join logs l on l.follower_id = f.id;
 
 -- commerce_allowed(): real signature, simplified body (blocks at L2/L3).
+-- hard_moment_label(): copied verbatim from the child-record migration.
+create function public.hard_moment_label(p_key text) returns text
+language sql immutable as $$
+  select case lower(coalesce(p_key,''))
+    when 'meal' then 'عند الأكل' when 'sleep' then 'عند النوم'
+    when 'out' then 'عند الخروج' when 'screen' then 'في وقت الشاشة'
+    when 'study' then 'عند الدراسة' when 'other' then 'في موقف آخر'
+    else null end
+$$;
+
+-- can_ground_seed(): the real one lives in a migration this fixture does
+-- not load. Same contract — a child name AND one of situation / prior
+-- outcome / pattern — reimplemented so can_send('seed') is exercised.
+create function public.can_ground_seed(p_parent_id uuid) returns jsonb
+language sql stable as $$
+  with ctx as (
+    select (select nullif(btrim(c.name),'') from public.children c
+             where c.follower_id = p_parent_id
+             order by c.is_primary desc nulls last, c.created_at limit 1) as nm,
+           exists (select 1 from public.situations s join public.children c on c.id = s.child_id
+                    where c.follower_id = p_parent_id and s.status in ('candidate','confirmed')) as sit,
+           exists (select 1 from public.daily_logs d
+                    where d.follower_id = p_parent_id and d.step_status = 'done') as outc
+  )
+  select jsonb_build_object(
+    'can_ground', nm is not null and (sit or outc),
+    'child_name', nm,
+    'basis', (select coalesce(jsonb_agg(b),'[]'::jsonb) from (
+                select 'situation' as b where sit
+                union all select 'prior_outcome' where outc) z),
+    'missing', (select coalesce(jsonb_agg(b),'[]'::jsonb) from (
+                select 'child_name' as b where nm is null
+                union all select 'grounding' where not (sit or outc)) z))
+  from ctx;
+$$;
+
 create function public.commerce_allowed(p_parent_id uuid) returns boolean
 language sql stable as $$
   select coalesce((select ps.level from public.parent_strain ps

@@ -14,9 +14,13 @@ export PGHOST=$RUN PGPORT=55432 PGUSER=postgres
 psql -v ON_ERROR_STOP=1 -f supabase/tests/fixture_minimal.sql
 psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260731090000_telegram_surface_state.sql
 psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260731120000_conversation_copy_and_button_law.sql
+psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260731150000_knowledge_gate_and_uniqueness.sql
 psql -f supabase/tests/telegram_surface_test.sql
 psql -f supabase/tests/conversation_law_test.sql
+psql -f supabase/tests/knowledge_gate_test.sql
 ```
+
+Current: **21 + 37 + 25 assertions, zero failures.**
 
 ## `fixture_minimal.sql`
 
@@ -54,5 +58,21 @@ The price check scans **only parent-visible strings** — pinned text, progress 
 Four cases test the bans for **overreach** rather than reach, which matters just as much: `خطوة` must survive a ban on `خطة`, `نفعله` must survive a ban on `فعّل`, `دجاج` must survive the currency list. A law that blocks approved copy is a law someone switches off.
 
 The file also closes the UX↔Conversation contract: every `meaning` `get_telegram_surface()` can emit must have a matching moment, or a parent taps the menu and ADAM has nothing to say.
+
+## `knowledge_gate_test.sql`
+
+25 cases. One family is built up fact by fact — no name, then a name, then a situation, then three logged evenings, then a month of outcomes — and `knowledge_depth()` is **watched rising** rather than asserted. That is the point: if level 4 were a flag someone could set, the honest reason a journey becomes possible only later would stop being honest.
+
+Then §2.6, the test the architecture names for every proactive message:
+
+| Message | Verdict |
+|---|---|
+| A generic parenting tip | `generic` — does not send |
+| The same tip **with the child's name in it** | `identity_only` — does not send |
+| A message built on what actually worked for this child | sends |
+
+The last two cases build a **second family** and send family A's message to family B, which must fail. §2.6 is a cross-family rule and cannot be tested with one family.
+
+The provenance cases use the real live pattern label `التنقل بين ثلاث عائلات`, which reveals family separation. It must never become a family token, and must start counting the moment `safe_for_record` is explicitly set — that single difference is what makes the column a gate rather than decoration.
 
 Everything runs inside a transaction and rolls back.
