@@ -65,17 +65,21 @@ create table public.stages (
   status text
 );
 
+-- Columns copied from production (information_schema), not from memory.
 create table public.daily_logs (
   id uuid primary key default gen_random_uuid(),
   follower_id uuid references public.followers(id) on delete cascade,
-  child_id uuid,
   log_date date not null,
-  night_result text,
-  step_status text,
-  step_given text,
-  hard_moment text,
-  seed_sent_at timestamptz,
-  harvest_sent_at timestamptz,
+  summary text, guardian_mood text,
+  step_given text, step_completed boolean, step_status text,
+  created_at timestamptz default now(), updated_at timestamptz default now(),
+  checkin_sent_at timestamptz,
+  child_id uuid,
+  night_result text, hard_moment text,
+  source text, journey_id uuid, situation_id uuid,
+  seed_text text, seed_grounded_on jsonb,
+  seed_scheduled_for timestamptz, seed_sent_at timestamptz,
+  harvest_sent_at timestamptz, harvest_answered_at timestamptz,
   unique (follower_id, log_date)
 );
 
