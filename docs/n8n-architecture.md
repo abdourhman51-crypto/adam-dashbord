@@ -184,6 +184,8 @@ Telegram requires the bot token **in the URL path**, so no n8n credential type c
 | **W3 Rhythm Sender** | **Built, 11 nodes, inactive** — `Vb4ADCkPsevPRWRN` |
 | **W2 situation detection** | **Built, 21 nodes, ACTIVE** — `7mTP12nVLS1Taokl` |
 | **All Telegram nodes → HTTP Request** | **Done** — §7 |
+| **Strain detection** | **Applied and tested** — 8 tests. `set_strain_level` · `commerce_allowed` · `get_strain_batch` |
+| **W2 strain branch** | **Built** — W2 now 30 nodes, ACTIVE |
 | **W1 Harvest handling** | **Done** — `CK - Update Step Status` now calls `record_harvest_answer()` |
 | W4 rework | Partially — Telegram node converted, gender-neutral copy fixed |
 | Legacy sender retirement | Blocked on W3 activation |
