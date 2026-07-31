@@ -137,3 +137,49 @@ Belongs to W2 (Knowledge Writer), not W1: extract the name into `children` and t
 ## 6. Blocked
 
 The n8n and Supabase connectors lost authorization mid-task. Batches 1–5 need n8n; nothing further can be applied until both are re-authorized from the claude.ai connector settings.
+
+---
+
+## 7. Execution log — 2026-07-31
+
+Applied to `42loY0bgUSwYmHFV` via atomic operation batches. **89 → 111 nodes.**
+
+| Batch | Ops | Result |
+|---|---|---|
+| 1 — stop the harm | 32 | applied |
+| 2 — first contact replaces the funnel | 53 | applied |
+| 3 — menu and menu taps | 22 | applied |
+
+### Batch 1
+- `M2 - Track Switch`[1] rerouted from `Check daily Cap` straight to `M2 - Get Memory Snapshot`. **Free conversation is no longer capped.** Five cap nodes disabled.
+- The selling branch replaced by `Get Referral Moment → Referral Allowed? → Send Team Referral | Get Presence Moment → Send Presence`. Twelve CTA nodes disabled, including the hardcoded `PRICES` map and the LLM that composed offers containing them.
+
+### Batch 2
+- `Get Parent Row → Resolve Parent → Get Surface → Get First Contact → Send First Contact → Send Pinned → Pin It`.
+- The reply keyboard is now sent on first contact; the pinned message is derived from `get_telegram_surface` and pinned with `disable_notification`.
+- Disabled: the country nodes, both welcome variants, all 27 `OB-*` nodes (including `OB - Send Clarity`, the trial pitch, and `OB - Log Step`, the direct `daily_logs` write), and the two `RA-*` nodes.
+
+### Batch 3
+- `Router` rewritten: recognises `القائمة ☰`, `/menu`, `كيف نتقدّم`, and `menu_*` callbacks. `how_start` / `not_now` from the new moment buttons are routed to the referral and the no-follow-up path.
+- `Route Switch` extended to 19 outputs (`menu`, `menu_tap`).
+- Menu renders from the surface; taps resolve through `get_conversation_moment`. Fixed moments send their stored body and buttons; the rest are answered **deterministically from the surface** (§2.2 — what tier 1 can answer must not go to the LLM).
+
+### ⚠ One manual step is required before this can go live
+
+**Fifteen new HTTP nodes have no credential attached.** The n8n MCP refuses to bind `supabaseApi` to an `httpRequest` node — retried on an already-created node and rejected again — although n8n itself supports the combination and W3 runs on it.
+
+Attach **`adam Supabase`** to these nodes in the n8n UI:
+
+```
+Get Referral Moment · Get Presence Moment · Get Parent Row · Get Surface
+Get First Contact · Menu - Get Parent · Menu - Get Surface
+Tap - Get Parent · Tap - Get Surface · Tap - Get Moment
+```
+
+Until then those nodes return 401 and `/start` produces no welcome. The edits appear to be saved as a new workflow version that is not the active one — **confirm in the UI before publishing**, and publish only after the credentials are attached.
+
+### Still not done
+
+**Batch 5 — child name and situation capture — belongs to W2 and has not been built. It is the only thing that unblocks W3.** Batches 1–3 fix the gateway; the rhythm still cannot start until a name reaches `children` and a situation reaches `situations` via `commit_situation`.
+
+Also outstanding: `validate_outgoing` is not yet wired between the agent and its send, and the agent's system prompt still frames itself as a 7-day trial.
