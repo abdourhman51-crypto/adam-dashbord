@@ -1,9 +1,18 @@
 -- Minimal fixture reproducing only the columns get_telegram_surface() reads.
 -- Column names and types copied from the real migrations, not invented.
 
-create role service_role;
-create role authenticated;
-create role anon;
+-- Roles are cluster-wide, not per-database, so this must be idempotent:
+-- a second test database in the same cluster would otherwise fail here
+-- and leave every later statement unrun.
+do $$
+declare r text;
+begin
+  foreach r in array array['service_role','authenticated','anon'] loop
+    if not exists (select 1 from pg_roles where rolname = r) then
+      execute format('create role %I', r);
+    end if;
+  end loop;
+end $$;
 
 create table public.followers (
   id uuid primary key default gen_random_uuid(),

@@ -13,7 +13,9 @@ su postgres -c "$PGBIN/pg_ctl -D $DATA -o '-k $RUN -p 55432 -c listen_addresses=
 export PGHOST=$RUN PGPORT=55432 PGUSER=postgres
 psql -v ON_ERROR_STOP=1 -f supabase/tests/fixture_minimal.sql
 psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260731090000_telegram_surface_state.sql
+psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260731120000_conversation_copy_and_button_law.sql
 psql -f supabase/tests/telegram_surface_test.sql
+psql -f supabase/tests/conversation_law_test.sql
 ```
 
 ## `fixture_minimal.sql`
@@ -42,5 +44,15 @@ Twelve parents — the seven states, plus paused, strain L2, unsupported country
 | Arabic dual form for two nights | §0.7 |
 
 The price check scans **only parent-visible strings** — pinned text, progress line, menu labels, keyboard. Scanning the whole payload is meaningless: it carries UUIDs, and a digit run inside a UUID is not a price. An earlier version of this test failed for exactly that reason.
+
+## `conversation_law_test.sql`
+
+27 cases. Each one **tries to store something the constitution forbids** and asserts the database refuses it — banned vocabulary, promotional verbs, a leaked price, a button set with no `شيء آخر`, a crisis message carrying buttons, a rescue reply raising its own line budget.
+
+> **A rule you have never seen reject anything is a rule you are hoping for.**
+
+Four cases test the bans for **overreach** rather than reach, which matters just as much: `خطوة` must survive a ban on `خطة`, `نفعله` must survive a ban on `فعّل`, `دجاج` must survive the currency list. A law that blocks approved copy is a law someone switches off.
+
+The file also closes the UX↔Conversation contract: every `meaning` `get_telegram_surface()` can emit must have a matching moment, or a parent taps the menu and ADAM has nothing to say.
 
 Everything runs inside a transaction and rolls back.
