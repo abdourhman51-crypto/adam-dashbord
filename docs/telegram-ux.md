@@ -3,7 +3,7 @@
 **The UX layer** in the build order (`docs/adam-architecture.md` §1.5) — settled after the Engines, before Conversation.
 **Derived from:** architecture §4 (Telegram Experience Engine), §4.5 (empty states), §4.7 (country), §6.5 (Value Ladder).
 
-**Status:** designed, written, and tested against a local fixture. `20260731090000_telegram_surface_state.sql` is **not yet applied to production** — see §7.
+**Status:** applied to production 2026-07-31. Tested against a local fixture (12/12 + 9/9).
 
 ---
 
@@ -141,7 +141,7 @@ Reply keyboard, three entries, never more:
 |---|---|
 | **Written** | `get_telegram_surface(uuid)`, `ar_digits(text)`, `ar_nights(integer)`, `situation_label_ar(text)` |
 | **Tested** | Against a local Postgres 16 fixture — 12 parents covering all 7 states plus paused, strain L2, unsupported country, dormant, and a nonexistent parent. **12/12 state assertions and 9/9 hard guarantees pass.** See `supabase/tests/` |
-| **Not applied** | The migration has **not run against production**. The Supabase connector lost authorization mid-session |
+| **Applied** | Live in production since 2026-07-31 |
 
 **The test caught a real bug.** `text[] || 'literal'` resolves to array concatenation, and Postgres then tries to parse the Arabic literal as an array — every call raised `malformed array literal`. The function would have failed on **every parent, in every state**. An explicit `::text` cast fixes it, and the cast now carries a comment saying why.
 

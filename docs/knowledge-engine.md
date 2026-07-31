@@ -3,7 +3,7 @@
 **The Knowledge layer** in the build order (`docs/adam-architecture.md` §1.5) — settled after Conversation, before Database.
 **Derived from:** architecture §2 in full.
 
-**Status:** designed, written, tested against a local fixture — **25/25**. `20260731150000_knowledge_gate_and_uniqueness.sql` is **not yet applied to production**.
+**Status:** applied to production 2026-07-31. Tested against a local fixture — **25/25**.
 
 ---
 

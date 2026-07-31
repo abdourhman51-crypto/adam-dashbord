@@ -3,7 +3,7 @@
 **The Conversation layer** in the build order (`docs/adam-architecture.md` §1.5) — settled after UX, before Knowledge.
 **Derived from:** architecture §3 (Conversation Engine), §9 (flows), §0.7 (voice and the two lexicons), §6.6–6.7.
 
-**Status:** designed, written, tested against a local fixture — **27/27**. `20260731120000_conversation_copy_and_button_law.sql` is **not yet applied to production**.
+**Status:** applied to production 2026-07-31. Tested against a local fixture — **27/27**.
 
 ---
 
