@@ -49,7 +49,9 @@ as $function$
   select case
     when p_n is null or p_n <= 0 then 'لا شيء بعد'
     when p_n = 1                 then 'مرة واحدة'
-    when p_n = 2                 then 'مرّتان'
+    -- Accusative. Every call site is adverbial — «جرّبتم مرّتين»،
+    -- «هدأ مرّتين» — so the nominative «مرّتان» would be wrong in all of them.
+    when p_n = 2                 then 'مرّتين'
     when p_n <= 10               then public.ar_digits(p_n::text) || ' مرات'
     else                              public.ar_digits(p_n::text) || ' مرة'
   end;

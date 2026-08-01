@@ -91,7 +91,10 @@ begin
 
   perform pg_temp.chk('/progress compares two weeks, it does not count',
     b like '%هذا الأسبوع%' and b like '%الأسبوع الماضي%', b);
-  perform pg_temp.chk('/progress states the direction', b like '%الاتجاه يتحسّن%', b);
+  -- Was «الاتجاه يتحسّن», which was a verdict on the child. The direction is
+  -- now stated about the parent's own effort, which is what they control.
+  perform pg_temp.chk('/progress states the direction, about them',
+    b like '%وهذا أكثر من الأسبوع الماضي%', b);
   perform pg_temp.chk('/child and /progress are different sentences', a <> b);
 
   -- and neither may repeat the pinned message
@@ -112,8 +115,16 @@ begin
     (p, current_date - 8,  'calm'),
     (p, current_date - 9,  'calm');
   b := public.compose_menu_body('menu_progress', p);
-  perform pg_temp.chk('a harder week is said plainly and then carried',
-    b like '%أصعب%' and b like '%نكمل%', b);
+  -- This fixture is three hard outcomes this week against two calm ones
+  -- last week. Under the old child-side metric that was "a worse week".
+  -- Under the parent-side metric it is the opposite and the more important
+  -- case: they tried MORE and nothing worked. All three must be true at
+  -- once — the effort named, the absence stated honestly, and the effort
+  -- still credited. This is the whole emotional design in one message.
+  perform pg_temp.chk('a week of effort with no reward still counts as effort',
+    b like '%جرّبتم%'
+    and b like '%ولم تمرّ أيّ منها بهدوء بعد%'
+    and b like '%وهذا أكثر من الأسبوع الماضي%', b);
 end $$;
 
 \echo '=== LEGACY BUTTONS STILL ON PHONES MUST ANSWER ==='
@@ -223,8 +234,10 @@ begin
   perform pg_temp.chk('ar_nights is gone, not merely unused',
     not exists (select 1 from pg_proc pr join pg_namespace ns on ns.oid=pr.pronamespace
                  where ns.nspname='public' and pr.proname='ar_nights'));
-  perform pg_temp.chk('ar_occasions carries the dual', public.ar_occasions(2) = 'مرّتان',
-    public.ar_occasions(2));
+  -- Accusative: every call site is adverbial («جرّبتم مرّتين»، «هدأ مرّتين»),
+  -- so the nominative «مرّتان» would be wrong in all of them.
+  perform pg_temp.chk('ar_occasions carries the dual, in the accusative',
+    public.ar_occasions(2) = 'مرّتين', public.ar_occasions(2));
 end $$;
 
 \echo '=== RESULTS ==='
