@@ -23,6 +23,19 @@ returns void language sql as $$
   values (p_name, case when p_cond then 'PASS' else 'FAIL' end, p_detail);
 $$;
 
+-- Engagement is derived from n8n_chat_histories, keyed by platform_user_id.
+-- Writing to a 'messages' table that does not exist is how a test asserts
+-- against a schema the product has never had.
+create or replace function pg_temp.spoke(p_parent uuid, p_n int) returns void
+language plpgsql as $$
+declare k text;
+begin
+  select platform_user_id into k from public.followers where id = p_parent;
+  insert into public.n8n_chat_histories (session_id, message)
+  select k, jsonb_build_object('type','human','content','x')
+  from generate_series(1, p_n);
+end $$;
+
 create or replace function pg_temp.parent(p_country text) returns uuid
 language plpgsql as $$
 declare v uuid;
@@ -146,11 +159,12 @@ begin
   perform pg_temp.chk('and is never shown a price for a country we cannot name',
     (j->>'body') !~ '(دينار|جنيه|درهم|ريال)', j->>'body');
   select array_agg(x->>'cb') into cbs from jsonb_array_elements(j->'buttons') x;
-  perform pg_temp.chk('the three countries are offered as taps, plus an honest fourth',
-    cbs = array['set_country_DZ','set_country_EG','set_country_MA','set_country_OTHER'],
+  perform pg_temp.chk('the three countries are offered as taps, plus an honest fourth and a way out',
+    cbs = array['set_country_DZ','set_country_EG','set_country_MA',
+                'set_country_OTHER','other'],
     array_to_string(cbs,','));
-  perform pg_temp.chk('the question is one line the parent can answer without typing',
-    (select count(*) from jsonb_array_elements(j->'buttons')) = 4);
+  perform pg_temp.chk('the question is answerable without typing a word',
+    (select count(*) from jsonb_array_elements(j->'buttons')) = 5);
 
   -- P1: crisis outranks every commercial answer, in all three states.
   insert into public.parent_strain (parent_id, level) values (dz, 2), (sa, 2), (zz, 2);
@@ -264,6 +278,88 @@ begin
     exists (select 1 from public.country_timezone ct
             join public.followers f on upper(btrim(f.country)) = ct.code
             where f.id = p));
+end $$;
+
+\echo '=== EVERY BUTTON SET HAS A WAY OUT, INCLUDING THE COMPOSED ONES ==='
+do $$
+declare dz uuid; sa uuid; zz uuid; bad text[] := '{}'; k text; j jsonb;
+begin
+  -- chk_escape_hatch guards buttons that are STORED. These are built at
+  -- runtime inside get_conversation_moment and never touch the constraint,
+  -- which is exactly how /journey shipped asking an unknown parent for their
+  -- country with four buttons and no «شيء آخر» — a question with no way to
+  -- decline it. The database cannot check what it never stores, so the list
+  -- of composed button sets lives here.
+  dz := pg_temp.parent('DZ'); sa := pg_temp.parent('SA'); zz := pg_temp.parent('ZZ');
+
+  foreach k in array array['menu_journey','country_other','country_ask_footer'] loop
+    foreach j in array array[to_jsonb(dz), to_jsonb(sa), to_jsonb(zz)] loop
+      declare g jsonb; n int;
+      begin
+        g := public.get_conversation_moment(k, (j #>> '{}')::uuid);
+        n := coalesce(jsonb_array_length(g->'buttons'), 0);
+        -- Zero buttons is a valid answer; a set of them without an exit is not.
+        if n > 0 and not (g->'buttons' @> '[{"cb":"other"}]'::jsonb) then
+          bad := bad || (k || '/' || coalesce(g->>'body',''))::text;
+        end if;
+      end;
+    end loop;
+  end loop;
+
+  perform pg_temp.chk('no composed button set traps a parent in a question',
+    cardinality(bad) = 0, left(array_to_string(bad, ' | '), 120));
+
+  -- And the specific one, named, so a future edit cannot quietly drop it.
+  perform pg_temp.chk('the country question can always be declined',
+    public.get_conversation_moment('menu_journey', zz)->'buttons'
+      @> '[{"cb":"other"}]'::jsonb,
+    (public.get_conversation_moment('menu_journey', zz)->'buttons')::text);
+end $$;
+
+\echo '=== THE 59 ARE ASKED ONCE, AND ONLY IF THEY HAVE SPOKEN ==='
+do $$
+declare p uuid; q uuid; r uuid;
+begin
+  -- A parent we can already place is never asked.
+  p := pg_temp.parent('DZ');
+  perform pg_temp.spoke(p, 4);
+  perform pg_temp.chk('a parent whose country we know is never asked',
+    not public.should_ask_country(p));
+
+  -- A stranger who has barely spoken is owed an answer, not a question.
+  q := pg_temp.parent('ZZ');
+  perform pg_temp.spoke(q, 1);
+  perform pg_temp.chk('a parent who has said one thing is not interrogated',
+    not public.should_ask_country(q));
+
+  -- The real cohort: unknown, engaged, never asked.
+  r := pg_temp.parent('ZZ');
+  perform pg_temp.spoke(r, 4);
+  perform pg_temp.chk('an engaged parent we cannot place IS asked',
+    public.should_ask_country(r));
+
+  perform pg_temp.chk('asking is recorded', public.record_country_ask(r));
+  perform pg_temp.chk('and never asked twice', not public.should_ask_country(r));
+  perform pg_temp.chk('a second stamp is refused, so a retry cannot ask twice',
+    not public.record_country_ask(r));
+
+  -- Ignoring the question is an answer. The debt is settled by ASKING.
+  perform pg_temp.chk('a parent who ignores it is not asked again',
+    not public.should_ask_country(r)
+    and public.country_state(r)->>'state' = 'unknown');
+
+  -- The sentence is about time, not money.
+  perform pg_temp.chk('the question never mentions price, journey or payment',
+    (select body_ar from public.conversation_moments where key='country_ask_footer')
+      !~ '(سعر|دينار|جنيه|درهم|رحلة|دفع|اشتراك|[0-9])',
+    (select body_ar from public.conversation_moments where key='country_ask_footer'));
+  perform pg_temp.chk('and it states the reason it is being asked',
+    (select body_ar from public.conversation_moments where key='country_ask_footer')
+      like '%متى أكتب لكم%');
+  perform pg_temp.chk('it is one line — it rides on a message, it is not a message',
+    (select max_lines from public.conversation_moments where key='country_ask_footer') = 1
+    and (select body_ar from public.conversation_moments where key='country_ask_footer')
+        not like '%' || chr(10) || '%');
 end $$;
 
 \echo '=== THE PINNED SURFACE AGREES WITH THE ANSWER ==='
