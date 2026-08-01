@@ -21,12 +21,18 @@ create table public.followers (
   first_seen timestamptz default now()
 );
 
+-- Columns copied from production. age_note is read by compose_menu_body();
+-- it was added here the moment that function started reading it, rather than
+-- after production returned 42703 — which is the mistake this fixture exists
+-- to stop repeating.
 create table public.children (
   id uuid primary key default gen_random_uuid(),
   follower_id uuid references public.followers(id) on delete cascade,
   name text,
+  gender text, birth_year integer, age_note text, temperament text,
   is_primary boolean,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  updated_at timestamptz default now()
 );
 
 create table public.country_timezone (
@@ -85,10 +91,15 @@ create table public.daily_logs (
 
 create table public.child_patterns (
   id uuid primary key default gen_random_uuid(),
+  follower_id uuid,
   child_id uuid references public.children(id) on delete cascade,
   pattern_label text,
+  description text,
   status text,
   evidence_count integer default 1,
+  first_observed timestamptz default now(),
+  last_observed timestamptz default now(),
+  updated_at timestamptz default now(),
   safe_for_record boolean not null default false
 );
 

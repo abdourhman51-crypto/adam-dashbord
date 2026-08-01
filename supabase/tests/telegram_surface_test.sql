@@ -135,16 +135,33 @@ select 'no price in any visible string' as guarantee,
               !~ '(دينار|جنيه|درهم|دج|درهماً|جنيهاً|[0-9]|٢٣٠٠|٤٩٠|١١٠|2300|2,300|490|110)')
             then 'PASS' else 'FAIL' end as result from pg_temp.results
 union all
-select 'paused wins over state',
-       case when (select got->'menu'->2->>'meaning' from pg_temp.results where label='paused') = 'resume'
+-- These three used to assert that a modifier RELABELS the menu's changing
+-- item: paused -> "resume", strain -> "lighten_load", unsupported ->
+-- "waitlist". That is the behaviour docs/telegram-logic.md L4 forbids, and
+-- it is the behaviour the founder hit — pressing the menu on a strained
+-- account answered "أن نخفّف الحمل قليلاً", which announced a suppression
+-- they had never been told about. A modifier now changes what is POSSIBLE
+-- and never what is DISPLAYED, so the assertions invert: the modifier must
+-- be readable in `modifiers` and invisible everywhere a parent looks.
+select 'paused is in modifiers, not in the copy',
+       case when (select (got->'modifiers'->>'paused')::boolean
+                    from pg_temp.results where label='paused')
+             and (select got->'pinned'->>'text' from pg_temp.results where label='paused')
+                   !~ '(متوقف|أوقف|نعود)'
             then 'PASS' else 'FAIL' end
 union all
-select 'strain L2 blocks commerce',
-       case when (select got->'menu'->2->>'meaning' from pg_temp.results where label='strain_L2') = 'lighten_load'
+select 'strain L2 blocks commerce silently',
+       case when not (select (got->'modifiers'->>'commerce_allowed')::boolean
+                        from pg_temp.results where label='strain_L2')
+             and (select got->'pinned'->>'text' from pg_temp.results where label='strain_L2')
+                   !~ '(الحمل|الحِمل|نخفّف)'
             then 'PASS' else 'FAIL' end
 union all
-select 'unsupported -> waitlist',
-       case when (select got->'menu'->2->>'meaning' from pg_temp.results where label='unsupported') = 'waitlist'
+select 'unsupported is invisible until she asks',
+       case when not (select (got->'modifiers'->>'country_supported')::boolean
+                        from pg_temp.results where label='unsupported')
+             and (select got->'pinned'->>'text' from pg_temp.results where label='unsupported')
+                   !~ '(قائمة الانتظار|بلدك|لم يصل)'
             then 'PASS' else 'FAIL' end
 union all
 select 'unsupported keeps full experience',
@@ -156,16 +173,20 @@ select 'no child -> no placeholder in pinned',
        case when (select got->'pinned'->>'text' from pg_temp.results where label='no_child_name') !~ 'طفلك'
             then 'PASS' else 'FAIL' end
 union all
-select 'menu always 5 items, exactly 1 changing',
-       case when bool_and(jsonb_array_length(got->'menu') = 5) filter (where (got->>'exists')::boolean)
-             and bool_and((select count(*) from jsonb_array_elements(got->'menu') m
-                            where (m->>'fixed')::boolean is false) = 1)
+-- Was: "menu always 5 items, exactly 1 changing". Telegram's native ☰ is now
+-- the only navigation, so the in-chat menu must be empty in every state —
+-- otherwise there are two lists of the same actions and neither is trusted.
+select 'no second navigation, in any state',
+       case when bool_and(jsonb_array_length(got->'menu') = 0
+                          and jsonb_array_length(got->'keyboard') = 0)
                  filter (where (got->>'exists')::boolean)
             then 'PASS' else 'FAIL' end
 from pg_temp.results
 union all
+-- Was: expects «ليلتان». The test was wrong, not the copy: سجّلنا takes an
+-- object, so the dual is accusative — «سجّلنا ليلتين».
 select 'dual form for 2 nights',
-       case when (select got->>'progress_line' from pg_temp.results where label='gathering') like '%ليلتان%'
+       case when (select got->>'progress_line' from pg_temp.results where label='gathering') like '%ليلتين%'
             then 'PASS' else 'FAIL' end
 union all
 select 'dormant flagged',
