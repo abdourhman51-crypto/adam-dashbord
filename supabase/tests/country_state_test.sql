@@ -362,6 +362,39 @@ begin
         not like '%' || chr(10) || '%');
 end $$;
 
+\echo '=== THE QUESTION IS CLAIMED, NOT MERELY CHECKED ==='
+do $$
+declare r uuid; a jsonb; b jsonb;
+begin
+  r := pg_temp.parent('ZZ');
+  perform pg_temp.spoke(r, 4);
+
+  a := public.take_country_ask(r);
+  perform pg_temp.chk('the first caller gets the question',
+    (a->>'ask')::boolean, a::text);
+  perform pg_temp.chk('and it arrives complete — sentence AND buttons',
+    (a->>'body') like '%من أي بلد أنتم؟%'
+    and jsonb_array_length(a->'buttons') = 5, a::text);
+  perform pg_temp.chk('the claimed question can be declined',
+    a->'buttons' @> '[{"cb":"other"}]'::jsonb, (a->'buttons')::text);
+
+  -- n8n retries. This is the whole reason the function exists.
+  --
+  -- The reason comes back 'not_due', not 'already_claimed': a sequential
+  -- retry now sees the stamp and is turned away by should_ask_country
+  -- before it ever reaches the claim. 'already_claimed' is the narrower
+  -- case — two callers that both passed the check before either wrote.
+  -- Both are the same guarantee, so the assertion is on the guarantee.
+  b := public.take_country_ask(r);
+  perform pg_temp.chk('a retry gets nothing — the question cannot be asked twice',
+    not (b->>'ask')::boolean and b->>'body' is null, b::text);
+  perform pg_temp.chk('and it says which gate stopped it',
+    (b->>'reason') in ('not_due','already_claimed'), b::text);
+
+  perform pg_temp.chk('a parent we can place is never claimed at all',
+    (public.take_country_ask(pg_temp.parent('DZ'))->>'reason') = 'not_due');
+end $$;
+
 \echo '=== THE PINNED SURFACE AGREES WITH THE ANSWER ==='
 do $$
 declare dz uuid; sa uuid; zz uuid; c uuid;

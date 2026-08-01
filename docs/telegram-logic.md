@@ -459,3 +459,29 @@ In order. Each line states what must happen; anything else is a defect.
    tapping it records and acknowledges.
 10. Nothing anywhere says "نجمع الصورة"، "نخفّف الحمل"، or any label that
     describes ADAM's own machinery.
+
+---
+
+## Appendix — n8n findings paid for in production
+
+**`httpRequest` + `supabaseApi` must be `typeVersion` 4.4.**
+A node added at 4.2 with an empty `credentials` field returns
+`Credentials not found` at runtime. It saves cleanly, publishes cleanly, and
+fails only when a real parent triggers it. Every working Supabase node in W1 is
+4.4; `FA - Country Ask?` was added at 4.2 and was the only one that failed.
+`sendHeaders` is *not* the variable — `Pin - Load` has it false and succeeds.
+
+The corollary to the earlier finding, which stands: at 4.4 an **empty**
+`credentials` field is fine, because n8n resolves against the single credential
+of that type. Missing credentials in the JSON are not evidence of a broken node.
+Only a live trace is.
+
+**A draft is invisible.** `update_workflow` saves a draft; `publish_workflow` is
+what makes it run. Verify `versionId == activeVersionId` *and* read
+`activeVersion.nodes` — reading the draft proves nothing. This has cost a full
+day once already.
+
+**Every new node on a send path needs `onError: continueRegularOutput`.**
+`FA - Country Ask?` failed on live traffic and فاطمة still received her reply,
+because the failure could only ever subtract the footer, never the message. That
+was designed in, and it is the only reason a bad node was a non-event.
