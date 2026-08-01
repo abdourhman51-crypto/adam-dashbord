@@ -44,7 +44,7 @@ begin
 
   m := public.get_conversation_moment('first_contact', null);
   perform pg_temp.chk('first_contact tells her exactly one thing to do',
-    (m->>'body') like '%احكِ لي ما حدث اليوم%', m->>'body');
+    (m->>'body') like '%احكوا لي ما حدث اليوم%', m->>'body');
   perform pg_temp.chk('first_contact no longer points at a surface',
     (m->>'body') not like '%☰%', 'L1: one action, and it is typing');
 
@@ -63,7 +63,7 @@ begin
   a := public.compose_menu_body('menu_child', p);
   b := public.compose_menu_body('menu_progress', p);
   perform pg_temp.chk('/child on an unknown child asks, and does not fake knowledge',
-    a like '%لم نتعرّف على طفلك بعد%', a);
+    a like '%لم نتعرّف على طفلكم بعد%', a);
   perform pg_temp.chk('/child and /progress differ when nothing is known', a is distinct from b);
 
   -- now a real family
@@ -164,6 +164,67 @@ begin
   perform pg_temp.chk('the journey is withheld without a reason being given',
     (m->>'found')::boolean and not (m->>'allowed')::boolean
     and coalesce(m->>'body','') = '', m->>'reason');
+end $$;
+
+\echo '=== ADAM NEVER ASSUMES A MOTHER (§0.7) ==='
+do $$
+declare p uuid; c uuid; k text; body text; bad text[] := '{}';
+begin
+  -- Every stored body, and every composed body for a family that has told
+  -- us everything. ADAM does not know whether he is speaking to a father.
+  --
+  -- This guard exists because on 2026-08-01 I wrote «صِفي لي»، «قولي لي»
+  -- and «أخبريني» into three new moments in one sitting. The constitution
+  -- has required gender-neutral address since §0.7 was written; nothing
+  -- enforced it, so it held only as long as whoever typed remembered.
+  insert into public.followers (platform_user_id, country) values ('gn-1','DZ') returning id into p;
+  insert into public.children (follower_id, name, is_primary) values (p, 'يوسف', true) returning id into c;
+  insert into public.situations (child_id, key, status, evidence_count) values (c,'sleep','confirmed',3);
+  insert into public.daily_logs (follower_id, log_date, night_result) values
+    (p, current_date, 'calm'), (p, current_date-1, 'hard'), (p, current_date-2, 'calm');
+
+  for k in select key from public.conversation_moments order by key loop
+    body := coalesce(public.get_conversation_moment(k, p)->>'body', '');
+    if body ~ '(صِفي|صفي لي|قولي|أخبريني|اخبريني|احكِ|احكي لي|اكتبي|جرّبي|جربي|أنتِ|كنتِ|لكِ |طفلكِ)' then
+      bad := bad || k;
+    end if;
+  end loop;
+
+  perform pg_temp.chk('no moment addresses a mother specifically',
+    cardinality(bad) = 0, array_to_string(bad, ', '));
+
+  perform pg_temp.chk('progress_line is gender-free',
+    public.progress_line(1,1,0) !~ '(قولي|أخبريني|اكتبي|جرّبي|أنتِ)');
+end $$;
+
+\echo '=== AND THE ENEMY IS NOT A TIME OF DAY (§8) ==='
+do $$
+declare p uuid; k text; body text; bad text[] := '{}'; n int;
+begin
+  insert into public.followers (platform_user_id, country) values ('en-1','DZ') returning id into p;
+  insert into public.daily_logs (follower_id, log_date, night_result) values
+    (p, current_date, 'calm'), (p, current_date-1, 'hard'),
+    (p, current_date-2, 'calm'), (p, current_date-9, 'calm');
+
+  -- progress copy must work for a parent whose repeating story is the
+  -- morning school run. "three calm nights" tells them ADAM is not for them.
+  perform pg_temp.chk('/progress speaks no time of day',
+    public.compose_menu_body('menu_progress', p) !~ '(ليلة|ليلت|ليال|مساء|صباح)',
+    public.compose_menu_body('menu_progress', p));
+
+  for n in 0..4 loop
+    if public.progress_line(n, n, 0) ~ '(ليلة|ليلت|ليال)' then
+      bad := bad || n::text;
+    end if;
+  end loop;
+  perform pg_temp.chk('progress_line speaks no time of day, in any state',
+    cardinality(bad) = 0, array_to_string(bad, ', '));
+
+  perform pg_temp.chk('ar_nights is gone, not merely unused',
+    not exists (select 1 from pg_proc pr join pg_namespace ns on ns.oid=pr.pronamespace
+                 where ns.nspname='public' and pr.proname='ar_nights'));
+  perform pg_temp.chk('ar_occasions carries the dual', public.ar_occasions(2) = 'مرّتان',
+    public.ar_occasions(2));
 end $$;
 
 \echo '=== RESULTS ==='

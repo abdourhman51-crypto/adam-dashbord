@@ -183,10 +183,14 @@ select 'no second navigation, in any state',
             then 'PASS' else 'FAIL' end
 from pg_temp.results
 union all
--- Was: expects «ليلتان». The test was wrong, not the copy: سجّلنا takes an
--- object, so the dual is accusative — «سجّلنا ليلتين».
-select 'dual form for 2 nights',
-       case when (select got->>'progress_line' from pg_temp.results where label='gathering') like '%ليلتين%'
+-- Was «ليلتان», then «ليلتين», now «مرّتين». The dual is still accusative —
+-- what changed is the noun: the enemy is a repeating story, not a time of
+-- day, so a parent whose story is the school run must not read "nights".
+select 'dual form, and it is not a night',
+       case when (select got->>'progress_line' from pg_temp.results where label='gathering')
+                   like '%مرّتين%'
+             and (select got->>'progress_line' from pg_temp.results where label='gathering')
+                   !~ '(ليلة|ليلت|ليال)'
             then 'PASS' else 'FAIL' end
 union all
 select 'dormant flagged',
