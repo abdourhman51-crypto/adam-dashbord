@@ -53,9 +53,12 @@ The parent's **circumstances**. Independent of state and of each other.
 | `dormant` | No message in 21+ days |
 | `strain_level` | `parent_strain.level` — 1 / 2 / 3 (AD-2) |
 | `commerce_allowed` | `commerce_allowed()` — the single answer |
-| `country_supported` | `supported_countries.is_active AND is_supported` |
+| `country_state` | `country_state()` — `supported` / `unsupported` / `unknown` |
+| `country_supported` | derived: `country_state = 'supported'`. Kept for one release only. |
 
 **Unsupported country is a modifier, not a state.** §4.7 says the free experience is *"full, identical"*. A state would replace the others and make that sentence false. It changes exactly one thing: the changing menu item.
+
+**And "we do not know" is not "we do not sell here."** The offer is live in exactly three countries — الجزائر، مصر، المغرب — but 59 of 301 parents carried `'ZZ'` or an empty country, and a boolean forced them into the unsupported answer. ADAM was stating a fact he did not have (P11). The third state asks instead, and the same answer also gives the daily rhythm a local clock, without which those families could never be written to at an honest hour.
 
 ---
 

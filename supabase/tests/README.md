@@ -12,15 +12,50 @@ su postgres -c "$PGBIN/pg_ctl -D $DATA -o '-k $RUN -p 55432 -c listen_addresses=
 
 export PGHOST=$RUN PGPORT=55432 PGUSER=postgres
 psql -v ON_ERROR_STOP=1 -f supabase/tests/fixture_minimal.sql
-psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260731090000_telegram_surface_state.sql
-psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260731120000_conversation_copy_and_button_law.sql
-psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260731150000_knowledge_gate_and_uniqueness.sql
-psql -f supabase/tests/telegram_surface_test.sql
-psql -f supabase/tests/conversation_law_test.sql
-psql -f supabase/tests/knowledge_gate_test.sql
+for m in 20260731090000_telegram_surface_state \
+         20260731120000_conversation_copy_and_button_law \
+         20260731150000_knowledge_gate_and_uniqueness \
+         20260801095000_moments_missing_from_repo \
+         20260801100000_one_moment_one_send \
+         20260801120000_rescue_floor_and_silent_journey \
+         20260801130000_the_enemy_is_not_a_time_of_day \
+         20260801150000_revive_the_rhythm_gate \
+         20260801170000_give_before_asking \
+         20260801190000_the_exit_is_owed_until_shown \
+         20260801200000_situation_other_is_not_grounding \
+         20260801220000_three_countries_and_the_unknown ; do
+  psql -v ON_ERROR_STOP=1 -q -f supabase/migrations/$m.sql || break
+done
+
+for t in telegram_surface conversation_law knowledge_gate one_send \
+         rhythm_gate give_before_asking country_state ; do
+  psql -q -f supabase/tests/${t}_test.sql
+done
 ```
 
-Current: **21 + 37 + 25 assertions, zero failures.**
+**The order is the whole point.** Each migration replaces functions the earlier
+ones defined, so loading a subset tests a schema that has never existed. Run the
+list, not a favourite file from it.
+
+Current: **21 + 27 + 25 + 34 + 14 + 29 + 53 assertions, zero failures.**
+
+### Proving the repo *is* production
+
+Green tests prove the repo is self-consistent, not that it matches the live
+database. That check is one query, run on both:
+
+```sql
+select md5(string_agg(p.proname || E'\n' || pg_get_functiondef(p.oid) || E'\n', ''
+                      order by p.proname))
+from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+where n.nspname = 'public' and p.proname in (...);
+```
+
+Identical hashes mean identical text, comments included. This caught a real
+divergence: a function reconstructed from memory rather than read, which had
+lost an argument and a whole `pinned.lines` key while still creating cleanly —
+Postgres does not resolve function calls inside a `plpgsql` body at `CREATE`
+time, so a wrong call site is a runtime error, not a deploy error.
 
 ## `fixture_minimal.sql`
 
@@ -76,3 +111,30 @@ The last two cases build a **second family** and send family A's message to fami
 The provenance cases use the real live pattern label `التنقل بين ثلاث عائلات`, which reveals family separation. It must never become a family token, and must start counting the moment `safe_for_record` is explicitly set — that single difference is what makes the column a gate rather than decoration.
 
 Everything runs inside a transaction and rolls back.
+
+## `country_state_test.sql`
+
+53 cases. The offer is live in **three** countries — الجزائر، مصر، المغرب — and the whole suite defends two claims at once: that the list is exactly three and enforced in one place, and that *"we do not sell here"* and *"we do not know where you are"* can never again produce the same sentence.
+
+| Input | State |
+|---|---|
+| `DZ` / `EG` / `MA` | `supported` |
+| `SA` — a row, `is_active = false` | `unsupported` |
+| `SY` — no row at all | `unsupported` |
+| `ZZ` · `''` · `null` · `XX` | `unknown` |
+
+`ZZ` is the one that mattered. It is well-formed, it passes every NOT NULL check, and it means nothing — 33 families held it, and a boolean turned it into a confident answer about a place that does not exist.
+
+One test adds a fourth country as **two rows** and asserts it becomes sellable with no code change. If that ever fails, the price list has leaked out of `supported_countries`.
+
+The suite also proves the country question is not merely cosmetic: a parent with an unknown country is **never returned by `get_rhythm_due`**, because the rhythm joins `country_timezone` and an unknown code joins to nothing. The 59 unknown parents were not just being told something untrue — they were unreachable.
+
+### A trap worth naming
+
+Two assertions failed on first run, and neither was a product bug:
+
+```sql
+perform chk('...', public.country_state(pg_temp.parent('QA'))->>'state' = 'supported');
+```
+
+`country_state` is `stable`, so inside a single statement it reads that statement's snapshot — taken **before** the volatile insert nested in the same expression ran. Written on one line this fails, and it fails looking exactly like a broken function. The write and the read must be separate statements.

@@ -189,9 +189,14 @@ language sql stable as $$
                     where ps.parent_id = p_parent_id), 1) < 2;
 $$;
 
+-- SA and SY are here on purpose: a country we can put on a clock but do NOT
+-- sell in. Without one of those, "unsupported" and "unknown" collapse into
+-- the same fixture state and the test that matters cannot be written.
 insert into public.country_timezone (code, iana_tz) values
   ('DZ','Africa/Algiers'), ('EG','Africa/Cairo'), ('MA','Africa/Casablanca'),
-  ('SA','Asia/Riyadh');
-insert into public.supported_countries (code, is_active, price_display_full) values
-  ('DZ',true,'2,300 دينار جزائري'), ('EG',true,'490 جنيهاً مصرياً'),
-  ('MA',true,'110 دراهم مغربية'), ('SA',false,null);
+  ('SA','Asia/Riyadh'), ('SY','Asia/Damascus');
+-- name_ar is read by country_recorded. It was absent, and the confirmation
+-- fell back to «بلدكم» in a test that still passed.
+insert into public.supported_countries (code, name_ar, is_active, price_display_full) values
+  ('DZ','الجزائر',true,'2,300 دينار جزائري'), ('EG','مصر',true,'490 جنيهاً مصرياً'),
+  ('MA','المغرب',true,'110 دراهم مغربية'), ('SA','السعودية',false,null);

@@ -153,7 +153,13 @@ and reaches the agent with an empty prompt. Under this spec E9 sends the rescue
 **Modifiers** — orthogonal, may combine:
 
 `paused` · `dormant` (21d silent) · `strain_level` 1/2/3 · `commerce_allowed` ·
-`country_supported`
+`country_state`
+
+`country_state` is one of **`supported` · `unsupported` · `unknown`** — never a
+boolean. It was a boolean, and that is why one parent in five (59 of 301) was
+told the offer had not reached their country, about a country nobody knew.
+`country_supported` still ships, derived from it, so no consumer breaks
+silently; it is true only for `supported`.
 
 Modifier precedence, highest first: **strain 3 → strain 2 → paused → dormant →
 commerce → country**. The first that applies decides; the rest are inert. This
@@ -177,7 +183,8 @@ oversight: a parent who opens `/privacy` gets privacy, never a state lecture.
 | **E5** | `media_unsupported` (§6.7) — **new moment, does not exist yet.** |
 | **E6** `/child` | `menu_child` — composed from what is known; if nothing, §6.8. |
 | **E6** `/progress` | `menu_progress` — composed from `progress_line`. |
-| **E6** `/journey` | `menu_journey` if `country_supported`, else `menu_waitlist`. |
+| **E6** `/journey` | `menu_journey`, which branches three ways on `country_state`: **supported** → the price of *their* country, no buttons, فريق آدم as the only next step. **unsupported** → the one true reason (no local payment method) + waitlist. **unknown** → «من أي بلد أنتم؟» with الجزائر · مصر · المغرب · بلد آخر. |
+| **E6** `set_country_*` | `record_country()`, then `country_recorded` — which answers the journey question in the same breath, so naming the country never costs the parent a second tap. `set_country_OTHER` → `country_other`, and we do **not** ask which country: it decides payment only, and payment is unavailable either way. |
 | **E6** `/settings` | `menu_settings`, or `menu_resume` when `paused`. |
 | **E6** `/privacy` | `menu_privacy`. |
 | **E6** `/faq` | `menu_faq`. |
