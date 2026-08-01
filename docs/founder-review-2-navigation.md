@@ -101,3 +101,19 @@ It is now on **every** outgoing path: `FA - Send Reply1`, `Tap - Send Fixed`, `T
 ### The menu message
 
 `Menu - Send` sent a message whose entire text was `القائمة ☰` — its own title, which E4 forbids. It now carries the child, the situation and the progress line, with the single changing action beneath.
+
+---
+
+## E12 violation: suppression was announcing itself
+
+The founder pressed القائمة and got **«✨ أن نخفّف الحمل قليلاً»** — a phrase meaningless out of context.
+
+Cause: the test account is at **strain level 2**, auto-classified by W2 from test conversations, so `commerce_allowed = false`. The surface responded by **changing the label**.
+
+That is exactly what E12 forbids: *she never senses a mode*. A parent at level 2 could see she was being treated differently, and see it in words she cannot interpret. Withholding a commercial surface has to be **invisible**, not signposted.
+
+**Fix:** `surface_changing_item()` now returns the **ordinary** label when commerce is blocked. The journey is still withheld — silently. Verified live: the account is still `strain 2 / commerce false`, and the item now reads `✨ ما الذي يمكن أن نعمل عليه؟`.
+
+`menu_lighten_load` survives as a **conversation** moment, where relief can be offered warmly and in context. It was only ever wrong as a menu label.
+
+The changing-item logic is now its own function, so the next change to it costs a few lines instead of a rewrite of the whole surface.
