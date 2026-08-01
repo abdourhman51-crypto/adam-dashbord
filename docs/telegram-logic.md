@@ -360,6 +360,57 @@ R9 is why old buttons still resolve to behaviour no one designed.
 
 ---
 
+## 7b. The reason the commands are silent — found while doing R1–R9
+
+Twelve nodes are configured with `authentication: predefinedCredentialType`
+and `nodeCredentialType: supabaseApi`, and **no credential instance selected**.
+Every request they make is unauthenticated.
+
+Those twelve are the entire `/start`, ☰-command and pinned-message spine:
+
+| Node | Breaks |
+|---|---|
+| `Get Parent Row`, `Get Surface`, `Get First Contact` | `/start` — greeting and state branch |
+| `Tap - Get Parent`, `Tap - Get Moment` | all seven ☰ commands |
+| `Tap - Record Waitlist`, `Get Presence Moment` | waitlist, commerce-blocked journey |
+| `Pin - Load`, `Pin - Surface`, `Pin - Remember` | the pinned message |
+| `HR - Context`, `HR - Gate` | the evening harvest reply |
+
+The other 29 Supabase calls work because they carry the service-role key as
+two hardcoded headers — which is why the conversation itself has been fine
+while every command was silent. **Two independent causes, and the callback
+fix on 2026-08-01 addressed only one.** Saying the commands were fixed was
+premature; this is the other half.
+
+`setNodeCredential` is refused by the MCP layer for `supabaseApi` on an
+`httpRequest` node — n8n itself allows it, the API surface does not. The
+alternatives are both worse than asking: copying the key into 24 more
+plaintext header fields, or attaching a credential whose contents cannot be
+inspected and hoping. Guessing here would produce exactly the failure this
+document exists to end — a change reported as done that was never verified.
+
+**Founder action, ~2 minutes:** open each of the twelve nodes and pick
+*adam Supabase* in the credential dropdown. Nothing else about them changes.
+
+### The R5 correction
+
+§7 R5 said to route the conversational reply through `gate_composed_reply`.
+Having read what that gate does, that is wrong and would make the founder's
+complaint worse, not better.
+
+The gate applies three checks. Vocabulary belongs on every outgoing message.
+The other two do not belong on free conversation: the three-line budget would
+truncate a genuine answer to a hard evening, and the uniqueness rule — every
+message must contain a measured family token — would force the child's name
+into every turn. That is a machine for producing the templated, rigid voice
+the founder identified as the deepest problem.
+
+**Revised:** conversation is gated on vocabulary only. The full three-check
+gate stays where it was designed to go — the proactive composed messages
+(`seed`, the harvest reply), where being generic is the actual risk.
+
+---
+
 ## 8. How this gets verified
 
 The failure mode of the last three days was reporting success from a tool
