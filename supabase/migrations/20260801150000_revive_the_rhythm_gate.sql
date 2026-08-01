@@ -107,7 +107,10 @@ ctx as (
     d.seed_sent_at,
     d.harvest_sent_at,
     d.seed_text,
-    -- Has ADAM ever started a conversation with this parent?
+    -- SUPERSEDED by 20260801190000: this asks a question about the
+    -- MESSAGE, and it becomes false the moment the seed is sent whether
+    -- or not the footer went with it. Six families proved it. The live
+    -- version reads followers.proactive_footer_at instead.
     not exists (
       select 1 from public.daily_logs d2
       where d2.follower_id = a.parent_id and d2.seed_sent_at is not null
