@@ -69,3 +69,35 @@ The pinned footer changed from *«القائمة ☰ فيها…»* — which po
 - A pinned line: the child, what we are working on, what was recorded, and **one** action
 
 No keyboard bar. No menu message. Nothing that needs to be learned.
+
+---
+
+## Correction — the first fix never applied
+
+I reported the `answerCallbackQuery` failure as fixed. It was not.
+
+I used `setNodeSettings` with `onError: continueRegularOutput`. The operation returned success, **and the node never received the property.** Execution `5566` (`/child`, 07:54 UTC) shows the identical 400 and the identical dead chain. `/child`, `/journey` and `/faq` still reached the parent as silence, and I had already said they were working.
+
+**The mistake was reporting completion from a tool acknowledgement rather than from evidence.** The tool said applied; the running workflow disagreed; I did not check.
+
+### The real fix
+
+Not `onError` — an explicit gate. `answerCallbackQuery` is now called **only when a button was actually tapped**:
+
+```
+Route Switch[18] → Tap - From A Button?
+                     ├─ true  (button) → Tap - Answer → Tap - Get Parent
+                     └─ false (typed)  → Tap - Get Parent
+```
+
+A typed command never touches the node that cannot serve it. Verified by reading the live connection graph back, not by trusting the write.
+
+### The reply keyboard
+
+Also over-claimed. `remove_keyboard` was only sent by `Send First Contact`, which fires on `/start` alone — so anyone who did not restart still had the bar, which is exactly what the screenshot shows.
+
+It is now on **every** outgoing path: `FA - Send Reply1`, `Tap - Send Fixed`, `Tap - Send Derived`, `Menu - Send`, `Send First Contact`. The bar clears on the next message ADAM sends, whatever it is.
+
+### The menu message
+
+`Menu - Send` sent a message whose entire text was `القائمة ☰` — its own title, which E4 forbids. It now carries the child, the situation and the progress line, with the single changing action beneath.
