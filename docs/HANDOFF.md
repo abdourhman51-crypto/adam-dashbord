@@ -20,7 +20,7 @@ Read in this order, and only as far as you need:
 |---|---|
 | Supabase | `aajqbmjasnbwwyvgrlzy` (Adam OS), Postgres 17.6 |
 | n8n | `adam-voices-n8n.hawiyat.cloud` |
-| **W1** Router + Agents | `42loY0bgUSwYmHFV` — 111 nodes, active |
+| **W1** Router + Agents | `42loY0bgUSwYmHFV` — 124 nodes, active |
 | **W2** Knowledge Writer | `7mTP12nVLS1Taokl` — 30 nodes, every 2h |
 | **W3** Rhythm Sender | `Vb4ADCkPsevPRWRN` — 11 nodes, hourly |
 | **W4** First Mirror | `pj19WNHEqU4xDDjy` |
@@ -62,7 +62,7 @@ Expected: **21 + 37 + 25 + 29, zero failures.**
 - **`update_workflow` takes atomic operations**, not SDK code — `addNode` / `addConnection` / `setNodeDisabled`. A whole batch fails or none of it lands. `setNodeParameter` cannot append to an array; replace the whole parameter.
 - **A fixture that invents a column tests the fixture.** `is_supported` did not exist, the fixture created it, 21 assertions passed and every production `/start` returned 400. Copy columns from production, never from a migration comment.
 - **Reading `$json` across an HTTP node loses it.** That silently discarded 68 extracted child names for months. Reference the upstream node explicitly.
-- **Founder-owned, still open:** rotate the exposed service-role key (plaintext ~116× in W1); attach `adam Supabase` to `HW - Write Child Name`; supply the vetted L3 referral directory (§16 D2).
+- **Founder-owned, still open:** rotate the exposed service-role key (plaintext ~116× in W1); attach `adam Supabase` to `HW - Write Child Name` and to the new `Gate - Agent Reply` node (added 2026-08-03, wires `gate_agent_reply` between `paid aget adam` and `FA - Send Reply1` — the credential field on `addNode` was tried and rejected by the MCP tool with "node type 'n8n-nodes-base.httpRequest' does not accept credential 'supabaseApi'", same trap as before); supply the vetted L3 referral directory (§16 D2).
 
 ## Next, in order
 

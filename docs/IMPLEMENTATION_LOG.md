@@ -5,6 +5,42 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-03 · Wired `gate_agent_reply` into W1
+
+`gate_agent_reply` (commit `35099f1`, `20260801250000_the_agent_speaks_under_law.sql`) was built and
+tested but never connected — every reply `paid aget adam` produced still went straight to Telegram
+unchecked. Confirmed live against workflow `42loY0bgUSwYmHFV`: no node called it, and `paid aget adam`
+connected directly to `FA - Send Reply1`.
+
+**Wired via `update_workflow`'s atomic operations** (not the SDK — this is an existing production
+workflow, not a fresh build): added `Gate - Agent Reply` (`httpRequest`, typeVersion 4.4, POST
+`/rest/v1/rpc/gate_agent_reply`, `authentication: predefinedCredentialType` / `nodeCredentialType:
+supabaseApi`, `onError: continueRegularOutput`) between `paid aget adam` and `FA - Send Reply1`, and
+rewrote `FA - Send Reply1`'s body to use the gate's `blocked` result — the fixed `reply_withheld` text
+when blocked, the raw reply otherwise, with the existing country-ask-footer logic untouched. On a gate
+error the raw reply still sends (fail open, not fail silent-and-broken): `gate.blocked` reads as
+`undefined`, not `=== true`.
+
+**The credential-attach trap held exactly as documented.** Setting `node.credentials.supabaseApi` on
+`addNode` was rejected outright: `"node type 'n8n-nodes-base.httpRequest' does not accept credential
+'supabaseApi'"`. Same limitation `HANDOFF.md` already named for `FA - Country Ask?`. Left as
+`authentication: predefinedCredentialType` in `parameters` only — the credential itself needs a manual
+UI attach, same as `Pin - Load` / `Pin - Surface` / `Pin - Remember` before it.
+
+**`setNodeParameter`'s `path` is relative to the node's `parameters` object, not the node.** The first
+attempt used `path: "/parameters/jsonBody"` — it returned `appliedOperations: 1` with no error, but the
+node was unchanged on re-fetch. `path: "/jsonBody"` is what actually lands. Caught by re-fetching the
+node after the write rather than trusting the success response, which is now the standing rule for any
+`setNodeParameter` call.
+
+Verified the two new expressions offline (normal reply passes through; blocked reply falls back to the
+fixed text plus the country-ask footer when owed; a gate error or malformed response both fail open) —
+`node`-run, not live, since `test_workflow` pins every `httpRequest` node and so cannot exercise the
+real credential resolution. That resolution — the one open question — needs a live message after the
+credential is attached.
+
+---
+
 ## 2026-07-29 · Pre-launch cleanup
 **Full report:** `docs/CLEANUP-2026-07-29.md` · **Status:** n8n 13 → 5 workflows, `public` 32 → 23 tables.
 
