@@ -5,6 +5,54 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-03 · The intention question is asked, not just written
+
+`should_ask_intention()`, `record_intention()` and `offer_ready()` (`give_before_asking` migration)
+were built and tested and never called from anywhere — `docs/adam-system.md` §10 item 4. This wires
+the first of the two: the intention ask, into the one live path it belongs to — the evening harvest
+reply, "asked once, ever, and only after something has already worked."
+
+**No new node, again.** `get_harvest_context(p_parent_id, p_answer)` is the one call already on the
+harvest path with a working credential (`HR - Context`). New migration
+`20260803180000_ask_the_intention.sql` makes it decide the ask too: on a positive answer
+(`p_answer = 'ok'`) with `should_ask_intention()` true, it stamps `intention_asked_at` (new function
+`record_intention_ask`, idempotent, mirrors `record_country_ask()`) and returns `ask_intention: true`
+plus the fixed `intention_ask` body. `get_harvest_context` is now `volatile`, not `stable` — the stamp
+is the point. `HR - Send`'s body now appends `intention_ask_body` to the composed reply when
+`ask_intention` is true, exactly the `country_ask_footer` pattern.
+
+**The stamp lands whether or not the gate later passes.** `HR - Context` runs before `HR - Compose`
+and `HR - Gate`, so it cannot know if the composed reply will be accepted. If `HR - Gate` rejects it,
+the flow falls to `CK - Reply Step` for a fallback message — a node shared with the unrelated CK
+check-in-step feature, keyed on `callback_data` equality, not on harvest context. Extending it to also
+carry the intention footer was judged out of scope for this change (real risk of breaking the CK step
+flow it already serves) — so on a gate-rejected harvest night, the stamp is spent and the question is
+not shown. This is the same tradeoff `record_country_ask()` already accepts and documents: "a spent
+stamp with no send costs one ask." Worth revisiting if gate rejections turn out to be common on nights
+the ask would otherwise fire.
+
+**Capture is not wired.** The parent's free-text reply to `intention_ask` (no buttons, by design) is
+not recognized anywhere — it will reach `paid aget adam` as an ordinary message and get an ordinary
+reply, not `record_intention()`. That needs a routing decision (an `intention_asked_at is not null and
+intention_text is null` check, most likely in `M2 - Classify Track`, the way `survey_mode` already
+intercepts a different flow) that this change deliberately does not make. Because the ask is stamped
+once, ever, regardless of capture, not wiring this does not risk asking twice — it only risks the
+answer never being recorded.
+
+Tested offline against `fixture_minimal.sql` plus the exact migration chain
+`get_harvest_context`/`should_ask_intention` depend on (21/21 new assertions in
+`composed_gate_test.sql`, plus the full `knowledge_gate_test.sql` and `conversation_law_test.sql`
+suites re-run for regressions — clean except one pre-existing, unrelated `can_send('harvest', ...)`
+failure that predates this change and touches no function this migration modifies).
+
+`offer_ready()` — item 5, the offer moment — is still completely unwired. Not attempted here: it has
+no buttons either (free-text fork, "هل نتركه يتكرّر... أم نشتغل عليه حتى يتغيّر؟"), so it inherits the
+same capture question as the intention ask, and its trigger point (which rhythm event, what
+`get_rhythm_due` action) has not been investigated the way the harvest path had already been mapped
+for this one.
+
+---
+
 ## 2026-08-03 · Wired `gate_agent_reply` into W1
 
 `gate_agent_reply` (commit `35099f1`, `20260801250000_the_agent_speaks_under_law.sql`) was built and

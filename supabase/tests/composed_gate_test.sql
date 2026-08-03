@@ -78,6 +78,43 @@ begin
     perform pg_temp.chk('night one has nothing measured, so it falls back rather than faking',
       not (g->>'ok')::boolean, g->>'reasons');
   end;
+
+  -- ---- get_harvest_context now also decides and stamps the intention ask ----
+  declare p3 uuid; s3 uuid; ctx3 jsonb;
+  begin
+    insert into public.followers (platform_user_id, country) values ('hg-3','MA') returning id into p3;
+    insert into public.children (follower_id, name, is_primary) values (p3,'ريان',true) returning id into c;
+    s3 := c;
+    insert into public.situations (child_id,key,status,evidence_count) values (s3,'sleep','confirmed',4);
+
+    ctx3 := public.get_harvest_context(p3, 'ok');
+    perform pg_temp.chk('no ask before anything has worked — night one is not the moment',
+      (ctx3->>'ask_intention')::boolean is not true, ctx3->>'ask_intention');
+
+    insert into public.daily_logs (follower_id, log_date, night_result, situation_id)
+    values (p3, current_date - 1, 'calm', s3);
+
+    ctx3 := public.get_harvest_context(p3, 'failed');
+    perform pg_temp.chk('a bad night never carries the ask, even once something has worked',
+      (ctx3->>'ask_intention')::boolean is not true, ctx3->>'ask_intention');
+    perform pg_temp.chk('and it does not spend the stamp either',
+      public.should_ask_intention(p3));
+
+    ctx3 := public.get_harvest_context(p3, 'ok');
+    perform pg_temp.chk('a positive answer after a calm night carries the ask',
+      (ctx3->>'ask_intention')::boolean, ctx3->>'ask_intention');
+    perform pg_temp.chk('and it carries the fixed intention_ask body, not composed language',
+      ctx3->>'intention_ask_body' = (select body_ar from public.conversation_moments where key='intention_ask'));
+
+    perform pg_temp.chk('the stamp lands in the same call that hands the question back',
+      not public.should_ask_intention(p3));
+
+    ctx3 := public.get_harvest_context(p3, 'ok');
+    perform pg_temp.chk('asked once, ever — a second positive night never asks again',
+      (ctx3->>'ask_intention')::boolean is not true, ctx3->>'ask_intention');
+    perform pg_temp.chk('and no answer is fabricated on the parent''s behalf',
+      (select intention_text from public.followers where id = p3) is null);
+  end;
 end $$;
 
 \echo '=== RESULTS ==='
