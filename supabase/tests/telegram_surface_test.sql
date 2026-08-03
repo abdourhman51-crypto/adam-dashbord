@@ -90,7 +90,9 @@ begin
   insert into pg_temp.results values ('strain_L2','rhythm', public.get_telegram_surface(p));
 
   -- 10. unsupported country, otherwise rhythm -> waitlist, everything else identical
-  p := pg_temp.mk('SA', 20); c := pg_temp.add_child(p,'يوسف');
+  -- TN, not SA: same UTC offset as DZ, so this compares supported against
+  -- unsupported without also comparing two different calendar days.
+  p := pg_temp.mk('TN', 20); c := pg_temp.add_child(p,'يوسف');
   insert into public.situations (child_id,key,status,evidence_count) values (c,'sleep','confirmed',5);
   perform pg_temp.add_nights(p, 7, 4);
   insert into pg_temp.results values ('unsupported','rhythm', public.get_telegram_surface(p));

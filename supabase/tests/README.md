@@ -23,12 +23,17 @@ for m in 20260731090000_telegram_surface_state \
          20260801170000_give_before_asking \
          20260801190000_the_exit_is_owed_until_shown \
          20260801200000_situation_other_is_not_grounding \
-         20260801220000_three_countries_and_the_unknown ; do
+         20260801220000_three_countries_and_the_unknown \
+         20260801230000_ask_the_59 \
+         20260801240000_claim_the_country_ask \
+         20260801250000_the_agent_speaks_under_law \
+         20260803120000_one_call_per_node ; do
   psql -v ON_ERROR_STOP=1 -q -f supabase/migrations/$m.sql || break
 done
 
 for t in telegram_surface conversation_law knowledge_gate one_send \
-         rhythm_gate give_before_asking country_state ; do
+         rhythm_gate give_before_asking country_state \
+         agent_gate agent_bundle ; do
   psql -q -f supabase/tests/${t}_test.sql
 done
 ```
@@ -37,7 +42,7 @@ done
 ones defined, so loading a subset tests a schema that has never existed. Run the
 list, not a favourite file from it.
 
-Current: **21 + 27 + 25 + 34 + 14 + 29 + 53 assertions, zero failures.**
+Current: **21 + 27 + 25 + 34 + 14 + 29 + 71 + 27 + 19 assertions, zero failures.**
 
 ### Proving the repo *is* production
 
@@ -114,7 +119,7 @@ Everything runs inside a transaction and rolls back.
 
 ## `country_state_test.sql`
 
-53 cases. The offer is live in **three** countries — الجزائر، مصر، المغرب — and the whole suite defends two claims at once: that the list is exactly three and enforced in one place, and that *"we do not sell here"* and *"we do not know where you are"* can never again produce the same sentence.
+71 cases. The offer is live in **three** countries — الجزائر، مصر، المغرب — and the whole suite defends two claims at once: that the list is exactly three and enforced in one place, and that *"we do not sell here"* and *"we do not know where you are"* can never again produce the same sentence.
 
 | Input | State |
 |---|---|
@@ -138,3 +143,29 @@ perform chk('...', public.country_state(pg_temp.parent('QA'))->>'state' = 'suppo
 ```
 
 `country_state` is `stable`, so inside a single statement it reads that statement's snapshot — taken **before** the volatile insert nested in the same expression ran. Written on one line this fails, and it fails looking exactly like a broken function. The write and the read must be separate statements.
+
+## `agent_gate_test.sql`
+
+27 cases guarding the one voice nobody was checking: the conversational reply, which went from the model to Telegram untouched.
+
+**It is deliberately not `gate_composed_reply`.** That gate enforces a line budget and a uniqueness rule alongside vocabulary, and both of those applied to open conversation push every reply toward the same safe three-line shape — the templated voice the product is trying to escape. This one checks vocabulary and nothing else.
+
+**The blocking list was chosen by replay, not by judgement.** The first draft was pointed at `copy_violations()` and replayed against all 2,233 replies ADAM has ever sent: it blocked 53 — one in 42 — of which roughly 40 were *good answers*. «احتواء» (33 hits) is internal jargon here and ordinary Arabic for holding a child. «وافتحوا أذرعكم» tripped the ban on «افتح». «إلحاحه على الـ 50 ريالاً» is a father discussing pocket money.
+
+The shipped rule blocks 15 of 2,234 — 0.67% — and every one is ADAM selling: a price, a closing line, posing as فريق آدم, a refund guarantee invented in the brand's name, a superiority claim. Both sets are in the suite as literal production strings, so the boundary cannot move by accident.
+
+Machinery words (`خطة`, `نظام`) are **recorded and allowed** in `reply_gate_log`, so the line can move next month on a count instead of an opinion.
+
+## `agent_bundle_test.sql`
+
+19 cases. The agent had no facts about the family: `memory_snapshot` was assembled and never passed to it, so the brand's core claim — *«المرجع ليس كتاباً — المرجع عائلتكم»* — was false in the one place it mattered.
+
+`get_agent_bundle()` carries the context, the knowledge level, and the country question in the single call an already-authenticated node was making anyway. Tests cover the framing (the model must not read our notes as the parent's words), the stripping of `PLAN_DAY`/`DAYS_LEFT`, and the level-0 case where ADAM knows nothing and must not imply otherwise.
+
+`get_moment_after_tap()` writes a tapped country **before** composing the answer — the order is the assertion, because the reverse confirms one country while quoting the price of another.
+
+### Why these are functions and not nodes
+
+n8n's MCP API cannot attach a `supabaseApi` credential to a new `httpRequest` node: `setNodeCredential` and `addNode` both reject the pair. Pre-existing nodes hold their credential server-side and the API omits it from every response, so they *look* bare and work. Three nodes added this way failed at runtime with `Credentials not found` — one of them, `Tap - Record Country`, had been silently discarding every country a parent tapped for two days.
+
+The number of Supabase-authenticated nodes in W1 cannot go up. The workaround — copying the hardcoded `apikey` header the older nodes use — is how the `service_role` key came to appear 116 times in plaintext, so existing calls carry more instead.

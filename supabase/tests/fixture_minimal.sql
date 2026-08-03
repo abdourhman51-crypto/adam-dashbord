@@ -146,6 +146,20 @@ from public.followers f
 left join chat c on c.key = f.platform_user_id
 left join logs l on l.follower_id = f.id;
 
+-- get_agent_context(): the shape production returns, not the real assembly.
+-- The PLAN_DAY / DAYS_LEFT preamble is reproduced deliberately — stripping it
+-- is the behaviour under test, and a stub without it would test nothing.
+create or replace function public.get_agent_context(p_follower_id uuid)
+returns text language sql stable as $$
+  select 'PLAN_DAY: ?' || chr(10) || 'DAYS_LEFT: 0' || chr(10) || chr(10)
+      || coalesce(
+           (select '== CHILDREN ==' || chr(10) || '- ' || c.name
+            from public.children c
+            where c.follower_id = p_follower_id and nullif(btrim(c.name),'') is not null
+            order by c.is_primary desc nulls last limit 1),
+           '');
+$$;
+
 -- commerce_allowed(): real signature, simplified body (blocks at L2/L3).
 -- hard_moment_label(): copied verbatim from the child-record migration.
 create function public.hard_moment_label(p_key text) returns text
@@ -194,7 +208,13 @@ $$;
 -- the same fixture state and the test that matters cannot be written.
 insert into public.country_timezone (code, iana_tz) values
   ('DZ','Africa/Algiers'), ('EG','Africa/Cairo'), ('MA','Africa/Casablanca'),
-  ('SA','Asia/Riyadh'), ('SY','Asia/Damascus');
+  ('SA','Asia/Riyadh'), ('SY','Asia/Damascus'),
+  -- Tunisia: genuinely unsupported, and on Africa/Tunis — permanently UTC+1,
+  -- exactly like Africa/Algiers. The unsupported-vs-supported comparison in
+  -- telegram_surface_test used SA, whose local date rolls over four hours
+  -- before DZ's, so the two parents' seven-day windows landed on different
+  -- dates and the test failed for roughly two hours every night.
+  ('TN','Africa/Tunis');
 -- name_ar is read by country_recorded. It was absent, and the confirmation
 -- fell back to «بلدكم» in a test that still passed.
 insert into public.supported_countries (code, name_ar, is_active, price_display_full) values
