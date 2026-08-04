@@ -115,6 +115,65 @@ begin
     perform pg_temp.chk('and no answer is fabricated on the parent''s behalf',
       (select intention_text from public.followers where id = p3) is null);
   end;
+
+  -- ---- the offer fork: presented once, and it outranks the intention ask ----
+  declare p4 uuid; s4 uuid; ctx4 jsonb; btns jsonb;
+  begin
+    insert into public.followers (platform_user_id, country) values ('hg-4','DZ') returning id into p4;
+    insert into public.children (follower_id, name, is_primary) values (p4,'يوسف',true) returning id into c;
+    s4 := c;
+    insert into public.situations (child_id,key,status,evidence_count) values (s4,'sleep','confirmed',4);
+
+    -- All the evidence at once, without ever composing a harvest in between,
+    -- so this parent is BOTH offer-ready and intention-due on the same night.
+    insert into public.daily_logs (follower_id, log_date, night_result, situation_id) values
+      (p4, current_date - 3, 'hard', s4),
+      (p4, current_date - 2, 'calm', s4),
+      (p4, current_date - 1, 'calm', s4);
+    perform pg_temp.chk('precondition: the offer is ready', (public.offer_ready(p4)->>'ready')::boolean);
+    perform pg_temp.chk('precondition: the intention is also due', public.should_ask_intention(p4));
+
+    ctx4 := public.get_harvest_context(p4, 'ok');
+    perform pg_temp.chk('once earned, the fork is presented',
+      (ctx4->>'offer_present')::boolean, ctx4->>'offer_present');
+    perform pg_temp.chk('the fork names the child and carries no price',
+      (ctx4->>'offer_fork_ar') like '%يوسف%'
+      and (ctx4->>'offer_fork_ar') !~ '(سعر|دينار|جنيه|درهم|اشتراك|[0-9])', ctx4->>'offer_fork_ar');
+    btns := ctx4->'offer_buttons';
+    perform pg_temp.chk('accept reuses the live journey door (cta_full_companion)',
+      btns @> '[{"cb":"cta_full_companion"}]'::jsonb, btns::text);
+    perform pg_temp.chk('decline reuses the live open space (not_now)',
+      btns @> '[{"cb":"not_now"}]'::jsonb, btns::text);
+    perform pg_temp.chk('the offer outranks the intention on the same night',
+      (ctx4->>'ask_intention')::boolean is not true, ctx4->>'ask_intention');
+    perform pg_temp.chk('and the intention stamp is NOT spent — it waits for a later night',
+      public.should_ask_intention(p4));
+
+    -- Once, ever. The next positive night: no fork, and now the deferred intention.
+    ctx4 := public.get_harvest_context(p4, 'ok');
+    perform pg_temp.chk('the fork is shown once, ever',
+      (ctx4->>'offer_present')::boolean is not true, ctx4->>'offer_present');
+    perform pg_temp.chk('the deferred intention ask now gets its night',
+      (ctx4->>'ask_intention')::boolean, ctx4->>'ask_intention');
+  end;
+
+  -- ---- strain withdraws the fork silently, before it is ever shown ----
+  declare p5 uuid; s5 uuid; ctx5 jsonb;
+  begin
+    insert into public.followers (platform_user_id, country) values ('hg-5','DZ') returning id into p5;
+    insert into public.children (follower_id, name, is_primary) values (p5,'مالك',true) returning id into c;
+    s5 := c;
+    insert into public.situations (child_id,key,status,evidence_count) values (s5,'sleep','confirmed',4);
+    insert into public.daily_logs (follower_id, log_date, night_result, situation_id) values
+      (p5, current_date - 2, 'calm', s5),
+      (p5, current_date - 1, 'calm', s5),
+      (p5, current_date - 3, 'hard', s5);
+    insert into public.parent_strain (parent_id, level) values (p5, 2);
+    ctx5 := public.get_harvest_context(p5, 'ok');
+    perform pg_temp.chk('strain withdraws the fork silently — never shown, never stamped',
+      (ctx5->>'offer_present')::boolean is not true
+      and (select offer_fork_at from public.followers where id = p5) is null, ctx5->>'offer_present');
+  end;
 end $$;
 
 \echo '=== RESULTS ==='
