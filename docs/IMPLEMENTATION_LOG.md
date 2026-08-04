@@ -5,6 +5,40 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-04 · Two live bugs in the reply path — one mine, one old
+
+**Every normal reply was erroring (mine, same session).** Execution `5918`:
+`FA - Send Reply1` failed with `ExpressionExtensionError: invalid syntax`, so from the moment
+`gate_agent_reply` was wired in, the paid/free conversation path sent nothing at all. Cause: when I
+set the node's `jsonBody` via `setNodeParameter`, the `\n` I wrote in the tool-call JSON was decoded
+by JSON into a real linefeed — and a real linefeed sitting inside a single-quoted JS string
+(`'…سأقول.⏎'`) is a syntax error n8n's expression parser rejects before it ever runs. `cat -A` on the
+stored value showed the bare `$` mid-string, confirming a literal LF, not the escape I intended. The
+same defect was in `HR - Send` from the intention-ask change. Fixed both by building the newline with
+`String.fromCharCode(10)` instead of any literal — immune to how JSON encodes the value. Both verified
+by evaluating the extracted expression under `node` (correct output, both branches) before publishing.
+
+This is the deeper form of the `setNodeParameter` trap already in HANDOFF: not just *where* the path
+points, but that **any `\n` in the value becomes a real newline in the stored expression source**. Use
+`String.fromCharCode(10)`, never a bare `\n`, inside an expression string literal set this way.
+
+**ADAM re-pinned the banner on every reply (old bug, surfaced now).** `Pin - Edit` carried
+`onError: continueErrorOutput` with its **error output wired to `Pin - Create`**. `editMessageText`
+returns `400 "message is not modified"` whenever the pinned surface text is unchanged — which is most
+replies — so every such reply fell through the error branch to Create + Attach, i.e. a brand-new
+pinned message. The banner was meant to be "created once, edited in place thereafter" (HANDOFF item 3);
+the error fallback quietly turned every steady-state reply into a re-pin. Confirmed against the DB:
+`pinned_message_id` was populated (11700) and the credential path worked, so the id-load hypothesis was
+wrong — it was the edit-failure fallback. Fixed by removing the `Pin - Edit → Pin - Create` connection:
+a failed or no-op edit now ends silently, and `Pin - Create` runs only when `Pin - Exists?` is false (a
+follower with no pin yet). Trade-off accepted: if a parent deletes their pinned message, it is not
+auto-recreated — far better than a fresh pin on every message, and aligned with the stated design.
+
+Both fixes applied to the live workflow (`42loY0bgUSwYmHFV`) and published. No repo/SQL change — n8n
+wiring only.
+
+---
+
 ## 2026-08-03 · The intention question is asked, not just written
 
 `should_ask_intention()`, `record_intention()` and `offer_ready()` (`give_before_asking` migration)
