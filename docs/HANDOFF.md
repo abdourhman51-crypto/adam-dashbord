@@ -84,6 +84,17 @@ From `docs/adam-experience-principles.md` Part 4:
 
 Open founder decision: «شيء آخر» on every button set — see Part 3 F9.
 
+## §10 rhythm items (`docs/adam-system.md`) — progress
+
+1. ✅ إحياء البوّابة — live
+2. ✅ رسالة المساء تُعطي قبل أن تسأل — `get_harvest_prompt`, live
+3. ✅ قلب المقياس إلى الوالد — `parent_effort`, live
+4. ✅ عنصر النيّة — `should_ask_intention`/`record_intention_ask` ride the harvest, live (2026-08-04)
+5. ✅ لحظة العرض — `offer_ready`/`take_offer_moment` ride the harvest as the fork, live (2026-08-04). Buttons reuse live callbacks (`cta_full_companion` → menu_journey → فريق آدم; `not_now`). Fires once per parent when earned (3 attempts, 2 outcomes, confirmed situation, no strain). 0 parents earned it yet.
+6. 🔴 ما بعد الوصول — **not designed**, not just unwired (`docs/adam-system.md` §7/§10). Needs a design pass before any DB/n8n work.
+
+**Not wired: the parent's typed answers.** The intention ask and the offer fork's «نتركه يتكرّر» let a parent type a reply that nothing records — `record_intention()` is called from nowhere. Both asks are stamped once regardless, so this never causes a repeat; it only means a typed answer is not stored. Capturing it needs a routing decision in `M2 - Classify Track` (the way `survey_mode` intercepts), keyed on `intention_asked_at is not null and intention_text is null`.
+
 ## Branch
 
 `claude/install-product-skills-ayvz5e`. Commit and push there; never to the default branch.

@@ -5,6 +5,45 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-04 · The offer moment — the fork, presented once, on the harvest
+
+`offer_ready()` (§10.5, the conversion moment) was built and tested and called from nowhere. Wired it
+into the evening harvest, the way the intention ask already rides it — because §10.5 is «لحظة العرض
+بعد أول نمط»: the fork appears after the parent has seen their own evidence, not on demand.
+
+**Why it rides the harvest, and why it is stamped once.** `offer_ready` is purely derived — left
+alone it returns `ready:true` every night until the parent converts, which is the push that produced
+8 offers and 0 clicks. New `take_offer_moment()` claims the fork atomically via a new `offer_fork_at`
+stamp (mirroring `record_country_ask` / `record_intention_ask`), so it is shown once, ever.
+`get_harvest_context` now decides exactly one proactive add-on per positive harvest: the offer fork if
+earned, else the intention ask if due. The offer outranks the intention and does not spend its stamp,
+so the anchor is not lost when both are eligible on the same night.
+
+**Why the buttons add no new route.** The founder chose «reuse the existing CTA → فريق آدم». Tracing
+that showed the CTA LLM offer-writer chain is **dead** — its entry nodes (`CTA - Answer Callback`,
+`CTA Ready - Answer Callback`) have no input and never fire. But `cta_full_companion` is a **live** tap
+already in the Router's table, routed to `menu_journey` — the real journey door, built from
+`supported_countries` at read time, with فريق آدم as the cashier (§7) and the price withheld under
+strain. So «نشتغل عليه» carries `cta_full_companion` and «نتركه يتكرّر» carries `not_now` (the open
+free space): both live callbacks, no new node, no new handoff, and the dead chain stays dead. `HR -
+Send` appends the fork + buttons when `offer_present`, else the intention, else the plain reply —
+built with `String.fromCharCode(10)`, not a literal `\n` (see the newline trap above).
+
+**State.** 0 parents are offer-ready today — none yet has three attempts and two outcomes against a
+confirmed situation — so nothing fires tonight, and none is double-stamped. The machinery runs
+correctly on live data (returns `offer_present:false` for everyone) and will present the fork the first
+night a family earns it. Tested offline: 32/32 in `composed_gate` (offer + intention + precedence +
+once-ever + strain-withdrawal), `knowledge_gate` 25/25 and `conversation_law` 27/27 clean. Migration
+applied to production and `HR - Send` republished.
+
+**Still not wired: the parent's free-text answers.** The intention ask and the fork's «نتركه يتكرّر»
+both leave the parent able to type a reply that nothing captures — `record_intention()` is still
+called from nowhere. The fork's «نشتغل عليه» is fully live (it reuses the journey door); it is only the
+*typed* answers that are unrecorded, and because both asks are stamped once regardless, the missing
+capture never causes a repeat — it only means the answer is not stored.
+
+---
+
 ## 2026-08-04 · Two live bugs in the reply path — one mine, one old
 
 **Every normal reply was erroring (mine, same session).** Execution `5918`:
