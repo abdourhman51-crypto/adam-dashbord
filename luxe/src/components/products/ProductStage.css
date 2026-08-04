@@ -1,0 +1,359 @@
+.stage {
+  position: relative;
+}
+
+.stage__frame {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--marble);
+}
+
+.stage__frame-inner {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: center;
+  padding-inline: var(--gutter);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  overflow: hidden;
+  will-change: clip-path, transform;
+}
+
+.stage--flip .stage__frame-inner {
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+}
+
+/* ——— Three rooms, three stones ——— */
+
+/* Calacatta — white marble, gold-threaded */
+.stage--plaster .stage__frame-inner {
+  background-color: var(--marble);
+  background-image:
+    radial-gradient(ellipse 70% 55% at 55% 0%, rgba(255, 254, 249, 0.95), transparent 62%),
+    radial-gradient(ellipse 60% 40% at 30% 100%, rgba(200, 164, 92, 0.1), transparent 65%),
+    var(--mineral-clouds),
+    var(--veins-light);
+  background-size: auto, auto, 900px 900px, 1400px 1400px;
+  color: var(--ink);
+}
+
+/* Statuario — cooler white marble, bolder grey veining; the black
+   object carries all the contrast */
+.stage--noir .stage__frame-inner {
+  background-color: var(--marble-warm);
+  background-image:
+    radial-gradient(ellipse 65% 50% at 45% 6%, rgba(255, 254, 250, 0.95), transparent 62%),
+    radial-gradient(ellipse 50% 38% at 78% 82%, rgba(200, 164, 92, 0.09), transparent 62%),
+    radial-gradient(ellipse 45% 35% at 12% 70%, var(--sage), transparent 60%),
+    var(--mineral-clouds),
+    var(--veins-light);
+  background-size: auto, auto, auto, 900px 900px, 1400px 1400px;
+  color: var(--ink);
+}
+
+/* White onyx — translucent stone, lit from behind */
+.stage--oxblood .stage__frame-inner {
+  background-color: var(--onyx-glow);
+  background-image:
+    radial-gradient(ellipse 52% 62% at 58% 44%, rgba(255, 244, 219, 0.95), rgba(247, 236, 217, 0.35) 60%, transparent 78%),
+    radial-gradient(ellipse 70% 55% at 20% 90%, rgba(123, 51, 64, 0.12), transparent 60%),
+    radial-gradient(ellipse 80% 70% at 90% 6%, rgba(200, 164, 92, 0.16), transparent 60%),
+    var(--mineral-clouds),
+    var(--veins-light);
+  background-size: auto, auto, auto, 900px 900px, 1400px 1400px;
+  color: var(--ink);
+}
+
+/* polished sheen across every room */
+.stage__frame-inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 32%,
+    rgba(255, 255, 255, 0.34) 47%,
+    rgba(255, 255, 255, 0.06) 53%,
+    rgba(255, 255, 255, 0) 68%
+  );
+  mix-blend-mode: soft-light;
+}
+
+/* daylight drifts across every room */
+.stage__frame-inner::after {
+  animation: light-drift 30s ease-in-out infinite alternate;
+}
+
+/* ——— Travelling key light ——— */
+.stage__sweep {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 30%;
+  width: 34%;
+  transform: rotate(14deg);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 252, 245, 0.4) 35%,
+    rgba(255, 252, 245, 0.6) 50%,
+    rgba(255, 252, 245, 0.4) 65%,
+    transparent
+  );
+  mix-blend-mode: soft-light;
+}
+
+/* the halo — soft radial light breathing behind each piece */
+.stage__halo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -52%;
+  width: 130%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle at center, rgba(255, 248, 228, 0.55) 0%, rgba(255, 248, 228, 0.14) 42%, transparent 68%);
+  mix-blend-mode: soft-light;
+  animation: light-breath 9s ease-in-out infinite;
+}
+
+/* ——— The numeral: carved, gold-leafed ——— */
+.stage__numeral {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  right: clamp(0.5rem, 4vw, 5rem);
+  font-family: var(--font-brand);
+  font-size: clamp(14rem, 38vw, 34rem);
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+.stage--flip .stage__numeral {
+  right: auto;
+  left: clamp(0.5rem, 4vw, 5rem);
+}
+
+.stage--plaster .stage__numeral {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(22, 19, 15, 0.22);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.7);
+}
+
+.stage--noir .stage__numeral {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(22, 19, 15, 0.24);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.7);
+}
+
+.stage--oxblood .stage__numeral {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(168, 133, 62, 0.42);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* ——— The object + its reflection ——— */
+.stage__object {
+  position: relative;
+  z-index: 2;
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  will-change: transform;
+}
+
+.stage--flip .stage__object {
+  order: 1;
+}
+
+.stage__angles,
+.stage__mirror {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+}
+
+.stage__angle {
+  grid-area: 1 / 1;
+  width: 100%;
+  max-width: clamp(320px, 40vw, 680px);
+  object-fit: contain;
+  filter: drop-shadow(0 50px 60px rgba(22, 19, 15, 0.4)) drop-shadow(0 12px 18px rgba(22, 19, 15, 0.25));
+  will-change: opacity, transform;
+}
+
+
+.stage__mirror {
+  margin-top: -2%;
+  transform: scaleY(-1);
+  pointer-events: none;
+}
+
+.stage__angle--mirror {
+  filter: blur(4px) saturate(0.75);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 50%);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 50%);
+}
+
+.stage__shadow {
+  position: absolute;
+  bottom: 11%;
+  width: 56%;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(22, 19, 15, 0.26), transparent 72%);
+  filter: blur(10px);
+  opacity: 0;
+}
+
+/* ——— The dossier ——— */
+.stage__dossier {
+  position: relative;
+  z-index: 3;
+  order: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.9rem, 2.2vh, 1.6rem);
+  max-width: 34rem;
+}
+
+.stage--flip .stage__dossier {
+  order: 2;
+  justify-self: end;
+}
+
+.stage__kicker {
+  color: var(--gold);
+}
+
+.stage--noir .stage__kicker {
+  color: var(--gold-deep);
+}
+
+.stage__name {
+  font-family: var(--font-brand);
+  font-size: var(--text-title);
+  line-height: 1;
+}
+
+.stage__name {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.stage__narrative {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--text-lead);
+  font-weight: 500;
+  line-height: 1.45;
+  opacity: 0.85;
+}
+
+.stage__details {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem 1.6rem;
+  padding-top: 0.4rem;
+}
+
+.stage__detail {
+  position: relative;
+  padding-left: 1.1rem;
+  font-size: calc(var(--text-body) * 0.88);
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+}
+
+.stage__detail::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.78em;
+  width: 0.45rem;
+  height: 1px;
+  background: var(--gold);
+  box-shadow: 0 0 6px rgba(168, 133, 62, 0.5);
+}
+
+.stage__commerce {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.9rem clamp(1.2rem, 3vw, 2.5rem);
+  padding-top: clamp(0.6rem, 2vh, 1.4rem);
+}
+
+.stage__price {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.stage__price-now {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.stage__price-was {
+  font-size: var(--text-label);
+  letter-spacing: 0.14em;
+  opacity: 0.45;
+}
+
+/* ——— Mobile ——— */
+@media (max-width: 768px) {
+  .stage__frame-inner,
+  .stage--flip .stage__frame-inner {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    padding-block: clamp(4.5rem, 10vh, 6rem) clamp(2rem, 5vh, 3rem);
+    align-items: center;
+  }
+
+  .stage__object,
+  .stage--flip .stage__object {
+    order: 1;
+    align-self: end;
+  }
+
+  .stage__dossier,
+  .stage--flip .stage__dossier {
+    order: 2;
+    justify-self: start;
+    gap: 0.7rem;
+  }
+
+  .stage__angle {
+    max-width: min(80vw, 440px);
+  }
+
+  .stage__mirror {
+    display: none;
+  }
+
+  .stage__numeral {
+    top: 36%;
+    font-size: clamp(11rem, 52vw, 16rem);
+  }
+
+  .stage__details {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+}

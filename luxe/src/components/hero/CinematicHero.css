@@ -1,0 +1,312 @@
+.hero {
+  position: relative;
+  background: var(--marble);
+}
+
+/* The gallery — white stone walls, museum light from above */
+.hero__stage {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+/* — Gallery light layers — */
+.hero__ambient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero__ambient--warm {
+  /* morning light entering from the upper left, breathing slowly */
+  background:
+    linear-gradient(112deg, rgba(255, 247, 226, 0.55) 0%, rgba(255, 247, 226, 0.12) 22%, transparent 38%),
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255, 253, 246, 0.9), transparent 60%),
+    radial-gradient(ellipse 45% 45% at 50% 46%, rgba(200, 164, 92, 0.12), transparent 65%),
+    radial-gradient(ellipse 40% 35% at 88% 80%, var(--sage), transparent 60%);
+  animation: light-breath 11s ease-in-out infinite;
+}
+
+.hero__ambient--floor {
+  background:
+    radial-gradient(ellipse 70% 26% at 50% 100%, rgba(160, 148, 122, 0.28), transparent 70%),
+    linear-gradient(0deg, rgba(221, 213, 196, 0.55), transparent 18%);
+}
+
+/* — The giant words: carved into the stone — */
+.hero__word {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -54%;
+  font-family: var(--font-brand);
+  font-size: clamp(8rem, 30vw, 26rem);
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  user-select: none;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero__word--elle {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(22, 19, 15, 0.42);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.hero__word--lui {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(168, 133, 62, 0.55);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* — The reel: dark artwork hung on the marble wall — */
+.hero__cell {
+  position: relative;
+  z-index: 2;
+  height: min(78vh, 78svh);
+  aspect-ratio: 4 / 5;
+  border-radius: 2px;
+  overflow: hidden;
+  isolation: isolate;
+  opacity: 0;
+  border: 6px solid #fbf8f1;
+  box-shadow:
+    var(--shadow-stone),
+    inset 0 0 0 1px rgba(22, 19, 15, 0.18);
+  will-change: transform, filter;
+  background: var(--nero);
+}
+
+.hero__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.hero__canvas--lui {
+  z-index: -1;
+}
+
+/* museum glass over the artwork */
+.hero__cell-edge {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.hero__cell-glare {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    118deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 45%,
+    rgba(255, 255, 255, 0.03) 53%,
+    transparent 66%
+  );
+}
+
+/* shadow pooling on the gallery floor */
+.hero__cell-pool {
+  position: absolute;
+  z-index: 1;
+  bottom: 3.5vh;
+  left: 50%;
+  translate: -50%;
+  width: min(56vh, 520px);
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(22, 19, 15, 0.4), transparent 68%);
+  filter: blur(12px);
+  pointer-events: none;
+}
+
+/* — Opening: the seal above the name, morning light — */
+.hero__opening {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1rem, 2.6vh, 1.9rem);
+  text-align: center;
+  background: radial-gradient(ellipse 85% 75% at 50% 50%, rgba(244, 240, 231, 0.82), rgba(244, 240, 231, 0.96));
+}
+
+.hero__seal {
+  width: clamp(84px, 13vh, 128px);
+}
+
+.hero__eyebrow {
+  font-family: var(--font-ui);
+  font-size: var(--text-label);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.hero__wordmark {
+  font-family: var(--font-brand);
+  font-size: var(--text-hero);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-indent: 0.06em;
+  line-height: 0.95;
+  color: var(--ink);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.hero__wordmark-tm {
+  font-size: 0.12em;
+  vertical-align: super;
+  letter-spacing: 0;
+  color: var(--gold);
+}
+
+.hero__tagline {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: var(--text-lead);
+  color: var(--gold);
+}
+
+.hero__cue {
+  position: absolute;
+  bottom: clamp(2rem, 6vh, 4rem);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hero__cue-label {
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.hero__cue-line {
+  width: 1px;
+  height: clamp(2.5rem, 7vh, 5rem);
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  animation: cue-pulse 2.6s var(--ease-lux) infinite;
+  transform-origin: top;
+}
+
+@keyframes cue-pulse {
+  0%, 100% { transform: scaleY(0.35); opacity: 0.4; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+/* — Scene captions: engraved in the wall — */
+.hero__scene-type {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.hero__chapter {
+  position: absolute;
+  top: clamp(5.5rem, 12vh, 8rem);
+  font-family: var(--font-ui);
+  font-size: var(--text-label);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  opacity: 0;
+}
+
+.hero__scene-type--elle .hero__chapter { left: var(--gutter); }
+.hero__scene-type--lui .hero__chapter { right: var(--gutter); text-align: right; }
+
+.hero__copy {
+  position: absolute;
+  bottom: clamp(2.6rem, 7vh, 5rem);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--text-lead);
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.4;
+  color: var(--ink);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.hero__copy span {
+  display: block;
+  overflow: hidden;
+}
+
+.hero__copy i {
+  display: block;
+  font-style: inherit;
+  will-change: transform;
+}
+
+/* — Finale — */
+.hero__finale {
+  position: absolute;
+  bottom: clamp(2.5rem, 7vh, 5rem);
+  left: 0;
+  right: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  opacity: 0;
+}
+
+.hero__finale-kicker {
+  font-family: var(--font-ui);
+  font-size: var(--text-label);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.hero__finale-title {
+  font-family: var(--font-brand);
+  font-size: clamp(2rem, 3.8vw, 3.4rem);
+  color: var(--ink);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+@media (max-width: 768px) {
+  .hero__cell {
+    height: auto;
+    width: min(78vw, 400px);
+  }
+
+  .hero__word {
+    font-size: clamp(7rem, 38vw, 12rem);
+  }
+}
