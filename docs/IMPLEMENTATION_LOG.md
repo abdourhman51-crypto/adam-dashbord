@@ -5,6 +5,55 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-05 · A soft funnel, from the first tap to the payment link
+
+`/faq` was a single 34-line wall. A document, not a journey: the parent either
+reads all of it or none of it, and either way reaches the offer only by accident.
+
+Now four stops, each short, each ending in a button that opens the next:
+
+    ١. 🌿 ما هو آدم؟        the hook + the result, in three lines
+    ٢. ⚙️ كيف يشتغل؟         the method, and the time it costs
+    ٣. ✨ ما الذي يميّزه؟     personalisation — the whole sale
+    ٤. 🎯 المرافقة والسعر    the offer and the فريق آدم link
+
+`first_contact` had no buttons at all — the very first message a parent ever
+sees was a dead end. It now opens the funnel: «🌿 ما هو آدم؟».
+
+**Why personalisation is the sale.** The Arab parent has already tried videos,
+articles and advice from every direction, and most of it did not work. Not
+because it was bad — because it was about *children*, not about *their* child.
+That is the sentence that sells, and it is the one thing a video or a general
+assistant cannot claim: to know the name, remember what was tried, and count
+what recurs.
+
+Every ✅ claim maps to something actually built, and nothing is inflated:
+
+| الادّعاء | ما يسنده |
+|---|---|
+| يعرف طفلكم بالاسم وأصعب لحظة عنده | `children` · `situations` |
+| يتذكّر ما جرّبتموه وما نفع | `daily_logs.step_given` / `step_status` |
+| يعدّ ما يتكرّر — «هذه ثالث مرة» | `get_harvest_prompt` |
+| يسأل عن النتيجة ويتعلّم | الحصاد المسائي |
+
+**Objection handling is placed where the objection appears**, not collected at
+the end: step 2 answers "how much of my time does this cost" (دقيقة في اليوم)
+before it is asked, because that is the silent objection at exactly that point.
+
+Emojis are used as section markers, not decoration — headings, the four numbered
+steps, and the ✅ feature list — so the surface scans like an app rather than a
+letter.
+
+Routing lesson applied from yesterday: every new key is `menu_`-prefixed so the
+Router's generic rule dispatches it with no code change, and the routing test
+added yesterday confirms all funnel buttons are live — `every_button_routes`
+PASS, `menu_callbacks_have_moments` PASS.
+
+Tests: conversation_law 27/27 + both routing assertions, one_send 35/35,
+knowledge_gate 25/25, country_state 71/71, composed_gate 32/32.
+
+---
+
 ## 2026-08-04 · Seven dead buttons, and the method the FAQ never explained
 
 Third founder review, on a live session. He tapped «امحوا كل ما قلته» and was
