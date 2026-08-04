@@ -135,9 +135,9 @@ begin
   -- first, or a copy rewrite silently turns this into a test of nothing.
   perform pg_temp.chk('and the free relationship is named as permanent, first',
     (j->>'body') like '%المجاني يبقى مجانياً%'
-    and (j->>'body') like '%الرحلة الواحدة%'
+    and (j->>'body') like '%المرافقة الكاملة:%'
     and position('المجاني يبقى مجانياً' in (j->>'body'))
-      < position('الرحلة الواحدة' in (j->>'body')), j->>'body');
+      < position('المرافقة الكاملة:' in (j->>'body')), j->>'body');
   -- Was "no buttons at all". The rule was never about buttons: it is that
   -- فريق آدم is the only next step, and nothing in the bot takes money.
   perform pg_temp.chk('the price answer opens no checkout — فريق آدم is the only next step',
@@ -303,12 +303,29 @@ begin
 
   foreach k in array array['menu_journey','country_other','country_ask_footer'] loop
     foreach j in array array[to_jsonb(dz), to_jsonb(sa), to_jsonb(zz)] loop
-      declare g jsonb; n int;
+      declare g jsonb; n int; has_exit boolean;
       begin
         g := public.get_conversation_moment(k, (j #>> '{}')::uuid);
         n := coalesce(jsonb_array_length(g->'buttons'), 0);
+
+        -- The rule is «شيء آخر»: a parent is never cornered. It was written
+        -- as `cb = 'other'` because that was the only shape an exit had.
+        -- The offer's exit is «ليس الآن — نكمل مجاناً», which is a better
+        -- exit than a generic one — it names what declining costs them
+        -- (nothing) — and it lands on a moment that itself offers `other`.
+        -- So the check follows the link instead of matching a literal. That
+        -- makes it stricter, not looser: a decline button pointing at a
+        -- dead end now fails where before it was simply absent.
+        select bool_or(
+                 x->>'cb' = 'other'
+                 or exists (select 1 from public.conversation_moments cm
+                            where cm.key = x->>'cb'
+                              and cm.buttons @> '[{"cb":"other"}]'::jsonb))
+          into has_exit
+        from jsonb_array_elements(coalesce(g->'buttons','[]'::jsonb)) x;
+
         -- Zero buttons is a valid answer; a set of them without an exit is not.
-        if n > 0 and not (g->'buttons' @> '[{"cb":"other"}]'::jsonb) then
+        if n > 0 and not coalesce(has_exit, false) then
           bad := bad || (k || '/' || coalesce(g->>'body',''))::text;
         end if;
       end;

@@ -5,6 +5,87 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-06 · One promise, one next step
+
+The offer stacked five reassurances — logged days, an extension, a refund,
+one-journey-at-a-time, and a vow of silence on an improving trend. Each was true.
+Together they read as a legal notice, and a parent skims a legal notice. Founder's
+call: **one guarantee**.
+
+    نتّفق قبل أن نبدأ على هدف واضح ترونه بأعينكم.
+    وإن لم نصل إليه في المدّة، أُكمل معكم نصف المدّة كاملةً مجاناً حتى نصل.
+
+**The refund left the design with it, and that cost nothing** — because it was never
+built. No function has ever written `stages.refunded_at`; the refund existed as a
+sentence in a column comment saying one "follows instead". A promise that lives only
+in a comment cannot be kept, so the comment is what went. `'refunded'` survives as a
+status an operator may set by hand — `can_propose_stage`, `get_telegram_surface` and
+the erasure view all read it. `erasure_requests.refund_due` is untouched: money back
+pro-rata when a parent erases everything mid-journey is a right, not a sales
+guarantee, and a different thing entirely.
+
+**٢٩ is now the engine's number, not an advert's.** `planned_logged_days` had no
+default at all, so the first stage فريق آدم started by hand would have hit a NOT NULL.
+It defaults to 29, and the column comment says the offer and the column move together.
+
+**The offer rebuilt on the value equation**, one section per term:
+
+| Term | What carries it |
+|---|---|
+| Outcome | a problem *they* name stops repeating — four named, so it is concrete before they imagine it |
+| Belief | the goal is agreed and observable **before** money moves; the guarantee; and «لا أعدكم بطفلٍ مثالي» — a smaller promise made honestly is believed more than a large one |
+| Wait | «خلال ٢٩ يوماً». Named and finite |
+| Effort | a minute or two a day, and «اليوم الذي لا تحتملونه لا يُحسب عليكم» |
+
+That last line is the honest edge of the ٢٩: the clock counts logged days, never
+calendar days. Said as a caveat it shrinks the offer; said as relief it grows it. Same
+fact either way — and that is where it now sits, in the effort section, not the
+guarantee.
+
+**Personalisation is the sale**, so it got its own section with the child's name in
+it, seven capabilities, one emoji each: the child row, yesterday's result feeding
+today's step, the counted repeats, the single evening question, `parent_strain`
+backing off, the §2.6 refusal to send anything generic, and erasure.
+
+**The buttons finally tell the truth.** ADAM is forbidden to say a price and does not
+know the terms — the agent prompt has said so since it was written. The old second
+button was «🤔 عندي سؤال قبل أن أقرّر» routed to ADAM, *who by design cannot answer
+it*: a dead end dressed as help, sitting on the conversion screen. Now:
+
+    📞 أتحدّث مع فريق آدم عن يوسف   → the humans, named, and the child named
+    🌿 ليس الآن — نكمل مجاناً       → new moment menu_not_now
+
+Declining had to become a real destination. If saying no costs a parent something, the
+safest move is never to open the offer at all. `menu_not_now` says the refusal was
+heard, restates that nothing was lost, and returns to the conversation in one line. The
+`menu_` prefix means the Router dispatches it with no code change. The same boundary is
+now stated in `menu_how`, where a parent reading about the method learns where the
+method stops.
+
+**Two test findings worth keeping.**
+
+*The escape-hatch rule was too literal.* `country_state` asserted every composed button
+set contains `cb='other'`. The offer's exit is «ليس الآن — نكمل مجاناً», which is a
+better exit than a generic one — it names what declining costs (nothing) — and it lands
+on a moment that itself offers `other`. The check now **follows the link** rather than
+matching a literal, which makes it stricter, not looser: a decline button pointing at a
+dead end now fails, where before it was merely absent.
+
+*A suite that is red for eight hours a day teaches people to ignore it.*
+`rhythm_gate` guarded its harvest block with `if hr >= 10` and no upper bound, but
+`get_rhythm_due` considers nobody outside `local_hour >= 7 and local_hour < 23` — ADAM
+is silent at night by design. Every night from 23:00 Algiers time the suite went red for
+the one reason that is not a bug. The guard now has its upper bound and the night branch
+asserts the quiet window instead of skipping it.
+
+**Tested:** 35 assertions in `offer_surface_test.sql`, all eleven suites green.
+`fixture_minimal` gained `planned_logged_days` and `extension_days` — the moment copy
+started promising what a column holds, the fixture had to hold it too. Applied to
+production and verified there: the Moroccan offer renders with «110 دراهم مغربية، لمدّة
+٢٩ يوماً», both buttons correct, and `menu_not_now` returns its own escape.
+
+---
+
 ## 2026-08-05 · The offer sells the result, and stops underselling the product
 
 Three faults on the one screen where a parent decides whether to pay.

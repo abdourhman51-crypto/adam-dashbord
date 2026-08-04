@@ -62,12 +62,19 @@ create table public.situations (
   last_observed timestamptz default now()
 );
 
+-- planned_logged_days and extension_days are here because the offer copy now
+-- promises what they hold — 29 days, and half of that again if we miss — and
+-- a promise the schema does not back is the thing the tests exist to catch.
+-- Types and the 7..60 bound are copied from
+-- 20260729130100_journey_engine_core_schema.sql, not invented.
 create table public.stages (
   id uuid primary key default gen_random_uuid(),
   parent_id uuid references public.followers(id) on delete cascade,
   child_id uuid,
   problem_key text,
   objective_text text,
+  planned_logged_days integer check (planned_logged_days between 7 and 60),
+  extension_days integer not null default 0 check (extension_days >= 0),
   status text
 );
 

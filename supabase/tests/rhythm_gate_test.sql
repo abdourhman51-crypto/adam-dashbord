@@ -104,7 +104,12 @@ declare p uuid; n int; hr int;
 begin
   select extract(hour from (now() at time zone 'Africa/Algiers'))::int into hr;
 
-  if hr >= 10 then
+  -- The upper bound is not optional. get_rhythm_due() considers nobody
+  -- outside `local_hour >= 7 and local_hour < 23` — ADAM is silent at night
+  -- by design — so between 23:00 and 07:00 Algiers time every assertion in
+  -- this block was failing for the one reason that is not a bug. A suite
+  -- that is red for eight hours a day teaches people to ignore it.
+  if hr >= 10 and hr < 23 then
     -- window closed hours ago, and no seed was ever sent today
     p := pg_temp.ready_parent('DZ', 7::smallint);
     select count(*) into n from public.get_rhythm_due(200) g
@@ -127,6 +132,16 @@ begin
              from public.get_rhythm_due(200) g
              where g.parent_id = p and g.action = 'harvest'),
       'the exit rides on the seed, which always came first');
+  elsif hr >= 23 or hr < 7 then
+    -- Not a skip: the quiet window is itself a rule worth defending. A parent
+    -- with a seed sent and the window long closed must still hear nothing at
+    -- 2am, and that is the assertion this branch makes.
+    p := pg_temp.ready_parent('DZ', 7::smallint);
+    insert into public.daily_logs (follower_id, log_date, seed_text, seed_sent_at)
+    values (p, (now() at time zone 'Africa/Algiers')::date, 'خطوة', now());
+    select count(*) into n from public.get_rhythm_due(200) g where g.parent_id = p;
+    perform pg_temp.chk('nothing is ever due between 23:00 and 07:00, seed or no seed',
+      n = 0, 'Algiers hour ' || hr::text);
   else
     perform pg_temp.chk('SKIPPED: too early in Algiers for a closed window', true, hr::text);
   end if;

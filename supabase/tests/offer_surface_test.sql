@@ -62,34 +62,48 @@ begin
   j := pg_temp.offer(p);
   b := j->>'body';
 
-  perform pg_temp.chk('the offer names the enemy — the night that comes back',
-    b like '%ترجع الأسبوع القادم%', left(b, 60));
+  perform pg_temp.chk('the offer names the enemy — the repeat, not tonight',
+    b like '%الموقف نفسه يتكرّر%', left(b, 60));
   perform pg_temp.chk('and says plainly what the free side already gives',
-    b like '%المجاني يبقى مجانياً%' and b like '%يبقى لكم دائماً%');
-  perform pg_temp.chk('the target is a number they can see, not a feeling',
-    b like '%خمس ليالٍ هادئة من سبع%');
+    b like '%المجاني يبقى مجانياً%' and b like '%لن ينقص منه شيء%');
 
-  -- The three promises the schema already enforces. If a line here is
-  -- deleted from the copy, this fails — the offer must not quietly shrink
-  -- back to the modest version that undersold the product.
-  perform pg_temp.chk('the clock counts days they were present, not calendar days',
-    b like '%لا حين يمرّ التقويم%');
-  perform pg_temp.chk('the unrequested extension is promised (stages.extension_days)',
-    b like '%أُكمل معكم نصفها كاملاً%' and b like '%بلا أن تطلبوا%');
-  perform pg_temp.chk('and the refund after it (stages.refunded_at)',
-    b like '%يرجع مالكم%');
+  -- The value equation, one assertion per term. Drop any one of these and
+  -- the offer stops being an offer and goes back to being a description.
+  perform pg_temp.chk('OUTCOME · named, and chosen by them',
+    b like '%مشكلة واحدة تختارونها أنتم%'
+    and b like '%نوم بلا معركة%' and b like '%نوبات غضب أقلّ%', b);
+  perform pg_temp.chk('BELIEF · the goal is agreed and visible before any money moves',
+    b like '%نتّفق عليها قبل أن نبدأ%' and b like '%ترونه بأعينكم%');
+  perform pg_temp.chk('BELIEF · and the promise is deliberately small, so it is credible',
+    b like '%لا أعدكم بطفلٍ مثالي%');
+  perform pg_temp.chk('WAIT · a finite, named number of days',
+    b like '%خلال ٢٩ يوماً%' and b like '%لمدّة ٢٩ يوماً%');
+  perform pg_temp.chk('EFFORT · a minute or two, and the day they cannot face is free',
+    b like '%دقيقة أو دقيقتان%' and b like '%لا يُحسب عليكم%');
 
-  -- The two refusals can_propose_stage() enforces. These buy more trust
-  -- than any claim, and they are free to make because they are already true.
-  perform pg_temp.chk('one journey at a time is said out loud (uq_one_live_stage_per_parent)',
-    b like '%رحلة واحدة في المرّة%');
-  perform pg_temp.chk('and the refusal to raise it on an improving trend',
-    b like '%تتحسّن عندكم%' and b like '%أصمت%');
+  -- Personalisation is the sale. The child's name is not decoration here:
+  -- it is the claim.
+  perform pg_temp.chk('the differentiator is stated as a rule, not a feature',
+    b like '%لا يعطيكم نصيحة عامّة%' and b like '%مصنوعة ليوسف وحده%', b);
+  perform pg_temp.chk('and the capability list is about this child by name',
+    b like '%يعرف يوسف%' and b like '%يبني خطوة اليوم على نتيجة أمس%'
+    and b like '%هذه ثالث مرّة هذا الأسبوع%');
 
-  perform pg_temp.chk('the fourth step is the differentiator: they stop needing it',
-    b like '%لا أريدكم أن تحتاجوني%');
-  perform pg_temp.chk('the price is present',
-    b like '%ثمن الرحلة%');
+  -- ONE guarantee. The count is the assertion: five reassurances read as a
+  -- legal notice, and a parent skims a legal notice.
+  perform pg_temp.chk('the extension is promised (stages.extension_days)',
+    b like '%أُكمل معكم نصف المدّة كاملةً مجاناً%');
+  perform pg_temp.chk('and it is the ONLY guarantee — no refund, no stacked reassurances',
+    b not like '%يرجع مالكم%'
+    and b not like '%رحلة واحدة في المرّة%'
+    and b not like '%لا حين يمرّ التقويم%', b);
+
+  -- ADAM is forbidden to say a price and does not know the terms. Saying so
+  -- before they ask is the difference between a boundary and a dead end.
+  perform pg_temp.chk('the offer says out loud that ADAM does not handle this part',
+    b like '%لا أتولّى هذا الجزء%' and b like '%فريق آدم%');
+  perform pg_temp.chk('the price is present, with the duration beside it',
+    b like '%ثمن الرحلة، لمدّة ٢٩ يوماً%', b);
   perform pg_temp.chk('and no asterisk survived into the offer',
     b not like '%*%', b);
 end $$;
@@ -105,19 +119,78 @@ begin
 
   perform pg_temp.chk('the offer carries a link button, not a bare address',
     bs->0 ? 'url' and (bs->0->>'url') like 'https://t.me/%', bs::text);
-  perform pg_temp.chk('and the label is a decision about this child',
-    (bs->0->>'label') like '%يوسف%', bs->0->>'label');
+  -- The old label was «نبدأ الرحلة» and the second button was «عندي سؤال قبل
+  -- أن أقرّر» routed to ADAM — who is forbidden to answer it. The button must
+  -- say who they are about to talk to.
+  perform pg_temp.chk('and it says they are going to the humans, by name',
+    (bs->0->>'label') like '%فريق آدم%' and (bs->0->>'label') like '%يوسف%',
+    bs->0->>'label');
   perform pg_temp.chk('the body no longer dumps the link as text',
     (j->>'body') not like '%t.me%', left(j->>'body', 40));
-  perform pg_temp.chk('and there is a way out that is not "no"',
-    bs @> '[{"cb":"other"}]'::jsonb, bs::text);
+  perform pg_temp.chk('declining is a real destination, not a shrug',
+    bs @> '[{"cb":"menu_not_now"}]'::jsonb, bs::text);
+  perform pg_temp.chk('no button on the offer sends a journey question to ADAM',
+    not (bs @> '[{"cb":"other"}]'::jsonb), bs::text);
+  perform pg_temp.chk('every button on the offer carries its own mark',
+    not exists (select 1 from jsonb_array_elements(bs) x
+                where (x->>'label') !~ '^[^[:ascii:]]'
+                   or (x->>'label') ~ '^[ء-ي]'), bs::text);
 
   -- A parent whose child we have not been told about must not be sold to
   -- with a placeholder where a name should be.
   p := pg_temp.parent('DZ');
   j := pg_temp.offer(p);
   perform pg_temp.chk('with no name known, the label is general, never «طفلكم» in a button',
-    (j->'buttons'->0->>'label') = '💚 نبدأ الرحلة', j->'buttons'->0->>'label');
+    (j->'buttons'->0->>'label') = '📞 أتحدّث مع فريق آدم', j->'buttons'->0->>'label');
+end $$;
+
+
+\echo '=== «LEIS AL-AAN» COSTS THEM NOTHING ==='
+do $$
+declare m jsonb;
+begin
+  m := public.get_conversation_moment('menu_not_now', null);
+  perform pg_temp.chk('declining lands on a moment that exists',
+    (m->>'found')::boolean, m::text);
+  perform pg_temp.chk('and it releases the pressure instead of asking again',
+    (m->>'body') like '%لا ضغط%' and (m->>'body') not like '%فريق آدم%', m->>'body');
+  perform pg_temp.chk('it restates that the free relationship is undamaged',
+    (m->>'body') like '%بلا نقص%');
+  perform pg_temp.chk('and it returns them to the ordinary conversation',
+    (m->'buttons') @> '[{"cb":"other"}]'::jsonb, (m->'buttons')::text);
+end $$;
+
+
+\echo '=== ADAM SAYS WHERE HE STOPS ==='
+do $$
+declare b text;
+begin
+  select body_ar into b from public.conversation_moments where key = 'menu_how';
+  perform pg_temp.chk('the method page names the boundary, before a parent finds it',
+    b like '%يتولّاه فريق آدم، لا أنا%', b);
+
+  select body_ar into b from public.conversation_moments where key = 'menu_why';
+  perform pg_temp.chk('and every capability carries its own mark, not nine identical ticks',
+    b not like '%✅%' and b like '%👦%' and b like '%🔒%', b);
+end $$;
+
+
+\echo '=== ٢٩ IS THE ENGINE''S NUMBER, NOT AN ADVERT''S ==='
+do $$
+declare v text;
+begin
+  select column_default into v from information_schema.columns
+  where table_schema='public' and table_name='stages' and column_name='planned_logged_days';
+  perform pg_temp.chk('a stage started with no explicit length is the length we promised',
+    coalesce(v,'') like '29%', coalesce(v,'null'));
+
+  -- The refund was never code — only a sentence in this comment saying one
+  -- would follow. A promise that lives in a comment cannot be kept.
+  perform pg_temp.chk('and the extension is documented as the whole of what is owed',
+    coalesce((select d.description from pg_description d
+              join pg_attribute a on a.attrelid = d.objoid and a.attnum = d.objsubid
+              where d.objoid = 'public.stages'::regclass
+                and a.attname = 'extension_days'), '') like '%whole of what is owed%');
 end $$;
 
 
