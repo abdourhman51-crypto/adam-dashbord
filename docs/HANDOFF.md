@@ -21,9 +21,9 @@ Read in this order, and only as far as you need:
 | Supabase | `aajqbmjasnbwwyvgrlzy` (Adam OS), Postgres 17.6 |
 | n8n | `adam-voices-n8n.hawiyat.cloud` |
 | **W1** Router + Agents | `42loY0bgUSwYmHFV` — 124 nodes, active |
-| **W2** Knowledge Writer | `7mTP12nVLS1Taokl` — 30 nodes, every 2h |
-| **W3** Rhythm Sender | `Vb4ADCkPsevPRWRN` — 11 nodes, hourly |
-| **W4** First Mirror | `pj19WNHEqU4xDDjy` |
+| **W2** Knowledge Writer | `7mTP12nVLS1Taokl` — 30 nodes, every 2h. **Paused** (`active:false`, `activeVersionId:null`) — founder-deliberate, to control cost pre-launch (2026-08-04). Do not re-activate without asking. |
+| **W3** Rhythm Sender | `Vb4ADCkPsevPRWRN` — 11 nodes, hourly. **Paused**, same reason as W2. No seed/harvest is currently being sent to anyone — the intention ask and offer fork (§10.4/5) are wired and correct but have nothing to trigger them until this is turned back on. |
+| **W4** First Mirror | `pj19WNHEqU4xDDjy` — **archived**. `generate_first_mirror`'s payload is ready (including `has_intention`, 2026-08-04) but there is no live workflow to render/send it. |
 
 ## State as of 2026-07-31
 
@@ -89,11 +89,13 @@ Open founder decision: «شيء آخر» on every button set — see Part 3 F9.
 1. ✅ إحياء البوّابة — live
 2. ✅ رسالة المساء تُعطي قبل أن تسأل — `get_harvest_prompt`, live
 3. ✅ قلب المقياس إلى الوالد — `parent_effort`, live
-4. ✅ عنصر النيّة — `should_ask_intention`/`record_intention_ask` ride the harvest, live (2026-08-04)
+4. ✅ عنصر النيّة — `should_ask_intention`/`record_intention_ask` ride the harvest, live (2026-08-04). Consumer built: `generate_first_mirror` emits `has_intention` (flag only, never the text — 2026-08-04), but W4 is archived so nothing renders it yet.
 5. ✅ لحظة العرض — `offer_ready`/`take_offer_moment` ride the harvest as the fork, live (2026-08-04). Buttons reuse live callbacks (`cta_full_companion` → menu_journey → فريق آدم; `not_now`). Fires once per parent when earned (3 attempts, 2 outcomes, confirmed situation, no strain). 0 parents earned it yet.
 6. 🔴 ما بعد الوصول — **not designed**, not just unwired (`docs/adam-system.md` §7/§10). Needs a design pass before any DB/n8n work.
 
 **Not wired: the parent's typed answers.** The intention ask and the offer fork's «نتركه يتكرّر» let a parent type a reply that nothing records — `record_intention()` is called from nowhere. Both asks are stamped once regardless, so this never causes a repeat; it only means a typed answer is not stored. Capturing it needs a routing decision in `M2 - Classify Track` (the way `survey_mode` intercepts), keyed on `intention_asked_at is not null and intention_text is null`.
+
+**Nothing in §10.4/5 is currently reaching anyone.** W3 (which sends the seed/harvest messages this all rides on) is paused — see Live system table. This is deliberate, not a bug: no real users yet, product still has known copywriting/UX gaps the founder is finding by testing manually. Founder's plan: finish the remaining threads, then a comprehensive review pass, testing live and reporting errors one at a time.
 
 ## Branch
 

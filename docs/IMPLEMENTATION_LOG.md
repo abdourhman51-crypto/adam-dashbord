@@ -5,6 +5,48 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-04 · The Mirror carries the intention forward — as a flag, never a quote
+
+`intention_text` (`give_before_asking` migration) has been write-only since it shipped: asked, stored,
+read by nothing. The Mirror — the one surface built to show a parent evidence of their own change — is
+where §10 item 4 always meant it to surface.
+
+**Why a flag, not the text.** `intention_text` is free text an exhausted parent typed once, and
+`record_intention()` only ever *wrote* it — it never had to be safe to *send*. Every other proactive
+message in this product passes `gate_agent_reply` or `gate_composed_reply` before a parent sees it.
+Piping `intention_text` into a Mirror payload that an LLM (or template) then echoes would quietly skip
+that entire discipline for exactly the kind of text most likely to be personal, mistyped, or unsafe to
+repeat back verbatim. So `generate_first_mirror` now emits `has_intention: boolean` only. The sentence
+the Mirror should actually say is fixed, pre-approved copy that shows *approach* without quoting her —
+`وتقتربون، خطوة بخطوة، ممّن أردتم أن تكونوا له.` — verified clean against production's own
+`copy_violations()`. Documented here rather than wired into a render step because **W4 (First Mirror
+Sender, `pj19WNHEqU4xDDjy`) is currently archived** — the payload is ready; there is no live workflow to
+carry the line yet.
+
+**Why the first Mirror, with no repetition guard needed.** `generate_first_mirror` is the only
+implemented Mirror kind — `weekly`, `stage_report`, and `parent` (the "identity payoff" kind that would
+be the more natural semantic home for this) are declared in the `mirrors.kind` CHECK constraint and
+never built. `uq_one_first_mirror_per_child` already guarantees the first Mirror fires at most once per
+child, so a fixed intention line here can never repeat to the same family without any new guard.
+
+**This engine had zero test coverage before today** — a live, revenue/retention-adjacent function with
+no assertions at all. New `supabase/tests/mirror_engine_test.sql` (10/10 passing) covers the pre-existing
+behavior it had never had tested (not-due-before-3-nights, generates-once, crisis suppression) alongside
+the new flag, including an explicit leak check: the parent's literal words are asserted absent from the
+payload's serialized text. `supabase/tests/fixture_mirror.sql` stubs `v_child_record`/`crisis_flags` —
+the real ones sit behind the journey_engine/child_record chain, which assumes columns
+(`stages.started_at`, `stages.created_at`) that predate this repo's migration history and cannot be
+reproduced from a blank fixture, the same constraint noted for `give_before_asking_test.sql`'s
+`ar_occasions` gap.
+
+**Also found while investigating where this consumer would even deliver:** W2 (Knowledge Writer) and W3
+(Rhythm Sender) are both currently `active: false` with `activeVersionId: null` — not merely paused, no
+published version exists to run. Confirmed with the founder: **deliberate**, to control cost while ADAM
+is pre-launch with no real users and known copywriting/UX gaps still being found through his own manual
+testing. Not a bug; left untouched. Recorded so a future session doesn't "fix" it.
+
+---
+
 ## 2026-08-04 · The offer moment — the fork, presented once, on the harvest
 
 `offer_ready()` (§10.5, the conversion moment) was built and tested and called from nowhere. Wired it
