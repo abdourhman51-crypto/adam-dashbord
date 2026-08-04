@@ -108,7 +108,11 @@ begin
     (e->>'tried_this_week')::int = 3, 'skip is honest, not a failure');
 
   b := public.compose_menu_body('menu_progress', p);
-  perform pg_temp.chk('/progress opens with what THEY did', b like 'هذا الأسبوع: جرّبتم%', b);
+  -- Not `like 'هذا الأسبوع%'`: the surface now opens with a heading naming the
+  -- child, because a parent tapping /progress for the first time was landing
+  -- mid-sentence. What the assertion is actually for survives that: the first
+  -- thing said ABOUT THE WEEK is what the parent did, not what the child did.
+  perform pg_temp.chk('/progress opens with what THEY did', b like '%هذا الأسبوع: جرّبتم%', b);
   -- "١ منها" reads like a spreadsheet row. One and two are words.
   perform pg_temp.chk('small counts are words, not digits', b not like '%١ منها%', b);
   perform pg_temp.chk('the child''s outcome is evidence, not the headline',

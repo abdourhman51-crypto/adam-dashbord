@@ -89,11 +89,13 @@ Open founder decision: «شيء آخر» on every button set — see Part 3 F9.
 1. ✅ إحياء البوّابة — live
 2. ✅ رسالة المساء تُعطي قبل أن تسأل — `get_harvest_prompt`, live
 3. ✅ قلب المقياس إلى الوالد — `parent_effort`, live
-4. ✅ عنصر النيّة — `should_ask_intention`/`record_intention_ask` ride the harvest, live (2026-08-04). Consumer built: `generate_first_mirror` emits `has_intention` (flag only, never the text — 2026-08-04), but W4 is archived so nothing renders it yet.
+4. ✅ عنصر النيّة — `should_ask_intention`/`record_intention_ask` ride the harvest, live (2026-08-04); the parent's typed answer is captured and answered (`capture_intention`, live 2026-08-05). Consumer built: `generate_first_mirror` emits `has_intention` (flag only, never the text — 2026-08-04), but W4 is archived so nothing renders it yet.
 5. ✅ لحظة العرض — `offer_ready`/`take_offer_moment` ride the harvest as the fork, live (2026-08-04). Buttons reuse live callbacks (`cta_full_companion` → menu_journey → فريق آدم; `not_now`). Fires once per parent when earned (3 attempts, 2 outcomes, confirmed situation, no strain). 0 parents earned it yet.
 6. 🔴 ما بعد الوصول — **not designed**, not just unwired (`docs/adam-system.md` §7/§10). Needs a design pass before any DB/n8n work.
 
-**Not wired: the parent's typed answers.** The intention ask and the offer fork's «نتركه يتكرّر» let a parent type a reply that nothing records — `record_intention()` is called from nowhere. Both asks are stamped once regardless, so this never causes a repeat; it only means a typed answer is not stored. Capturing it needs a routing decision in `M2 - Classify Track` (the way `survey_mode` intercepts), keyed on `intention_asked_at is not null and intention_text is null`.
+**The intention answer is now captured** (2026-08-05, `capture_intention`). A parent whose ask is stamped and unanswered gets their next typed message read as the answer — if it looks like one. `get_agent_bundle(p_follower_id, p_message)` performs the capture on the call `M2 - Get Memory Snapshot` was already making, and two credential-free nodes (`IN - Kept?`, `IN - Send Kept`) branch to the fixed `intention_kept` reply. Anything that does not look like an answer — a command, a question back, an essay, a message more than 36h late — captures nothing and falls through to the ordinary reply, because the intention is written once and never overwritten.
+
+**Still not wired: the offer fork's «نتركه يتكرّر».** A parent who taps it and then types gets an ordinary reply; nothing records that they chose to let it repeat. Lower value than the intention (the fork is stamped once regardless, and the «نشتغل عليه» side is fully live), and it needs a moment written for it before any wiring.
 
 **Nothing in §10.4/5 is currently reaching anyone.** W3 (which sends the seed/harvest messages this all rides on) is paused — see Live system table. This is deliberate, not a bug: no real users yet, product still has known copywriting/UX gaps the founder is finding by testing manually. Founder's plan: finish the remaining threads, then a comprehensive review pass, testing live and reporting errors one at a time.
 

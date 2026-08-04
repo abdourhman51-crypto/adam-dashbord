@@ -15,6 +15,7 @@ psql -v ON_ERROR_STOP=1 -f supabase/tests/fixture_minimal.sql
 for m in 20260731090000_telegram_surface_state \
          20260731120000_conversation_copy_and_button_law \
          20260731150000_knowledge_gate_and_uniqueness \
+         20260731210000_composed_reply_gate \
          20260801095000_moments_missing_from_repo \
          20260801100000_one_moment_one_send \
          20260801120000_rescue_floor_and_silent_journey \
@@ -27,13 +28,21 @@ for m in 20260731090000_telegram_surface_state \
          20260801230000_ask_the_59 \
          20260801240000_claim_the_country_ask \
          20260801250000_the_agent_speaks_under_law \
-         20260803120000_one_call_per_node ; do
+         20260803120000_one_call_per_node \
+         20260803180000_ask_the_intention \
+         20260804090000_the_offer_moment \
+         20260804120000_the_mirror_shows_approach \
+         20260804150000_copy_that_sells_the_promise \
+         20260804180000_no_message_assumes_you_know_adam \
+         20260804210000_seven_dead_buttons_and_the_method \
+         20260805090000_the_soft_funnel \
+         20260805150000_the_answer_is_kept ; do
   psql -v ON_ERROR_STOP=1 -q -f supabase/migrations/$m.sql || break
 done
 
 for t in telegram_surface conversation_law knowledge_gate one_send \
          rhythm_gate give_before_asking country_state \
-         agent_gate agent_bundle ; do
+         agent_gate agent_bundle composed_gate intention_capture ; do
   psql -q -f supabase/tests/${t}_test.sql
 done
 ```
@@ -42,7 +51,12 @@ done
 ones defined, so loading a subset tests a schema that has never existed. Run the
 list, not a favourite file from it.
 
-Current: **21 + 27 + 25 + 34 + 14 + 29 + 71 + 27 + 19 assertions, zero failures.**
+That is not a style note. `composed_reply_gate` was missing from this list for
+days; adding it *at the end* — where a reader naturally appends — silently
+reverted four later migrations and turned 32 green assertions into 24 red ones
+that looked exactly like a broken change. Append by timestamp, never by habit.
+
+Current: **21 + 27 + 25 + 35 + 7 + 29 + 71 + 27 + 19 + 32 + 29 assertions, zero failures.**
 
 ### Proving the repo *is* production
 
@@ -169,3 +183,24 @@ Machinery words (`خطة`, `نظام`) are **recorded and allowed** in `reply_ga
 n8n's MCP API cannot attach a `supabaseApi` credential to a new `httpRequest` node: `setNodeCredential` and `addNode` both reject the pair. Pre-existing nodes hold their credential server-side and the API omits it from every response, so they *look* bare and work. Three nodes added this way failed at runtime with `Credentials not found` — one of them, `Tap - Record Country`, had been silently discarding every country a parent tapped for two days.
 
 The number of Supabase-authenticated nodes in W1 cannot go up. The workaround — copying the hardcoded `apikey` header the older nodes use — is how the `service_role` key came to appear 116 times in plaintext, so existing calls carry more instead.
+
+## `intention_capture_test.sql`
+
+29 cases. ADAM asked a parent the one question the whole promise hangs on — *«أيّ أب أو أمّ تمنّيتم أن تكونوا له؟»* — and then threw the answer away. `record_intention()` had existed, tested, since `give_before_asking`, called from nowhere.
+
+Most of this file is about **not** capturing. The intention is written once and never overwritten, so a wrong capture is permanent, and every guard gets its own case with its own parent — a captured answer would close the door for every case after it and the suite would pass for the wrong reason:
+
+| The parent types | Verdict |
+|---|---|
+| `أب هادئ، لا يصرخ في أولاده`, same night | kept |
+| the same, four days later | `window_closed` |
+| `ok` | `too_short` |
+| `/faq` | `command` |
+| `كيف يعني؟` · `what do you mean?` | `a_question` |
+| a paragraph about tonight | `too_long` |
+| four lines about tonight | `not_a_sentence` |
+| a second answer, after one was kept | `not_awaiting`, and the first survives |
+
+The pair that matters most is the last group: a **declined message stores nothing**, and the real answer sent right after it still lands. Declining is only safe if it is not also destructive.
+
+Four cases guard the carrier rather than the rule — a captured message must not *also* spend the country ask or build a context for a model that will never run, and an ordinary message must come back with the identical bundle it always did.

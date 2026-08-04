@@ -5,6 +5,77 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-05 · The answer is kept
+
+ADAM asked the one question the whole promise hangs on — «أيّ أب أو أمّ تمنّيتم أن
+تكونوا له؟» — and threw the answer away. `record_intention()` had existed, tested,
+since `give_before_asking`, called from nowhere. Without that sentence stored,
+«تقتربون ممّن أردتم أن تكونوا له» has no referent: the Mirror's closing line is a
+promise about a thing the database does not hold.
+
+Worse than missing: the parent typed the most personal sentence they will ever type
+into this product and got an ordinary conversational reply, as if it were small talk
+about bedtime.
+
+**The ask now says how to answer.** It had no buttons by design — an intention cannot
+be picked from a list — but it also never said that typing was the move. A buttonless
+message with no instruction reads as an announcement, and an announcement gets no
+reply. Third line added: «اكتبوها بكلماتكم الآن، سطر واحد يكفي.»
+
+**And the answer gets an answer.** New `intention_kept`, the one moment ADAM replies
+to a typed message with fixed copy. Not a receipt — a parent who has just written who
+they hoped to be does not need «تم الحفظ». It says what the sentence is *for*:
+
+    🌱 هذه الجملة تكفي، ولن أسألكم عنها ثانية.
+
+    لن أطلب منكم أن تصيروها هذه الليلة.
+    لكن في كلّ مرّة يهدأ شيء، سأريكم أنّكم اقتربتم منها خطوة.
+
+**Most of the work is refusing to capture.** `intention_text` is written once and never
+overwritten, so a wrong capture is permanent. `capture_intention()` holds every guard in
+one place — not awaiting, more than 36h after the ask, under 3 characters, over 240,
+starts with `/`, ends with `؟` or `?`, more than three lines — and anything it declines
+writes nothing and falls through to the ordinary reply. `كيف يعني؟` is the case that
+mattered: the most likely reply to a question a parent did not expect, and the one a
+naive capture would have frozen into their identity forever.
+
+**No new authenticated node.** `supabase/tests/README.md` states why the count cannot go
+up. `get_agent_bundle` gained a second argument and now performs the capture on the call
+`M2 - Get Memory Snapshot` was already making; two credential-free nodes — `IN - Kept?`
+(IF) and `IN - Send Kept` (Telegram, token in URL like every other sender) — do the
+branching. Two arities, no default: a default makes the one-argument call ambiguous and
+would have broken the live node between apply and publish, so `get_agent_bundle(uuid)`
+survives as a thin forward.
+
+`M2 - Get Memory Snapshot` also gained `onError: continueRegularOutput`. It sits on every
+free and paid message, and until today a failure there took the whole reply with it. Now
+a failed bundle degrades to «لا توجد ذاكرة مسجلة بعد» and `intention_captured` reads
+false — the parent still gets answered.
+
+**Tested:** 29 new assertions in `intention_capture_test.sql`, offline, with a separate
+parent per guard so a capture in one case cannot make the next pass for the wrong reason.
+Regressions clean: conversation_law 27/27, knowledge_gate 25/25, one_send 35/35,
+give_before_asking 29/29, country_state 71/71, agent_gate 27/27, agent_bundle 19/19,
+composed_gate 32/32, rhythm_gate 7/7, telegram_surface 21/21. Applied to production and
+verified there on a disposable parent: `كيف يعني؟` → not captured, nothing stored;
+`أب هادئ، يسمع قبل ما يحكم` → captured, stored verbatim, `intention_kept` returned with
+its escape button, country ask not spent; the next message → ordinary bundle, 217-character
+context. W1 published.
+
+**One stale assertion fixed on the way.** `give_before_asking` had `/progress opens with
+what THEY did` pinned to `like 'هذا الأسبوع: جرّبتم%'` — a prefix that stopped being the
+prefix when `no_message_assumes_you_know_adam` added the «📊 رحلتكم مع» heading. Same
+class as the three `one_send` assertions fixed two days ago: the copy rewrite was right,
+the test was pinned to wording instead of to what it was defending.
+
+**And a trap in the test harness itself.** `composed_reply_gate` was missing from the
+README's migration chain. Appending it at the end — where a reader naturally appends —
+silently reverted four later migrations and turned 32 green assertions into 24 red ones
+that looked exactly like a broken change. The chain is now complete and ordered by
+timestamp, with the trap written down next to it.
+
+---
+
 ## 2026-08-05 · A soft funnel, from the first tap to the payment link
 
 `/faq` was a single 34-line wall. A document, not a journey: the parent either
