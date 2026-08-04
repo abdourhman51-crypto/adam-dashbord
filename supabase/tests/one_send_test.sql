@@ -62,8 +62,11 @@ begin
   -- empty state first
   a := public.compose_menu_body('menu_child', p);
   b := public.compose_menu_body('menu_progress', p);
+  -- The assertion is the PROPERTY, not the wording: the empty state must
+  -- admit it knows nothing and ask for a way in. Pinning the exact sentence
+  -- made this test fail on a rewrite that satisfied it better.
   perform pg_temp.chk('/child on an unknown child asks, and does not fake knowledge',
-    a like '%لم نتعرّف على طفلكم بعد%', a);
+    a like '%لا شيء بعد%' and a like '%اكتبوا اسمه%', a);
   perform pg_temp.chk('/child and /progress differ when nothing is known', a is distinct from b);
 
   -- now a real family
@@ -84,10 +87,20 @@ begin
   b := public.compose_menu_body('menu_progress', p);
 
   perform pg_temp.chk('/child names the child and the age', a like '%يوسف%' and a like '%أربع سنوات%', a);
-  perform pg_temp.chk('/child names the hard moment', a like '%الأصعب عادةً%', a);
+  perform pg_temp.chk('/child names the hard moment', a like '%أصعب لحظة معه%', a);
   perform pg_temp.chk('/child reads back only a safe_for_record pattern',
     a like '%يهدأ حين نبدأ مبكراً%', a);
-  perform pg_temp.chk('/child stays within three lines', public.content_line_count(a) <= 3, a);
+  -- Was a hardcoded three. That cap is what forced every composed surface
+  -- into context-free fragments («جرّبتم مرة واحدة» — tried WHAT?), so
+  -- menu_child moved to the reference category and declares its own budget.
+  -- The property worth testing is that the body respects the budget it
+  -- declares, whatever that budget is.
+  perform pg_temp.chk('/child stays within its declared budget',
+    public.content_line_count(a) <=
+      (select max_lines from public.conversation_moments where key = 'menu_child'),
+    a);
+  perform pg_temp.chk('/child says what it is, so it reads alone',
+    a like '👦%', a);
 
   perform pg_temp.chk('/progress compares two weeks, it does not count',
     b like '%هذا الأسبوع%' and b like '%الأسبوع الماضي%', b);
