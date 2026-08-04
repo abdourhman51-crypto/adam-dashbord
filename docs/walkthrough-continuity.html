@@ -1,0 +1,443 @@
+<title>One ADAM — Chapters, Not Products</title>
+
+<style>
+  :root {
+    --ground: #EDEFF2; --ground-2: #E3E7EC; --ink: #16202B; --ink-2: #4A5A6B;
+    --ink-3: #7C8B9C; --rule: #CFD6DE; --chat-bg: #E9EDF2; --bubble-in: #FFFFFF;
+    --bubble-in-ink: #16202B; --bubble-out: #DCF2C9; --bubble-out-ink: #16202B;
+    --device: #C6CFD9; --device-edge: #AEB9C6; --accent: #5E8A6C; --accent-soft: #E3EDE5;
+    --amber: #A8761C; --amber-soft: #F6EAD2; --rose: #A85C5C; --rose-soft: #F5E3E3;
+    --indigo: #4A5E8C; --indigo-soft: #E2E7F2;
+    --shadow: 0 18px 50px rgba(22,32,43,.14); --glow: none;
+    --serif: "Iowan Old Style", "Palatino Linotype", Charter, Georgia, "Times New Roman", serif;
+    --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --ar: "SF Arabic", "Geeza Pro", "Noto Naskh Arabic", "Traditional Arabic", Tahoma, "Segoe UI", sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #0E1420; --ground-2: #131B29; --ink: #E6ECF3; --ink-2: #A9B7C6;
+      --ink-3: #74849A; --rule: #23303F; --chat-bg: #17212B; --bubble-in: #1E2B37;
+      --bubble-in-ink: #E6ECF3; --bubble-out: #2B5278; --bubble-out-ink: #EAF2FA;
+      --device: #1B2432; --device-edge: #2A3646; --accent: #7FA88B; --accent-soft: #1B2A22;
+      --amber: #D9A441; --amber-soft: #2A2318; --rose: #C97A7A; --rose-soft: #2B1D1D;
+      --indigo: #8FA3D4; --indigo-soft: #1A2136;
+      --shadow: 0 22px 60px rgba(0,0,0,.55); --glow: 0 0 80px rgba(127,168,139,.10);
+    }
+  }
+  :root[data-theme="light"] {
+    --ground: #EDEFF2; --ground-2: #E3E7EC; --ink: #16202B; --ink-2: #4A5A6B;
+    --ink-3: #7C8B9C; --rule: #CFD6DE; --chat-bg: #E9EDF2; --bubble-in: #FFFFFF;
+    --bubble-in-ink: #16202B; --bubble-out: #DCF2C9; --bubble-out-ink: #16202B;
+    --device: #C6CFD9; --device-edge: #AEB9C6; --accent: #5E8A6C; --accent-soft: #E3EDE5;
+    --amber: #A8761C; --amber-soft: #F6EAD2; --rose: #A85C5C; --rose-soft: #F5E3E3;
+    --indigo: #4A5E8C; --indigo-soft: #E2E7F2;
+    --shadow: 0 18px 50px rgba(22,32,43,.14); --glow: none;
+  }
+  :root[data-theme="dark"] {
+    --ground: #0E1420; --ground-2: #131B29; --ink: #E6ECF3; --ink-2: #A9B7C6;
+    --ink-3: #74849A; --rule: #23303F; --chat-bg: #17212B; --bubble-in: #1E2B37;
+    --bubble-in-ink: #E6ECF3; --bubble-out: #2B5278; --bubble-out-ink: #EAF2FA;
+    --device: #1B2432; --device-edge: #2A3646; --accent: #7FA88B; --accent-soft: #1B2A22;
+    --amber: #D9A441; --amber-soft: #2A2318; --rose: #C97A7A; --rose-soft: #2B1D1D;
+    --indigo: #8FA3D4; --indigo-soft: #1A2136;
+    --shadow: 0 22px 60px rgba(0,0,0,.55); --glow: 0 0 80px rgba(127,168,139,.10);
+  }
+
+  body { background: var(--ground); color: var(--ink); font-family: var(--serif); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 110px; }
+
+  .hero { padding: 90px 0 54px; border-bottom: 1px solid var(--rule); }
+  .eyebrow { font-family: var(--sans); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  .hero h1 { font-size: clamp(38px, 6.6vw, 70px); line-height: 1.04; margin: 18px 0 0; font-weight: 400; letter-spacing: -.02em; text-wrap: balance; }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero .lede { margin-top: 24px; font-size: clamp(17px, 2vw, 21px); color: var(--ink-2); max-width: 64ch; text-wrap: pretty; }
+
+  .thread { margin-top: 44px; padding: 26px 28px; border-radius: 14px; background: var(--ground-2); }
+  .thread .ar { font-family: var(--ar); font-size: 19px; line-height: 1.9; color: var(--ink); }
+  .thread .en { font-family: var(--sans); font-size: 13.5px; color: var(--ink-3); margin-top: 10px; }
+
+  .leaks { margin-top: 40px; }
+  .leaks h3 { font-family: var(--sans); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--rose); margin: 0 0 14px; font-weight: 700; }
+  .scroller { overflow-x: auto; }
+  .tbl { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 13.5px; }
+  .tbl th, .tbl td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .tbl th { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; }
+  .tbl td:first-child { color: var(--ink); font-weight: 650; white-space: nowrap; }
+  .tbl .bad { color: var(--rose); }
+  .tbl .good { color: var(--accent); font-weight: 600; }
+
+  .act { padding: 66px 0; border-bottom: 1px solid var(--rule); }
+  .act-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .day { font-family: var(--mono); font-size: 12px; letter-spacing: .09em; text-transform: uppercase; font-weight: 600; white-space: nowrap; padding: 4px 10px; border-radius: 999px; color: var(--accent); border: 1px solid var(--accent); }
+  .day.free { color: var(--ink-3); border-color: var(--rule); }
+  .day.paid { color: var(--indigo); border-color: var(--indigo); }
+  .clock { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+  .act h2 { font-size: clamp(24px, 3.2vw, 34px); font-weight: 400; letter-spacing: -.015em; margin: 16px 0 0; text-wrap: balance; }
+  .say { margin-top: 13px; max-width: 66ch; color: var(--ink-2); font-size: 17px; text-wrap: pretty; }
+  .say + .say { margin-top: 11px; }
+  .say strong { color: var(--ink); font-weight: 600; }
+
+  .cols { display: grid; grid-template-columns: 1fr; gap: 36px; margin-top: 32px; align-items: start; }
+  @media (min-width: 900px) { .cols { grid-template-columns: minmax(0,1fr) 400px; gap: 52px; } }
+
+  .phone { background: var(--device); border: 1px solid var(--device-edge); border-radius: 34px; padding: 9px; box-shadow: var(--shadow), var(--glow); max-width: 400px; width: 100%; justify-self: center; }
+  .screen { background: var(--chat-bg); border-radius: 26px; overflow: hidden; }
+  .statusbar { display: flex; justify-content: space-between; align-items: center; padding: 9px 18px 5px; font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); }
+  .tgbar { display: flex; align-items: center; gap: 11px; padding: 9px 14px 11px; border-bottom: 1px solid var(--rule); }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; flex: none; background: var(--accent); color: var(--ground); display: grid; place-items: center; font-size: 16px; }
+  .tgname { font-family: var(--sans); font-size: 14px; font-weight: 650; color: var(--ink); line-height: 1.25; }
+  .tgsub { font-family: var(--sans); font-size: 11px; color: var(--accent); }
+  .menu-ico { margin-inline-start: auto; color: var(--ink-3); font-size: 17px; line-height: 1; }
+
+  .chat { padding: 14px 12px 18px; display: flex; flex-direction: column; gap: 9px; }
+  .chat[dir="rtl"] { font-family: var(--ar); }
+  .msg { max-width: 88%; padding: 9px 13px; border-radius: 15px; font-size: 15px; line-height: 1.72; }
+  .from-adam { background: var(--bubble-in); color: var(--bubble-in-ink); align-self: flex-end; border-bottom-right-radius: 5px; }
+  .from-user { background: var(--bubble-out); color: var(--bubble-out-ink); align-self: flex-start; border-bottom-left-radius: 5px; }
+  .msg .t { display: block; font-family: var(--mono); font-size: 9.5px; opacity: .55; margin-top: 5px; direction: ltr; text-align: left; }
+  .from-user .t { text-align: right; }
+  .kb { align-self: flex-end; max-width: 88%; display: grid; gap: 5px; margin-top: -3px; }
+  .kb .key { display: block; text-align: center; padding: 9px 10px; background: var(--bubble-in); color: var(--accent); border-radius: 9px; font-family: var(--ar); font-size: 14px; box-shadow: inset 0 0 0 1px var(--rule); }
+  .kb .picked { background: var(--accent); color: var(--ground); box-shadow: none; font-weight: 600; }
+  .daysep { align-self: center; font-family: var(--sans); font-size: 10.5px; letter-spacing: .06em; color: var(--ink-3); background: var(--bubble-in); padding: 3px 12px; border-radius: 999px; margin: 5px 0; text-transform: uppercase; }
+  .record { border-inline-start: 3px solid var(--accent); padding-inline-start: 11px; }
+  .journeycard { border-inline-start: 3px solid var(--indigo); padding-inline-start: 11px; }
+  .mirror { border-inline-start: 3px solid var(--amber); padding-inline-start: 11px; }
+  .bars { font-family: var(--mono); font-size: 16px; letter-spacing: 2px; color: var(--amber); direction: ltr; display: block; margin: 3px 0; }
+
+  .note { font-family: var(--sans); font-size: 13.5px; line-height: 1.62; background: var(--ground-2); border-radius: 12px; padding: 17px 19px; color: var(--ink-2); }
+  .note + .note { margin-top: 12px; }
+  .note h4 { font-family: var(--sans); font-size: 10.5px; letter-spacing: .13em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; font-weight: 700; }
+  .note.warm { background: var(--amber-soft); } .note.warm h4 { color: var(--amber); }
+  .note.deep { background: var(--indigo-soft); } .note.deep h4 { color: var(--indigo); }
+  .note.care { background: var(--rose-soft); } .note.care h4 { color: var(--rose); }
+  .note b { color: var(--ink); font-weight: 650; }
+  .note ul { margin: 8px 0 0; padding-inline-start: 18px; } .note li { margin-bottom: 5px; }
+  .gloss { font-family: var(--sans); font-size: 12.5px; color: var(--ink-3); margin-top: 14px; padding-inline-start: 13px; border-inline-start: 2px solid var(--rule); max-width: 62ch; }
+  .gloss b { color: var(--ink-2); font-weight: 600; }
+
+  .vs { display: grid; gap: 2px; border-radius: 12px; overflow: hidden; margin-top: 4px; }
+  .vs > div { padding: 15px 18px; font-family: var(--sans); font-size: 13.5px; background: var(--ground-2); }
+  .vs .old { color: var(--ink-3); }
+  .vs .new { color: var(--ink); }
+  .vs b { display: block; font-size: 10px; letter-spacing: .13em; text-transform: uppercase; margin-bottom: 6px; }
+  .vs .old b { color: var(--rose); } .vs .new b { color: var(--accent); }
+  .vs .ar { font-family: var(--ar); font-size: 15px; line-height: 1.8; }
+
+  .close { padding: 78px 0 0; }
+  .close h2 { font-size: clamp(28px, 4vw, 42px); font-weight: 400; letter-spacing: -.02em; margin: 0 0 6px; }
+  .qa { display: grid; gap: 2px; margin-top: 34px; border-radius: 14px; overflow: hidden; }
+  .qa > div { background: var(--ground-2); padding: 22px 24px; }
+  .qa h3 { font-family: var(--sans); font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--accent); margin: 0 0 9px; font-weight: 700; }
+  .qa p { margin: 0; font-size: 16px; color: var(--ink-2); max-width: 72ch; }
+  .qa b { color: var(--ink); font-weight: 600; }
+  .end { margin-top: 58px; padding-top: 26px; border-top: 1px solid var(--rule); font-family: var(--sans); font-size: 13px; color: var(--ink-3); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .act { animation: rise .6s ease-out both; animation-timeline: view(); animation-range: entry 0% entry 32%; }
+    @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Walkthrough v3 · continuity</div>
+    <h1>One ADAM,<br>many <em>chapters</em></h1>
+    <p class="lede">v2 got the hook right and the architecture wrong: a menu of seven Journeys is a shop, and a parent who browses it is a customer, not a companion's charge. This fixes the seams — the four places where the product leaked “separate purchases.”</p>
+
+    <div class="thread">
+      <div class="ar">«نحن في رحلة واحدة. الآن نقف عند مرحلة النوم.»</div>
+      <div class="en">We are on one journey. Right now we are at the sleep stage.</div>
+    </div>
+
+    <div class="leaks">
+      <h3>The four leaks in v2</h3>
+      <div class="scroller">
+        <table class="tbl">
+          <tr><th>Seam</th><th class="bad">v2 — felt like a product</th><th class="good">v3 — feels like a companion</th></tr>
+          <tr><td>The menu</td><td class="bad">«الرحلات» — a browsable catalogue with prices</td><td class="good">No catalogue. ADAM proposes one thing</td></tr>
+          <tr><td>Who chooses</td><td class="bad">She selects from a list</td><td class="good">ADAM chooses and explains why, from her data</td></tr>
+          <tr><td>Between stages</td><td class="bad">Journey ends → gap → new offer</td><td class="good">Nothing pauses. The rhythm never stops</td></tr>
+          <tr><td>The ask</td><td class="bad">“Buy the Sibling Journey”</td><td class="good">«نكمل» — <i>we continue</i></td></tr>
+        </table>
+      </div>
+    </div>
+  </header>
+
+  <!-- ACT 1 -->
+  <section class="act">
+    <div class="act-head"><span class="day free">Night 5</span><span class="clock">22:15 · the menu, rebuilt</span></div>
+    <h2>She opens ☰ and finds no shop</h2>
+    <p class="say">In v2 the menu said <strong>«الرحلات»</strong> — <em>the Journeys</em> — and listed them. That single word turns ADAM into a storefront and her into a shopper comparing her children's problems by price.</p>
+    <p class="say">In v3 the menu says <strong>«أين نحن؟»</strong> — <em>where are we?</em> It answers with their history, not an inventory.</p>
+
+    <div class="cols">
+      <div>
+        <div class="vs">
+          <div class="old"><b>v2 — the catalogue</b><div class="ar">الرحلات المتاحة:<br>• رحلة النوم — ١٤ يوماً — ٤٩٠ ج<br>• رحلة العناد — ٢١ يوماً — ٤٩٠ ج<br>• رحلة الغيرة — ٢١ يوماً — ٤٩٠ ج</div></div>
+          <div class="new"><b>v3 — where we are</b><div class="ar">نحن معاً منذ ٥ ليالٍ.<br>ما نعمل عليه الآن: نوم يوسف.<br>وما أراه قادماً: سأخبركِ حين يحين وقته.</div></div>
+        </div>
+        <div class="note" style="margin-top:14px">
+          <h4>Why the catalogue had to go</h4>
+          <p style="margin:0">A price list invites a mother to weigh <b>her son's sleep against her daughter's jealousy</b> and pick the cheaper one. That is a grotesque thing to ask a parent to do, and it is what any menu of priced Journeys asks. Removing it is not cosmetic — it removes the comparison entirely.</p>
+        </div>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>22:15</span><span>▮▮▮ 48%</span></div>
+        <div class="tgbar"><div class="avatar">🌿</div><div><div class="tgname">آدم</div><div class="tgsub">متصل</div></div><div class="menu-ico">☰</div></div>
+        <div class="chat" dir="rtl">
+          <div class="msg from-user">أين نحن<span class="t">22:15</span></div>
+          <div class="msg from-adam record">
+            نحن معاً منذ خمس ليالٍ. 🌿<br><br>
+            ما نعمل عليه الآن: <b>نوم يوسف</b>.<br>
+            ثلاث ليالٍ من خمس نام فيها دون معركة كاملة.<br><br>
+            وما عرفتُه عنه حتى الآن محفوظ في <b>سجل يوسف</b> — اطلبيه متى شئتِ.<br><br>
+            حين أرى أن شيئاً آخر صار أهمّ، سأقول لكِ.
+            <span class="t">22:15</span>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ACT 2 -->
+  <section class="act">
+    <div class="act-head"><span class="day free">any time</span><span class="clock">«سجل يوسف»</span></div>
+    <h2>The record — memory made into an object she owns</h2>
+    <p class="say">This is new in v3, and it solves a problem that dogged both earlier versions. Memory is the differentiator, but <strong>nobody buys memory</strong> — your own offer prompt says so: <em>«لا أحد يشتري ذاكرة»</em>.</p>
+    <p class="say">The record doesn't sell memory. It <strong>hands it over</strong>. One document, free, growing forever, that she can ask for at any moment.</p>
+
+    <div class="cols">
+      <div>
+        <div class="note">
+          <h4>Why it must be free</h4>
+          <p style="margin:0">The instant a parent's knowledge of her own child sits behind a paywall, ADAM stops being a companion and becomes a landlord. The record is <b>hers</b>. It is also the single most tangible proof that this is one relationship and not a series of transactions — it does not reset, it does not expire, and it never belonged to us.</p>
+        </div>
+        <div class="note deep">
+          <h4>What it quietly does for retention</h4>
+          <p style="margin:0">Every stage makes it richer. After a year it holds things no other product could reconstruct — and it was built one tap at a time, by her. Leaving means leaving that behind. <b>That is an honest switching cost</b>, built from delivered value rather than from lock-in.</p>
+        </div>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>14:20</span><span>▮▮▮ 90%</span></div>
+        <div class="tgbar"><div class="avatar">🌿</div><div><div class="tgname">آدم</div><div class="tgsub">متصل</div></div><div class="menu-ico">☰</div></div>
+        <div class="chat" dir="rtl">
+          <div class="msg from-user">سجل يوسف<span class="t">14:20</span></div>
+          <div class="msg from-adam record">
+            <b>سجل يوسف</b> — ٥ سنوات<br>معاً منذ ١٤ يوليو<br><br>
+            <b>ما يهدّئه:</b><br>
+            • الضوء الخافت عند النوم<br>
+            • جملة «أنا برّه الباب» — نجحت ٦ مرات من ٧<br>
+            • التنبيه قبل الانتقال بدقيقة<br><br>
+            <b>ما يفجّر الموقف:</b><br>
+            • الظلام الكامل بدونكِ<br>
+            • الأوامر المباشرة بلا تمهيد<br>
+            • الشرح الطويل وقت النوم — يوقظه<br><br>
+            <b>ما مررنا به:</b><br>
+            • مرحلة النوم — اكتملت. ٦ معارك أسبوعياً ← واحدة<br><br>
+            <b>ما ألاحظه ولم نعمل عليه بعد:</b><br>
+            • شجار متكرر مع أخته قبل النوم
+            <span class="t">14:20</span>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <p class="gloss">Note the last section. ADAM tells her what he has noticed and <b>not yet acted on</b>, in a document she asked for, with no price attached. Transparency doubles as the most natural setup for what comes next.</p>
+  </section>
+
+  <!-- ACT 3 -->
+  <section class="act">
+    <div class="act-head"><span class="day free">Day 15–16</span><span class="clock">the night after the stage ends</span></div>
+    <h2>Nothing stops</h2>
+    <p class="say">This is the most important fix in v3. In v2, a Journey ended, the parent dropped back to free, and an offer arrived later — three distinct events that <strong>taught her she had been a customer for fourteen days and was now between purchases</strong>.</p>
+    <p class="say">In v3 the stage report is delivered, and then the next evening at 21:00 the rhythm simply continues, exactly as it always has. No downgrade message. No “your Journey has ended.” Nothing to notice.</p>
+
+    <div class="cols">
+      <div>
+        <div class="vs">
+          <div class="old"><b>v2 — the seam</b><div class="ar">اكتملت رحلة النوم.<br>عدتِ الآن إلى المساحة المجانية.<br><br><i>…ثم بعد أيام: عرض جديد</i></div></div>
+          <div class="new"><b>v3 — no seam</b><div class="ar"><i>لا رسالة انتقال إطلاقاً.</i><br>الليلة التالية، ٩:٠٠ مساءً:<br>«كيف كانت الليلة مع يوسف؟»</div></div>
+        </div>
+        <div class="note" style="margin-top:14px">
+          <h4>What she loses, and what she doesn't</h4>
+          <p style="margin:0 0 9px"><b>Stops:</b> the 19:15 message before bedtime. The adaptive daily step. The weekly Mirror.</p>
+          <p style="margin:0"><b>Continues, untouched:</b> the nightly rhythm, rescue at 23:40 on any bad night, the record, and every single thing ADAM knows about Yusuf. She was never downgraded, because she was never upgraded — <b>she was accompanied, more intensely for a while.</b></p>
+        </div>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>21:00</span><span>▮▮▮ 63%</span></div>
+        <div class="tgbar"><div class="avatar">🌿</div><div><div class="tgname">آدم</div><div class="tgsub">متصل</div></div><div class="menu-ico">☰</div></div>
+        <div class="chat" dir="rtl">
+          <div class="daysep">يوم ١٤ — التقرير</div>
+          <div class="msg from-adam mirror">…الأسبوع الأخير: <b>ست ليالٍ من سبع</b>.<br><br>لم يهدأ يوسف وحده.<span class="t">21:00</span></div>
+          <div class="daysep">يوم ١٥</div>
+          <div class="msg from-adam">كيف كانت الليلة مع يوسف؟<span class="t">21:00</span></div>
+          <div class="kb"><span class="key picked">نام بسهولة</span><span class="key">تعب لكن نام</span><span class="key">معركة</span></div>
+          <div class="msg from-adam">جميل. 🌿<span class="t">21:01</span></div>
+          <div class="daysep">يوم ١٦</div>
+          <div class="msg from-adam">كيف كانت الليلة؟<span class="t">21:00</span></div>
+        </div>
+      </div></div>
+    </div>
+    <p class="gloss"><b>The absence is the design.</b> There is no message announcing a change of status, because there is no change of status. A companion does not send you a downgrade notice.</p>
+  </section>
+
+  <!-- ACT 4 -->
+  <section class="act">
+    <div class="act-head"><span class="day free">Day 19</span><span class="clock">21:00 · guidance, free</span></div>
+    <h2>ADAM decides what matters next — and charges nothing to say so</h2>
+    <p class="say">Blueprint v1 banned proactive selling on hard evidence: <strong>8 pushed offers, 0 clicks</strong>. But a companion who never guides isn't a companion. v3 resolves this with one rule:</p>
+    <p class="say"><strong>Guidance is free, proactive and unconditional. The transaction is pull-only.</strong></p>
+
+    <div class="cols">
+      <div>
+        <div class="note deep">
+          <h4>Read what is missing from this message</h4>
+          <ul>
+            <li><b>No price.</b> Not mentioned, not hinted.</li>
+            <li><b>No button.</b> Nothing to tap.</li>
+            <li><b>No duration.</b> Not framed as a package.</li>
+            <li><b>No date, no urgency, no expiry.</b></li>
+          </ul>
+          <p style="margin:9px 0 0">It is a doctor saying <i>“I think we should look at this next.”</i> That is care. Attaching an invoice to it, unprompted, is not — and your data already showed what happens when you do.</p>
+        </div>
+        <div class="note">
+          <h4>Why ADAM choosing is a feature, not a restriction</h4>
+          <p style="margin:0">She is exhausted. Asking her to <b>diagnose her own family and pick a programme</b> is work — and it is work she came here to be relieved of. ADAM choosing, and showing his reasoning from her own logs, is the entire value of having a companion who has been watching. She can always redirect; she rarely will, because he is right and he shows why.</p>
+        </div>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>21:04</span><span>▮▮▮ 58%</span></div>
+        <div class="tgbar"><div class="avatar">🌿</div><div><div class="tgname">آدم</div><div class="tgsub">متصل</div></div><div class="menu-ico">☰</div></div>
+        <div class="chat" dir="rtl">
+          <div class="msg from-adam journeycard">
+            لاحظتُ شيئاً يتكرّر، وأظنّه صار الأهم الآن.<br><br>
+            في ٦ من ليالي الأسبوعين الماضيين ذكرتِ شجاراً مع أخته — مرّتان منهما قبل النوم مباشرة.<br><br>
+            لم أتحدّث عنه لأننا كنّا نعمل على النوم، والانتباه المقسوم لا يغيّر شيئاً — لا عندكِ ولا عنده.<br><br>
+            الآن نوم يوسف استقرّ. أرى أن الغيرة هي ما نقف عنده بعد ذلك.<br><br>
+            ولا شيء يتغيّر إن لم يكن الوقت مناسباً — أنا هنا كل ليلة كما كنت. 🌿
+            <span class="t">21:04</span>
+          </div>
+          <div class="msg from-user">صح والله. طب نعمل ايه<span class="t">21:31</span></div>
+        </div>
+      </div></div>
+    </div>
+    <p class="gloss">She asked. <b>Only now</b> does the cost appear — and only because she pulled it. Had she said nothing, the guidance would still stand and the nightly rhythm would carry on unchanged.</p>
+  </section>
+
+  <!-- ACT 5 -->
+  <section class="act">
+    <div class="act-head"><span class="day paid">Day 19</span><span class="clock">21:32 · «نكمل»</span></div>
+    <h2>The second ask is a continuation, not a purchase</h2>
+    <p class="say">Same money. Completely different sentence. v2 said <em>“the Sibling Journey — 21 days — 490 EGP.”</em> v3 never names a product, because there is no product.</p>
+
+    <div class="cols">
+      <div>
+        <div class="vs">
+          <div class="old"><b>v2 — a second product</b><div class="ar">رحلة الغيرة — ٢١ يوماً<br>٤٩٠ جنيهاً<br>[شراء الرحلة]</div></div>
+          <div class="new"><b>v3 — continuing</b><div class="ar">نكمل معاً — الغيرة هذه المرة.<br>ثلاثة أسابيع، لأن سلوك طفلين يتغيّر أبطأ من واحد.<br>٢٩٠ جنيهاً.</div></div>
+        </div>
+        <div class="note" style="margin-top:14px">
+          <h4>Three things that make it a continuation</h4>
+          <ul>
+            <li><b>«نكمل»</b> — <i>we continue</i>. Not “buy”, not “start”, not “subscribe”.</li>
+            <li><b>The lower price is framed as history, not a discount</b> — she has walked with him before. No “50% off”, no promotion language.</li>
+            <li><b>The duration is justified by the child</b>, not by a package tier: <i>two children's behaviour shifts more slowly than one</i>.</li>
+          </ul>
+        </div>
+        <div class="note warm">
+          <h4>The objective is still declared before she pays</h4>
+          <p style="margin:0">Unchanged from v2, and non-negotiable. She knows exactly what she is buying and exactly how she will know if it failed — <b>and if it fails, ADAM continues free until it doesn't.</b></p>
+        </div>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>21:32</span><span>▮▮▮ 57%</span></div>
+        <div class="tgbar"><div class="avatar">🌿</div><div><div class="tgname">آدم</div><div class="tgsub">متصل</div></div><div class="menu-ico">☰</div></div>
+        <div class="chat" dir="rtl">
+          <div class="msg from-adam journeycard">
+            نكمل معاً — الغيرة هذه المرة.<br><br>
+            الهدف: أن يمرّ اليوم بشجارٍ واحد بدل خمسة، وأن يقترب يوسف من أخته دون أن تُطلبي منه ذلك.<br><br>
+            ثلاثة أسابيع — لأن سلوك طفلين يتغيّر أبطأ من سلوك طفل واحد.<br><br>
+            وسأصلكِ قبل وقت الشجار لا بعده، كما فعلنا مع النوم.<br><br>
+            ٢٩٠ جنيهاً — أقلّ، لأننا مشينا معاً من قبل.
+            <span class="t">21:32</span>
+          </div>
+          <div class="kb"><span class="key picked">نكمل</span><span class="key">ليس الآن</span></div>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ACT 6 -->
+  <section class="act">
+    <div class="act-head"><span class="day free">Year 2</span><span class="clock">Yusuf is 7 · school mornings</span></div>
+    <h2>The long arc — the same ADAM, two years on</h2>
+    <p class="say">This is what “lifelong companion” actually buys you, and it is a stronger retention story than any subscription: not <em>“keep paying to retain access”</em> but <em>“I have known your child since he was five.”</em></p>
+
+    <div class="cols">
+      <div>
+        <div class="note deep">
+          <h4>What ADAM does here that nothing else can</h4>
+          <p style="margin:0 0 9px">He reaches back <b>two years</b> to a solved problem and reuses its mechanism — because the underlying trait is the same child's trait. Yusuf has always needed warning before transitions. At five it was bedtime; at seven it is the school gate.</p>
+          <p style="margin:0">No new parent could know that. No new AI could know that. <b>Only the one who was there.</b></p>
+        </div>
+        <div class="note">
+          <h4>Stages follow the child, not the customer</h4>
+          <p style="margin:0">A 5-year-old's bedtime becomes a 7-year-old's school mornings becomes a 9-year-old's screen conflict becomes a 12-year-old's withdrawal. The relationship has no natural end date, because <b>childhood keeps producing new stages</b> — and each one is easier than the last, because the record keeps growing.</p>
+        </div>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>07:10</span><span>▮▮▮ 84%</span></div>
+        <div class="tgbar"><div class="avatar">🌿</div><div><div class="tgname">آدم</div><div class="tgsub">متصل</div></div><div class="menu-ico">☰</div></div>
+        <div class="chat" dir="rtl">
+          <div class="msg from-user">كل صباح بقى معركة عشان المدرسة. بيتعلق فيا ومش عايز يدخل<span class="t">07:04</span></div>
+          <div class="msg from-adam record">
+            هذا يشبه شيئاً مررنا به.<br><br>
+            حين كان يوسف في الخامسة، لم يكن يرفض النوم — كان يرفض أن تختفي في الظلام. وما حلّه وقتها لم يكن الروتين، بل جملة واحدة: أن يعرف أنكِ موجودة حتى حين لا يراكِ.<br><br>
+            بوابة المدرسة هي الظلام الجديد.<br><br>
+            الصباح، قبل أن تتركيه، قولي له أين ستكونين بالضبط الساعة الثانية. مكان محدد، لا «هعدي عليك».
+            <span class="t">07:10</span>
+          </div>
+          <div class="msg from-user">انت فاكر ده من سنتين؟<span class="t">07:12</span></div>
+          <div class="msg from-adam">أنا أعرف يوسف منذ كان في الخامسة. 🌿<span class="t">07:12</span></div>
+        </div>
+      </div></div>
+    </div>
+    <p class="gloss"><b>«انت فاكر ده من سنتين؟»</b> — <i>You remember that from two years ago?</i><br>That question is the moat. It is not answerable by a competitor, a book, a course, or a general AI — only by something that stayed.</p>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="close">
+    <div class="eyebrow">What changed</div>
+    <h2>Six decisions, one constraint</h2>
+    <p class="say">“Journeys are chapters, not products” sounds like naming. It is six structural decisions, and leaving any one of them unchanged would have leaked the shop back in.</p>
+
+    <div class="scroller">
+      <table class="tbl" style="margin-top:26px">
+        <tr><th>Decision</th><th class="bad">If products</th><th class="good">If chapters</th></tr>
+        <tr><td>Menu</td><td class="bad">Priced catalogue</td><td class="good">«أين نحن؟» — history, not inventory</td></tr>
+        <tr><td>Who chooses</td><td class="bad">She browses and selects</td><td class="good">ADAM proposes with reasoning; she confirms</td></tr>
+        <tr><td>Between stages</td><td class="bad">Ends → gap → new offer</td><td class="good">Nothing pauses; no status message exists</td></tr>
+        <tr><td>The record</td><td class="bad">Per-Journey, resets</td><td class="good">One document, free, grows forever, hers</td></tr>
+        <tr><td>Ask language</td><td class="bad">“Buy the Sibling Journey”</td><td class="good">«نكمل» — we continue</td></tr>
+        <tr><td>Horizon</td><td class="bad">Ends with the Journey</td><td class="good">Follows the child from 3 to 13</td></tr>
+      </table>
+    </div>
+
+    <div class="qa">
+      <div><h3>What she is buying</h3><p>Not a programme. <b>A period of closer attention</b> from someone already walking with her — who arrives before the hard moment instead of after it, for as long as that particular thing is hard.</p></div>
+      <div><h3>What she never does</h3><p>Compare her son's sleep against her daughter's jealousy by price. <b>The catalogue that would force that comparison does not exist.</b></p></div>
+      <div><h3>How ADAM sells without selling</h3><p>Guidance is free, proactive and unconditional — he says what matters next, with no price, no button, no date. <b>The transaction only ever appears after she pulls it.</b> This is the rule that reconciles “never push” with “always guide.”</p></div>
+      <div><h3>Why she stays</h3><p>Not because access would be revoked — nothing is revoked. Because the record keeps growing, each stage is easier than the last, and after two years ADAM knows things about her child that <b>nobody else could reconstruct</b>.</p></div>
+      <div><h3>What is unchanged from v2</h3><p>The child problem is still the hook. The objective is still declared before payment. The three-phase spine — observe, build, hold — is intact. Crisis is still never billed. The parent's transformation is still the payoff, not the pitch.</p></div>
+      <div><h3>The one open blocker</h3><p>Unchanged and still yours: <b>where a parent-violence disclosure routes.</b> Nothing in this revision touches it, and I would still not scale past a pilot without it settled.</p></div>
+    </div>
+
+    <div class="end">
+      Architecture: <code>docs/journey-architecture.md</code> §3.0–3.1.1, §6–6.1. Nothing implemented; nothing in the live system modified.
+    </div>
+  </section>
+
+</div>

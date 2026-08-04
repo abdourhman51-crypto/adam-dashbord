@@ -1,0 +1,14 @@
+-- Situation detection. Applied via Supabase migration
+-- `situation_catalog_and_detection`.
+--
+-- situation_catalog   : the CLOSED taxonomy, each key carrying the time
+--                       window the rhythm schedules against.
+-- commit_situation    : the only way a situation is created. Takes the
+--                       window from the catalog, never from the caller,
+--                       so no LLM can smuggle in a window that would
+--                       misschedule the rhythm. Three independent
+--                       observations promote candidate -> confirmed.
+-- get_situation_batch : parents with a named child but no confirmed
+--                       situation, plus conversation to classify from.
+--
+-- Keys: sleep(20-22) study(16-18) meal(13-15) screen(16-20) out(16-19) other(20-22)

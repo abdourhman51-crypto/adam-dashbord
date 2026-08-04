@@ -1,0 +1,222 @@
+-- ============================================================================
+-- Cleanup: drop legacy selling machinery and provably-dead objects
+-- ============================================================================
+--
+-- Context. The old product was a funnel: a Judge scored parents, a Silent
+-- Seller pushed offers, a Renewal Guard dunned them monthly. The new product
+-- has none of those. The workflows that drove this machinery were archived in
+-- n8n on 2026-07-29; these are the database objects they called.
+--
+-- Every object dropped below was verified unreferenced by ALL of:
+--   * the live workflow ADAM - Machine 1+2 (calls only check_daily_message_cap
+--     and get_agent_context)
+--   * the live workflow ADAM - Heart Writer (get_heart_batch, heart_commit,
+--     write_child_name)
+--   * every other function in the public schema (pg_proc.prosrc scan)
+--   * every committed file under app/
+--
+-- Deliberately NOT dropped, and why:
+--   return_to_free, activate_subscription  -> called from app/actions/activate.ts
+--   v_renewal_summary and all other v_*    -> dashboard reads them; lib/queries.ts
+--                                             is not committed, so the reference
+--                                             set cannot be verified from source
+--   writer_commit, get_extraction_batch,
+--   _ensure_child, get_free_session_state  -> an unattributed write touched
+--                                             memory_events + memory_snapshots +
+--                                             child_patterns on 2026-07-28 10:01
+--                                             that no n8n execution accounts for.
+--                                             Not provably dead -> deprecated only.
+--   weekly_plans                           -> write_child_name backfills it and
+--                                             the dashboard reads it
+--   survey_responses, session_tracker      -> execute_erasure depends on both
+--
+-- Recovery. The full prior definition of every dropped object is reproduced in
+-- the comment block at the end of this file. Nothing here touches parent data:
+-- both dropped tables held zero rows.
+-- ============================================================================
+
+begin;
+
+-- ---------------------------------------------------------------------------
+-- 1. The broken message counter
+-- ---------------------------------------------------------------------------
+-- Week-0 established that followers.message_count froze at 0 while parents were
+-- demonstrably conversing: the trigger fired on public.messages, which has never
+-- held a row, and the RPC that called increment_follower_message had been dropped
+-- from the router. Engagement is now derived by v_parent_engagement, which
+-- reconciles exactly (2080 attributed + 7 orphaned = 2087).
+--
+-- Leaving a counter that silently reports 0 is worse than having none.
+
+drop trigger if exists trg_update_message_count on public.messages;
+drop function if exists public.update_follower_message_count();
+drop function if exists public.increment_follower_message(uuid);
+drop table if exists public.messages;
+
+-- ---------------------------------------------------------------------------
+-- 2. Offer / renewal machinery
+-- ---------------------------------------------------------------------------
+-- These are the query layer of the funnel. get_live_offer_signal in particular
+-- encodes the old model precisely: fire an offer at >= 15 messages, within a
+-- 2-20 minute silence window, in three countries, excluding two hardcoded test
+-- accounts. The new architecture pulls guidance rather than pushing offers, so
+-- none of these have a caller.
+
+drop function if exists public.get_offer_candidates();
+drop function if exists public.get_live_offer_signal(integer, integer);
+drop function if exists public.get_followup_candidates();
+drop function if exists public.get_renewal_actions();
+drop function if exists public.increment_waitlist_daily(uuid);
+
+-- ---------------------------------------------------------------------------
+-- 3. Never-populated aggregate table
+-- ---------------------------------------------------------------------------
+-- collective_intelligence was intended to hold cross-parent aggregate signals.
+-- It and its 2026-07-08 archive copy have both always been empty, and no
+-- function, workflow or committed file reads either.
+
+drop table if exists public.collective_intelligence;
+drop table if exists public.collective_intelligence_archive_20260708;
+
+commit;
+
+-- ============================================================================
+-- RECOVERY DDL — prior definitions of everything dropped above
+-- ============================================================================
+--
+-- create table public.messages (
+--   id uuid not null default gen_random_uuid(),
+--   follower_id uuid,
+--   direction text,
+--   content text,
+--   timestamp timestamp with time zone default now()
+-- );
+--
+-- create table public.collective_intelligence (
+--   id uuid not null default gen_random_uuid(),
+--   period_start date,
+--   period_end date,
+--   generated_at timestamp with time zone default now(),
+--   top_struggles jsonb,
+--   top_fears jsonb,
+--   top_goals jsonb,
+--   product_signals jsonb,
+--   reviewed boolean default false
+-- );
+--
+-- create table public.collective_intelligence_archive_20260708 (
+--   id uuid, period_start date, period_end date,
+--   generated_at timestamp with time zone,
+--   top_struggles jsonb, top_fears jsonb, top_goals jsonb,
+--   product_signals jsonb, reviewed boolean
+-- );
+--
+-- CREATE FUNCTION public.update_follower_message_count() RETURNS trigger
+--   LANGUAGE plpgsql SET search_path TO 'pg_catalog','public' AS $$
+-- BEGIN
+--   UPDATE followers
+--   SET message_count = COALESCE(message_count, 0) + 1, last_active = now()
+--   WHERE id = NEW.follower_id;
+--   RETURN NEW;
+-- END; $$;
+-- (trigger: CREATE TRIGGER trg_update_message_count AFTER INSERT ON public.messages
+--           FOR EACH ROW EXECUTE FUNCTION public.update_follower_message_count();)
+--
+-- CREATE FUNCTION public.increment_follower_message(p_follower_id uuid) RETURNS void
+--   LANGUAGE plpgsql SET search_path TO 'pg_catalog','public' AS $$
+-- BEGIN
+--   UPDATE followers SET message_count = message_count + 1, last_active = now()
+--   WHERE id = p_follower_id;
+-- END; $$;
+--
+-- CREATE FUNCTION public.increment_waitlist_daily(p_follower_id uuid) RETURNS integer
+--   LANGUAGE plpgsql SET search_path TO 'pg_catalog','public' AS $$
+-- DECLARE v_count integer;
+-- BEGIN
+--   UPDATE followers
+--   SET daily_msg_count = CASE WHEN daily_msg_date = CURRENT_DATE
+--                              THEN daily_msg_count + 1 ELSE 1 END,
+--       daily_msg_date = CURRENT_DATE, last_active = now()
+--   WHERE id = p_follower_id
+--   RETURNING daily_msg_count INTO v_count;
+--   RETURN COALESCE(v_count, 0);
+-- END; $$;
+--
+-- CREATE FUNCTION public.get_offer_candidates()
+--   RETURNS TABLE(follower_id uuid, platform_user_id text, first_name text, country text)
+--   LANGUAGE sql STABLE SET search_path TO 'pg_catalog','public' AS $$
+--   SELECT f.id, f.platform_user_id, COALESCE(f.first_name,''), f.country
+--   FROM followers f
+--   WHERE f.country IN ('DZ','EG','MA')
+--     AND f.funnel_stage = 'free_conversation'
+--     AND COALESCE(f.offer_status,'none') = 'none'
+--     AND (SELECT count(*) FROM n8n_chat_histories h
+--          WHERE h.session_id = f.platform_user_id
+--            AND h.message->>'type' = 'human') >= 12;
+-- $$;
+--
+-- CREATE FUNCTION public.get_live_offer_signal(p_min_quiet_minutes integer DEFAULT 2,
+--                                              p_max_gap_minutes integer DEFAULT 20)
+--   RETURNS TABLE(id uuid, platform_user_id text, first_name text, country text,
+--                 message_count integer, return_count integer,
+--                 last_msg_at timestamp with time zone, minutes_since_last numeric)
+--   LANGUAGE sql STABLE SET search_path TO 'pg_catalog','public' AS $$
+--   WITH last_msg AS (
+--     SELECT session_id, MAX(created_at) AS last_at
+--     FROM n8n_chat_histories WHERE session_id ~ '^[0-9]+$' GROUP BY session_id
+--   )
+--   SELECT f.id, f.platform_user_id, f.first_name, f.country,
+--          f.message_count, COALESCE(f.return_count,0),
+--          lm.last_at, ROUND(EXTRACT(EPOCH FROM (now()-lm.last_at))/60.0,1)
+--   FROM followers f JOIN last_msg lm ON lm.session_id = f.platform_user_id
+--   WHERE f.funnel_stage='free_conversation' AND f.cohort='new'
+--     AND COALESCE(f.waitlist,false)=false
+--     AND COALESCE(f.message_count,0)>=15
+--     AND COALESCE(f.ready_for_offer,false)=false
+--     AND COALESCE(f.offer_declined_count,0)<2
+--     AND (f.offer_status IS NULL OR f.offer_status NOT IN
+--          ('sent','followed_up','converted','converted_pending','presented'))
+--     AND f.country IN ('DZ','EG','MA')
+--     AND f.platform_user_id NOT IN ('7377091520','8074049810')
+--     AND lm.last_at <= now() - make_interval(mins => p_min_quiet_minutes)
+--     AND lm.last_at >= now() - make_interval(mins => p_max_gap_minutes)
+--   ORDER BY lm.last_at DESC;
+-- $$;
+--
+-- CREATE FUNCTION public.get_followup_candidates()
+--   RETURNS TABLE(follower_id uuid, platform_user_id text, first_name text, country text)
+--   LANGUAGE sql STABLE SET search_path TO 'pg_catalog','public' AS $$
+--   SELECT f.id, f.platform_user_id, COALESCE(f.first_name,''), f.country
+--   FROM followers f
+--   WHERE f.funnel_stage = 'offer_presented'
+--     AND f.offer_sent_at IS NOT NULL
+--     AND f.offer_sent_at <= now() - interval '3 days'
+--     AND f.followup_sent_at IS NULL
+--     AND COALESCE(f.last_active, 'epoch'::timestamptz) <= f.offer_sent_at;
+-- $$;
+--
+-- CREATE FUNCTION public.get_renewal_actions()
+--   RETURNS TABLE(follower_id uuid, platform_user_id text, first_name text, country text,
+--                 action text, days_left integer, child_name text, main_challenge text,
+--                 wins text, has_breakthrough boolean, next_step text,
+--                 progress_score integer, win_count bigint, completed_steps bigint,
+--                 improved_patterns bigint)
+--   LANGUAGE sql STABLE SET search_path TO 'pg_catalog','public' AS $$
+--   SELECT * FROM (
+--     SELECT v.follower_id, v.platform_user_id, COALESCE(v.first_name,''), f.country,
+--       CASE
+--         WHEN v.days_left <= 0  AND f.renewal_d0_sent_at IS NULL THEN 'd0'
+--         WHEN v.days_left <= -1 THEN 'expire'
+--         WHEN v.days_left BETWEEN 1 AND 5 AND f.renewal_d5_sent_at IS NULL THEN 'd5'
+--         ELSE NULL
+--       END AS action,
+--       v.days_left, v.child_name, v.main_challenge, v.wins,
+--       v.has_breakthrough, v.next_step, v.progress_score,
+--       COALESCE(v.win_count,0), COALESCE(v.completed_steps,0),
+--       COALESCE(v.improved_patterns,0)
+--     FROM v_renewal_summary v
+--     JOIN followers f ON f.id = v.follower_id
+--     WHERE f.funnel_stage = 'paid_active'
+--   ) q WHERE q.action IS NOT NULL;
+-- $$;
+-- ============================================================================

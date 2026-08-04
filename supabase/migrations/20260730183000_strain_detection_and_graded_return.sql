@@ -1,0 +1,26 @@
+-- Strain detection and graded return (AD-2).
+-- Applied via Supabase migration `strain_detection_and_graded_return`.
+--
+-- This closes a live safety gap: get_rhythm_due() already refused to send
+-- at strain level > 1, but nothing in the system ever wrote level 2 or 3,
+-- so the guardrail was declared and inert. A parent disclosing violence at
+-- night would have received a cheerful Seed the next morning.
+--
+-- set_strain_level(parent_id, level, reason)
+--   Escalation is IMMEDIATE. Recovery is GRADED: one level at a time, and
+--   never before return_eligible_at. The asymmetry is the design — a parent
+--   in danger cannot wait for a cooling period, and "they seem fine now" is
+--   not a judgement a scheduler should be trusted to make.
+--   L3 holds 7 days before it may step to L2. L2 holds 3 days before L1.
+--
+-- commerce_allowed(parent_id)
+--   The single answer to "may anything commercial reach this parent right
+--   now?". Blocks at L2/L3 and for 14 days after any crisis flag. One
+--   function, so five engines cannot each reach a different conclusion.
+--   Defaults true where no strain record exists: absence of strain is not
+--   strain.
+--
+-- get_strain_batch(limit)
+--   Recent conversation, oldest-assessed first. Batch rather than realtime
+--   is acceptable because the Seed only sends in a morning window and this
+--   runs every 2h, so a night disclosure is caught before it.
