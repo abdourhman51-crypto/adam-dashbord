@@ -20,10 +20,11 @@ Read in this order, and only as far as you need:
 |---|---|
 | Supabase | `aajqbmjasnbwwyvgrlzy` (Adam OS), Postgres 17.6 |
 | n8n | `adam-voices-n8n.hawiyat.cloud` |
-| **W1** Router + Agents | `42loY0bgUSwYmHFV` — 124 nodes, active |
+| **W1** Router + Agents | `42loY0bgUSwYmHFV` — 126 nodes, active |
 | **W2** Knowledge Writer | `7mTP12nVLS1Taokl` — 30 nodes, every 2h. **Paused** (`active:false`, `activeVersionId:null`) — founder-deliberate, to control cost pre-launch (2026-08-04). Do not re-activate without asking. |
 | **W3** Rhythm Sender | `Vb4ADCkPsevPRWRN` — 11 nodes, hourly. **Paused**, same reason as W2. No seed/harvest is currently being sent to anyone — the intention ask and offer fork (§10.4/5) are wired and correct but have nothing to trigger them until this is turned back on. |
 | **W4** First Mirror | `pj19WNHEqU4xDDjy` — **archived**. `generate_first_mirror`'s payload is ready (including `has_intention`, 2026-08-04) but there is no live workflow to render/send it. |
+| **Bot Commands** | `Wlc3VSq3YYmZZdZj` — 3 nodes, manual trigger, never scheduled. Writes the Telegram command list (`setMyCommands`) with its emoji. Run it by hand after changing the menu wording; the list lives in this workflow, not in the database. |
 
 ## State as of 2026-07-31
 

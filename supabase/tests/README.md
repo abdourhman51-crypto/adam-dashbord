@@ -36,13 +36,15 @@ for m in 20260731090000_telegram_surface_state \
          20260804180000_no_message_assumes_you_know_adam \
          20260804210000_seven_dead_buttons_and_the_method \
          20260805090000_the_soft_funnel \
-         20260805150000_the_answer_is_kept ; do
+         20260805150000_the_answer_is_kept \
+         20260805200000_the_offer_that_sells_the_result ; do
   psql -v ON_ERROR_STOP=1 -q -f supabase/migrations/$m.sql || break
 done
 
 for t in telegram_surface conversation_law knowledge_gate one_send \
          rhythm_gate give_before_asking country_state \
-         agent_gate agent_bundle composed_gate intention_capture ; do
+         agent_gate agent_bundle composed_gate intention_capture \
+         offer_surface ; do
   psql -q -f supabase/tests/${t}_test.sql
 done
 ```
@@ -56,7 +58,7 @@ days; adding it *at the end* — where a reader naturally appends — silently
 reverted four later migrations and turned 32 green assertions into 24 red ones
 that looked exactly like a broken change. Append by timestamp, never by habit.
 
-Current: **21 + 27 + 25 + 35 + 7 + 29 + 71 + 27 + 19 + 32 + 29 assertions, zero failures.**
+Current: **21 + 27 + 25 + 35 + 7 + 29 + 71 + 27 + 19 + 32 + 29 + 22 assertions, zero failures.**
 
 ### Proving the repo *is* production
 
@@ -204,3 +206,44 @@ Most of this file is about **not** capturing. The intention is written once and 
 The pair that matters most is the last group: a **declined message stores nothing**, and the real answer sent right after it still lands. Declining is only safe if it is not also destructive.
 
 Four cases guard the carrier rather than the rule — a captured message must not *also* spend the country ask or build a context for a model that will never run, and an ordinary message must come back with the identical bundle it always did.
+
+## `offer_surface_test.sql`
+
+22 cases on the one screen where a parent decides whether to pay.
+
+Two of them are about markup. Nothing in this product sends with a `parse_mode`, so
+`**عنوان**` reached parents as literal asterisks for as long as it was there. The test
+asserts no stored moment carries `**`, and then tries to insert one and asserts the
+database refuses it.
+
+The rest pin **each promise in the offer to the thing that enforces it**, so the copy
+cannot quietly shrink back to the modest version that undersold the product:
+
+| The line | Enforced by |
+|---|---|
+| «لا حين يمرّ التقويم» | `v_stage_progress.logged_days` |
+| «أُكمل معكم نصفها… بلا أن تطلبوا» | `stages.extension_days` |
+| «يرجع مالكم» | `stages.refunded_at` |
+| «رحلة واحدة في المرّة» | `uq_one_live_stage_per_parent` |
+| «إن رأيت الأمور تتحسّن… أصمت» | `can_propose_stage` → `trend_improving` |
+
+> **A promise with no column behind it is a lie with a deadline.**
+
+The call-to-action cases check the button carries a `url` rather than the message body
+carrying an address, that its label names the child when we know one — and that it
+falls back to a general label when we don't, rather than putting «طفلكم» on a button.
+
+### The `STABLE` snapshot trap, again
+
+Every case here creates its parent in **its own statement**, never nested inside the
+call under test:
+
+```sql
+p := pg_temp.parent('DZ', 'يوسف');   -- statement 1
+j := pg_temp.offer(p);               -- statement 2
+```
+
+`country_state()` is `STABLE`, so written on one line it reads the snapshot taken
+*before* the insert and every supported-country case fails looking exactly like a
+broken function. This is the third time the same trap has cost real debugging; it is
+in this README twice now for that reason.

@@ -5,6 +5,65 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-05 · The offer sells the result, and stops underselling the product
+
+Three faults on the one screen where a parent decides whether to pay.
+
+**Bold that was never bold.** Nothing in this product sends with a `parse_mode`, so
+every `**عنوان**` reached the parent as literal asterisks — on `/faq`, `/how`, `/why`
+and the offer itself. Removed everywhere, and a CHECK constraint
+(`chk_body_no_dead_markup`) now refuses the next one. Deliberately a constraint on
+stored copy rather than a new `copy_violations()` rule: that function also gates what
+the model writes at send time, and an LLM reaching for markdown would start costing
+real sends. The bug was in copy we wrote, so the guard sits exactly there.
+
+**The offer described the machinery.** A parent at 10pm is not buying a method; they
+are buying the end of a night that keeps coming back. Rewritten around that: what the
+free side already gives and that it is permanent, then the enemy named
+(«ترجع الأسبوع القادم، وبعده، وبعده»), then how we get there — including the fourth
+step, which is the whole differentiator: «ثم أتراجع أنا عمداً… لا أريدكم أن تحتاجوني
+بعد شهر».
+
+**And we had been underselling it.** The journey engine already implements three
+promises the offer never mentioned, each one a column, not a claim:
+
+| The line the parent reads | What enforces it |
+|---|---|
+| «الأيام تُحسب حين تكونون معي، لا حين يمرّ التقويم» | `v_stage_progress.logged_days` counts logged days, never calendar days |
+| «أُكمل معكم نصفها كاملاً، مجاناً، وبلا أن تطلبوا» | `stages.extension_days` — the column comment says *unrequested* |
+| «ولم نصل بعدها؟ يرجع مالكم» | `stages.refunded_at`; a second extension is never granted |
+| «رحلة واحدة في المرّة» | `uq_one_live_stage_per_parent` |
+| «وإن رأيت الأمور تتحسّن عندكم، أصمت» | `can_propose_stage` → `trend_improving` |
+
+The last two are refusals, and they buy more trust than any claim precisely because
+they cost us money. They were free to say — they were already true.
+
+**The call to action is a button now.** `get_conversation_moment` may emit a button
+carrying `url` instead of `cb`, and `Tap - Send Fixed` renders it as a Telegram link
+button. The label carries the child's name when we know it — «💚 نبدأ رحلة يوسف» is a
+decision about one child; a bare `t.me` address in the message body was not. Ordered
+carefully: the sender shipped and was published *before* the migration, because the
+reverse order would have sent a button with `callback_data: undefined` and Telegram
+would have rejected the whole offer.
+
+**The command list has its emoji.** Written by `setMyCommands` from a new one-shot
+workflow (`ADAM · Bot Commands`, `Wlc3VSq3YYmZZdZj`, manual trigger, never scheduled)
+because api.telegram.org is not reachable from this session's proxy. Both calls
+returned `ok:true`. The word «القائمة» beside the input box is Telegram's own
+localisation of "Menu" for a `commands`-type menu button — the Bot API exposes no text
+field for it, so that one is not ours to move.
+
+**Tested:** 22 new assertions in `offer_surface_test.sql`, which pins each promise to
+its schema counterpart so the offer cannot quietly shrink back to the modest version.
+Regressions clean across all eleven suites. Two `country_state` assertions were
+rewritten: they pinned the old implementation («no buttons at all», «the body contains
+the t.me address») rather than the rule, which was always *فريق آدم is the only next
+step and nothing in the bot takes money*. A third was passing vacuously —
+`position(a) < position(b)` is true whenever `a` is missing, so a copy rewrite had
+silently turned it into a test of nothing; both needles are now asserted present first.
+
+---
+
 ## 2026-08-05 · The answer is kept
 
 ADAM asked the one question the whole promise hangs on — «أيّ أب أو أمّ تمنّيتم أن

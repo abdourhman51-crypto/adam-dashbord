@@ -130,13 +130,22 @@ begin
   j := public.get_conversation_moment('menu_journey', dz);
   perform pg_temp.chk('a supported parent is told the price of their own country',
     (j->>'body') like '%2,300 دينار جزائري%', j->>'body');
+  -- position() returns 0 for a missing needle, so `position(a) < position(b)`
+  -- passes vacuously when `a` is gone. Both needles are asserted present
+  -- first, or a copy rewrite silently turns this into a test of nothing.
   perform pg_temp.chk('and the free relationship is named as permanent, first',
-    position('مجاناً، دائماً' in (j->>'body'))
+    (j->>'body') like '%المجاني يبقى مجانياً%'
+    and (j->>'body') like '%الرحلة الواحدة%'
+    and position('المجاني يبقى مجانياً' in (j->>'body'))
       < position('الرحلة الواحدة' in (j->>'body')), j->>'body');
-  perform pg_temp.chk('the price answer carries no buttons — فريق آدم is the only next step',
-    coalesce(j->'buttons', '[]'::jsonb) = '[]'::jsonb, (j->'buttons')::text);
-  perform pg_temp.chk('and it hands them a human, not a checkout',
-    (j->>'body') like '%https://t.me/Abdouleg%', j->>'body');
+  -- Was "no buttons at all". The rule was never about buttons: it is that
+  -- فريق آدم is the only next step, and nothing in the bot takes money.
+  perform pg_temp.chk('the price answer opens no checkout — فريق آدم is the only next step',
+    not exists (select 1 from jsonb_array_elements(coalesce(j->'buttons','[]'::jsonb)) x
+                where coalesce(x->>'url','') <> '' and (x->>'url') not like 'https://t.me/%'),
+    (j->'buttons')::text);
+  perform pg_temp.chk('and it hands them a human, on a button rather than a raw address',
+    (j->'buttons'->0->>'url') = 'https://t.me/Abdouleg', (j->'buttons')::text);
 
   -- unsupported
   j := public.get_conversation_moment('menu_journey', sa);
