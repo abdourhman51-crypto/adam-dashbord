@@ -5,6 +5,63 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-04 · The copy stops describing the machine, and the prompt stops being a rulebook
+
+Founder review of a live Telegram session: the replies are weak, the button copy is poor, there is no
+clear line between free and paid, and nothing anywhere gives a parent a reason to want the paid thing.
+All four were true. **All four were already answered in the brand bible — the product simply never
+carried the answers.**
+
+**«المجاني: أن تكون القصة أخفّ. / المرافقة: ألّا تتكرّر القصة.»** is the sharpest sentence this product
+owns, decided in `adam-promise.md`, and it appeared in **zero** live strings. It is the entire answer to
+"what am I paying for", understood in one second without explanation. It now opens every commercial
+surface: `menu_journey`, `menu_faq`, `menu_journey_presence`.
+
+**«شيء آخر» — nine times, meaning nothing.** `chk_escape_hatch` requires a button whose *callback* is
+`other`; it says nothing about the *label*. Every escape hatch shipped with the same placeholder, so a
+parent who does not know ADAM read nine dead ends. The constraint was never the cause — laziness was.
+Each label is now written for its context («عندي موقف آخر» · «عندي سؤال آخر» · «صار شيء آخر» ·
+«أفضّل ألّا أقول»). Zero dead-end buttons remain, verified by query.
+
+**The command that sells could not be named.** Verified against production `copy_violations()`: the
+literal string `/journey` is blocked as `internal:latin`. So the one command reaching the paid offer was
+unwritable in stored copy — the FAQ literally could not tell a parent where to go, and that is a hard
+conversion blocker nobody had noticed. Fixed without loosening the rule: a **button** carrying
+`cta_full_companion`, which the Router already maps to `menu_journey`. No typing, no hunting, lexicon
+still banned.
+
+**The evening buttons blamed the parent.** «ما صارت الفرصة» makes an exhausted parent report in the
+language of a missed obligation, and an unanswered demand from an app produces guilt — which ends
+subscriptions before they start. Now «اليوم كان أثقل»: same fact, none of the blame. And «نجحت» became
+«مرّ أهدأ», because `parent_effort()` exists precisely so the score is about the parent, not a verdict on
+the step.
+
+**Also corrected:** `menu_journey` said «ليالٍ أهدأ». `adam-promise.md` names night-shaped vocabulary as
+the sleep-product leak that tells a morning-battle parent this is not for them — one sentence that loses
+them. Now «الموقف», domain-neutral by design.
+
+### The system prompt — a compliance document became a character
+
+The replies were cold because of the prompt's *architecture*, not the model. ~60% of it was prohibitions;
+under heavy negative constraint a model optimises for the shortest output that violates nothing.
+«قاعدتك الأولى: أقلّ كلاماً» led the document, anchoring brevity above warmth. And there were almost no
+worked examples — while W3's seed prompt has three and is visibly warmer for it.
+
+Rewritten around: a success criterion first (*that the parent feels someone knows their house in
+particular, and that they are not alone*), **four worked exchanges** (guilt disclosure, collapse,
+recurrence, the price question), and an explicit split the founder asked for by name — **defaults that
+bend for the parent** (length, opening, shape, whether to give a step at all; *"the default is two or
+three lines; if their moment needs five, give five… do not cut until it goes cold"*) versus **lines never
+crossed**. The commercial bans were deliberately left firm: `gate_agent_reply` *blocks* a reply that
+breaks them, so loosening them buys more blocking, not more warmth. Full text and rationale now live in
+`docs/prompts/adam-conversation-agent.md`, which is the source of truth; the node is pushed from it.
+
+Every string was checked against production's own `copy_violations()` and `content_line_count()` **before**
+the migration was written. Applied and published; `conversation_law` 27/27, `knowledge_gate` 25/25,
+`country_state` 71/71, `one_send` 34/34 clean.
+
+---
+
 ## 2026-08-04 · The Mirror carries the intention forward — as a flag, never a quote
 
 `intention_text` (`give_before_asking` migration) has been write-only since it shipped: asked, stored,
