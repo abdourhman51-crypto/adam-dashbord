@@ -193,3 +193,44 @@ begin
 end $$;
 
 rollback;
+
+\echo ''
+\echo '=== EVERY BUTTON MUST BE ROUTABLE ==='
+-- Seven buttons shipped whose callbacks were handled NOWHERE: quiet_hours,
+-- pause, erase, resume_tomorrow, stay_paused, review_yes, review_stay. Each
+-- fell through the Router's final else to the rescue, so a parent tapping
+-- «امحوا كل ما قلته» was answered «لم أفهم هذه تماماً». No test looked at
+-- routing, so the copy law passed while the product was broken.
+--
+-- The Router dispatches a callback when it is in its TAPS table, or starts
+-- with menu_ / ck_mom_ / ck_step_ / ck_gen_ / set_country_. Anything else is
+-- the rescue. This asserts the property directly.
+with taps(cb) as (
+  values ('menu_help'),('help_start'),('other'),('how_exactly'),('how_start'),
+         ('not_now'),('cta_later'),('cta_ready'),('cta_full_companion'),
+         ('waitlist_join')
+),
+buttons as (
+  select distinct c.key as from_moment, b->>'cb' as cb
+  from public.conversation_moments c, jsonb_array_elements(c.buttons) b
+)
+select case when count(*) = 0 then 'PASS' else 'FAIL' end as every_button_routes,
+       coalesce(string_agg(from_moment || '→' || cb, ', '), '') as dead
+from buttons
+where cb not in (select cb from taps)
+  and cb !~ '^(menu_|ck_mom_|ck_step_|ck_gen_|set_country_)';
+
+-- A menu_-prefixed callback is used verbatim as the moment key, so the moment
+-- must exist — unless get_moment_after_tap deliberately redirects it, which
+-- only the three hour keys do.
+with buttons as (
+  select distinct b->>'cb' as cb
+  from public.conversation_moments c, jsonb_array_elements(c.buttons) b
+)
+select case when count(*) = 0 then 'PASS' else 'FAIL' end as menu_callbacks_have_moments,
+       coalesce(string_agg(cb, ', '), '') as missing
+from buttons
+where cb like 'menu\_%'
+  and cb not in ('menu_settings_hour_morning','menu_settings_hour_evening',
+                 'menu_settings_hour_night')
+  and not exists (select 1 from public.conversation_moments m where m.key = buttons.cb);

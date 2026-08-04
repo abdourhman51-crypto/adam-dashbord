@@ -5,6 +5,67 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-04 · Seven dead buttons, and the method the FAQ never explained
+
+Third founder review, on a live session. He tapped «امحوا كل ما قلته» and was
+answered «لم أفهم هذه تماماً». Same for «أوقفوا الرسالة اليومية». Not a copy
+defect — **dead buttons**.
+
+**The evidence, not a guess.** Searched all 262,000 characters of the workflow
+JSON: `quiet_hours`, `pause`, `erase`, `resume_tomorrow`, `stay_paused`,
+`review_yes`, `review_stay` appear **zero times**. The Router's dispatch ends
+with `else { route = 'menu_tap'; cbdata = 'rescue'; }`, so every one of them
+fell to the rescue. Seven buttons promised an action and delivered an apology.
+Pre-existing — my better labels only made them more inviting to press.
+
+**Fixed without touching the Router.** It already has a generic rule —
+`else if (cbdata.indexOf('menu_') === 0) route = 'menu_tap'` — which dispatches
+any `menu_`-prefixed callback verbatim as the moment key. Naming the new
+callbacks accordingly makes them live with a **database change alone**, instead
+of hand-editing a 7,000-character Code node, which would be the riskiest
+possible way to fix a copy bug. `review_yes`/`review_stay` needed no new moments
+at all: they now point at `menu_journey` and `menu_open_question`, both always
+routable.
+
+`get_moment_after_tap` becomes the one place a tap performs its action — the
+pattern it already used to record the country. The action runs **before** the
+moment is composed, so a confirmation can never describe something that did not
+happen. Verified end to end against production with a disposable parent:
+
+    الوقت → لا فعل · صباحاً → local_hour=8 · قبل النوم → local_hour=21
+    إيقاف → cadence=stopped · إعادة → cadence=nightly
+    طلب المحو → لا فعل، الوالد باقٍ · تأكيد المحو → 0 صفوف
+
+**Erasure is two taps now.** The old copy promised «بضغطة واحدة وبلا أسئلة» — a
+one-tap irreversible delete of the parent row. "No questions asked" stays true
+(we never ask why), but the act is confirmed once so a misplaced thumb cannot
+erase a family. After erasure the moment is composed with a null id, because
+the parent row no longer exists.
+
+**A test that would have caught it.** `conversation_law_test.sql` now asserts
+that every button callback in the table is routable by the Router's actual
+rules, and that every `menu_`-prefixed callback has a moment. The copy law
+passed for weeks while the product was broken because nothing tested routing.
+
+**The FAQ still described the machine.** Added «كيف نصل إلى ذلك؟» — the method
+in four steps, each starting with the parent, ending at "after three times I
+show you the situation that repeats in your house and what calms your child" —
+plus «كم يأخذ منّي هذا؟» (a minute a day) and «هل ستصلني رسائل كثيرة؟», because
+a parent does not know ADAM sends anything at all, so «إيقاف الرسائل» read as a
+setting for a thing they had never been told about.
+
+**Why the founder never saw the new commercial copy.** His own test account
+carried `strain_level = 2`, set by W2's classifier during his earlier probing
+(«انت خطر»). `commerce_allowed` was false, so `menu_journey` was correctly
+suppressed and `/journey` fell to `menu_journey_presence` every time. Correct
+product behaviour, invisible cause. Reset to 1 on his account only, and
+`/journey` now renders the full offer with the price.
+
+Tests: conversation_law 29/29 (two new), one_send 35/35, knowledge_gate 25/25,
+country_state 71/71, composed_gate 32/32.
+
+---
+
 ## 2026-08-04 · The copy stops describing the machine, and the prompt stops being a rulebook
 
 Founder review of a live Telegram session: the replies are weak, the button copy is poor, there is no
