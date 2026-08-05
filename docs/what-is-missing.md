@@ -379,29 +379,27 @@ itself.
 
 ---
 
-## 7b. The suites still describe a schema production would refuse
+## 7b. ~~The suites describe a schema production would refuse~~ — CLOSED 2026-08-07
 
-Now that the repo can rebuild production (§6b), the offline suites can run against the
-**real** migrated schema instead of `fixture_minimal.sql`. That experiment was run on
-2026-08-07: **10 of 19 suites pass unchanged. 9 write rows production would reject.**
+**`fixture_minimal.sql` is deleted.** All 19 suites, 589 assertions, run against the schema
+`supabase/migrations/*` builds — so the offline suite and the rebuild check are now the
+same act: a migration that cannot apply to an empty database means the tests do not run.
 
-This is the last of the fixture drift, and it is worth finishing, because a fixture the
-tests agree with is not evidence — it is a second opinion from the same source.
+Nine suites had to be fixed to get there, and every one of them was writing rows production
+would refuse — constraint violations, not failing assertions. Two were more than schema
+hygiene:
 
-| Constraint hit | Suites | What the test does that production forbids |
-|---|---|---|
-| `supported_countries.currency` / `price_comeback` NOT NULL, and `chk_active_market_has_pricing` | `country_state`, `journey_engine`, `offer_surface`, `team_question` | activates a market without the prices it will be asked for. One shared helper fixes all four. |
-| `chk_active_has_expiry` | `restored_functions` | sets `funnel_stage = 'paid_active'` with no `subscription_expires_at` — paid access with no end |
-| `daily_logs_night_result_check` | `give_before_asking` | a `night_result` outside `calm` / `hard` / `normal` |
-| `daily_logs_situation_id_fkey` | `composed_gate` | a `situation_id` that is not a situation |
-| `guard_safe_for_record` | `knowledge_gate` | sets `safe_for_record` directly; production demands an approval row in the same transaction, so the test must go through `set_pattern_record_visibility()` |
+- **`daily_logs.situation_id` was being set to a child id** in three places. The fixture had
+  no foreign key, so three nights pointed at a situation that did not exist and every
+  assertion still passed.
+- **`/child` was reading back a pattern with `safe_for_record = true`** that
+  `guard_safe_for_record` makes impossible to create — the flag can only be raised by
+  `set_pattern_record_visibility()`, which writes an audit row naming who approved it and
+  why. The test had been asserting behaviour for a row the disclosure safeguard would never
+  have released.
 
-The last one is not a schema detail — it is the disclosure safeguard. The test has been
-asserting behaviour for a row the product makes impossible to create.
-
-**The finish line is deleting `fixture_minimal.sql`.** Every table it stubs now has real
-DDL in git; what remains is these nine suites and a small seed file for
-`supported_countries`, which is business data rather than schema.
+The full table is in `supabase/tests/README.md`. What replaced the fixture is
+`seed_test.sql`: four rows of prices, which are business data and not schema.
 
 ## The order, and why
 

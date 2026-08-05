@@ -50,9 +50,14 @@ end $$;
 do $$
 declare p uuid; j jsonb; b text;
 begin
+  -- Every price an active market can be asked for, or
+  -- chk_active_market_has_pricing refuses the row. The amounts are 1 on purpose:
+  -- what is asserted is the DISPLAY string, never a number.
   insert into public.supported_countries
-    (code, name_ar, currency, price_subscription, price_comeback, is_active, price_display_full)
-  values ('DZ', 'الجزائر', 'DZD', 1, 1, true, 'ثمن الرحلة')
+    (code, name_ar, currency, price_subscription, price_comeback, price_continuation,
+     price_display_full, price_display_short, price_continuation_display, is_active)
+  values ('DZ', 'الجزائر', 'DZD', 1, 1, 1,
+          'ثمن الرحلة', 'ثمن الرحلة', 'ثمن المواصلة', true)
   on conflict (code) do update set is_active = true, price_display_full = 'ثمن الرحلة';
 
   -- Two statements, never one. country_state() is STABLE, so a parent

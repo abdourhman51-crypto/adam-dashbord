@@ -11,57 +11,27 @@ su postgres -c "$PGBIN/initdb -D $DATA -U postgres --auth=trust"
 su postgres -c "$PGBIN/pg_ctl -D $DATA -o '-k $RUN -p 55432 -c listen_addresses=' -l $DATA/log start"
 
 export PGHOST=$RUN PGPORT=55432 PGUSER=postgres
-psql -v ON_ERROR_STOP=1 -f supabase/tests/fixture_minimal.sql
-psql -v ON_ERROR_STOP=1 -f supabase/tests/fixture_mirror.sql
-for m in 20260729130200_journey_engine_progress_and_proposal_gate \
-         20260729150000_mirror_engine_core \
-         20260729150100_mirror_engine_fix_offer_check_to_values_only \
-         20260730175200_rhythm_write_side \
-         20260730180000_situation_catalog_and_detection \
-         20260730183000_strain_detection_and_graded_return \
-         20260731090000_telegram_surface_state \
-         20260731120000_conversation_copy_and_button_law \
-         20260731150000_knowledge_gate_and_uniqueness \
-         20260731170000_child_name_capture \
-         20260731210000_composed_reply_gate \
-         20260801095000_moments_missing_from_repo \
-         20260801100000_one_moment_one_send \
-         20260801120000_rescue_floor_and_silent_journey \
-         20260801130000_the_enemy_is_not_a_time_of_day \
-         20260801150000_revive_the_rhythm_gate \
-         20260801170000_give_before_asking \
-         20260801190000_the_exit_is_owed_until_shown \
-         20260801200000_situation_other_is_not_grounding \
-         20260801220000_three_countries_and_the_unknown \
-         20260801230000_ask_the_59 \
-         20260801240000_claim_the_country_ask \
-         20260801250000_the_agent_speaks_under_law \
-         20260803120000_one_call_per_node \
-         20260803180000_ask_the_intention \
-         20260804090000_the_offer_moment \
-         20260804120000_the_mirror_shows_approach \
-         20260804150000_copy_that_sells_the_promise \
-         20260804180000_no_message_assumes_you_know_adam \
-         20260804210000_seven_dead_buttons_and_the_method \
-         20260805090000_the_soft_funnel \
-         20260805150000_the_answer_is_kept \
-         20260805200000_the_offer_that_sells_the_result \
-         20260806090000_one_promise_one_next_step \
-         20260806140000_the_team_question_is_not_the_agents \
-         20260806180000_answer_the_free_question_too \
-         20260807090000_the_journey_can_be_started \
-         20260807140000_the_repo_can_rebuild_production ; do
-  psql -v ON_ERROR_STOP=1 -q -f supabase/migrations/$m.sql || break
+createdb adam_test; export PGDATABASE=adam_test
+
+# The three platform roles Supabase provides. Everything else comes from git.
+psql -q -c "create role service_role; create role authenticated; create role anon"
+
+# The real schema, built from the repository in timestamp order.
+for f in $(ls supabase/migrations/*.sql | sort); do
+  psql -v ON_ERROR_STOP=1 -q -f "$f" || echo "MIGRATION FAILED: $f"
 done
 
-for t in telegram_surface conversation_law knowledge_gate one_send \
-         rhythm_gate give_before_asking country_state \
-         agent_gate agent_bundle composed_gate intention_capture \
-         offer_surface team_question journey_engine lifecycle \
-         mirror_engine restored_functions ; do
-  psql -q -f supabase/tests/${t}_test.sql
-done
+# Prices — business data, which no migration carries.
+psql -v ON_ERROR_STOP=1 -q -f supabase/tests/seed_test.sql
+
+for t in supabase/tests/*_test.sql; do psql -q -f "$t"; done
 ```
+
+Expected: **19 suites, 589 assertions, zero failures**, and zero failed migrations.
+
+Because the suites now run on the schema the migrations build, this is simultaneously
+the rebuild check: if a migration cannot apply to an empty database, the tests do not run
+at all.
 
 **The order is the whole point.** Each migration replaces functions the earlier
 ones defined, so loading a subset tests a schema that has never existed. Run the
@@ -96,11 +66,18 @@ lost an argument and a whole `pinned.lines` key while still creating cleanly —
 Postgres does not resolve function calls inside a `plpgsql` body at `CREATE`
 time, so a wrong call site is a runtime error, not a deploy error.
 
-## `fixture_minimal.sql`
+## ~~`fixture_minimal.sql`~~ — deleted 2026-08-07
 
-The columns `get_telegram_surface()` actually reads, and nothing else. Names and types are copied from the real migrations rather than invented, so a rename in production shows up here as a failure instead of passing quietly.
+It described the schema by hand, because the repository could not build the real one. Every
+place its description drifted from production was a place the suites tested the fixture
+instead of the product: it produced three failures that looked like product bugs and were
+not, and it hid at least six rows production would have refused — including
+`daily_logs.situation_id` values that were actually child ids, and a `safe_for_record`
+pattern the disclosure safeguard makes impossible to create.
 
-**It is deliberately not the full schema.** A fixture that tries to mirror everything drifts silently and then lies. This one covers one function, and its scope is checkable by reading it.
+`supabase/migrations/*` builds the real schema now, so there is nothing left to describe.
+What replaced it is `seed_test.sql`: four rows of prices, which are business data rather
+than schema. `fixture_mirror.sql` went with it — the real `v_child_record` exists.
 
 ## `telegram_surface_test.sql`
 
@@ -474,29 +451,26 @@ places `fixture_minimal.sql` still admits to being looser than production (`situ
 and its simplified `commerce_allowed` and `can_ground_seed`) would stop being drift and
 start being nothing at all.
 
-## Running the suites on the real schema — 10 of 19, and why the other 9 matter
+## The fixture is gone — 19 of 19 on the real schema
 
-Now that the repo rebuilds production, the suites can run on the **real** migrated schema
-instead of `fixture_minimal.sql`. Build a database from `supabase/migrations/*` in order,
-insert the four `supported_countries` rows the tests need, and run the suites against that.
+The suites run against the schema `supabase/migrations/*` builds. There is no longer a
+hand-written description of the database anywhere in this repository.
 
-As of 2026-08-07: **10 pass unchanged. 9 fail — every one of them because the test writes a
-row production would refuse.** Not assertion failures: constraint violations.
+Getting there took fixing nine suites, and **every one of them was writing rows production
+would refuse** — not failing assertions, failing constraints:
 
-That is the point. A fixture the tests agree with is not evidence, it is a second opinion
-from the same source. Three of these were fixed the day the experiment was first run:
+| What the tests did | What production says |
+|---|---|
+| `situations` inserts with no `parent_id`, `label_ar`, `window_start`, `window_end` — **21 sites** | all four NOT NULL. The rhythm's windows had been null in every test and never in production. |
+| `daily_logs.situation_id` set to a **child** id — 3 sites | `daily_logs_situation_id_fkey`. Three nights pointed at a situation that did not exist, and every assertion still passed. |
+| `child_patterns` with `safe_for_record => true` | `guard_safe_for_record` forces it false on INSERT; only `set_pattern_record_visibility()` can raise it, with an audit row naming who approved it and why. **`/child` had been reading back a row the disclosure safeguard would never release.** |
+| `child_patterns.status = 'confirmed'` | `child_patterns_status_check` allows `active`, `improving`, `resolved`, `dormant`. Nothing else. |
+| `child_patterns` with no `follower_id` | NOT NULL. |
+| `night_result = 'skip'` | `daily_logs_night_result_check` allows `calm`, `hard`, `normal`. The production shape for a night too tired to try is `step_status = 'not_tried'`; `parent_effort` counts identically either way, since it only ever counts calm and hard. |
+| `funnel_stage = 'paid_active'` with no `subscription_expires_at` | `chk_active_has_expiry`. Paid access always has an end. |
+| activating a market with some prices missing | `chk_active_market_has_pricing`. An active market carries every price it can be asked for. |
 
-- `situations` inserts omitted `parent_id`, `label_ar`, `window_start`, `window_end`, all
-  NOT NULL in production. 21 sites, now filled from `situation_catalog` — the same source
-  `commit_situation()` uses. **The rhythm's windows had been null in every test and never
-  in production.**
-- `child_patterns.follower_id` is NOT NULL; two suites omitted it.
-- Two suites used `status = 'confirmed'`, which `child_patterns_status_check` does not
-  allow — `active`, `improving`, `resolved` and `dormant` are the only values.
+None of these were caught by 589 passing assertions, because the fixture agreed with the
+tests. A fixture the tests agree with is not evidence — it is a second opinion from the
+same source.
 
-The remaining nine are catalogued in `docs/what-is-missing.md` §7b. The worst of them is
-not a schema detail: `knowledge_gate_test` sets `safe_for_record` directly, and production
-refuses that without an approval row written in the same transaction. The test has been
-asserting behaviour for a row the product makes impossible.
-
-**The finish line is deleting `fixture_minimal.sql` entirely.**

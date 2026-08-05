@@ -5,6 +5,49 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-07 · The fixture is deleted — the tests now run on the real schema
+
+`fixture_minimal.sql` described the database by hand, because the repository could not
+build the real one. That stopped being true this morning (§6b), so the suites were pointed
+at the schema `supabase/migrations/*` actually builds. **All 19 suites, 589 assertions,
+zero failures — and no hand-written description of the database anywhere in the repo.**
+
+The offline suite and the rebuild check are now the same act: a migration that cannot apply
+to an empty database means the tests do not run at all.
+
+Getting there took fixing nine suites, and **not one of them was a failing assertion**.
+Every one was a constraint violation — a row the tests had been writing that production
+would have refused:
+
+- **`situations` inserts omitted `parent_id`, `label_ar`, `window_start`, `window_end`** —
+  21 sites, all four NOT NULL in production. The rhythm's windows had been null in every
+  test and never in production.
+- **`daily_logs.situation_id` was set to a child id** in three places. The fixture carried
+  no foreign key, so three nights pointed at a situation that did not exist and every
+  assertion still passed.
+- **`/child` read back a pattern with `safe_for_record = true`** that
+  `guard_safe_for_record` makes impossible to create: the flag can only be raised through
+  `set_pattern_record_visibility()`, which writes an audit row naming who approved it and
+  why. The test had been asserting behaviour for a row the disclosure safeguard would never
+  release. That one is not schema hygiene.
+- `child_patterns.status = 'confirmed'` — a value `child_patterns_status_check` has never
+  allowed. `child_patterns.follower_id` omitted, NOT NULL in production.
+- `night_result = 'skip'` — not one of `calm` / `hard` / `normal`. The production shape is
+  `step_status = 'not_tried'`, and `parent_effort` counts identically either way because it
+  only ever counts calm and hard.
+- `funnel_stage = 'paid_active'` with no `subscription_expires_at`, which
+  `chk_active_has_expiry` refuses: paid access always has an end.
+- Four suites activated a market with prices missing, which
+  `chk_active_market_has_pricing` refuses: an active market carries every price it can be
+  asked for.
+
+None of this was caught by 589 passing assertions, because the fixture agreed with the
+tests. A fixture the tests agree with is not evidence — it is a second opinion from the
+same source. Its replacement is `seed_test.sql`: four rows of prices, which are business
+data and not schema. `fixture_mirror.sql` went with it; the real `v_child_record` exists.
+
+---
+
 ## 2026-08-07 · The legacy evening system is gone, and two things it was hiding
 
 §3 of `what-is-missing.md` said: delete the legacy layer. The database half is done, and

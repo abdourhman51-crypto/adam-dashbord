@@ -243,8 +243,11 @@ end $$;
 do $$
 declare p uuid; a jsonb;
 begin
-  insert into public.supported_countries (code, name_ar, currency, price_subscription, is_active)
-  values ('DZ','الجزائر','DZD', 2300, true)
+  insert into public.supported_countries
+    (code, name_ar, currency, price_subscription, price_comeback, price_continuation,
+     price_display_full, price_display_short, price_continuation_display, is_active)
+  values ('DZ','الجزائر','DZD', 2300, 1500, 1500,
+          '2,300 دينار جزائري', '2,300 دج', '1,500 دينار جزائري', true)
   on conflict (code) do update set price_subscription = 2300, is_active = true;
 
   p := pg_temp.family('ريان');

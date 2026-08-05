@@ -106,8 +106,15 @@ select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 3, sc.window_start,
   perform pg_temp.chk('a message quoting a disclosure does not send',
     not (u->>'passes')::boolean, u->>'reason');
 
-  update public.child_patterns set safe_for_record = true
-   where child_id = c and pattern_label = 'التنقل بين ثلاث عائلات';
+  -- Cleared through the ONLY door production leaves open. A bare UPDATE is
+  -- refused by guard_safe_for_record, which demands an audit row written in the
+  -- same transaction naming who approved it and why — so the bare UPDATE this
+  -- used to do was setting a flag the disclosure safeguard makes unsettable.
+  perform public.set_pattern_record_visibility(
+    (select id from public.child_patterns
+      where child_id = c and pattern_label = 'التنقل بين ثلاث عائلات'),
+    true, 'operator:test',
+    'Reviewed for the record test: the label is the parent''s own wording and was cleared deliberately.');
   perform pg_temp.chk('the same label DOES count once explicitly cleared',
     public.family_tokens(p)->'measured' @> '["التنقل بين ثلاث عائلات"]'::jsonb,
     'safe_for_record is the only thing that changed');

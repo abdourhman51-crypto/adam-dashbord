@@ -28,8 +28,14 @@ create or replace function pg_temp.parent(p_pid text, p_stage text default 'free
 returns uuid language plpgsql as $$
 declare v uuid;
 begin
-  insert into public.followers (platform_user_id, country, funnel_stage, first_name)
-  values (p_pid, 'DZ', p_stage, 'أمّ') returning id into v;
+  -- chk_active_has_expiry: paid access always has an end. A paid_active row
+  -- with no subscription_expires_at is one production refuses, and the fixture
+  -- had no such constraint.
+  insert into public.followers (platform_user_id, country, funnel_stage, first_name,
+                                subscription_expires_at)
+  values (p_pid, 'DZ', p_stage, 'أمّ',
+          case when p_stage = 'paid_active' then now() + interval '30 days' end)
+  returning id into v;
   return v;
 end $$;
 

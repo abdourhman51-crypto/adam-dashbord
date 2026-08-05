@@ -104,7 +104,12 @@ begin
     (p, current_date,     'hard', s),
     (p, current_date - 1, 'hard', s),
     (p, current_date - 2, 'calm', s),
-    (p, current_date - 3, 'skip', s),
+    -- A night too tired to try. It used to be written as night_result 'skip',
+    -- which daily_logs_night_result_check has never allowed — calm, hard and
+    -- normal are the only values. The production shape is step_status
+    -- 'not_tried' with no night_result, and parent_effort counts identically
+    -- either way because it only ever counts calm and hard.
+    (p, current_date - 3, null, s),
     (p, current_date - 9, 'hard', s);
 
   e := public.parent_effort(p);

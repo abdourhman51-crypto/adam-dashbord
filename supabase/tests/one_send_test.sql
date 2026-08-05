@@ -55,7 +55,7 @@ end $$;
 
 \echo '=== /child AND /progress MUST NOT SAY THE SAME THING ==='
 do $$
-declare p uuid; c uuid; a text; b text; s jsonb;
+declare p uuid; c uuid; pat uuid; a text; b text; s jsonb;
 begin
   insert into public.followers (platform_user_id, country) values ('os-2','DZ') returning id into p;
 
@@ -77,9 +77,17 @@ begin
 select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 4, sc.window_start, sc.window_end
   from public.children ch, public.situation_catalog sc
  where ch.id = c and sc.key = 'sleep';
-  -- follower_id is NOT NULL in production.
-  insert into public.child_patterns (child_id, follower_id, pattern_label, status, evidence_count, safe_for_record)
-    values (c, p, 'يهدأ حين نبدأ مبكراً.', 'active', 3, true);
+  -- follower_id is NOT NULL in production, and a pattern is NEVER born visible:
+  -- guard_safe_for_record forces the flag false on INSERT and only
+  -- set_pattern_record_visibility() can raise it, writing the audit row that
+  -- names who approved it and why. Passing safe_for_record => true here used to
+  -- be silently accepted by the fixture, so /child was reading back a row the
+  -- disclosure safeguard would never have released.
+  insert into public.child_patterns (child_id, follower_id, pattern_label, status, evidence_count)
+    values (c, p, 'يهدأ حين نبدأ مبكراً.', 'active', 3)
+  returning id into pat;
+  perform public.set_pattern_record_visibility(pat, true, 'operator:test',
+    'Reviewed for the /child test: a calming pattern in the parent''s own words, cleared deliberately.');
   insert into public.daily_logs (follower_id, log_date, night_result) values
     (p, current_date,     'calm'),
     (p, current_date - 1, 'calm'),

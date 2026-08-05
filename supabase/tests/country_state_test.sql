@@ -108,8 +108,15 @@ begin
   -- real schema QA may already be there.
   insert into public.country_timezone (code, iana_tz) values ('QA','Asia/Qatar')
     on conflict (code) do nothing;
-  insert into public.supported_countries (code, name_ar, is_active, price_display_full)
-  values ('QA','قطر', true, '90 ريالاً قطرياً');
+  -- chk_active_market_has_pricing: an active market must carry EVERY price it
+  -- will be asked for. The short row this used to insert is one production
+  -- would refuse, and «add a country by adding a row» is the claim under test —
+  -- so the row has to be a real one.
+  insert into public.supported_countries
+    (code, name_ar, currency, price_subscription, price_comeback, price_continuation,
+     price_display_full, price_display_short, price_continuation_display, is_active)
+  values ('QA','قطر','QAR', 90, 60, 60,
+          '90 ريالاً قطرياً', '90 ر.ق', '60 ريالاً قطرياً', true);
   -- The write and the read MUST be separate statements. country_state is
   -- STABLE, so inside one statement it reads that statement's snapshot —
   -- taken before the volatile insert nested in the same expression ran.
