@@ -12,7 +12,8 @@ su postgres -c "$PGBIN/pg_ctl -D $DATA -o '-k $RUN -p 55432 -c listen_addresses=
 
 export PGHOST=$RUN PGPORT=55432 PGUSER=postgres
 psql -v ON_ERROR_STOP=1 -f supabase/tests/fixture_minimal.sql
-for m in 20260731090000_telegram_surface_state \
+for m in 20260729130200_journey_engine_progress_and_proposal_gate \
+         20260731090000_telegram_surface_state \
          20260731120000_conversation_copy_and_button_law \
          20260731150000_knowledge_gate_and_uniqueness \
          20260731210000_composed_reply_gate \
@@ -40,14 +41,15 @@ for m in 20260731090000_telegram_surface_state \
          20260805200000_the_offer_that_sells_the_result \
          20260806090000_one_promise_one_next_step \
          20260806140000_the_team_question_is_not_the_agents \
-         20260806180000_answer_the_free_question_too ; do
+         20260806180000_answer_the_free_question_too \
+         20260807090000_the_journey_can_be_started ; do
   psql -v ON_ERROR_STOP=1 -q -f supabase/migrations/$m.sql || break
 done
 
 for t in telegram_surface conversation_law knowledge_gate one_send \
          rhythm_gate give_before_asking country_state \
          agent_gate agent_bundle composed_gate intention_capture \
-         offer_surface team_question ; do
+         offer_surface team_question journey_engine ; do
   psql -q -f supabase/tests/${t}_test.sql
 done
 ```
@@ -61,7 +63,7 @@ days; adding it *at the end* — where a reader naturally appends — silently
 reverted four later migrations and turned 32 green assertions into 24 red ones
 that looked exactly like a broken change. Append by timestamp, never by habit.
 
-Current: **21 + 27 + 25 + 35 + 12 + 29 + 71 + 27 + 19 + 32 + 29 + 35 + 18 assertions, zero failures.**
+Current: **21 + 27 + 25 + 35 + 12 + 29 + 71 + 27 + 19 + 32 + 29 + 35 + 18 + 36 assertions, zero failures.**
 
 `rhythm_gate` reports 5 or 12 depending on the hour in Algiers — the harvest block
 only runs when the harvest window is genuinely closed, and the 23:00–07:00 branch
@@ -285,3 +287,43 @@ Three cases guard the ordering inside `get_agent_bundle`: the team check runs **
 `capture_intention`, because «اشتراك» is short, has no question mark and is one line —
 the capture would have taken it and written it into that parent's intention permanently,
 as who they hoped to be.
+
+## `journey_engine_test.sql`
+
+36 cases, and the first of them could not have been written before this week: until
+`20260807090000` the entire journey engine was a schema, a gate and a view, and **nothing
+had ever written a row**, so none of it had ever run.
+
+Two families are walked through a whole journey, day by day:
+
+| Family | What happens |
+|---|---|
+| آدم | 29 hard nights → clock exhausted, objective missed → **extended by 14 in the same call that detected the miss** → 14 more hard nights → `failed` |
+| ليان | 3 calm nights (not enough), 6 hard, then a full calm week → `objective_met` → `completed` **before** the clock ran out |
+
+The «3 calm nights is not five of seven» case is the one worth keeping: `objective_met`
+requires a **full measurement window**, so a good week cannot be declared a finished
+journey. That rule lives in `v_stage_progress` and is asserted here, not restated —
+restating a rule is how two versions of it start to disagree.
+
+### The walk is the beginning of the simulation harness
+
+`pg_temp.walk(parent, nights, result)` writes N distinct `log_date` rows, because
+`daily_logs` is unique on `(follower_id, log_date)` — the same constraint that makes the
+clock count **days** rather than messages. With nobody being messaged in production, this
+is currently the only way any time-and-evidence path can be seen working at all.
+
+### What start_stage deliberately does not check
+
+`can_propose_stage` refuses on a 30-day cadence, a lifetime cap per problem, and an
+improving trend. Those govern when ADAM may *raise* the subject. `start_stage` ignores
+them on purpose and enforces only structural invariants — one live journey, a target
+inside its window, a clock of 7..60 logged days.
+
+> **Refusing to start a journey someone has already agreed and paid for is not a
+> safeguard. It is a bug that takes money.**
+
+The last two cases cover the half-state this migration exists to remove: paying **with**
+an agreed goal starts the journey, and paying **without** one still records the money but
+returns `journey.started = false, reason = objective_required` — loudly, in the return
+value, instead of leaving a paid parent silently adrift.

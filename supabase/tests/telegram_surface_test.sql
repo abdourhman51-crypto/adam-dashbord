@@ -65,14 +65,21 @@ begin
   p := pg_temp.mk('EG', 30); c := pg_temp.add_child(p,'سارة');
   insert into public.situations (child_id,key,status,evidence_count) values (c,'study','confirmed',5);
   perform pg_temp.add_nights(p, 7, 5);
-  insert into public.stages (parent_id,child_id,problem_key,status) values (p,c,'study','active');
+  -- A stage the way one can actually exist: an agreed objective, a target
+  -- inside its window, and started_at set — the four columns this line used to
+  -- carry produced a row production's constraints would refuse.
+  insert into public.stages (parent_id,child_id,problem_key,objective_text,
+                             objective_target,objective_window,status,started_at)
+  values (p,c,'study','خمس ليالٍ هادئة من سبع',5,7,'active',now());
   insert into pg_temp.results values ('journey_active','journey_active', public.get_telegram_surface(p));
 
   -- 7. journey_ended_no_next
   p := pg_temp.mk('EG', 30); c := pg_temp.add_child(p,'سارة');
   insert into public.situations (child_id,key,status,evidence_count) values (c,'sleep','confirmed',5);
   perform pg_temp.add_nights(p, 7, 6);
-  insert into public.stages (parent_id,child_id,problem_key,status) values (p,c,'sleep','completed');
+  insert into public.stages (parent_id,child_id,problem_key,objective_text,
+                             objective_target,objective_window,status,completed_at)
+  values (p,c,'sleep','خمس ليالٍ هادئة من سبع',5,7,'completed',now());
   insert into pg_temp.results values ('journey_ended','journey_ended_no_next', public.get_telegram_surface(p));
 
   -- 8. paused, otherwise rhythm  -> modifier must outrank state

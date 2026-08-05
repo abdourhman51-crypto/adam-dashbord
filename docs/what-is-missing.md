@@ -138,6 +138,12 @@ journey completes, which is 29 days after the first sale.
   delete it; leaving a cap that does not cap is worse than either.
 - **The service-role key is in W1 in plaintext ~116 times.** Founder-owned rotation, still
   open, and it should not survive to launch day.
+- **`fixture_minimal.situations` is looser than production.** `parent_id`, `label_ar`,
+  `window_start` and `window_end` are NOT NULL in production; the fixture leaves all four
+  nullable and ~25 test inserts omit them. No product behaviour is mistested today — the
+  only reader of the windows is `get_rhythm_due`, and that test supplies them — but this
+  is the same class of drift that made every `/start` return 400 once. The fix is moving
+  those inserts onto `commit_situation()`, production's only writer.
 - **`get_child_record`, `request_erasure`, `execute_erasure`** — the privacy promise
   («تطلبون محوه فيُمحى كلّه») is wired for erasure via `menu_privacy_erased`, but
   `get_child_record` (the "show me everything you know" side) has no surface.

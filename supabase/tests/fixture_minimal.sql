@@ -18,7 +18,29 @@ create table public.followers (
   id uuid primary key default gen_random_uuid(),
   platform_user_id text,
   country text,
-  first_seen timestamptz default now()
+  first_seen timestamptz default now(),
+  -- The legacy subscription columns. activate_subscription() still writes them
+  -- because the dashboard still calls it, so the fixture carries them — a
+  -- function this suite exercises must not be tested against a schema it does
+  -- not run on. This block is EXPECTED TO SHRINK: when the legacy paid model
+  -- is deleted (docs/what-is-missing.md §3) these go with it, and the test
+  -- that fails will be pointing at the right thing.
+  funnel_stage text default 'free_conversation',
+  payment_status text default 'none',
+  offer_status text default 'none',
+  subscription_started_at timestamptz,
+  subscription_expires_at timestamptz,
+  payment_pending_at timestamptz,
+  renewal_d5_sent_at timestamptz,
+  renewal_d0_sent_at timestamptz
+);
+
+create table public.payments (
+  id uuid primary key default gen_random_uuid(),
+  follower_id uuid references public.followers(id) on delete cascade,
+  amount numeric, currency text, plan_type text, status text,
+  claimed_at timestamptz, confirmed_at timestamptz, confirmed_by text,
+  notes text, created_at timestamptz default now()
 );
 
 -- Columns copied from production. age_note is read by compose_menu_body();
@@ -52,30 +74,81 @@ create table public.supported_countries (
   created_at timestamptz default now()
 );
 
+-- KNOWN DRIFT, recorded rather than hidden. In production `parent_id`,
+-- `label_ar`, `window_start` and `window_end` are all NOT NULL, and the raw
+-- inserts throughout this suite would be refused there — production's only
+-- writer is commit_situation(), which fills all four from situation_catalog.
+-- Nothing reads the three that tests omit except get_rhythm_due (windows),
+-- and rhythm_gate_test does supply those, so no product behaviour is being
+-- mistested today. Tightening this means moving ~25 raw inserts onto
+-- commit_situation(); it is on the list in docs/what-is-missing.md §7 rather
+-- than done quietly at the end of an unrelated change.
 create table public.situations (
   id uuid primary key default gen_random_uuid(),
   child_id uuid references public.children(id) on delete cascade,
+  parent_id uuid references public.followers(id) on delete cascade,
   key text,
+  label_ar text,
   status text check (status in ('candidate','confirmed','rejected')),
   window_start smallint, window_end smallint,
   evidence_count integer default 1,
   last_observed timestamptz default now()
 );
 
--- planned_logged_days and extension_days are here because the offer copy now
--- promises what they hold — 29 days, and half of that again if we miss — and
--- a promise the schema does not back is the thing the tests exist to catch.
--- Types and the 7..60 bound are copied from
--- 20260729130100_journey_engine_core_schema.sql, not invented.
+-- The full production shape, copied from
+-- 20260729130100_journey_engine_core_schema.sql — constraints included, because
+-- the constraints ARE the product here: one live stage per parent, a target
+-- that fits its window, and a clock between 7 and 60 logged days. A fixture
+-- that keeps the columns but drops the checks tests a journey engine that
+-- cannot exist.
 create table public.stages (
-  id uuid primary key default gen_random_uuid(),
-  parent_id uuid references public.followers(id) on delete cascade,
-  child_id uuid,
-  problem_key text,
-  objective_text text,
-  planned_logged_days integer check (planned_logged_days between 7 and 60),
-  extension_days integer not null default 0 check (extension_days >= 0),
-  status text
+  id                   uuid primary key default gen_random_uuid(),
+  parent_id            uuid not null references public.followers(id) on delete cascade,
+  child_id             uuid references public.children(id) on delete set null,
+  problem_key          text not null,
+  objective_text       text not null,
+  objective_metric     text not null default 'calm_nights_in_window'
+                         check (objective_metric in ('calm_nights_in_window','steps_done_in_window')),
+  objective_target     integer not null check (objective_target > 0),
+  objective_window     integer not null check (objective_window > 0),
+  planned_logged_days  integer not null default 29 check (planned_logged_days between 7 and 60),
+  extension_days       integer not null default 0 check (extension_days >= 0),
+  extension_granted_at timestamptz,
+  status               text not null default 'proposed' check (status in (
+                         'proposed','active','extended','completed','failed','paused','refunded')),
+  price_amount         numeric,
+  price_currency       text,
+  proposed_at          timestamptz not null default now(),
+  started_at           timestamptz,
+  paused_at            timestamptz,
+  completed_at         timestamptz,
+  refunded_at          timestamptz,
+  created_at           timestamptz not null default now(),
+  updated_at           timestamptz not null default now(),
+  constraint chk_target_fits_window check (objective_target <= objective_window),
+  constraint chk_started_when_live  check (status not in ('active','extended') or started_at is not null)
+);
+create unique index uq_one_live_stage_per_parent
+  on public.stages (parent_id) where status in ('active','extended','paused');
+
+-- v_stage_progress and can_propose_stage read these two. Stubs, because this
+-- fixture covers the journey engine, not safeguarding or the proposal log.
+create table public.crisis_flags (
+  id          uuid primary key default gen_random_uuid(),
+  parent_id   uuid not null references public.followers(id) on delete cascade,
+  category    text not null,
+  detected_at timestamptz not null default now(),
+  handled_at  timestamptz
+);
+
+create table public.stage_proposals (
+  id          uuid primary key default gen_random_uuid(),
+  parent_id   uuid not null references public.followers(id) on delete cascade,
+  child_id    uuid,
+  problem_key text not null,
+  proposed_at timestamptz not null default now(),
+  outcome     text not null default 'pending',
+  stage_id    uuid references public.stages(id) on delete set null
 );
 
 -- Columns copied from production (information_schema), not from memory.

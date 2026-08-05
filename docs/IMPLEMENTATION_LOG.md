@@ -5,6 +5,70 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-07 · The journey can be started
+
+Founder's decision first: ADAM is stopped, nobody is being messaged, and the build is to
+be finished before any launch — the paused workflows are paused deliberately, to stop
+them burning credit for nothing. So the order changed from «turn something on» to
+«finish the parts that do not exist», and this is the most important of them.
+
+Until today the complete list of journey functions in production was `can_propose_stage`.
+A gate, and nothing to gate. `stages` held the shape, `v_stage_progress` derived the
+phase and the clock, and **nothing had ever written a row**, so none of it had ever run.
+
+Which means the offer shipped on 2026-08-06 sold this —
+
+> نتّفق قبل أن نبدأ على هدف واضح ترونه بأعينكم.
+> وإن لم نصل إليه في المدّة، أُكمل معكم نصف المدّة كاملةً مجاناً حتى نصل.
+
+— while the only tool that turned a payment into access granted 30 calendar days on a
+clock, with no goal, no measurement, and nothing for «نصل» to refer to.
+
+**Four functions, and one rewritten:**
+
+| | |
+|---|---|
+| `suggest_objective(parent)` | the sentence فريق آدم agrees with the parent, built from the situation already confirmed. Returns `ready=false` with a reason rather than inventing a goal for a house we do not know |
+| `start_stage(...)` | the journey begins, once |
+| `stage_state(parent)` | the live journey, its progress, its clock and its phase, in one call |
+| `close_stage(stage)` | met → completed; missed → the extension; missed again → failed |
+| `activate_subscription` | unchanged signature, same payment row — now also starts the journey, and reports whether one exists |
+
+**The extension is granted by the same call that detects the miss.** That is what lets
+the offer promise it «بلا أن تطلبوا»: there is no path where a parent has to ask and no
+path where an operator has to remember.
+
+**What `start_stage` deliberately does not enforce.** `can_propose_stage` blocks on a
+30-day cadence, a lifetime cap per problem, and an improving trend — rules about when
+ADAM may *raise* the subject. Applying them at start would mean refusing to begin a
+journey someone had already agreed and paid for. That is not a safeguard; it is a bug
+that takes money. `start_stage` enforces only structural invariants.
+
+**The objective has no default, on purpose.** A goal nobody agreed is not a goal, and a
+fallback here would recreate the gap in a new place. So `activate_subscription` without
+one still records the money and returns `journey.started = false, reason =
+objective_required` — the half-state made loud instead of silent.
+
+**Tested:** 36 assertions walking two families through a whole journey — one missed,
+extended by 14 in the same call, missed again, failed; one that reached it and completed
+*before* the clock. All fourteen suites green (396 assertions). Verified on production
+with a disposable family: suggest → start → 29 hard nights → `hold`, exhausted →
+`close_stage` → extended by 14, allowed_days 43, live again.
+
+**The walk is the first piece of the simulation harness** the next step needs. With
+nobody being messaged, walking a synthetic family through time is the only way any
+time-and-evidence path can be seen working.
+
+**Two fixture findings on the way.** `fixture_minimal.stages` carried four loose columns
+where production has a dozen with constraints — so `telegram_surface_test` had been
+creating stages production would refuse, and tightening the fixture caught it
+immediately. And `situations` is still looser than production (`parent_id`, `label_ar`,
+`window_start`, `window_end` are NOT NULL there). That one is recorded in the fixture and
+in `docs/what-is-missing.md` §7 rather than fixed quietly at the end of an unrelated
+change: it means moving ~25 raw inserts onto `commit_situation()`.
+
+---
+
 ## 2026-08-06 · The setting that made ADAM answer blind
 
 The handover shipped, the database returned it correctly with the link — and parents
