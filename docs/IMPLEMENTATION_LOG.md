@@ -5,6 +5,68 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-06 · The setting that made ADAM answer blind
+
+The handover shipped, the database returned it correctly with the link — and parents
+still got the model's one-line deflection. The cause was one option on
+`M2 - Get Memory Snapshot`:
+
+    options.response.response.responseFormat = "text"
+
+With that set, n8n does not parse the JSON body. It puts the whole thing in a **string**
+under `data`. So `$json.handled` was `undefined`, the IF fell to false, and the model ran
+the turn it was supposed to never see.
+
+**And the same setting had been breaking two much bigger things, silently:**
+
+| Reader | What it asked for | What it got |
+|---|---|---|
+| `M2 - Build Paid Context` | `b.context`, `b.family_context`, `b.knowledge_level` | undefined — so **every reply was written with no knowledge of the family at all**, always falling back to «لا توجد ذاكرة مسجلة بعد» at level 0 |
+| `FA - Send Reply1` | `b.ask`, `b.ask_body` | undefined — the country question was never appended to a reply |
+
+`get_agent_bundle` was built precisely so the agent would stop answering strangers, and
+it has been returning the right answer to a node that could not read it. Personalisation
+— the thing the offer sells — was never reaching the model. That reframes the founder's
+standing complaint about reply quality: the prompt was not the only problem. The model
+was working blind.
+
+Fixed by clearing the option, and by making all four readers unwrap `data` when it is a
+string, so flipping one dropdown can never again break three features without a word.
+
+**The lesson, and it is the same one twice this week:** every layer reported success. The
+function returned correct JSON. The node returned HTTP 200. The IF evaluated without
+error. The reply sent. Nothing anywhere was red. Only reading an actual execution showed
+it — which is why «حل كامل» has to mean *verified in a live execution*, not *applied and
+green offline*.
+
+---
+
+## 2026-08-06 · «هل انت مجاني» is the same question
+
+Three messages, one turn apart: «بخصوص المرافقة الكاملة» caught, «بكم الاشتراك» caught,
+«هل انت مجاني» **not** caught — it carries no word about a price, a subscription or
+paying, so it reached the model.
+
+It is the same question. A parent asking whether ADAM is free is asking what they get for
+nothing and what costs money.
+
+**And the answer was the wrong shape, not only missing.** «هذا يتولّاه فريق آدم» in
+response to «هل انت مجاني» is close to a refusal: they asked whether they owe anything
+and ADAM declined to say. He *can* answer that half — what is free is the relationship he
+is in, not a commercial term he lacks facts for. So the moment now answers first and
+hands over second:
+
+    🌿 كل ما بيننا الآن مجاني، ويبقى مجانياً.        ← he knows this
+    🤝 وهناك مرافقة كاملة… يتولّاها فريق آدم وحده     ← he does not
+
+One moment serves all three messages, and every one of them ends with the link.
+
+`تدفع` and `فلوس` were **not** added, and that is the discipline of this list in two
+words: «تدفعه للنوم بالقوة» is a parent pushing a child, and «يطلب فلوس كل يوم للمدرسة»
+is pocket money. Both are now false-positive cases in the suite.
+
+---
+
 ## 2026-08-06 · A question for فريق آدم is not a question for آدم
 
 A parent asked «اريد ان اعرف بخصوص المرافقة الكاملة». The model answered at length, and

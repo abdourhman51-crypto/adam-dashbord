@@ -40,7 +40,13 @@ begin
     'وين ندفع بالضبط',
     'عندي سؤال لفريق آدم',
     'ثمنها شحال', -- «ثمنها» carries it, «شحال» alone would not
-    'بغيت نعرف التكلفة'
+    'بغيت نعرف التكلفة',
+    -- The same question from the other side. This one reached the model for
+    -- a whole release: no word about a price, a subscription or paying.
+    'هل انت مجاني',
+    'واش هذا مجاني ولا مدفوع',
+    'آدم مجاناً؟',
+    'هل الخدمة بالمجان'
   ] loop
     if not public.is_team_question(t) then bad := bad || t; end if;
   end loop;
@@ -69,7 +75,9 @@ begin
     'صار عنيداً جداً هذا الأسبوع',
     'تعبت، ما عاد فيني',
     'نامت بهدوء الليلة ولأول مرة',
-    'أخته الصغيرة تنام مبكراً وهو لا'
+    'أخته الصغيرة تنام مبكراً وهو لا',
+    'تدفعه للنوم بالقوة ما ينفعش',        -- «تدفع» is pushing, and stays out
+    'يطلب فلوس كل يوم للمدرسة'            -- «فلوس» is pocket money, and stays out
   ] loop
     if public.is_team_question(t) then bad := bad || t; end if;
   end loop;
@@ -96,8 +104,14 @@ begin
 
   perform pg_temp.chk('the handover exists and composes',
     (m->>'found')::boolean, m::text);
-  perform pg_temp.chk('it says plainly that ADAM does not handle this',
-    (m->>'body') like '%لا أتولّاه%' and (m->>'body') like '%فريق آدم%', m->>'body');
+  -- «هل انت مجاني» deserves an answer, not a deflection. ADAM knows what is
+  -- free — that is the relationship he is in, not a commercial term.
+  perform pg_temp.chk('it answers the free half itself, before handing anything over',
+    (m->>'body') like '%كل ما بيننا الآن مجاني%'
+    and position('مجاني' in (m->>'body')) < position('فريق آدم' in (m->>'body')),
+    m->>'body');
+  perform pg_temp.chk('and hands over only the half that is genuinely theirs',
+    (m->>'body') like '%لا أتولّاها%' and (m->>'body') like '%فريق آدم%', m->>'body');
 
   -- The failure that started this: the model invented «وسيتواصلون معكم
   -- قريباً». Nothing schedules that and no human was told.

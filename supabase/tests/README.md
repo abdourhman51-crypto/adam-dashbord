@@ -39,7 +39,8 @@ for m in 20260731090000_telegram_surface_state \
          20260805150000_the_answer_is_kept \
          20260805200000_the_offer_that_sells_the_result \
          20260806090000_one_promise_one_next_step \
-         20260806140000_the_team_question_is_not_the_agents ; do
+         20260806140000_the_team_question_is_not_the_agents \
+         20260806180000_answer_the_free_question_too ; do
   psql -v ON_ERROR_STOP=1 -q -f supabase/migrations/$m.sql || break
 done
 
@@ -60,9 +61,9 @@ days; adding it *at the end* — where a reader naturally appends — silently
 reverted four later migrations and turned 32 green assertions into 24 red ones
 that looked exactly like a broken change. Append by timestamp, never by habit.
 
-Current: **21 + 27 + 25 + 35 + 5 + 29 + 71 + 27 + 19 + 32 + 29 + 35 + 17 assertions, zero failures.**
+Current: **21 + 27 + 25 + 35 + 12 + 29 + 71 + 27 + 19 + 32 + 29 + 35 + 18 assertions, zero failures.**
 
-`rhythm_gate` reports 5 or 7 depending on the hour in Algiers — the harvest block
+`rhythm_gate` reports 5 or 12 depending on the hour in Algiers — the harvest block
 only runs when the harvest window is genuinely closed, and the 23:00–07:00 branch
 asserts the quiet window instead. Both are green; only the count moves.
 
