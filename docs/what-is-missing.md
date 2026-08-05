@@ -349,7 +349,15 @@ itself.
   workflow. Until then the rhythm still cannot be quietened by silence.
 - **The service-role key is in W1 in plaintext ~116 times.** Founder-owned rotation, still
   open, and it should not survive to launch day.
-- **`fixture_minimal.situations` is looser than production.** `parent_id`, `label_ar`,
+- **~~`fixture_minimal.situations` is looser than production~~ — FIXED 2026-08-07.**
+  `parent_id`, `label_ar`, `window_start` and `window_end` are NOT NULL in the fixture now,
+  and all 21 raw inserts fill them from `situation_catalog` — the same source
+  `commit_situation()` uses. Proven by running the suites against the real migrated schema,
+  where every one of those inserts was refused. Two more of the same class went with it:
+  `child_patterns.follower_id` (NOT NULL in production, omitted in two suites) and a
+  `status` of `'confirmed'`, which `child_patterns_status_check` does not allow at all.
+  See §7b for what the same experiment found next.
+- ~~The old wording:~~ `parent_id`, `label_ar`,
   `window_start` and `window_end` are NOT NULL in production; the fixture leaves all four
   nullable and ~25 test inserts omit them. No product behaviour is mistested today — the
   only reader of the windows is `get_rhythm_due`, and that test supplies them — but this
@@ -370,6 +378,30 @@ itself.
   `get_child_record` (the "show me everything you know" side) has no surface.
 
 ---
+
+## 7b. The suites still describe a schema production would refuse
+
+Now that the repo can rebuild production (§6b), the offline suites can run against the
+**real** migrated schema instead of `fixture_minimal.sql`. That experiment was run on
+2026-08-07: **10 of 19 suites pass unchanged. 9 write rows production would reject.**
+
+This is the last of the fixture drift, and it is worth finishing, because a fixture the
+tests agree with is not evidence — it is a second opinion from the same source.
+
+| Constraint hit | Suites | What the test does that production forbids |
+|---|---|---|
+| `supported_countries.currency` / `price_comeback` NOT NULL, and `chk_active_market_has_pricing` | `country_state`, `journey_engine`, `offer_surface`, `team_question` | activates a market without the prices it will be asked for. One shared helper fixes all four. |
+| `chk_active_has_expiry` | `restored_functions` | sets `funnel_stage = 'paid_active'` with no `subscription_expires_at` — paid access with no end |
+| `daily_logs_night_result_check` | `give_before_asking` | a `night_result` outside `calm` / `hard` / `normal` |
+| `daily_logs_situation_id_fkey` | `composed_gate` | a `situation_id` that is not a situation |
+| `guard_safe_for_record` | `knowledge_gate` | sets `safe_for_record` directly; production demands an approval row in the same transaction, so the test must go through `set_pattern_record_visibility()` |
+
+The last one is not a schema detail — it is the disclosure safeguard. The test has been
+asserting behaviour for a row the product makes impossible to create.
+
+**The finish line is deleting `fixture_minimal.sql`.** Every table it stubs now has real
+DDL in git; what remains is these nine suites and a small seed file for
+`supported_countries`, which is business data rather than schema.
 
 ## The order, and why
 

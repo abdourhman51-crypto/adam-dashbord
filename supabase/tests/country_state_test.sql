@@ -104,7 +104,10 @@ begin
     sellable = array['DZ','EG','MA'], array_to_string(sellable, ','));
 
   -- Adding a fourth must be a row, not a deploy. Prove it by adding one.
-  insert into public.country_timezone (code, iana_tz) values ('QA','Asia/Qatar');
+  -- The migrations seed country_timezone, so this must be idempotent: on the
+  -- real schema QA may already be there.
+  insert into public.country_timezone (code, iana_tz) values ('QA','Asia/Qatar')
+    on conflict (code) do nothing;
   insert into public.supported_countries (code, name_ar, is_active, price_display_full)
   values ('QA','قطر', true, '90 ريالاً قطرياً');
   -- The write and the read MUST be separate statements. country_state is
@@ -276,8 +279,11 @@ begin
   -- about a sentence.
   p := pg_temp.parent('ZZ');
   insert into public.children (follower_id, name, is_primary) values (p, 'آدم', true) returning id into c;
-  insert into public.situations (child_id, key, status, evidence_count)
-  values (c, 'sleep', 'confirmed', 4);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 4, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
 
   perform pg_temp.chk('an unknown country is never due a proactive message',
     not exists (select 1 from public.get_rhythm_due(500) g where g.parent_id = p));

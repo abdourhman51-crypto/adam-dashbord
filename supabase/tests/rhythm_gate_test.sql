@@ -20,8 +20,11 @@ begin
   values (gen_random_uuid()::text, p_country) returning id into v;
   insert into public.children (follower_id, name, is_primary)
   values (v, 'يوسف', true) returning id into c;
-  insert into public.situations (child_id, key, status, evidence_count, window_start, window_end)
-  values (c, 'sleep', 'confirmed', 4, p_win_start, (p_win_start + 2)::smallint);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 4, p_win_start, (p_win_start + 2)::smallint
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   return v;
 end $$;
 

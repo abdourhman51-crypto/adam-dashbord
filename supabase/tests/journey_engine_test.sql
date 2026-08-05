@@ -33,8 +33,11 @@ begin
   insert into public.children (follower_id, name, is_primary)
   values (v, p_name, true) returning id into c;
   if p_confirm then
-    insert into public.situations (child_id, key, status, evidence_count)
-    values (c, 'sleep', 'confirmed', 4);
+    insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 4, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   end if;
   return v;
 end $$;

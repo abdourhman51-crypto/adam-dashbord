@@ -105,23 +105,21 @@ create table public.supported_countries (
   created_at timestamptz default now()
 );
 
--- KNOWN DRIFT, recorded rather than hidden. In production `parent_id`,
--- `label_ar`, `window_start` and `window_end` are all NOT NULL, and the raw
--- inserts throughout this suite would be refused there — production's only
--- writer is commit_situation(), which fills all four from situation_catalog.
--- Nothing reads the three that tests omit except get_rhythm_due (windows),
--- and rhythm_gate_test does supply those, so no product behaviour is being
--- mistested today. Tightening this means moving ~25 raw inserts onto
--- commit_situation(); it is on the list in docs/what-is-missing.md §7 rather
--- than done quietly at the end of an unrelated change.
+-- The drift recorded here is FIXED as of 2026-08-07. `parent_id`, `label_ar`,
+-- `window_start` and `window_end` are NOT NULL, exactly as production, and the
+-- 21 raw inserts across this suite now fill all four from situation_catalog —
+-- the same source commit_situation() uses. Running the suites against the real
+-- migrated schema is what proved the drift was real: every one of those inserts
+-- was refused there, so the windows the rhythm reads had been null in tests and
+-- never in production.
 create table public.situations (
   id uuid primary key default gen_random_uuid(),
   child_id uuid references public.children(id) on delete cascade,
-  parent_id uuid references public.followers(id) on delete cascade,
+  parent_id uuid not null references public.followers(id) on delete cascade,
   key text,
-  label_ar text,
+  label_ar text not null,
   status text check (status in ('candidate','confirmed','rejected')),
-  window_start smallint, window_end smallint,
+  window_start smallint not null, window_end smallint not null,
   evidence_count integer default 1,
   first_observed timestamptz default now(),
   last_observed timestamptz default now(),

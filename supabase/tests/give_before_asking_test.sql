@@ -16,8 +16,11 @@ begin
   values (gen_random_uuid()::text, 'DZ') returning id into v;
   insert into public.children (follower_id, name, is_primary)
   values (v, p_name, true) returning id into c;
-  insert into public.situations (child_id, key, status, evidence_count)
-  values (c, 'sleep', 'confirmed', 4);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 4, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   return v;
 end $$;
 
@@ -72,8 +75,11 @@ declare p uuid; s1 uuid; c uuid; s2 uuid; t text;
 begin
   p := pg_temp.family('سارة'); s1 := pg_temp.sit_of(p);
   select id into c from public.children where follower_id = p;
-  insert into public.situations (child_id, key, status, evidence_count)
-  values (c, 'meal', 'confirmed', 2) returning id into s2;
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'meal', sc.label_ar, 'confirmed', 2, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'meal' returning id into s2;
 
   insert into public.daily_logs (follower_id, log_date, step_given, situation_id, seed_sent_at)
   values (p, current_date, 'خطوة اليوم', s1, now());

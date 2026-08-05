@@ -473,3 +473,30 @@ DDL in git, so the suites could run against the rebuilt schema instead — and t
 places `fixture_minimal.sql` still admits to being looser than production (`situations`,
 and its simplified `commerce_allowed` and `can_ground_seed`) would stop being drift and
 start being nothing at all.
+
+## Running the suites on the real schema — 10 of 19, and why the other 9 matter
+
+Now that the repo rebuilds production, the suites can run on the **real** migrated schema
+instead of `fixture_minimal.sql`. Build a database from `supabase/migrations/*` in order,
+insert the four `supported_countries` rows the tests need, and run the suites against that.
+
+As of 2026-08-07: **10 pass unchanged. 9 fail — every one of them because the test writes a
+row production would refuse.** Not assertion failures: constraint violations.
+
+That is the point. A fixture the tests agree with is not evidence, it is a second opinion
+from the same source. Three of these were fixed the day the experiment was first run:
+
+- `situations` inserts omitted `parent_id`, `label_ar`, `window_start`, `window_end`, all
+  NOT NULL in production. 21 sites, now filled from `situation_catalog` — the same source
+  `commit_situation()` uses. **The rhythm's windows had been null in every test and never
+  in production.**
+- `child_patterns.follower_id` is NOT NULL; two suites omitted it.
+- Two suites used `status = 'confirmed'`, which `child_patterns_status_check` does not
+  allow — `active`, `improving`, `resolved` and `dormant` are the only values.
+
+The remaining nine are catalogued in `docs/what-is-missing.md` §7b. The worst of them is
+not a schema detail: `knowledge_gate_test` sets `safe_for_record` directly, and production
+refuses that without an approval row written in the same transaction. The test has been
+asserting behaviour for a row the product makes impossible.
+
+**The finish line is deleting `fixture_minimal.sql` entirely.**

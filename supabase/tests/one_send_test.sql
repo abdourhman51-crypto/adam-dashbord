@@ -72,10 +72,14 @@ begin
   -- now a real family
   insert into public.children (follower_id, name, is_primary) values (p, 'يوسف', true) returning id into c;
   update public.children set age_note = 'أربع سنوات' where id = c;
-  insert into public.situations (child_id, key, status, evidence_count)
-    values (c, 'sleep', 'confirmed', 4);
-  insert into public.child_patterns (child_id, pattern_label, status, evidence_count, safe_for_record)
-    values (c, 'يهدأ حين نبدأ مبكراً.', 'confirmed', 3, true);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 4, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
+  -- follower_id is NOT NULL in production.
+  insert into public.child_patterns (child_id, follower_id, pattern_label, status, evidence_count, safe_for_record)
+    values (c, p, 'يهدأ حين نبدأ مبكراً.', 'active', 3, true);
   insert into public.daily_logs (follower_id, log_date, night_result) values
     (p, current_date,     'calm'),
     (p, current_date - 1, 'calm'),
@@ -203,7 +207,11 @@ begin
   -- enforced it, so it held only as long as whoever typed remembered.
   insert into public.followers (platform_user_id, country) values ('gn-1','DZ') returning id into p;
   insert into public.children (follower_id, name, is_primary) values (p, 'يوسف', true) returning id into c;
-  insert into public.situations (child_id, key, status, evidence_count) values (c,'sleep','confirmed',3);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 3, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   insert into public.daily_logs (follower_id, log_date, night_result) values
     (p, current_date, 'calm'), (p, current_date-1, 'hard'), (p, current_date-2, 'calm');
 

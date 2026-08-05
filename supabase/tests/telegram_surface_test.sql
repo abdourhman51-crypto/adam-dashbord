@@ -51,19 +51,31 @@ begin
 
   -- 4. gathering (situation, 2 nights)
   p := pg_temp.mk('DZ', 8); c := pg_temp.add_child(p,'يوسف');
-  insert into public.situations (child_id,key,status,evidence_count) values (c,'sleep','confirmed',3);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 3, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   perform pg_temp.add_nights(p, 2, 1);
   insert into pg_temp.results values ('gathering','gathering', public.get_telegram_surface(p));
 
   -- 5. rhythm (7 nights, 4 calm, no journey ever)
   p := pg_temp.mk('DZ', 20); c := pg_temp.add_child(p,'يوسف');
-  insert into public.situations (child_id,key,status,evidence_count) values (c,'sleep','confirmed',5);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 5, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   perform pg_temp.add_nights(p, 7, 4);
   insert into pg_temp.results values ('rhythm','rhythm', public.get_telegram_surface(p));
 
   -- 6. journey_active
   p := pg_temp.mk('EG', 30); c := pg_temp.add_child(p,'سارة');
-  insert into public.situations (child_id,key,status,evidence_count) values (c,'study','confirmed',5);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'study', sc.label_ar, 'confirmed', 5, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'study';
   perform pg_temp.add_nights(p, 7, 5);
   -- A stage the way one can actually exist: an agreed objective, a target
   -- inside its window, and started_at set — the four columns this line used to
@@ -75,7 +87,11 @@ begin
 
   -- 7. journey_ended_no_next
   p := pg_temp.mk('EG', 30); c := pg_temp.add_child(p,'سارة');
-  insert into public.situations (child_id,key,status,evidence_count) values (c,'sleep','confirmed',5);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 5, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   perform pg_temp.add_nights(p, 7, 6);
   insert into public.stages (parent_id,child_id,problem_key,objective_text,
                              objective_target,objective_window,status,completed_at)
@@ -84,14 +100,22 @@ begin
 
   -- 8. paused, otherwise rhythm  -> modifier must outrank state
   p := pg_temp.mk('DZ', 20); c := pg_temp.add_child(p,'يوسف');
-  insert into public.situations (child_id,key,status,evidence_count) values (c,'sleep','confirmed',5);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 5, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   perform pg_temp.add_nights(p, 7, 4);
   update public.checkin_state set paused_until = current_date + 5 where parent_id = p;
   insert into pg_temp.results values ('paused','rhythm', public.get_telegram_surface(p));
 
   -- 9. strain L2, otherwise rhythm -> no commercial item
   p := pg_temp.mk('DZ', 20); c := pg_temp.add_child(p,'يوسف');
-  insert into public.situations (child_id,key,status,evidence_count) values (c,'sleep','confirmed',5);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 5, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   perform pg_temp.add_nights(p, 7, 4);
   insert into public.parent_strain (parent_id, level) values (p, 2);
   insert into pg_temp.results values ('strain_L2','rhythm', public.get_telegram_surface(p));
@@ -100,13 +124,21 @@ begin
   -- TN, not SA: same UTC offset as DZ, so this compares supported against
   -- unsupported without also comparing two different calendar days.
   p := pg_temp.mk('TN', 20); c := pg_temp.add_child(p,'يوسف');
-  insert into public.situations (child_id,key,status,evidence_count) values (c,'sleep','confirmed',5);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 5, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   perform pg_temp.add_nights(p, 7, 4);
   insert into pg_temp.results values ('unsupported','rhythm', public.get_telegram_surface(p));
 
   -- 11. dormant returner
   p := pg_temp.mk('DZ', 20, 40); c := pg_temp.add_child(p,'يوسف');
-  insert into public.situations (child_id,key,status,evidence_count) values (c,'sleep','confirmed',5);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 5, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   insert into pg_temp.results values ('dormant','gathering', public.get_telegram_surface(p));
 
   -- 12. nonexistent parent
