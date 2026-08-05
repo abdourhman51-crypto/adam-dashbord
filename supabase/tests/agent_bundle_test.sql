@@ -145,9 +145,13 @@ begin
     (m->'country_recorded'->>'reason') = 'unknown_code'
     and (select coalesce(country,'') from public.followers where id = p) = 'ZZ',
     (m->'country_recorded')::text);
-  -- P11: having failed to record it, ADAM must not claim he did.
+  -- P11: having failed to record it, ADAM must not claim he did. An unplaceable
+  -- code is «بلد آخر», so the answer is now the honest unavailable-here offer
+  -- (20260807270000) rather than a bare "not recognised" — but the invariant is
+  -- the same: it never says it saved a country.
   perform pg_temp.chk('and the answer does not pretend the country was recorded',
-    (m->>'body') like '%لم أتعرّف على البلد%', m->>'body');
+    (m->>'body') not like '%سجّلنا%' and (m->>'action_done') = 'country_unknown',
+    m->>'body');
 end $$;
 
 \echo '=== RESULTS ==='

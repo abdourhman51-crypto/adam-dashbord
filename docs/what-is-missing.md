@@ -39,6 +39,10 @@ marked as they were closed. This is the state now.
    back unprompted and free. **BUILT the same day** — `arrival_message()`,
    `v_arrival_watch`, and a trigger that quietens the rhythm at arrival. 19 assertions.
 5. **Run `ADAM · Bot Commands` once** so Telegram shows 📖 قراءة آدم in the menu.
+6. **One n8n wire for free-text country capture** — the «بلد آخر» tree's last
+   clause. The database side is built, tested and deployed; it needs one
+   credentialed httpRequest node in W1's message path. Full instructions:
+   `docs/workflows/country-capture-remaining-wire.md`.
 
 ---
 

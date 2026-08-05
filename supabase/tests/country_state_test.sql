@@ -272,8 +272,11 @@ begin
   perform pg_temp.chk('it carries no price',
     (j->>'body') !~ '[0-9٠-٩]', j->>'body');
   select array_agg(x->>'cb') into cbs from jsonb_array_elements(j->'buttons') x;
+  -- The button now carries menu_waitlist_join directly — the key with a real
+  -- handler in get_moment_after_tap — rather than the old waitlist_join alias
+  -- the Router had to translate.
   perform pg_temp.chk('and it still offers the waitlist',
-    cbs @> array['waitlist_join'], array_to_string(cbs,','));
+    cbs @> array['menu_waitlist_join'], array_to_string(cbs,','));
 end $$;
 
 \echo '=== AN UNKNOWN COUNTRY IS WHY 59 FAMILIES NEVER HEARD FROM ADAM ==='
