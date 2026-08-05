@@ -168,6 +168,44 @@ begin
 end $$;
 
 
+\echo '=== AN UNREADABLE ANSWER IS REFUSED, NOT SILENTLY SWALLOWED ==='
+do $$
+declare p uuid; c uuid; s uuid; v_day uuid; res jsonb;
+begin
+  p := pg_temp.parent('cd-bad-outcome');
+  insert into public.children (follower_id, name, is_primary) values (p, 'يوسف', true) returning id into c;
+  insert into public.situations (child_id, parent_id, key, label_ar, status, window_start, window_end)
+  select c, p, 'sleep', sc.label_ar, 'confirmed', sc.window_start, sc.window_end
+    from public.situation_catalog sc where sc.key = 'sleep' returning id into s;
+
+  v_day := (public.record_seed_sent(p, current_date, 'خطوة صغيرة',
+              jsonb_build_array('child_name','situation'), s, c)->>'day_id')::uuid;
+  perform public.record_harvest_sent(v_day);
+
+  -- 'calm' is the vocabulary of night_result, in the same table, one column
+  -- across. It used to be accepted here: the night was stamped answered, the
+  -- streak was reset, and NOTHING was written down.
+  res := public.record_harvest_answer(p, 'calm');
+
+  perform pg_temp.chk('an outcome we cannot read is refused',
+    (res->>'recorded')::boolean is false and res->>'reason' = 'unknown_outcome', res::text);
+  perform pg_temp.chk('and the night is NOT marked answered',
+    (select harvest_answered_at from public.daily_logs
+      where follower_id = p and log_date = current_date) is null,
+    'otherwise can_send would never ask again, and nothing was learned');
+  perform pg_temp.chk('and nothing was written',
+    (select night_result is null and step_status is null from public.daily_logs
+      where follower_id = p and log_date = current_date));
+
+  -- The real word works, on the very same night.
+  res := public.record_harvest_answer(p, 'succeeded');
+  perform pg_temp.chk('and the correct word still records it',
+    (res->>'recorded')::boolean
+    and (select night_result from public.daily_logs
+          where follower_id = p and log_date = current_date) = 'calm', res::text);
+end $$;
+
+
 \echo '=== ONE REPLY WIPES THE STREAK — BUT DOES NOT OVERRIDE HER STOP ==='
 do $$
 declare p uuid; c uuid; s uuid; v_day uuid;
@@ -183,7 +221,7 @@ begin
   v_day := (public.record_seed_sent(p, current_date, 'خطوة صغيرة الليلة',
               jsonb_build_array('child_name','situation'), s, c)->>'day_id')::uuid;
   perform public.record_harvest_sent(v_day);
-  perform public.record_harvest_answer(p, 'calm');
+  perform public.record_harvest_answer(p, 'succeeded');
 
   perform pg_temp.chk('the streak is wiped entirely',
     (select consecutive_ignored from public.checkin_state where parent_id = p) = 0,
