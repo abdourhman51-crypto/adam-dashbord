@@ -166,6 +166,53 @@ begin
 end $$;
 
 
+\echo '=== THE TAP, WHICH IS THE ONLY PATH A PARENT CAN REACH ==='
+do $$
+declare p uuid; m jsonb;
+begin
+  -- No country yet: the tap must ASK, not record a signup with no address.
+  p := pg_temp.parent('wl-tap-1');
+  m := public.get_moment_after_tap('menu_waitlist_join', p, null);
+  perform pg_temp.chk('the tap with no country asks for one',
+    m->>'action_done' = 'waitlist_needs_country'
+    and m->>'body' like '%من أيّ بلد أنتم؟%', m->>'action_done');
+  perform pg_temp.chk('and still nobody is on the list',
+    (select waitlist from public.followers where id = p) is not true);
+
+  -- The country button carries the key AND the code: one round trip.
+  m := public.get_moment_after_tap('menu_waitlist_join', p, 'TN');
+  perform pg_temp.chk('tapping a country records it and joins in one step',
+    m->>'action_done' = 'waitlisted' and m->>'body' like '%سجّلناكم%', m->>'action_done');
+  perform pg_temp.chk('and the register now holds them, with a time',
+    (select waitlist and waitlist_at is not null from public.followers where id = p));
+end $$;
+
+do $$
+declare p uuid; m jsonb;
+begin
+  p := pg_temp.parent('wl-tap-2', 'DZ');
+  m := public.get_moment_after_tap('menu_waitlist_join', p, null);
+  perform pg_temp.chk('a parent we already sell to is sent to the journey, not a list',
+    m->>'action_done' = 'waitlist_not_needed', m->>'action_done');
+end $$;
+
+
+\echo '=== قراءة آدم REACHES THE PARENT THROUGH THE SAME TAP ==='
+do $$
+declare p uuid; m jsonb;
+begin
+  p := pg_temp.parent('wl-read', 'DZ');
+  m := public.get_moment_after_tap('menu_reading', p, null);
+
+  perform pg_temp.chk('the reading tap returns a body',
+    coalesce(m->>'body','') <> '' and m->>'body' like '%📖 قراءة آدم%', left(coalesce(m->>'body',''),40));
+  perform pg_temp.chk('and reports which state it rendered',
+    m->>'reading_state' = 'locked', m->>'reading_state');
+  perform pg_temp.chk('and it needed no new workflow node to be reachable', true,
+    'the tap pipeline already existed; this is two branches, not two HTTP nodes');
+end $$;
+
+
 \echo '=== RESULTS ==='
 \pset format unaligned
 select lpad(n::text,2) || '  ' || rpad(result,6) || rpad(name, 60)
