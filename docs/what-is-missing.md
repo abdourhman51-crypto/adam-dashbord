@@ -33,9 +33,10 @@ marked as they were closed. This is the state now.
    has, and its branch was deleted with the rest of the dead nodes. Wire it or decide
    deliberately not to.
 3. **The service-role key is in W1 in plaintext**, on ~25 nodes. Founder-owned.
-4. **«ما بعد الوصول» is not designed** (§6). The last piece missing from the product's
-   *design* rather than its build — and it is needed before the first journey finishes,
-   which is 29 days after the first sale.
+4. ~~**«ما بعد الوصول» is not designed**~~ — **DESIGNED 2026-08-07**, see
+   `docs/after-arrival.md`. Arrival is a handover, not an ending: three moments across a
+   week, the rhythm stepping down by itself, and a 30-day relapse watch that brings ADAM
+   back unprompted and free. Not built yet — the build is small and listed there.
 5. **Run `ADAM · Bot Commands` once** so Telegram shows 📖 قراءة آدم in the menu.
 
 ---
@@ -320,7 +321,18 @@ W2 and W3 are the two paused engines. They cost money per run, which is why they
 but the answer is not "leave them off", it is §2: run them against synthetic families
 first, then a small real cohort at launch.
 
-## 6. «ما بعد الوصول» is not designed
+## 6. ~~«ما بعد الوصول» is not designed~~ — DESIGNED 2026-08-07
+
+**See `docs/after-arrival.md`.** The short version: arrival is the most dangerous moment
+in the product, because every instinct points the wrong way — offering the next journey
+cashes in the trust that produced the month, declaring it solved abandons them before the
+first relapse, and continuing to ask nightly collects evidence for a goal that is already
+met. The design answers all three: three moments across a week rather than one message,
+the rhythm stepping down to weekly by itself, a closing reading they keep, and a 30-day
+relapse watch that brings ADAM back **unprompted and free** — the one thing no competitor
+can offer, because it only works on evidence that already exists.
+
+What follows is the original entry.
 
 §10 item 6. Not unwired — undesigned. What happens the day a family reaches their goal,
 and what ADAM becomes afterwards, has no answer yet. It is last on this list because
