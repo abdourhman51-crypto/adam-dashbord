@@ -8,6 +8,38 @@ writing. Where something is "built and unwired", that is stated as a fact, not a
 
 ---
 
+## Where it stands — 2026-08-07, end of day
+
+The document below was written on the 6th, when the honest summary was «the paid
+product is about a quarter built». That is no longer true, and the sections are
+marked as they were closed. This is the state now.
+
+| | |
+|---|---|
+| The repo rebuilds production | ✅ from an empty database, matching by name |
+| Offline suite | ✅ 23 suites, 638 assertions, on the **real** schema — the fixture is deleted |
+| Journey engine | ✅ start / state / close, with `activate_subscription` unified |
+| قراءة آدم — the paid centre | ✅ four states, reachable at `/reading` |
+| Waitlist | ✅ records the country, ranks demand, and knows who is owed the news |
+| Privacy erasure | ✅ fixed and tested **through the tap** |
+| Legacy layer | ✅ gone: 64 W1 nodes, 38 columns, 4 tables, 5 views |
+| Nothing is switched on | ✅ W2, W3, W4 stay paused. No data is being collected. |
+
+**Still open before launch**, and every one of them is now small and named:
+
+1. **`decay_checkin_consent` has no scheduled caller.** The consent rule — silence
+   quietens the rhythm — is correct and tested and fires never. It needs one daily run.
+2. **`check_daily_message_cap` is not wired.** It is the only brake on spend the product
+   has, and its branch was deleted with the rest of the dead nodes. Wire it or decide
+   deliberately not to.
+3. **The service-role key is in W1 in plaintext**, on ~25 nodes. Founder-owned.
+4. **«ما بعد الوصول» is not designed** (§6). The last piece missing from the product's
+   *design* rather than its build — and it is needed before the first journey finishes,
+   which is 29 days after the first sale.
+5. **Run `ADAM · Bot Commands` once** so Telegram shows 📖 قراءة آدم in the menu.
+
+---
+
 ## The one-paragraph answer
 
 The **free** product is nearly complete but two of its three engines are switched off, so

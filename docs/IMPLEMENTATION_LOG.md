@@ -5,6 +5,60 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-07 · قراءة آدم, the waitlist, and the country that was thrown away
+
+Three features and a bug, in one pass, with nothing switched on.
+
+**قراءة آدم** is the paid tier's centre: a reading of your own house that nobody
+else could write, because it is built from your child's nights and nobody else's.
+Four states, and the founder's correction is the reason there are four — my first
+version needed fifteen logged nights before it said anything, which means a parent
+pays and meets an empty screen. `opened` now fires on the payment itself, with the
+child, the situation, the agreed goal, and when more appears.
+
+A free parent sees it `locked`: **one true line from their own data**, never an
+invented preview, and an admission when ADAM does not know the house yet. The
+credibility is the conversion tool.
+
+Rendering it found three defects no passing assertion would have caught alone: it
+ranked "what calms" on `step_given`, which the rhythm never writes — so the single
+most valuable line in the whole feature was silently empty; the stage key is
+`objective_text`, so the goal line was missing; and Arabic counts 3–10 nights as
+ليالٍ, not ليلة.
+
+**The waitlist** is a pipe laid for production, collecting nothing today. Two
+decisions carry it. `waitlist` is set by the tap and never inferred from geography,
+because that column routes `M2 - Classify Track` and inferring it would move every
+parent in an unsupported country onto a different track without one of them asking.
+And the country is asked *for* the signup rather than assumed, because demand with
+no address is the one number it must not produce.
+
+Both features reach the parent through **two branches in `get_moment_after_tap`**
+rather than two new n8n nodes. Every HTTP node added to W1 needs a credential the
+MCP API cannot bind, so each one is a manual step and another place the service key
+is pasted in plaintext. The tap pipeline already existed; it is 61 lines.
+
+**And the bug the wiring exposed.** The Router handled a country button by
+discarding the code unless it was one of three hardcoded markets — so a parent in an
+unsupported country could tap their own flag and ADAM would still not know where
+they were. The waitlist built that morning would have collected exactly the thing it
+was designed never to collect. Every country is recorded now, and the hardcoded
+`SUPPORTED` list is gone: `supported_countries.is_active` is the only source, so a
+market can be opened with a row instead of a deploy.
+
+Earlier the same day, two more: `record_harvest_answer` accepted an unknown outcome,
+stamped the night as answered and wrote nothing — silent loss of the evidence the
+whole product rests on. And my own cleanup broke erasure, by dropping
+`session_tracker` while `execute_erasure` still deleted from it. The founder found
+that one by using the product. The suite had not, because erasure was tested by
+calling the function directly and never through the tap — a function tested only
+where nobody calls it is tested in the wrong place. Both are fixed, both now have
+cases on the path a parent can actually reach.
+
+23 suites, **638 assertions, zero failures** on the real schema.
+
+---
+
 ## 2026-08-07 · The fixture is deleted — the tests now run on the real schema
 
 `fixture_minimal.sql` described the database by hand, because the repository could not
