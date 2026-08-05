@@ -36,7 +36,8 @@ marked as they were closed. This is the state now.
 4. ~~**«ما بعد الوصول» is not designed**~~ — **DESIGNED 2026-08-07**, see
    `docs/after-arrival.md`. Arrival is a handover, not an ending: three moments across a
    week, the rhythm stepping down by itself, and a 30-day relapse watch that brings ADAM
-   back unprompted and free. Not built yet — the build is small and listed there.
+   back unprompted and free. **BUILT the same day** — `arrival_message()`,
+   `v_arrival_watch`, and a trigger that quietens the rhythm at arrival. 19 assertions.
 5. **Run `ADAM · Bot Commands` once** so Telegram shows 📖 قراءة آدم in the menu.
 
 ---
