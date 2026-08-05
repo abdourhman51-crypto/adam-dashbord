@@ -38,14 +38,15 @@ for m in 20260731090000_telegram_surface_state \
          20260805090000_the_soft_funnel \
          20260805150000_the_answer_is_kept \
          20260805200000_the_offer_that_sells_the_result \
-         20260806090000_one_promise_one_next_step ; do
+         20260806090000_one_promise_one_next_step \
+         20260806140000_the_team_question_is_not_the_agents ; do
   psql -v ON_ERROR_STOP=1 -q -f supabase/migrations/$m.sql || break
 done
 
 for t in telegram_surface conversation_law knowledge_gate one_send \
          rhythm_gate give_before_asking country_state \
          agent_gate agent_bundle composed_gate intention_capture \
-         offer_surface ; do
+         offer_surface team_question ; do
   psql -q -f supabase/tests/${t}_test.sql
 done
 ```
@@ -59,7 +60,7 @@ days; adding it *at the end* — where a reader naturally appends — silently
 reverted four later migrations and turned 32 green assertions into 24 red ones
 that looked exactly like a broken change. Append by timestamp, never by habit.
 
-Current: **21 + 27 + 25 + 35 + 5 + 29 + 71 + 27 + 19 + 32 + 29 + 35 assertions, zero failures.**
+Current: **21 + 27 + 25 + 35 + 5 + 29 + 71 + 27 + 19 + 32 + 29 + 35 + 17 assertions, zero failures.**
 
 `rhythm_gate` reports 5 or 7 depending on the hour in Algiers — the harvest block
 only runs when the harvest window is genuinely closed, and the 23:00–07:00 branch
@@ -252,3 +253,34 @@ j := pg_temp.offer(p);               -- statement 2
 *before* the insert and every supported-country case fails looking exactly like a
 broken function. This is the third time the same trap has cost real debugging; it is
 in this README twice now for that reason.
+
+## `team_question_test.sql`
+
+17 cases. A parent asked «اريد ان اعرف بخصوص المرافقة الكاملة» and the model answered
+at length, invented «وسيتواصلون معكم قريباً» — nobody was going to — and gave no link.
+The prompt already forbade quoting a price; it cannot forbid inventing a follow-up,
+because the failure is not vocabulary. It is a model answering a question it has no
+facts for.
+
+`is_team_question()` recognises the shape and the reply becomes a fixed moment with the
+فريق آدم button on it, so the model never sees the turn.
+
+**Most of the file is the false-positive set**, because the two errors are not
+symmetrical. A missed phrasing costs one ordinary reply. A false positive hands a sales
+card to a parent telling us their child hit their brother.
+
+| Excluded token | The message it would have broken |
+|---|---|
+| `بكم` | «أهلاً بكم، سعيدة بوجودكم» |
+| `شحال` | «شحال من مرة قلت له لا ينفع» — a count |
+| `قداش` | «قداش من ليلة وأنا صاحية معه» |
+| `الدفع` | «الدفع بينهم كل يوم صار عادة» — pushing, not paying |
+| `رحلة` | «رحلتنا إلى بيت جدّته كانت متعبة» |
+
+Their narrower cousins are kept: `بكام`, `بشحال`, `بقداش`, `طريقة الدفع`,
+`المرافقة الكاملة`.
+
+Three cases guard the ordering inside `get_agent_bundle`: the team check runs **before**
+`capture_intention`, because «اشتراك» is short, has no question mark and is one line —
+the capture would have taken it and written it into that parent's intention permanently,
+as who they hoped to be.

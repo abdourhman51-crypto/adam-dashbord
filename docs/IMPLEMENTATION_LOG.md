@@ -5,6 +5,64 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-06 · A question for فريق آدم is not a question for آدم
+
+A parent asked «اريد ان اعرف بخصوص المرافقة الكاملة». The model answered at length, and
+invented this:
+
+> «وسيتواصلون معكم لتوضيح كل شيء قريباً»
+
+Nobody was going to contact them. Nothing schedules that and no human was told. The
+reply also carried no link — so a parent who had raised their own hand was left with a
+promise that will not arrive and no way to act. That is the worst possible outcome on
+the one turn that matters commercially.
+
+**The prompt could not have fixed this.** It already forbids quoting a price, and the
+model obeyed that. The failure was not vocabulary: it was a model answering a question
+it has no facts for, and filling the gap the way models do. So the fix is to stop
+asking it. `is_team_question()` recognises the shape and the reply becomes a fixed
+moment with the فريق آدم button on it. The model never sees the turn.
+
+**And the prompt got shorter, not longer** — the founder's constraint, and the right
+one. The worked example teaching the model how to answer «كم يكلّف هذا؟» is deleted,
+because that turn no longer reaches it, and the prohibition is now one sentence that
+also forbids the specific thing that went wrong: «ولا تعد بأن أحداً سيتّصل». Net −127
+characters.
+
+**Precision over reach, deliberately.** The two errors are not symmetrical: a missed
+phrasing costs one ordinary reply, a false positive hands a sales card to a parent
+telling us their child hit their brother. So the dangerous near-misses are excluded and
+sit in the test file as cases:
+
+| Excluded | Because |
+|---|---|
+| `بكم` | «أهلاً بكم» — `بكام` is kept |
+| `شحال` · `قداش` | «شحال من مرة قلت له» is a count — `بشحال` · `بقداش` are kept |
+| `الدفع` | «الدفع بينهم صار عادة» is pushing — `طريقة الدفع` is kept |
+| `رحلة` | a real journey to the grandmother's — `المرافقة الكاملة` is exact |
+
+**Ordering matters more than it looks.** The team check runs *before*
+`capture_intention`. «اشتراك» is short, carries no question mark and is one line — the
+capture would have taken it and written it into that parent's intention permanently, as
+who they hoped to be. There is a test for exactly that.
+
+**The branch generalised.** `intention_captured` became `handled` / `handled_reason` /
+`handled_body` / `handled_buttons`, so the bundle can answer a turn itself for more than
+one reason. The nodes are now `BD - Handled?` and `BD - Send Handled`, and the sender
+renders `url` buttons, so the handover carries a link rather than a wait.
+
+**The prompt doc had drifted from the node** — example order and three diacritics,
+because the node had been edited directly. A prompt doc that differs from the node is
+worse than no doc: it describes rules the model never sees. The doc now mirrors the live
+node byte for byte, and says so.
+
+**Tested:** 17 assertions in `team_question_test.sql`, all thirteen suites green.
+Verified live on production: «اريد ان اعرف بخصوص المرافقة الكاملة» and «بشحال؟» both
+return the handover with the link and «💬 نكمل مع أحمد»; «أحمد دفع أخاه اليوم» is
+untouched and still reaches the model.
+
+---
+
 ## 2026-08-06 · One promise, one next step
 
 The offer stacked five reassurances — logged days, an extension, a refund,
