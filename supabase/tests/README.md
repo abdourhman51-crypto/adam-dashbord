@@ -442,3 +442,34 @@ suite failed on a missing view rather than on anything about the Mirror.
 The stub is deleted rather than guarded with `IF NOT EXISTS`: two fixtures owning one
 table is exactly how the shapes drift apart. The mirror migrations are now part of the
 standard chain, so the suite runs with everything else.
+
+---
+
+## The rebuild check — the one a fixture cannot fake
+
+Since 2026-08-07 the repository can build production from an empty database. That is worth
+running as a check, not just claiming once:
+
+```bash
+createdb rebuild
+psql -d rebuild -c "create role service_role; create role authenticated; create role anon"
+for f in $(ls supabase/migrations/*.sql | sort); do
+  psql -d rebuild -v ON_ERROR_STOP=1 -q -f "$f" || echo "FAIL $f"
+done
+```
+
+Expected: **0 failures, 29 tables, 12 views, 88 functions**, matching production by name.
+
+It earns its place because it catches a class of problem the offline suite structurally
+cannot. `fixture_minimal.sql` describes the schema the tests need; when it disagrees with
+production, the tests still pass — they are agreeing with the fixture. The rebuild has no
+fixture to agree with. On its first run it found two functions that reading had missed
+(`get_agent_context`, `commerce_allowed`), five views nobody had noticed were sourceless,
+three migrations that could not apply to a fresh database, and a live privilege escalation
+in production.
+
+**The natural next step is to stop needing the fixture.** Every table it stubs now has real
+DDL in git, so the suites could run against the rebuilt schema instead — and the three
+places `fixture_minimal.sql` still admits to being looser than production (`situations`,
+and its simplified `commerce_allowed` and `can_ground_seed`) would stop being drift and
+start being nothing at all.

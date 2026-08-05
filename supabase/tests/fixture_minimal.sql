@@ -36,7 +36,7 @@ create table public.followers (
   -- record_seed_sent() stamps this on the first proactive message.
   proactive_footer_at timestamptz,
   -- The free tier's own columns, read and written by the functions restored in
-  -- 20260807140000: the light memory (heart_commit / get_heart_batch), the
+  -- 20260729000100: the light memory (heart_commit / get_heart_batch), the
   -- message cap (check_daily_message_cap), and the return signal that makes a
   -- parent golden (get_free_session_state).
   first_name text,
@@ -271,11 +271,25 @@ create table public.memory_events (
   created_at timestamptz not null default now()
 );
 
+-- Production's full shape. It was four columns until get_agent_context came
+-- home in 20260729000100 and replaced the stub below with the real body, which
+-- reads current_day. Four columns was enough to test the stub and nothing else.
 create table public.plan_sessions (
   id uuid primary key default gen_random_uuid(),
   follower_id uuid references public.followers(id) on delete cascade,
+  plan_started_at timestamptz default now(),
+  current_day integer default 1,
+  current_week integer default 1,
+  child_name text, child_age text, main_challenge text, wins text, next_step text,
+  updated_at timestamptz default now(),
+  compressed_memory text,
+  session_count integer default 0,
   has_breakthrough boolean default false,
-  updated_at timestamptz default now()
+  child_gender text, guardian_name text, guardian_state text,
+  guardian_approach text, relation_to_child text,
+  onboarding_complete boolean not null default false,
+  progress_score integer not null default 0,
+  unique (follower_id)
 );
 
 -- write_child_name() back-links this table's orphan rows to the only child.
@@ -351,19 +365,13 @@ from public.followers f
 left join chat c on c.key = f.platform_user_id
 left join logs l on l.follower_id = f.id;
 
--- get_agent_context(): the shape production returns, not the real assembly.
--- The PLAN_DAY / DAYS_LEFT preamble is reproduced deliberately — stripping it
--- is the behaviour under test, and a stub without it would test nothing.
-create or replace function public.get_agent_context(p_follower_id uuid)
-returns text language sql stable as $$
-  select 'PLAN_DAY: ?' || chr(10) || 'DAYS_LEFT: 0' || chr(10) || chr(10)
-      || coalesce(
-           (select '== CHILDREN ==' || chr(10) || '- ' || c.name
-            from public.children c
-            where c.follower_id = p_follower_id and nullif(btrim(c.name),'') is not null
-            order by c.is_primary desc nulls last limit 1),
-           '');
-$$;
+-- get_agent_context() was stubbed here, because its source lived only in the
+-- database. It came home in 20260729000100_baseline_the_functions_that_predate
+-- _the_repo.sql, which the chain loads first, so the real body is what these
+-- tests now run against — including the PLAN_DAY / DAYS_LEFT preamble whose
+-- stripping is the behaviour under test. The stub is deleted rather than kept
+-- and shadowed: a fixture that defines what a migration also defines is a
+-- second source, and second sources drift.
 
 -- commerce_allowed(): real signature, simplified body (blocks at L2/L3).
 -- hard_moment_label(): copied verbatim from the child-record migration.

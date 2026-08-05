@@ -17,6 +17,47 @@ run, or finish a journey**. Everything the offer sells is currently unbacked by 
 
 ---
 
+## 0. Fixed the day it was found: anyone could grant themselves a journey
+
+Found on 2026-08-07 while proving the rebuild. Four SECURITY DEFINER functions
+were executable in production **with the public anon key**:
+
+| Function | What the holder of a public key could do |
+|---|---|
+| `activate_subscription(…10 args)` | **grant paid access and start a journey**, for any follower id |
+| `get_conversation_for(text)` | read any parent's entire conversation history |
+| `heart_commit(text, jsonb)` | overwrite what ADAM remembers about any family |
+| `write_child_name(text, text)` | write a child's name for any parent |
+
+Two causes, neither a mistake in the security model — both side effects of
+ordinary work:
+
+1. The ten-argument `activate_subscription` is an **overload**, created when the
+   journey engine gained its start parameters. A new function is born with
+   EXECUTE granted to PUBLIC, and week 0 had revoked the five-argument one *by
+   exact signature*. A signature protects one function; it does not protect a
+   capability.
+2. Week 0 wrote `REVOKE … ON FUNCTION public.get_heart_batch()`. That function
+   takes `p_limit integer default 40`, so the signature matched nothing, the
+   statement raised, and the two revocations written **after** it — `heart_commit`
+   and `write_child_name` — never ran. One wrong signature silently cancelled the
+   rest of the list, twelve days before anyone looked.
+
+A third, found only by verifying the fix on a bare cluster: `REVOKE … FROM anon`
+does not remove a privilege `anon` holds through **PUBLIC**. Supabase happens to
+revoke PUBLIC and grant `anon` explicitly, so week 0's revoke worked there and
+would have been a no-op anywhere else.
+
+Closed in `20260807160000_nobody_grants_themselves_a_journey.sql`, **applied to
+production** and verified: `anon` has EXECUTE on none of them, `service_role`
+still has all 88. Revocation is now by function *name* so every present and
+future overload is covered, and `alter default privileges` closes the door the
+next new function would otherwise walk through.
+
+Nothing in the product lost access — n8n authenticates as `service_role`.
+
+---
+
 ## Where a parent's life actually stops
 
 | # | Stage of the relationship | State |
@@ -34,7 +75,19 @@ run, or finish a journey**. Everything the offer sells is currently unbacked by 
 
 ---
 
-## 1. The journey engine has no write side — the single biggest gap
+## 1. ~~The journey engine has no write side~~ — BUILT 2026-08-07
+
+`suggest_objective`, `start_stage`, `stage_state` and `close_stage` exist, with a
+36-assertion suite walking two families through a whole journey
+(`supabase/tests/journey_engine_test.sql`). What follows is why it was needed, and one
+thing that is still true.
+
+**Still true:** `activate_subscription` now has **two overloads**. The ten-argument one
+starts a journey; the five-argument one — the one the dashboard calls — does not. Both are
+in production. A payment confirmed through the old path still produces `paid_active` with
+no stage, exactly as described below. Deleting the five-argument overload belongs to §3.
+
+### The original entry
 
 `stages` exists. `v_stage_progress` derives phase, days remaining and whether the
 objective was met. `can_propose_stage` decides when it may be offered.
@@ -100,6 +153,7 @@ The offer/engine mismatch in §1 is not an isolated accident. It is the pattern.
 |---|---|---|
 | `Adam - Nightly Checkin` workflow (`A2XHImAuFiPA6Yoh`) | W3 Rhythm Sender | both paused, both send an evening question |
 | `get_checkin_batch` / `record_checkin_response` / `checkin_state` | `get_rhythm_due` / `record_harvest_answer` / `daily_logs` | two evening systems |
+| `activate_subscription(uuid,int,numeric,text,text)` — starts no journey | `activate_subscription(…10 args)` — starts one | **two overloads of the same name**, both live; the dashboard calls the one that does nothing |
 | `activate_subscription` + `payments` + `renewal_d5/d0_sent_at` | `stages` | two paid models |
 | `offer_status`, `ready_for_offer`, `offer_score`, `offer_hook`, `offer_text`, `offer_child_name`, `offer_pain_safe`, `judge_reason`, `cohort`, `is_golden`, `insight_sent_at`, `reactivation_*`, `clarity_seen_at`, `trial_started_at` on `followers` | `offer_ready()` derived on demand | ~14 dead columns |
 | W1 orphan nodes: `CTA - *` (5), `OB - Answer *` (6), `Handle CTA Click`, `RA - Answer Click`, `Send Country Buttons`, `Answer Callback`, `Check daily Cap`, `Send Pinned` | the moment/tap system | 17 nodes with no inbound connection |
@@ -135,64 +189,72 @@ and what ADAM becomes afterwards, has no answer yet. It is last on this list bec
 nothing can reach it until 1–5 exist, but it must be answered before the first paid
 journey completes, which is 29 days after the first sale.
 
-## 6b. The repo cannot rebuild production — but not for the reason first written here
+## 6b. ~~The repo cannot rebuild production~~ — CLOSED 2026-08-07
 
-**This section said "34 of 88 functions". That number was wrong, and the correction
-matters more than the original claim.**
+**A blank Postgres database now becomes production from this repository alone:
+66 migrations, zero failures, 29 tables, 12 views, 88 functions — the same names
+production has, checked by set difference, not by counting.**
 
-It came from diffing production against the **offline test chain** — the 35 migration
-files the harness loads on top of `fixture_minimal.sql` — and not against the
-**repository**, which holds 64. Everything the chain does not load was counted as absent
-when it was merely untested. Re-checked on 2026-08-07 name by name against all 64 files:
+That is what this section asked for. What follows is the record of what was
+actually wrong, because the first version of it was wrong twice.
 
-| | |
+### The number was wrong
+
+It said "34 of 88 functions have no source in this repo". That diff was taken
+against the **offline test chain** — the migration files the harness loads on top
+of `fixture_minimal.sql` — not against the **repository**, which holds 66.
+Everything the chain did not load counted as absent when it was merely untested.
+Re-checked name by name, **fourteen** functions genuinely had no source:
+
+`writer_commit`, `_ensure_child`, `get_extraction_batch`, `write_child_name`,
+`get_heart_batch`, `heart_commit`, `get_conversation_for`,
+`get_free_session_state`, `check_daily_message_cap`, `surface_changing_item`,
+`return_to_free`, `set_updated_at`, `get_agent_context`, `commerce_allowed`.
+
+Seventeen more were in git the whole time (the child-record and erasure family,
+the checkin family, `get_pricing`, both chat-history guards,
+`record_mirror_delivered`, `derive_aha_class`, `jsonb_text_values`,
+`commit_child_name_by_platform`). Restoring those would have created a *second*
+source for each — the disease, not the cure.
+
+### The diagnosis was wrong too
+
+Functions were never the real gap. This migration history begins at
+`20260729123012_week0_*`, on a database that already existed and already held 310
+families. **Fourteen tables and five views had no DDL in git at all** — including
+`followers`, `children`, `daily_logs` and `n8n_chat_histories`. No number of
+restored functions would have made a rebuild possible.
+
+Now in the repository, dated before week 0 so a rebuild meets them first:
+
+| File | Carries |
 |---|---|
-| Production functions | 88 |
-| With no source anywhere in git | **12** |
-| In git but not loaded by the offline chain, so untested | 17 |
-| Restored earlier on 2026-08-07 with their own migrations | 6 |
+| `20260729000000_baseline_the_tables_that_predate_the_repo.sql` | 14 tables, their constraints, indexes, RLS and policies |
+| `20260729000100_baseline_the_functions_that_predate_the_repo.sql` | 13 of the 14 functions |
+| `20260729000200_baseline_the_views_that_predate_the_repo.sql` | the 5 dashboard views |
+| `20260730183100_commerce_allowed_restored.sql` | the 14th, which belongs with the strain layer |
+| `20260807150000_baseline_tail_the_bindings_that_needed_later_objects.sql` | the FKs and triggers that point at objects later migrations create |
 
-The seventeen that were in git the whole time: the child-record and erasure family
-(`get_child_record`, `request_erasure`, `execute_erasure`, `set_pattern_record_visibility`,
-`guard_safe_for_record`, `reject_audit_mutation`), the checkin family
-(`ensure_checkin_state`, `get_checkin_batch`, `record_checkin_sent`,
-`record_checkin_response`, `decay_checkin_consent`), plus `get_pricing`,
-`guard_chat_history_message`, `record_mirror_delivered`, `derive_aha_class`,
-`jsonb_text_values` and `commit_child_name_by_platform`.
+### Only running the rebuild found the last four problems
 
-The twelve that were genuinely nowhere came home in
-`20260807140000_the_repo_can_rebuild_production.sql`, with a 65-assertion suite
-(`supabase/tests/restored_functions_test.sql`) — they had been running in production for
-weeks with no source and therefore no test, which is the same thing as nobody knowing what
-they do. Three migration files (`rhythm_write_side`, `situation_catalog_and_detection`,
-`strain_detection_and_graded_return`) had contained **no SQL at all**, only comments
-describing objects applied straight to the database; that is how this started.
+Reading found twelve functions. **Attempting the rebuild** found
+`get_agent_context`, `commerce_allowed`, the five views, and three migrations
+that could not apply to a fresh database at all:
 
-### The real gap: fourteen tables have no CREATE TABLE at all
+- **week 0's revocations aborted** on `public.messages` and
+  `public.collective_intelligence`, two tables since dropped. An unguarded
+  statement in the middle of a security file cancels every revocation after it.
+- **week 0's `search_path` pins aborted** on six functions that
+  `20260729160000_cleanup_*` deletes an hour later.
+- **`20260729160200`'s `COMMENT`** named an `activate_subscription` signature no
+  migration creates.
 
-Restoring the twelve does **not** make the repo able to rebuild production, and saying so
-would repeat the original mistake in the other direction. This migration history begins at
-`20260729123012_week0_*` — "week 0" of a database that already existed. Every table older
-than that has no DDL in git:
+All three are now guarded loops that skip what is absent instead of dying on it.
+This is the argument for the rebuild being a routine check rather than a
+one-off: it is the only test that cannot be satisfied by a fixture agreeing with
+itself.
 
-`followers`, `children`, `daily_logs`, `child_patterns`, `memory_events`,
-`memory_snapshots`, `n8n_chat_histories`, `payments`, `plan_sessions`, `session_tracker`,
-`supported_countries`, `survey_responses`, `weekly_plans`, `follower_insights`.
-
-A blank database cannot be brought to production's shape from this repository. What is
-needed is one baseline migration holding those fourteen tables — columns, constraints,
-indexes and triggers — dated before week 0 and written `if not exists` so it is a no-op
-against the database that already has them. Until that exists, `fixture_minimal.sql` is
-the only written description of those tables anywhere, and it is deliberately partial.
-
-**Still true, and unchanged:** this belongs before the legacy deletion in §3. You cannot
-safely delete from a system you cannot rebuild.
-
-### The drift nobody has checked yet
-
-The seventeen functions that are in git have never been compared against what production
-actually runs. They are *present*, not *verified equal*. `pg_get_functiondef` against each
-one is the check, and it is the natural next task after the baseline.
+### And it uncovered a live privilege escalation — see §0
 
 ## 7. Smaller, real, and cheap
 
@@ -207,6 +269,16 @@ one is the check, and it is the natural next task after the baseline.
   only reader of the windows is `get_rhythm_due`, and that test supplies them — but this
   is the same class of drift that made every `/start` return 400 once. The fix is moving
   those inserts onto `commit_situation()`, production's only writer.
+- **`commerce_allowed`'s recovery window is dead code.** The body reads
+  `ps.level = 1 and (ps.entered_at < now() - interval '14 days' or ps.level = 1)`. The
+  second half of that parenthesis is true whenever the first condition already passed, so
+  the fourteen-day settling period after strain steps down never applies: commerce reopens
+  the instant a parent returns to level 1. Whether it *should* wait is a decision about how
+  soon it is decent to mention money to someone who was drowning last week — the founder's
+  call, so the line was restored exactly as it runs
+  (`20260730183100_commerce_allowed_restored.sql`) and named here instead of quietly
+  changed. Note also that `lifecycle_test.sql` exercises the *fixture's* simplified
+  `commerce_allowed`, not this body, which is how it went unnoticed.
 - **`get_child_record`, `request_erasure`, `execute_erasure`** — the privacy promise
   («تطلبون محوه فيُمحى كلّه») is wired for erasure via `menu_privacy_erased`, but
   `get_child_record` (the "show me everything you know" side) has no surface.
@@ -219,7 +291,7 @@ one is the check, and it is the natural next task after the baseline.
 |---|---|---|
 | 1 | The simulation harness (§2) | Nothing after this can be *seen* working without it. Cheapest thing on the list, and it makes every later claim checkable. |
 | 2 | The journey write side (§1) | The paid product does not exist without it, and the offer is already selling it. |
-| 2b | The baseline schema — fourteen tables (§6b) | The repo still cannot rebuild production, and step 3 deletes things. Deleting from a system you cannot rebuild is the one irreversible move on this list. |
+| ~~2b~~ | ~~The baseline schema (§6b)~~ — **DONE 2026-08-07** | A blank database now becomes production from this repo: 66 migrations, 0 failures, 29 tables / 12 views / 88 functions matching by name. Step 3 can now delete safely. |
 | 3 | Delete the legacy layer (§3) | Do it before building on top, not after. Every day it stays, something new is built against the wrong half. |
 | 4 | The Mirror sender (§4) | Small — the payload is ready. Restores the free tier's peak. |
 | 5 | Turn W2 + W3 on against synthetic families, then verify the whole lifecycle end to end | Needs 1–4 done to be meaningful. |

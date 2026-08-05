@@ -5,6 +5,83 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-07 · The repo rebuilds production — and the rebuild found a way in
+
+**A blank Postgres database now becomes production from this repository alone.** 66
+migrations, zero failures, 29 tables, 12 views, 88 functions — the same names production
+has, verified by set difference rather than by counting. That was never true before today,
+and the entry below this one, written hours earlier, was wrong about why.
+
+**The gap was never functions.** This migration history begins at week 0 on a database
+that already existed and already held 310 families. Fourteen tables and five views had no
+DDL in git at all: `followers`, `children`, `daily_logs`, `n8n_chat_histories`,
+`memory_snapshots`, the dashboard's funnel views. No number of restored functions would
+have made a rebuild possible. They are now in three baseline files dated before week 0,
+plus a tail file for the foreign keys and triggers that point at objects later migrations
+create — split rather than guarded, because a baseline that silently skips a binding
+produces a database that merely *looks* like production.
+
+**Only running the rebuild found the rest.** Reading found twelve missing functions.
+Attempting the rebuild found `get_agent_context`, `commerce_allowed`, five views, and
+three migrations that could not apply to a fresh database at all — week 0's revocations
+aborting on two tables since dropped, week 0's search_path pins aborting on six functions
+deleted an hour later by the cleanup migration, and a `COMMENT` naming a signature no
+migration creates. All three are now guarded loops. This is the argument for the rebuild
+being a routine check: it is the only test a fixture cannot satisfy by agreeing with
+itself.
+
+### And it found a live privilege escalation
+
+Four SECURITY DEFINER functions were executable in production **with the public anon key**:
+`activate_subscription` (the ten-argument one — it grants paid access and starts a
+journey), `get_conversation_for` (any parent's entire history), `heart_commit` (overwrite
+what ADAM remembers about any family), and `write_child_name`.
+
+Two causes, and neither was a mistake in the security model:
+
+1. The ten-argument `activate_subscription` is an **overload**, created on 2026-08-07 when
+   the journey engine gained its start parameters. New functions are born with EXECUTE
+   granted to PUBLIC, and week 0 had revoked the five-argument one *by exact signature*. My
+   own migration reopened the door week 0 closed. A signature protects a function; it does
+   not protect a capability.
+2. Week 0 wrote `REVOKE … ON FUNCTION public.get_heart_batch()`. That function takes
+   `p_limit integer default 40`. The signature matched nothing, the statement raised, and
+   the two revocations written after it — `heart_commit` and `write_child_name` — never
+   ran. One wrong signature silently cancelled the rest of the list, and nobody looked for
+   twelve days.
+
+A third, found only by verifying the fix on a bare cluster: `REVOKE … FROM anon` does not
+remove a privilege `anon` holds through **PUBLIC**. Supabase happens to revoke PUBLIC and
+grant `anon` explicitly, so week 0's revoke worked there and would have been a no-op
+anywhere else.
+
+Closed by `20260807160000_nobody_grants_themselves_a_journey.sql`, **applied to
+production** and verified: `anon` has EXECUTE on none of them, `service_role` still has all
+88. Revocation is now by function *name*, so every present and future overload is covered,
+and `alter default privileges` closes the door the next new function would walk through.
+Nothing in the product lost access — n8n authenticates as `service_role`.
+
+### Two more things the rebuild surfaced
+
+**`activate_subscription` has two live overloads.** The ten-argument one starts a journey.
+The five-argument one — the one the dashboard calls — does not. A payment confirmed
+through the old path still produces `paid_active` with no stage, which is exactly the gap
+the journey engine was built to close. Named in §1 and §3 rather than fixed here, because
+deleting the old overload is the legacy deletion, not a side effect of a baseline.
+
+**`commerce_allowed`'s recovery window is dead code.** Its body reads
+`ps.level = 1 and (ps.entered_at < now() - interval '14 days' or ps.level = 1)` — the
+second half is true whenever the first already passed, so the fourteen-day settling period
+after strain steps down never applies. Restored exactly as it runs and named in §7:
+whether ADAM should wait two weeks before mentioning money to someone who was drowning
+last week is the founder's decision, not a thing to change quietly inside a migration
+titled "restored".
+
+Eighteen suites, **567 assertions, zero failures** — and three of them now run the real
+`get_agent_context` instead of a fixture stub, because the real one finally has a source.
+
+---
+
 ## 2026-08-07 · Twelve functions came home, and a number I got wrong
 
 **Correction first.** The previous entry, and `docs/what-is-missing.md` §6b, said "34 of

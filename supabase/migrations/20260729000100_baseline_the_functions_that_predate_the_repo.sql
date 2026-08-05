@@ -1,4 +1,4 @@
--- The twelve functions that live only in the database
+-- The thirteen functions that live only in the database
 --
 -- CORRECTION, and it matters. docs/what-is-missing.md §6b said "34 of 88
 -- production functions have no source in this repo". That number was wrong. It
@@ -10,9 +10,11 @@
 -- family, get_pricing, the two chat-history guards, record_mirror_delivered,
 -- derive_aha_class, jsonb_text_values, commit_child_name_by_platform.
 --
--- Re-checked on 2026-08-07 against all 64 migrations, name by name. Twelve
+-- Re-checked on 2026-08-07 against all 64 migrations, name by name. Thirteen
 -- functions genuinely have no source anywhere in this repository, and they are
--- restored below, read out of production with pg_get_functiondef.
+-- restored below, read out of production with pg_get_functiondef. (Twelve were
+-- found by that pass; get_agent_context was found by the thirteenth thing —
+-- actually trying the rebuild, which is the only check that cannot be fooled.)
 --
 -- They are, in one sentence each: the two writers W2 runs (writer_commit,
 -- _ensure_child) and its queue (get_extraction_batch); the free tier's light
@@ -21,7 +23,9 @@
 -- and the message cap (check_daily_message_cap); the pre-commit_child_name
 -- writer W2 still calls (write_child_name); the keyboard's one changing item
 -- (surface_changing_item); the legacy end-of-subscription reset (return_to_free);
--- and set_updated_at, which eight tables hang a trigger off.
+-- and set_updated_at, which eight tables hang a trigger off; plus
+-- get_agent_context, which assembles everything ADAM knows about one family
+-- into the paid prompt.
 --
 -- One deliberate departure from the production text: return_to_free's Arabic
 -- comments are mojibake in production (UTF-8 bytes stored as latin-1) and its
@@ -32,10 +36,10 @@
 -- so the fix is a visible change and not a silent edit smuggled in under the
 -- word "restore".
 --
--- This does NOT make the repo able to rebuild production. Fourteen tables —
--- followers, children, daily_logs and eleven more — still have no CREATE TABLE
--- anywhere in git, because this migration history begins at "week 0" on a
--- database that already existed. See docs/what-is-missing.md §6b.
+-- Dated before week 0, alongside the tables baseline. These functions predate
+-- this repository exactly as those tables do, and week 0 itself pins their
+-- search_path — so a rebuild that met them at the end would fail at the
+-- beginning. See docs/what-is-missing.md §6b.
 
 begin;
 
@@ -303,6 +307,93 @@ begin
                           'last_history_id', greatest(p_last_history_id,
                             coalesce(nullif(memory_snapshots.built_from->>'last_history_id','')::int, 0))),
         updated_at    = now();
+end $fn$;
+
+-- Everything ADAM knows about one family, assembled into the paid prompt: the
+-- day counter, the compressed snapshot, the children, the unresolved patterns,
+-- the five heaviest moments and the last three days. Resolved patterns are left
+-- out on purpose — a family should not keep meeting what they already fixed.
+create or replace function public.get_agent_context(p_follower_id uuid)
+returns text
+language plpgsql
+stable
+set search_path to 'pg_catalog', 'public'
+as $fn$
+declare
+  v_out text := '';
+  v_snap text;
+  v_children text;
+  v_patterns text;
+  v_events text;
+  v_logs text;
+  v_day int;
+  v_days_left int;
+begin
+  -- عداد الأيام
+  select ps.current_day,
+         greatest(0, extract(day from f.subscription_expires_at - now())::int)
+    into v_day, v_days_left
+  from followers f
+  left join plan_sessions ps on ps.follower_id = f.id
+  where f.id = p_follower_id;
+
+  v_out := 'PLAN_DAY: ' || coalesce(v_day::text,'?')
+        || E'\nDAYS_LEFT: ' || coalesce(v_days_left::text,'?');
+
+  -- الملخص المضغوط
+  select snapshot_text into v_snap
+  from memory_snapshots where follower_id = p_follower_id and char_count > 0;
+  if v_snap is not null then
+    v_out := v_out || E'\n\n== SUMMARY ==\n' || v_snap;
+  end if;
+
+  -- الأطفال
+  select string_agg(
+    '- ' || name
+    || coalesce(' ('||gender||')','')
+    || coalesce(', '||age_note,'')
+    || coalesce(', طبع: '||temperament,''), E'\n')
+  into v_children from children where follower_id = p_follower_id;
+  if v_children is not null then
+    v_out := v_out || E'\n\n== CHILDREN ==\n' || v_children;
+  end if;
+
+  -- الأنماط النشطة (غير المحلولة)
+  select string_agg(
+    '- ['||status||' x'||evidence_count||'] '||pattern_label
+    || coalesce(': '||description,''), E'\n')
+  into v_patterns from child_patterns
+  where follower_id = p_follower_id and status <> 'resolved';
+  if v_patterns is not null then
+    v_out := v_out || E'\n\n== PATTERNS ==\n' || v_patterns;
+  end if;
+
+  -- آخر 5 أحداث مهمة (وزن شعوري >= 3)
+  select string_agg(line, E'\n') into v_events from (
+    select '- ['||event_type||', '||to_char(occurred_at,'MM/DD')||'] '||title
+           || coalesce(': '||summary,'') as line
+    from memory_events
+    where follower_id = p_follower_id and emotional_weight >= 3
+    order by occurred_at desc limit 5
+  ) t;
+  if v_events is not null then
+    v_out := v_out || E'\n\n== KEY_MOMENTS ==\n' || v_events;
+  end if;
+
+  -- آخر 3 أيام
+  select string_agg(line, E'\n') into v_logs from (
+    select '- ['||log_date||'] '||coalesce(summary,'')
+           || coalesce(' | خطوة: '||step_given,'')
+           || case step_completed when true then ' (نُفذت)' when false then ' (لم تُنفذ)' else '' end as line
+    from daily_logs
+    where follower_id = p_follower_id
+    order by log_date desc limit 3
+  ) t;
+  if v_logs is not null then
+    v_out := v_out || E'\n\n== RECENT_DAYS ==\n' || v_logs;
+  end if;
+
+  return v_out;
 end $fn$;
 
 -- ── The light memory (free tier) ──────────────────────────────────────────────
