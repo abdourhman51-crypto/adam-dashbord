@@ -67,7 +67,11 @@ no «نصل» and no «المدّة» — only an access clock counting down.
 This is buildable now, with no users and no risk. It is pure database work with an
 offline test suite, exactly like everything else this month.
 
-## 2. There is no way to prove the engine works without messaging anyone
+## 2. ~~There is no way to prove the engine works without messaging anyone~~ — BUILT 2026-08-07
+
+`supabase/tests/lifecycle_test.sql` walks one synthetic family from stranger to finished
+journey in seconds, every row written by the production writers. See
+`supabase/tests/README.md`. What follows is why it was needed.
 
 This is the gap the founder's decision creates, and it is the one that unblocks
 everything else.
@@ -130,6 +134,24 @@ first, then a small real cohort at launch.
 and what ADAM becomes afterwards, has no answer yet. It is last on this list because
 nothing can reach it until 1–5 exist, but it must be answered before the first paid
 journey completes, which is 29 days after the first sale.
+
+## 6b. The repo cannot rebuild production — 34 of 88 functions
+
+Found on 2026-08-07 while building the harness. Three migration files
+(`rhythm_write_side`, `situation_catalog_and_detection`,
+`strain_detection_and_graded_return`) contained **no SQL at all** — only comments
+describing objects applied straight to the database.
+
+Checked against a full offline load, **34 of 88 production functions have no source in
+this repo**, including `commit_situation`, `record_harvest_answer`, `set_strain_level`,
+`request_erasure`, `execute_erasure` and `get_child_record`.
+
+This means the offline suite can never cover them, a rebuild would produce a product
+missing whole layers, and "the repo is the source of truth" is false for more than a
+third of the logic. Six came home on 2026-08-07; **28 remain**. The work is mechanical —
+`pg_get_functiondef` into the migration that should have carried it — and it belongs
+before the legacy deletion in §3, because you cannot safely delete from a system you
+cannot rebuild.
 
 ## 7. Smaller, real, and cheap
 

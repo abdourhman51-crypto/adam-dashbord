@@ -32,7 +32,9 @@ create table public.followers (
   subscription_expires_at timestamptz,
   payment_pending_at timestamptz,
   renewal_d5_sent_at timestamptz,
-  renewal_d0_sent_at timestamptz
+  renewal_d0_sent_at timestamptz,
+  -- record_seed_sent() stamps this on the first proactive message.
+  proactive_footer_at timestamptz
 );
 
 create table public.payments (
@@ -92,7 +94,25 @@ create table public.situations (
   status text check (status in ('candidate','confirmed','rejected')),
   window_start smallint, window_end smallint,
   evidence_count integer default 1,
-  last_observed timestamptz default now()
+  first_observed timestamptz default now(),
+  last_observed timestamptz default now(),
+  updated_at timestamptz default now(),
+  -- commit_situation() upserts on this key: three independent observations
+  -- promote a candidate to confirmed, and without the constraint the promotion
+  -- silently becomes a duplicate row instead.
+  unique (child_id, key)
+);
+
+-- record_seed_sent() writes an A1/A2 row the first time a seed is grounded on
+-- the child's name or on a prior outcome.
+create table public.aha_moments (
+  id uuid primary key default gen_random_uuid(),
+  parent_id uuid references public.followers(id) on delete cascade,
+  child_id uuid,
+  kind text, moment_class text,
+  first_occurrence boolean, day_id uuid,
+  journey_id uuid,
+  occurred_at timestamptz default now()
 );
 
 -- The full production shape, copied from
@@ -141,6 +161,22 @@ create table public.crisis_flags (
   handled_at  timestamptz
 );
 
+-- The erasure audit trail. It carries NO foreign key to followers by design:
+-- the record of an erasure must survive the erasure it records. Copied from
+-- 20260729130100 because write_child_name() refuses to write a name for a
+-- parent with an open erasure request.
+create table public.erasure_requests (
+  id               uuid primary key default gen_random_uuid(),
+  parent_id        uuid not null,
+  platform_user_id text not null,
+  requested_at     timestamptz not null default now(),
+  completed_at     timestamptz,
+  status           text not null default 'requested'
+                     check (status in ('requested','completed','failed')),
+  refund_due       boolean not null default false,
+  notes            text
+);
+
 create table public.stage_proposals (
   id          uuid primary key default gen_random_uuid(),
   parent_id   uuid not null references public.followers(id) on delete cascade,
@@ -186,13 +222,24 @@ create table public.child_patterns (
 create table public.checkin_state (
   parent_id uuid primary key references public.followers(id) on delete cascade,
   cadence text not null default 'nightly',
-  paused_until date
+  local_hour smallint,
+  consecutive_ignored integer not null default 0,
+  last_sent_date date,
+  last_sent_at timestamptz,
+  last_responded_at timestamptz,
+  cadence_changed_at timestamptz,
+  paused_until date,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
 );
 
 create table public.parent_strain (
   parent_id uuid primary key references public.followers(id) on delete cascade,
   level smallint not null default 1,
-  return_eligible_at timestamptz
+  reason text,
+  entered_at timestamptz default now(),
+  return_eligible_at timestamptz,
+  updated_at timestamptz default now()
 );
 
 create table public.n8n_chat_histories (

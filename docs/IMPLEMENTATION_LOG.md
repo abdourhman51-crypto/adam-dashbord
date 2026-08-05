@@ -5,6 +5,56 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-07 · One family, walked — and 34 functions that only existed in the database
+
+The next gap after the journey engine was the one the founder's decision creates: with
+ADAM stopped and nobody being messaged, the time-and-evidence machines will never
+accumulate data, so no path can be *watched* working. `lifecycle_test.sql` answers that —
+35 cases walking one synthetic family from stranger to finished journey in seconds, every
+row written by the production function the live product would call.
+
+**But writing it uncovered something bigger.** Three migration files —
+`rhythm_write_side`, `situation_catalog_and_detection`,
+`strain_detection_and_graded_return` — contained **no SQL at all**. Nine, fourteen and
+twenty-six lines of comment describing objects that had been applied straight to the
+database and never written down.
+
+That is not an isolated slip. Checked properly against a full offline load:
+
+> **34 of 88 production functions cannot be rebuilt from this repo.**
+
+Among them `commit_situation`, `record_harvest_answer`, `set_strain_level`,
+`request_erasure`, `execute_erasure`, `get_child_record` — live product logic whose only
+copy is the running database. The consequences: the offline suite can never cover them, a
+rebuild would produce a product missing whole layers, and the repo's claim to be the
+source of truth is false for over a third of the logic.
+
+Six of them came home today — the three files above now carry their real definitions,
+pulled from production with `pg_get_functiondef` and verified by the suite that now
+exercises them. The remaining 28 are on the list.
+
+**The harness caught the product three times while it was being written**, and none of
+them were assertion bugs:
+
+| The harness assumed | The product actually does |
+|---|---|
+| answering a harvest is enough | the harvest is **sent** first; without `record_harvest_sent` the gate still says an evening question is owed on a day already answered |
+| strain drops when a parent recovers | L2 **holds three days** before stepping to L1 — nobody is declared recovered on one calm sentence |
+| the journey clock counts the nights before it | it counts days on or after `started_at`; the free-tier nights before the sale are not borrowed |
+
+**And the STABLE snapshot trap, for the fourth time.** `set_strain_level` is volatile,
+`offer_ready` is stable; called in one expression the read sees the snapshot from before
+the write and reports the offer still withdrawn — indistinguishable from a real bug. It
+has now cost debugging in four separate suites and is written up in each.
+
+**Fixture:** `situation_catalog` handed back to its migration where it belongs;
+`erasure_requests`, `aha_moments`, the full `checkin_state` and `parent_strain` column
+sets added — each one added the moment a production writer turned out to touch it.
+
+Fifteen suites, 453 assertions, zero failures.
+
+---
+
 ## 2026-08-07 · The journey can be started
 
 Founder's decision first: ADAM is stopped, nobody is being messaged, and the build is to

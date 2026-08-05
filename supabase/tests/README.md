@@ -13,9 +13,13 @@ su postgres -c "$PGBIN/pg_ctl -D $DATA -o '-k $RUN -p 55432 -c listen_addresses=
 export PGHOST=$RUN PGPORT=55432 PGUSER=postgres
 psql -v ON_ERROR_STOP=1 -f supabase/tests/fixture_minimal.sql
 for m in 20260729130200_journey_engine_progress_and_proposal_gate \
+         20260730175200_rhythm_write_side \
+         20260730180000_situation_catalog_and_detection \
+         20260730183000_strain_detection_and_graded_return \
          20260731090000_telegram_surface_state \
          20260731120000_conversation_copy_and_button_law \
          20260731150000_knowledge_gate_and_uniqueness \
+         20260731170000_child_name_capture \
          20260731210000_composed_reply_gate \
          20260801095000_moments_missing_from_repo \
          20260801100000_one_moment_one_send \
@@ -49,7 +53,7 @@ done
 for t in telegram_surface conversation_law knowledge_gate one_send \
          rhythm_gate give_before_asking country_state \
          agent_gate agent_bundle composed_gate intention_capture \
-         offer_surface team_question journey_engine ; do
+         offer_surface team_question journey_engine lifecycle ; do
   psql -q -f supabase/tests/${t}_test.sql
 done
 ```
@@ -63,9 +67,9 @@ days; adding it *at the end* — where a reader naturally appends — silently
 reverted four later migrations and turned 32 green assertions into 24 red ones
 that looked exactly like a broken change. Append by timestamp, never by habit.
 
-Current: **21 + 27 + 25 + 35 + 12 + 29 + 71 + 27 + 19 + 32 + 29 + 35 + 18 + 36 assertions, zero failures.**
+Current: **21 + 27 + 25 + 35 + 14 + 29 + 71 + 27 + 19 + 32 + 29 + 35 + 18 + 36 + 35 assertions, zero failures.**
 
-`rhythm_gate` reports 5 or 12 depending on the hour in Algiers — the harvest block
+`rhythm_gate` reports 5 or 14 depending on the hour in Algiers — the harvest block
 only runs when the harvest window is genuinely closed, and the 23:00–07:00 branch
 asserts the quiet window instead. Both are green; only the count moves.
 
@@ -327,3 +331,51 @@ The last two cases cover the half-state this migration exists to remove: paying 
 an agreed goal starts the journey, and paying **without** one still records the money but
 returns `journey.started = false, reason = objective_required` — loudly, in the return
 value, instead of leaving a paid parent silently adrift.
+
+## `lifecycle_test.sql` — the simulation harness
+
+35 cases walking **one synthetic family from stranger to finished journey**, in seconds.
+
+This file exists because of a decision, not a preference. ADAM is stopped and nobody is
+being messaged until the build is finished — but every engine here is a **time and
+evidence machine** (three attempts, two calm nights, fifteen outcomes), so with no
+traffic none of them will ever accumulate the data that makes them run. Offline, walking
+a synthetic family through time is the only way these paths can be watched working at
+all.
+
+**Every row is written by the production function the live product would call:**
+
+```
+commit_child_name → commit_situation → record_seed_sent
+→ record_harvest_sent → record_harvest_answer → start_stage → close_stage
+```
+
+Nothing inserts a `daily_logs` row by hand. That is the difference between a harness and
+a fiction: a harness that invents its own rows tests the harness. The one place history
+must be aged — `record_harvest_answer` only ever writes today — moves the **date** of a
+row the real function produced and never its contents, and one assertion pins the aged
+shape to a live one.
+
+What it watches, in order: `knowledge_depth` 0→1→2→3→4 each for its own reason;
+`can_send` flipping for seed, harvest and mirror; `offer_ready` becoming true on the
+exact night it is earned; strain withdrawing the offer and the recovery window holding it
+withdrawn; then the journey started, missed, extended and reached.
+
+### It caught the product three times while being written
+
+| The harness assumed | The product actually does |
+|---|---|
+| answering a harvest is enough | the harvest is **sent** before it is answered — `record_harvest_sent` sets `harvest_sent_at`, and without it `can_send('harvest')` still says an evening question is owed on a day already answered |
+| strain drops the moment a parent recovers | L2 **holds for three days** before it may step to L1. Nobody is declared recovered on one calm sentence |
+| the journey clock counts the nights before it | it counts days on or after `started_at` — the free-tier nights before the sale are deliberately not borrowed |
+
+None of those were assertion bugs. All three were the harness being wrong about the
+product, which is the whole reason to write one.
+
+### And the STABLE snapshot trap, a fourth time
+
+`set_strain_level` is VOLATILE and `offer_ready` is STABLE. Calling both inside a single
+expression makes `offer_ready` read the snapshot from **before** the step-down and report
+the offer still withdrawn — a failure that looks exactly like a broken product. The write
+and the read must be separate statements. This trap has now cost real debugging in
+`country_state`, `offer_surface`, `journey_engine` and here.
