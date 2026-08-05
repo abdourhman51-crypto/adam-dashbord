@@ -53,7 +53,8 @@ begin
   insert into public.children (follower_id, name, is_primary) values (p,'ريان',true) returning id into c;
   insert into public.daily_logs (follower_id, log_date, night_result) values
     (p, current_date - 2, 'calm'), (p, current_date - 1, 'calm'), (p, current_date, 'calm');
-  insert into public.crisis_flags (parent_id, detected_at) values (p, now() - interval '2 days');
+  insert into public.crisis_flags (parent_id, category, detected_at)
+  values (p, 'self_harm', now() - interval '2 days');
 
   g := public.generate_first_mirror(c);
   perform pg_temp.chk('a crisis inside the last 7 days withholds the wow moment',

@@ -34,7 +34,23 @@ create table public.followers (
   renewal_d5_sent_at timestamptz,
   renewal_d0_sent_at timestamptz,
   -- record_seed_sent() stamps this on the first proactive message.
-  proactive_footer_at timestamptz
+  proactive_footer_at timestamptz,
+  -- The free tier's own columns, read and written by the functions restored in
+  -- 20260807140000: the light memory (heart_commit / get_heart_batch), the
+  -- message cap (check_daily_message_cap), and the return signal that makes a
+  -- parent golden (get_free_session_state).
+  first_name text,
+  parent_gender text,
+  light_memory text,
+  light_memory_updated_at timestamptz,
+  daily_msg_count integer not null default 0,
+  daily_msg_date date,
+  waitlist boolean default false,
+  return_count integer not null default 0,
+  last_return_at timestamptz,
+  last_gap_hours numeric,
+  is_golden boolean default false,
+  last_active timestamptz
 );
 
 create table public.payments (
@@ -54,9 +70,17 @@ create table public.children (
   follower_id uuid references public.followers(id) on delete cascade,
   name text,
   gender text, birth_year integer, age_note text, temperament text,
-  is_primary boolean,
+  -- NOT NULL DEFAULT false, exactly as production. It was nullable here, and
+  -- that is not a harmless looseness: every "primary child, else any child"
+  -- reader orders by `is_primary desc`, and DESC puts NULLs FIRST — so a child
+  -- with a null flag outranked the actual primary child in the fixture and in
+  -- no other database. The bug belonged to the fixture; the readers are right.
+  is_primary boolean not null default false,
   created_at timestamptz not null default now(),
-  updated_at timestamptz default now()
+  updated_at timestamptz default now(),
+  -- _ensure_child() and writer_commit() both upsert on this. Without it the
+  -- "same child mentioned twice" case silently creates a sibling.
+  unique (follower_id, name)
 );
 
 create table public.country_timezone (
@@ -216,7 +240,61 @@ create table public.child_patterns (
   first_observed timestamptz default now(),
   last_observed timestamptz default now(),
   updated_at timestamptz default now(),
-  safe_for_record boolean not null default false
+  safe_for_record boolean not null default false,
+  -- writer_commit() upserts patterns on this key; a second sighting is meant to
+  -- raise evidence_count, not to create a second pattern with the same label.
+  unique (follower_id, pattern_label)
+);
+
+-- The four tables W2's writer touches, and the one the free session clock keeps.
+-- Columns copied from production's information_schema. Only the columns the
+-- restored functions in 20260807140000 actually read or write carry the
+-- production defaults; the rest are here because the writers name them.
+create table public.memory_snapshots (
+  follower_id uuid primary key references public.followers(id) on delete cascade,
+  snapshot_text text not null default '',
+  char_count integer,
+  built_from jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+create table public.memory_events (
+  id uuid primary key default gen_random_uuid(),
+  follower_id uuid not null references public.followers(id) on delete cascade,
+  child_id uuid,
+  event_type text not null,
+  title text not null,
+  summary text,
+  emotional_weight integer not null default 3,
+  occurred_at timestamptz not null default now(),
+  source text not null default 'agent_extraction',
+  created_at timestamptz not null default now()
+);
+
+create table public.plan_sessions (
+  id uuid primary key default gen_random_uuid(),
+  follower_id uuid references public.followers(id) on delete cascade,
+  has_breakthrough boolean default false,
+  updated_at timestamptz default now()
+);
+
+-- write_child_name() back-links this table's orphan rows to the only child.
+create table public.weekly_plans (
+  id uuid primary key default gen_random_uuid(),
+  follower_id uuid not null references public.followers(id) on delete cascade,
+  week_number integer not null,
+  child_id uuid,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table public.session_tracker (
+  platform_user_id text primary key,
+  session_anchor_id bigint not null default 0,
+  session_started_at timestamptz not null default now(),
+  last_seen_at timestamptz not null default now(),
+  session_msg_turns integer not null default 0,
+  session_number integer not null default 1
 );
 
 create table public.checkin_state (

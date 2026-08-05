@@ -12,7 +12,10 @@ su postgres -c "$PGBIN/pg_ctl -D $DATA -o '-k $RUN -p 55432 -c listen_addresses=
 
 export PGHOST=$RUN PGPORT=55432 PGUSER=postgres
 psql -v ON_ERROR_STOP=1 -f supabase/tests/fixture_minimal.sql
+psql -v ON_ERROR_STOP=1 -f supabase/tests/fixture_mirror.sql
 for m in 20260729130200_journey_engine_progress_and_proposal_gate \
+         20260729150000_mirror_engine_core \
+         20260729150100_mirror_engine_fix_offer_check_to_values_only \
          20260730175200_rhythm_write_side \
          20260730180000_situation_catalog_and_detection \
          20260730183000_strain_detection_and_graded_return \
@@ -46,14 +49,16 @@ for m in 20260729130200_journey_engine_progress_and_proposal_gate \
          20260806090000_one_promise_one_next_step \
          20260806140000_the_team_question_is_not_the_agents \
          20260806180000_answer_the_free_question_too \
-         20260807090000_the_journey_can_be_started ; do
+         20260807090000_the_journey_can_be_started \
+         20260807140000_the_repo_can_rebuild_production ; do
   psql -v ON_ERROR_STOP=1 -q -f supabase/migrations/$m.sql || break
 done
 
 for t in telegram_surface conversation_law knowledge_gate one_send \
          rhythm_gate give_before_asking country_state \
          agent_gate agent_bundle composed_gate intention_capture \
-         offer_surface team_question journey_engine lifecycle ; do
+         offer_surface team_question journey_engine lifecycle \
+         mirror_engine restored_functions ; do
   psql -q -f supabase/tests/${t}_test.sql
 done
 ```
@@ -379,3 +384,61 @@ expression makes `offer_ready` read the snapshot from **before** the step-down a
 the offer still withdrawn — a failure that looks exactly like a broken product. The write
 and the read must be separate statements. This trap has now cost real debugging in
 `country_state`, `offer_surface`, `journey_engine` and here.
+
+---
+
+## `restored_functions_test.sql` — the twelve that lived only in the database
+
+Sixty-five assertions over the functions restored by
+`20260807140000_the_repo_can_rebuild_production.sql`. Every one of them had been running
+in production for weeks with no source in git, and therefore no test — which is the same
+thing as nobody knowing what they do.
+
+The cases do not re-describe the bodies. They assert the promises the bodies make:
+
+- **`_ensure_child`** — the same name twice is one child, a different name is a different
+  child, no name resolves to the *primary* child, and a parent with no children at all
+  gets exactly one placeholder.
+- **`write_child_name`** — a recorded name is never replaced by a new inference; an empty
+  one is filled in and the orphan nights back-linked; and with **two** children the orphan
+  nights are left orphaned, because a sibling's nights must never be reassigned on a guess.
+- **`writer_commit`** — everything it takes is model output, so: the placeholder is
+  promoted rather than left beside the real name, blank fields write nothing, an invented
+  `event_type` is clamped to `other`, a weight of 99 becomes 5, a second sighting of a
+  pattern raises evidence instead of duplicating the row, the read watermark only moves
+  forward, and a blank snapshot never erases the one we had.
+- **`heart_commit`** — five blank fields write nothing, report `false`, and **do not stamp
+  the freshness clock**, so the parent is retried next cycle rather than skipped forever.
+- **`get_free_session_state`** — a session is a gap, not a clock; and coming back *twice*
+  is what makes a parent golden.
+- **`surface_changing_item`** — when commerce is blocked the label is **identical** to the
+  ordinary one. A withheld journey is silent, never announced as a thing being withheld.
+- **`return_to_free`** — the subscription clock is cleared and the payment row is not
+  touched.
+
+### Two failures that were the fixture, not the product
+
+`_ensure_child` orders by `is_primary desc, created_at asc`. In Postgres `DESC` puts NULLs
+**first**, and `fixture_minimal.children.is_primary` was nullable while production's is
+`NOT NULL DEFAULT false` — so a child with a null flag outranked the actual primary child,
+in the fixture and in no other database. The fixture was wrong; the readers were right.
+This is the third time a looseness in the fixture has produced a failure that looked like
+a product bug (see §`fixture_minimal.sql`), and the answer each time is the same: copy the
+column definition from `information_schema`, not from memory.
+
+The other two were `now()`. Inside one transaction `now()` is constant, so a chat row
+inserted "after" a memory write ties with it, and a `BEFORE UPDATE` trigger's stamp equals
+one taken moments earlier. Both tests now say so explicitly rather than asserting a strict
+`>` that only holds in production.
+
+### The Mirror suite had been unrunnable, silently
+
+`mirror_engine_test.sql` (10 assertions) was orphaned from the offline chain. When the
+journey engine landed, `fixture_minimal.sql` gained a `crisis_flags` table — and
+`fixture_mirror.sql` still created its own stub of the same name. The second `CREATE`
+aborted `fixture_mirror.sql` at line 16, taking `v_child_record` with it, and the whole
+suite failed on a missing view rather than on anything about the Mirror.
+
+The stub is deleted rather than guarded with `IF NOT EXISTS`: two fixtures owning one
+table is exactly how the shapes drift apart. The mirror migrations are now part of the
+standard chain, so the suite runs with everything else.

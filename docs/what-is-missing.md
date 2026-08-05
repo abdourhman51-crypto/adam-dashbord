@@ -135,23 +135,64 @@ and what ADAM becomes afterwards, has no answer yet. It is last on this list bec
 nothing can reach it until 1–5 exist, but it must be answered before the first paid
 journey completes, which is 29 days after the first sale.
 
-## 6b. The repo cannot rebuild production — 34 of 88 functions
+## 6b. The repo cannot rebuild production — but not for the reason first written here
 
-Found on 2026-08-07 while building the harness. Three migration files
-(`rhythm_write_side`, `situation_catalog_and_detection`,
-`strain_detection_and_graded_return`) contained **no SQL at all** — only comments
-describing objects applied straight to the database.
+**This section said "34 of 88 functions". That number was wrong, and the correction
+matters more than the original claim.**
 
-Checked against a full offline load, **34 of 88 production functions have no source in
-this repo**, including `commit_situation`, `record_harvest_answer`, `set_strain_level`,
-`request_erasure`, `execute_erasure` and `get_child_record`.
+It came from diffing production against the **offline test chain** — the 35 migration
+files the harness loads on top of `fixture_minimal.sql` — and not against the
+**repository**, which holds 64. Everything the chain does not load was counted as absent
+when it was merely untested. Re-checked on 2026-08-07 name by name against all 64 files:
 
-This means the offline suite can never cover them, a rebuild would produce a product
-missing whole layers, and "the repo is the source of truth" is false for more than a
-third of the logic. Six came home on 2026-08-07; **28 remain**. The work is mechanical —
-`pg_get_functiondef` into the migration that should have carried it — and it belongs
-before the legacy deletion in §3, because you cannot safely delete from a system you
-cannot rebuild.
+| | |
+|---|---|
+| Production functions | 88 |
+| With no source anywhere in git | **12** |
+| In git but not loaded by the offline chain, so untested | 17 |
+| Restored earlier on 2026-08-07 with their own migrations | 6 |
+
+The seventeen that were in git the whole time: the child-record and erasure family
+(`get_child_record`, `request_erasure`, `execute_erasure`, `set_pattern_record_visibility`,
+`guard_safe_for_record`, `reject_audit_mutation`), the checkin family
+(`ensure_checkin_state`, `get_checkin_batch`, `record_checkin_sent`,
+`record_checkin_response`, `decay_checkin_consent`), plus `get_pricing`,
+`guard_chat_history_message`, `record_mirror_delivered`, `derive_aha_class`,
+`jsonb_text_values` and `commit_child_name_by_platform`.
+
+The twelve that were genuinely nowhere came home in
+`20260807140000_the_repo_can_rebuild_production.sql`, with a 65-assertion suite
+(`supabase/tests/restored_functions_test.sql`) — they had been running in production for
+weeks with no source and therefore no test, which is the same thing as nobody knowing what
+they do. Three migration files (`rhythm_write_side`, `situation_catalog_and_detection`,
+`strain_detection_and_graded_return`) had contained **no SQL at all**, only comments
+describing objects applied straight to the database; that is how this started.
+
+### The real gap: fourteen tables have no CREATE TABLE at all
+
+Restoring the twelve does **not** make the repo able to rebuild production, and saying so
+would repeat the original mistake in the other direction. This migration history begins at
+`20260729123012_week0_*` — "week 0" of a database that already existed. Every table older
+than that has no DDL in git:
+
+`followers`, `children`, `daily_logs`, `child_patterns`, `memory_events`,
+`memory_snapshots`, `n8n_chat_histories`, `payments`, `plan_sessions`, `session_tracker`,
+`supported_countries`, `survey_responses`, `weekly_plans`, `follower_insights`.
+
+A blank database cannot be brought to production's shape from this repository. What is
+needed is one baseline migration holding those fourteen tables — columns, constraints,
+indexes and triggers — dated before week 0 and written `if not exists` so it is a no-op
+against the database that already has them. Until that exists, `fixture_minimal.sql` is
+the only written description of those tables anywhere, and it is deliberately partial.
+
+**Still true, and unchanged:** this belongs before the legacy deletion in §3. You cannot
+safely delete from a system you cannot rebuild.
+
+### The drift nobody has checked yet
+
+The seventeen functions that are in git have never been compared against what production
+actually runs. They are *present*, not *verified equal*. `pg_get_functiondef` against each
+one is the check, and it is the natural next task after the baseline.
 
 ## 7. Smaller, real, and cheap
 
@@ -178,6 +219,7 @@ cannot rebuild.
 |---|---|---|
 | 1 | The simulation harness (§2) | Nothing after this can be *seen* working without it. Cheapest thing on the list, and it makes every later claim checkable. |
 | 2 | The journey write side (§1) | The paid product does not exist without it, and the offer is already selling it. |
+| 2b | The baseline schema — fourteen tables (§6b) | The repo still cannot rebuild production, and step 3 deletes things. Deleting from a system you cannot rebuild is the one irreversible move on this list. |
 | 3 | Delete the legacy layer (§3) | Do it before building on top, not after. Every day it stays, something new is built against the wrong half. |
 | 4 | The Mirror sender (§4) | Small — the payload is ready. Restores the free tier's peak. |
 | 5 | Turn W2 + W3 on against synthetic families, then verify the whole lifecycle end to end | Needs 1–4 done to be meaningful. |

@@ -5,7 +5,81 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-07 · Twelve functions came home, and a number I got wrong
+
+**Correction first.** The previous entry, and `docs/what-is-missing.md` §6b, said "34 of
+88 production functions have no source in this repo". That is wrong. The diff was taken
+against the **offline test chain** — the 35 migration files the harness loads on top of
+`fixture_minimal.sql` — and not against the **repository**, which holds 64. Everything the
+chain does not load counted as absent when it was merely untested.
+
+Re-checked name by name against all 64 files:
+
+| | |
+|---|---|
+| Production functions | 88 |
+| No source anywhere in git | **12** |
+| In git, not loaded by the chain, therefore untested | 17 |
+| Restored earlier the same day with their own migrations | 6 |
+
+The seventeen that were in git the whole time include the entire child-record and erasure
+family and the entire checkin family. Restoring them would have created a *second* source
+for each — the exact disease being treated.
+
+**The twelve that were genuinely nowhere** are now in
+`20260807140000_the_repo_can_rebuild_production.sql`, read out of production with
+`pg_get_functiondef`: `writer_commit`, `_ensure_child`, `get_extraction_batch`,
+`write_child_name`, `get_heart_batch`, `heart_commit`, `get_conversation_for`,
+`get_free_session_state`, `check_daily_message_cap`, `surface_changing_item`,
+`return_to_free`, `set_updated_at`. Between them they are the whole of W2's writing, the
+free tier's memory, and the session clock — running for weeks with no source and therefore
+no test, which is the same thing as nobody knowing what they do.
+
+`supabase/tests/restored_functions_test.sql` is the test they never had: 65 assertions on
+the promises the bodies make. A recorded child's name is never replaced by a new
+inference. With two children the orphan nights are left orphaned, because a sibling's
+nights must never be reassigned on a guess. An `event_type` the model invented is clamped
+to `other` and a weight of 99 becomes 5. Five blank fields write nothing **and do not
+stamp the freshness clock**, so the parent is retried rather than skipped forever. When
+commerce is blocked the keyboard label is *identical* to the ordinary one — a withheld
+journey is silent, never announced.
+
+**The real gap, which restoring twelve functions does not close.** This migration history
+begins at `week0` on a database that already existed. Fourteen tables — `followers`,
+`children`, `daily_logs`, `n8n_chat_histories` and ten more — have **no `CREATE TABLE`
+anywhere in git**. A blank database still cannot be brought to production's shape from
+this repository. That baseline is now step 2b in `what-is-missing.md`, ahead of the legacy
+deletion, because deleting from a system you cannot rebuild is the one irreversible move
+on that list. The seventeen present-but-unloaded functions have also never been compared
+against what production actually runs; they are *present*, not *verified equal*.
+
+**Two things the work caught on the way.**
+
+`fixture_minimal.children.is_primary` was nullable; production's is `NOT NULL DEFAULT
+false`. Every "primary child, else any child" reader orders by `is_primary desc`, and
+`DESC` puts NULLs **first** — so a child with a null flag outranked the actual primary
+child, in the fixture and in no other database. Third time a fixture looseness has
+produced a failure that looked like a product bug.
+
+`mirror_engine_test.sql` had been silently unrunnable. When the journey engine landed,
+`fixture_minimal.sql` gained a `crisis_flags` table, and `fixture_mirror.sql` still
+created its own stub of the same name; the second `CREATE` aborted that file at line 16,
+took `v_child_record` with it, and the suite failed on a missing view rather than on
+anything about the Mirror. Ten assertions recovered, and the mirror migrations are now
+part of the standard chain.
+
+Eighteen suites, **567 assertions, zero failures**.
+
+The migration is deliberately **not applied to production** — every function in it already
+exists there, byte-identical in behaviour, so applying would rewrite `prosrc` to no effect.
+It exists so a rebuild produces them.
+
+---
+
 ## 2026-08-07 · One family, walked — and 34 functions that only existed in the database
+
+> The figure **34 is wrong**; it was 12. See the correction in the entry above. The rest
+> of this entry stands.
 
 The next gap after the journey engine was the one the founder's decision creates: with
 ADAM stopped and nobody being messaged, the time-and-evidence machines will never

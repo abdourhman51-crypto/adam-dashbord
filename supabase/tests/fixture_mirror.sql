@@ -9,11 +9,11 @@
 --
 -- Load after fixture_minimal.sql and before mirror_engine_core.sql.
 
-create table public.crisis_flags (
-  id uuid primary key default gen_random_uuid(),
-  parent_id uuid references public.followers(id) on delete cascade,
-  detected_at timestamptz not null default now()
-);
+-- crisis_flags was stubbed here once. It now lives in fixture_minimal.sql, in
+-- its production shape (category NOT NULL), and the second CREATE aborted this
+-- file at line 16 — taking v_child_record with it and leaving the whole Mirror
+-- suite unrunnable without saying so. Deleted rather than guarded with IF NOT
+-- EXISTS: two fixtures owning one table is how the shapes drift apart.
 
 create view public.v_child_record as
 select
