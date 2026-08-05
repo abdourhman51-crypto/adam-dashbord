@@ -5,6 +5,78 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-07 · The legacy evening system is gone, and two things it was hiding
+
+§3 of `what-is-missing.md` said: delete the legacy layer. The database half is done, and
+almost nothing about it went the way the list said it would.
+
+**`activate_subscription` was not duplicated — it was broken.** Production was returning
+`ERROR: 42725: function activate_subscription(uuid, integer, numeric, text, text) is not
+unique` for every five-argument call, which is exactly how the dashboard confirms a
+payment. `CREATE OR REPLACE FUNCTION` with a longer parameter list does not replace; it
+creates an overload, and because arguments six to ten all had defaults, both candidates
+matched a five-argument call equally. I introduced it myself hours earlier, adding the
+journey parameters. Nobody noticed because nobody has been paying — the first sale would
+have. There is now one function, and a five-argument call records the payment and returns
+`journey.started = false, reason = objective_required`.
+
+**`checkin_state` was on the deletion list and should not have been.** The table was never
+replaced; the rhythm adopted it. `get_rhythm_due` skips a stopped cadence through it,
+`get_telegram_surface` shows a paused parent «كيف نعود؟» from it, `record_harvest_answer`
+resets her streak in it, `get_moment_after_tap` writes her pause/resume/stop taps to it,
+and `set_checkin_hour` stores the hour she chose. Dropping it would have deleted every
+means a parent has of controlling when ADAM speaks. The list had been written from what
+objects were *named*, not from what still *reads* them — which is the whole argument for
+doing a deletion slowly.
+
+**`decay_checkin_consent` looked dead and was merely inert — the worse case.** It is the
+consent model: five ignored nights quieten the rhythm to weekly, nine more stop it, one
+reply resets the streak. It counted ignored nights from `checkin_state.last_sent_date`, and
+the only writer of that column was `record_checkin_sent`, replaced by the rhythm on 30
+July. So for eight days the live product had the *recovery* half working and the *decay*
+half counting nothing: it could come back from silence it was structurally unable to
+notice, and would have gone on asking nightly, forever, of someone who had stopped
+answering weeks ago. For a product whose first principle is that it must be possible to be
+left alone, that is the worse half to have working. Deleting it with the rest of the engine
+would have removed the principle without anyone deciding to.
+
+Rebuilt on the rhythm's own evidence — an ignored night is one where `harvest_sent_at is
+not null and harvest_answered_at is null`, so a night the sender never ran is our silence
+and not hers — with a `last_decayed_on` watermark making the scan idempotent within a day
+and able to catch up after a day it did not run. 22 assertions
+(`supabase/tests/consent_decay_test.sql`).
+
+One of those assertions was wrong when written, and the disagreement was worth having. The
+legacy `record_checkin_response` revived a stopped cadence on any answer; `record_harvest_answer`
+does not, and I first assumed that was a regression. It is not. 'stopped' is reached two
+ways — she tapped stop, or decay stopped her — and the table does not distinguish them, so
+auto-reviving would silently override an explicit choice, the one thing the old
+`ensure_checkin_state` comment said never to do. She is not stranded: her keyboard offers
+«كيف نعود؟» and the resume tap sets it back. Coming back stays her decision, made once, out
+loud. The test now asserts that silence.
+
+**Actually deleted:** `get_checkin_batch`, `record_checkin_sent`, `record_checkin_response`,
+`ensure_checkin_state`, and `followers.checkin_opt_in / checkin_opted_at /
+last_checkin_sent_date` — 15 rows archived to `archive.followers_checkin_20260807` first,
+because they record what parents were asked and what they answered.
+
+**And a measurement that replaces a guess.** §3 estimated 17 orphan nodes in the live
+workflow. Walking `connections` forward from the trigger, and backwards along
+`ai_languageModel` / `ai_memory` edges, **64 of 126 nodes are unreachable** — the whole old
+onboarding (27), the whole old CTA flow (13), the daily cap (4), country, waitlist,
+referral, pinning, reactivation. That also answers §7's «`check_daily_message_cap` runs on
+nobody»: its node is in a dead branch. Not deleted — it is half a live workflow, four times
+the estimate, and no offline suite can prove the survivors still work. It wants the
+founder's go-ahead.
+
+Production and a from-zero rebuild now agree at **84 functions**. Nineteen suites, **589
+assertions, zero failures**.
+
+Still open, and now visible: `decay_checkin_consent` has no scheduled caller. The rule is
+correct, tested, and fires never.
+
+---
+
 ## 2026-08-07 · The repo rebuilds production — and the rebuild found a way in
 
 **A blank Postgres database now becomes production from this repository alone.** 66

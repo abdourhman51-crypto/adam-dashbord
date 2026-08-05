@@ -50,7 +50,12 @@ create table public.followers (
   last_return_at timestamptz,
   last_gap_hours numeric,
   is_golden boolean default false,
-  last_active timestamptz
+  last_active timestamptz,
+  -- The legacy checkin consent columns. Present so the chain can run the
+  -- migration that DROPS them (20260807180000); they leave with it.
+  checkin_opt_in boolean,
+  checkin_opted_at timestamptz,
+  last_checkin_sent_date date
 );
 
 create table public.payments (

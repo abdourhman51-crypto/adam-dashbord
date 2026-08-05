@@ -50,7 +50,7 @@ would have been a no-op anywhere else.
 
 Closed in `20260807160000_nobody_grants_themselves_a_journey.sql`, **applied to
 production** and verified: `anon` has EXECUTE on none of them, `service_role`
-still has all 88. Revocation is now by function *name* so every present and
+still has every one of them. Revocation is now by function *name* so every present and
 future overload is covered, and `alter default privileges` closes the door the
 next new function would otherwise walk through.
 
@@ -82,10 +82,11 @@ Nothing in the product lost access — n8n authenticates as `service_role`.
 (`supabase/tests/journey_engine_test.sql`). What follows is why it was needed, and one
 thing that is still true.
 
-**Still true:** `activate_subscription` now has **two overloads**. The ten-argument one
-starts a journey; the five-argument one — the one the dashboard calls — does not. Both are
-in production. A payment confirmed through the old path still produces `paid_active` with
-no stage, exactly as described below. Deleting the five-argument overload belongs to §3.
+**Also fixed, later the same day:** `activate_subscription` briefly had two overloads, and
+the five-argument one — the one the dashboard calls — was not merely the old path, it was
+*uncallable*: two candidates matched and Postgres refused to choose. See §3. There is now
+one function, and a five-argument call records the payment and returns
+`journey.started = false, reason = objective_required`.
 
 ### The original entry
 
@@ -145,22 +146,102 @@ lifecycle can be run in seconds, offline, and asserted:
 
 Without this, "the product is complete" is an opinion. With it, it is a test run.
 
-## 3. Two of everything — the legacy layer has to go
+## 3. Two of everything — the legacy layer, half deleted 2026-08-07
 
-The offer/engine mismatch in §1 is not an isolated accident. It is the pattern.
+The offer/engine mismatch in §1 is not an isolated accident. It is the pattern. What
+follows is what has gone, what stayed and why, and what is left.
 
-| Old | New | State |
-|---|---|---|
-| `Adam - Nightly Checkin` workflow (`A2XHImAuFiPA6Yoh`) | W3 Rhythm Sender | both paused, both send an evening question |
-| `get_checkin_batch` / `record_checkin_response` / `checkin_state` | `get_rhythm_due` / `record_harvest_answer` / `daily_logs` | two evening systems |
-| `activate_subscription(uuid,int,numeric,text,text)` — starts no journey | `activate_subscription(…10 args)` — starts one | **two overloads of the same name**, both live; the dashboard calls the one that does nothing |
-| `activate_subscription` + `payments` + `renewal_d5/d0_sent_at` | `stages` | two paid models |
-| `offer_status`, `ready_for_offer`, `offer_score`, `offer_hook`, `offer_text`, `offer_child_name`, `offer_pain_safe`, `judge_reason`, `cohort`, `is_golden`, `insight_sent_at`, `reactivation_*`, `clarity_seen_at`, `trial_started_at` on `followers` | `offer_ready()` derived on demand | ~14 dead columns |
-| W1 orphan nodes: `CTA - *` (5), `OB - Answer *` (6), `Handle CTA Click`, `RA - Answer Click`, `Send Country Buttons`, `Answer Callback`, `Check daily Cap`, `Send Pinned` | the moment/tap system | 17 nodes with no inbound connection |
+### Done — and one thing §3 got wrong
 
-Deleting these is not tidying. Every one of them is a place where a future session — or a
-future me — reads the wrong system and builds against it. That is precisely how the offer
-came to promise one thing while the only payment tool implemented another.
+| Deleted | Superseded by |
+|---|---|
+| `get_checkin_batch()` | `get_rhythm_due()` |
+| `record_checkin_sent()` | `record_seed_sent()` / `record_harvest_sent()` |
+| `record_checkin_response()` | `record_harvest_answer()` |
+| `ensure_checkin_state()` | `set_checkin_hour()` / `get_moment_after_tap()` |
+| `followers.checkin_opt_in`, `checkin_opted_at`, `last_checkin_sent_date` | the tap system — archived to `archive.followers_checkin_20260807` (15 rows) first |
+| `activate_subscription(uuid,int,numeric,text,text)` | the ten-argument one — see below |
+
+**`checkin_state` was on this list and should not have been.** The table was never
+replaced; the rhythm *adopted* it. Five live functions depend on it right now —
+`get_rhythm_due` (skips a stopped cadence), `get_telegram_surface` (shows a paused parent
+«كيف نعود؟»), `record_harvest_answer` (resets the streak), `get_moment_after_tap`
+(pause/resume/stop taps) and `set_checkin_hour` (her chosen evening hour). Dropping it
+would have deleted every means a parent has of controlling when ADAM speaks. It stays, and
+`supabase/tests/consent_decay_test.sql` now asserts that it stays. So does
+`daily_logs.checkin_sent_at`, which the live `CK - Save Night Result` node still writes.
+
+This is the entry that justifies doing the deletion slowly. The list was written from what
+the objects were *named*, not from what still *reads* them.
+
+### `activate_subscription` was not duplicated — it was broken
+
+Deleting the old overload was not tidying. Production was returning:
+
+```
+ERROR: 42725: function public.activate_subscription(uuid, integer, numeric, text, text)
+       is not unique
+```
+
+`CREATE OR REPLACE FUNCTION` with a longer parameter list does not replace — it creates an
+overload, and because arguments six to ten all had defaults, a five-argument call matched
+both candidates and Postgres refused to choose. **Every dashboard activation had failed
+since 2026-08-07.** Nobody noticed because nobody has been paying. The first sale would
+have found it. Fixed in `20260807170000_one_way_to_activate_a_subscription.sql`: one
+function, and a five-argument call now records the payment and returns
+`journey.started = false, reason = objective_required`.
+
+### `decay_checkin_consent` was inert, not dead — and that was the worse bug
+
+It looked like part of the checkin engine. It is the consent model: five ignored nights
+quieten the rhythm to weekly, nine more stop it, one reply resets the streak. It counted
+ignored nights from `checkin_state.last_sent_date`, and the only function that ever wrote
+that column was `record_checkin_sent` — replaced by the rhythm on 30 July.
+
+So since 30 July the live product had the *recovery* half working and the *decay* half
+counting nothing. It could come back from silence it was structurally unable to notice: it
+would have gone on asking nightly, forever, of someone who stopped answering weeks ago. For
+a product whose first principle is that it must be possible to be left alone, that is the
+worse half to have working.
+
+Rebuilt on the rhythm's own evidence in `20260807190000_silence_is_still_an_answer.sql` —
+an ignored night is one where `harvest_sent_at is not null and harvest_answered_at is
+null`, so a night the sender never ran is our silence and not hers. Idempotent within a
+day via a `last_decayed_on` watermark, and it catches up after a day it did not run.
+22 assertions. **It still has no scheduled caller** — see below.
+
+### Left, and why
+
+| Item | State |
+|---|---|
+| `Adam - Nightly Checkin` workflow (`A2XHImAuFiPA6Yoh`) | paused; its four database functions are gone, so it can only error. Safe to archive in n8n. |
+| **`decay_checkin_consent` has no caller** | Nothing runs it. The rule is correct and tested and fires never. It needs a daily schedule — W3, or its own small workflow. |
+| ~14 dead `followers` columns | **Blocked, and not by risk of the unknown.** Four dashboard views (`v_funnel_summary`, `v_funnel_weekly`, `v_offers_log`, `v_conversations_list`) read `cohort`, `is_golden`, `offer_score`, `judge_reason`, `offer_text`. Dropping the columns means rewriting the founder's reports, which is a decision about what he wants to see, not a cleanup. |
+| W1 orphan nodes | **64 of 126, not 17** — see §3b. |
+
+## 3b. Half the live workflow is unreachable
+
+Measured, not estimated: walking `connections` forward from `Telegram Trigger` (and
+backwards along `ai_languageModel` / `ai_memory` edges, which attach a model or memory to
+its agent), **62 of 126 nodes are reachable. 64 are not.**
+
+Whole subsystems, all superseded by the moment/tap system:
+
+| Dead subsystem | Nodes |
+|---|---|
+| `OB - *` — the old button onboarding | 27 |
+| `CTA - *` — the old offer flow | 13 |
+| the daily cap (`Check daily Cap`, `M2 - Cap Exceeded?`, `M2 - Send Cap Message`, `Mark Cap Reached`) | 4 |
+| country (`Parse Country`, `Save Country`, `Send Country Buttons`) | 3 |
+| waitlist, referral, pinning, reactivation, misc | 17 |
+
+This also answers §7's «`check_daily_message_cap` runs on nobody» — its node is in a dead
+branch, along with the three others that would have enforced the cap.
+
+**Not deleted yet, deliberately.** This is 64 nodes out of a live, active workflow, it is
+four times what §3 estimated, and unlike the database half there is no offline suite that
+can prove the survivors still work. It wants the founder's go-ahead and a live pass
+afterwards.
 
 ## 4. The Mirror has no sender
 
@@ -258,9 +339,14 @@ itself.
 
 ## 7. Smaller, real, and cheap
 
-- **`check_daily_message_cap` runs on nobody.** Its node has no inbound connection, and it
-  does not read `funnel_stage` — cap 68 for everyone, 15 for waitlisted. Either wire it or
-  delete it; leaving a cap that does not cap is worse than either.
+- **`check_daily_message_cap` runs on nobody** — and §3b now says why: its node is one of
+  64 unreachable ones, together with the three others that would have enforced the cap
+  (`M2 - Cap Exceeded?`, `M2 - Send Cap Message`, `Mark Cap Reached`). It also does not read
+  `funnel_stage` — cap 68 for everyone, 15 for waitlisted. Either wire the branch or delete
+  it; leaving a cap that does not cap is worse than either.
+- **`decay_checkin_consent` has no scheduled caller.** Rebuilt and tested on 2026-08-07
+  (§3), correct, and it fires never. It needs a daily run — a step in W3, or its own small
+  workflow. Until then the rhythm still cannot be quietened by silence.
 - **The service-role key is in W1 in plaintext ~116 times.** Founder-owned rotation, still
   open, and it should not survive to launch day.
 - **`fixture_minimal.situations` is looser than production.** `parent_id`, `label_ar`,
@@ -292,7 +378,8 @@ itself.
 | 1 | The simulation harness (§2) | Nothing after this can be *seen* working without it. Cheapest thing on the list, and it makes every later claim checkable. |
 | 2 | The journey write side (§1) | The paid product does not exist without it, and the offer is already selling it. |
 | ~~2b~~ | ~~The baseline schema (§6b)~~ — **DONE 2026-08-07** | A blank database now becomes production from this repo: 66 migrations, 0 failures, 29 tables / 12 views / 88 functions matching by name. Step 3 can now delete safely. |
-| 3 | Delete the legacy layer (§3) | Do it before building on top, not after. Every day it stays, something new is built against the wrong half. |
+| ~~3~~ | ~~Delete the legacy layer (§3)~~ — **DATABASE HALF DONE 2026-08-07** | Four dead functions and three columns gone (archived first); `activate_subscription` unified, which also fixed a production error nobody had hit yet; `decay_checkin_consent` rebuilt rather than deleted. `checkin_state` kept — §3 was wrong to list it. |
+| 3b | The 64 unreachable W1 nodes (§3b), and the ~14 `followers` columns | Both need the founder: the nodes because it is half a live workflow with no offline proof, the columns because four dashboard views read them. |
 | 4 | The Mirror sender (§4) | Small — the payload is ready. Restores the free tier's peak. |
 | 5 | Turn W2 + W3 on against synthetic families, then verify the whole lifecycle end to end | Needs 1–4 done to be meaningful. |
 | 6 | «ما بعد الوصول» (§6) | Design pass, needed before any journey can finish. |
