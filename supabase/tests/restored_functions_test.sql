@@ -2,12 +2,22 @@
 begin;
 
 -- ============================================================
--- THE TWELVE THAT LIVED ONLY IN THE DATABASE.
+-- THE ONES THAT LIVED ONLY IN THE DATABASE.
 --
--- Restored on 2026-08-07 by 20260807140000. Every one of them had
+-- Restored on 2026-08-07 by 20260729000100. Every one of them had
 -- been running in production for weeks with no source in git and
 -- therefore no test — which is the same thing as no one knowing
 -- what they do.
+--
+-- Two of them did not survive the day. get_free_session_state (the
+-- eight-hour session gap, and the "golden" parent who came back
+-- twice) and return_to_free (the legacy subscription reset) were
+-- deleted hours later by 20260807200000: nothing called either —
+-- neither is among the eleven Supabase endpoints W1 can reach —
+-- and the founder's instruction was that nothing old survives.
+-- Restoring them first was still right. A thing you cannot rebuild
+-- is a thing you cannot safely delete, and their cases are in git
+-- history rather than nowhere.
 --
 -- These cases do not re-describe the bodies. They assert the
 -- promises the bodies make, in the words the comments use: a
@@ -106,15 +116,12 @@ begin
   p := pg_temp.parent('wcn-2');
   insert into public.children (follower_id, name, is_primary) values (p, '', true) returning id into c;
   insert into public.daily_logs (follower_id, log_date) values (p, current_date - 1);
-  insert into public.weekly_plans (follower_id, week_number) values (p, 1);
 
   perform public.write_child_name('wcn-2', 'ريان');
   perform pg_temp.chk('an empty name IS filled in',
     (select name from public.children where id = c) = 'ريان');
   perform pg_temp.chk('and the orphan nights are back-linked to the only child',
     (select child_id from public.daily_logs where follower_id = p) = c);
-  perform pg_temp.chk('and so are the orphan plans',
-    (select child_id from public.weekly_plans where follower_id = p) = c);
 end $$;
 
 do $$
@@ -339,41 +346,6 @@ begin
 end $$;
 
 
-\echo '=== get_free_session_state: A SESSION IS A GAP, NOT A CLOCK ==='
-do $$
-declare p uuid; s record;
-begin
-  p := pg_temp.parent('fs-1');
-
-  select * into s from public.get_free_session_state('fs-1');
-  perform pg_temp.chk('the first message ever is a new session, number 1',
-    s.is_new_session and s.session_number = 1 and s.session_turn = 1);
-
-  select * into s from public.get_free_session_state('fs-1');
-  perform pg_temp.chk('a second message minutes later is the SAME session, turn 2',
-    not s.is_new_session and s.session_number = 1 and s.session_turn = 2);
-
-  update public.session_tracker set last_seen_at = now() - interval '20 hours'
-   where platform_user_id = 'fs-1';
-
-  select * into s from public.get_free_session_state('fs-1');
-  perform pg_temp.chk('coming back after a long silence starts session 2',
-    s.is_new_session and s.session_number = 2 and s.session_turn = 1);
-  perform pg_temp.chk('and the return is counted',
-    (select return_count from public.followers where id = p) = 1);
-  perform pg_temp.chk('one return is not yet golden',
-    not coalesce((select is_golden from public.followers where id = p), false));
-
-  update public.session_tracker set last_seen_at = now() - interval '20 hours'
-   where platform_user_id = 'fs-1';
-  perform public.get_free_session_state('fs-1');
-
-  perform pg_temp.chk('coming back TWICE is what makes a parent golden',
-    (select is_golden from public.followers where id = p),
-    'the only unfaked signal of value in the free tier');
-end $$;
-
-
 \echo '=== check_daily_message_cap ==='
 do $$
 declare p uuid; q uuid; s record;
@@ -434,43 +406,6 @@ begin
     public.surface_changing_item('journey_active', false, true, true, 'النوم')->>'label' = 'كيف تسير رحلة النوم؟');
   perform pg_temp.chk('and with no goal named it still asks, without a blank',
     public.surface_changing_item('journey_active', false, true, true, null)->>'label' = 'كيف تسير الرحلة؟');
-end $$;
-
-
-\echo '=== return_to_free: THE RECORD OF WHAT WAS PAID SURVIVES ==='
-do $$
-declare p uuid; res jsonb;
-begin
-  p := pg_temp.parent('rtf-1', 'paid_active');
-  update public.followers set
-    payment_status = 'paid', subscription_started_at = now() - interval '20 days',
-    subscription_expires_at = now() + interval '10 days', renewal_d5_sent_at = now()
-  where id = p;
-  insert into public.payments (follower_id, amount, currency, status)
-  values (p, 2300, 'DZD', 'confirmed');
-
-  res := public.return_to_free(p);
-
-  perform pg_temp.chk('the funnel stage goes back to free conversation',
-    (select funnel_stage from public.followers where id = p) = 'free_conversation');
-  perform pg_temp.chk('and the subscription clock is cleared, not merely expired',
-    (select subscription_expires_at from public.followers where id = p) is null);
-  perform pg_temp.chk('and the renewal stamps go with it',
-    (select renewal_d5_sent_at from public.followers where id = p) is null);
-  perform pg_temp.chk('the payment row is NOT touched',
-    (select count(*) from public.payments where follower_id = p) = 1);
-  perform pg_temp.chk('and the caller is told what the previous state was',
-    res->>'previous_stage' = 'paid_active');
-end $$;
-
-do $$
-begin
-  begin
-    perform public.return_to_free(gen_random_uuid());
-    perform pg_temp.chk('an unknown parent raises rather than silently doing nothing', false);
-  exception when others then
-    perform pg_temp.chk('an unknown parent raises rather than silently doing nothing', true, sqlerrm);
-  end;
 end $$;
 
 

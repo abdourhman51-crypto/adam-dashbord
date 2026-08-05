@@ -219,29 +219,54 @@ day via a `last_decayed_on` watermark, and it catches up after a day it did not 
 | ~14 dead `followers` columns | **Blocked, and not by risk of the unknown.** Four dashboard views (`v_funnel_summary`, `v_funnel_weekly`, `v_offers_log`, `v_conversations_list`) read `cohort`, `is_golden`, `offer_score`, `judge_reason`, `offer_text`. Dropping the columns means rewriting the founder's reports, which is a decision about what he wants to see, not a cleanup. |
 | W1 orphan nodes | **64 of 126, not 17** — see §3b. |
 
-## 3b. Half the live workflow is unreachable
+## 3b. ~~Half the live workflow is unreachable~~ — DELETED 2026-08-07
 
-Measured, not estimated: walking `connections` forward from `Telegram Trigger` (and
-backwards along `ai_languageModel` / `ai_memory` edges, which attach a model or memory to
-its agent), **62 of 126 nodes are reachable. 64 are not.**
+Founder's decision: «اريد التخلص من كل ما هو قديم ولا نحتاجه — اريد المنتج يكون نضيف»,
+and the dashboard breaking is accepted because it is being rebuilt.
 
-Whole subsystems, all superseded by the moment/tap system:
+**W1 went from 126 nodes to 62.** The 64 removed were measured, not estimated: walking
+`connections` forward from `Telegram Trigger` and backwards along `ai_languageModel` /
+`ai_memory` edges, none of them could be reached.
 
-| Dead subsystem | Nodes |
+| Deleted subsystem | Nodes |
 |---|---|
-| `OB - *` — the old button onboarding | 27 |
-| `CTA - *` — the old offer flow | 13 |
-| the daily cap (`Check daily Cap`, `M2 - Cap Exceeded?`, `M2 - Send Cap Message`, `Mark Cap Reached`) | 4 |
-| country (`Parse Country`, `Save Country`, `Send Country Buttons`) | 3 |
-| waitlist, referral, pinning, reactivation, misc | 17 |
+| `OB - *`, the button onboarding | 27 |
+| `CTA - *`, the old offer flow | 13 |
+| the daily cap branch | 4 |
+| country, waitlist, referral, pinning, reactivation, misc | 20 |
 
-This also answers §7's «`check_daily_message_cap` runs on nobody» — its node is in a dead
-branch, along with the three others that would have enforced the cap.
+Three surviving nodes were edited in the same pass, because they named columns that were
+about to be dropped: `Create Follower` (wrote `signup_source`), `M2 - Get Follower Full`
+(selected five old-onboarding columns) and `M2 - Classify Track` (copied them onward,
+where nothing downstream ever read them). Published as active version
+`b2f7d4c4-442b-4c19-bfc8-e7004c317f37`.
 
-**Not deleted yet, deliberately.** This is 64 nodes out of a live, active workflow, it is
-four times what §3 estimated, and unlike the database half there is no offline suite that
-can prove the survivors still work. It wants the founder's go-ahead and a live pass
-afterwards.
+### And the database behind it
+
+| | Before | After |
+|---|---|---|
+| Tables | 29 | **25** |
+| Views | 12 | **7** |
+| Functions | 84 | **82** |
+| `followers` columns | 68 | **30** |
+
+Dropped: all five dashboard views; `plan_sessions` (the 30-day plan `stages` replaced),
+`follower_insights`, `weekly_plans`, `session_tracker`; `get_free_session_state` and
+`return_to_free`; and 38 columns — the judge/seller funnel, the three lead scores, the
+button onboarding, the reactivation campaigns, and the "golden parent" session tracker.
+
+`plan_sessions` and `follower_insights` were archived first. **312 parents, 71 children and
+4,674 messages are untouched.** Nothing was dropped on the strength of its name: every
+object was checked against every surviving function's source, every surviving view's
+definition, and the 62 reachable nodes of W1.
+
+Two consequences worth naming:
+
+- **`get_agent_context` no longer opens the paid prompt with `PLAN_DAY: n`.** It was
+  counting a plan nobody runs. `DAYS_LEFT` stays — that is the access clock the parent
+  actually paid for.
+- **`writer_commit` no longer sets `plan_sessions.has_breakthrough`.** A breakthrough is a
+  `memory_events` row of that type, which is where it belonged.
 
 ## 4. The Mirror has no sender
 
