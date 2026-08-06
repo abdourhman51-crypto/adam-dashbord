@@ -246,7 +246,31 @@ declare
   v_moment text := p_key;
   v_reading jsonb;
   v_join jsonb;
+  v_cap jsonb;
 begin
+  -- A TYPED country answer arrives here with the raw text in p_country_code and a
+  -- reserved key, routed by W1's M2 - Classify Track (track=country_answer) into
+  -- the SAME credentialed tap node the buttons already use — so free-text capture
+  -- needs no new credentialed workflow node. Handled first, before record_country
+  -- would choke on «انا من تونس». The classify gate only sends us here inside the
+  -- open 36h window, so we always return a sendable moment: a confirmation if
+  -- caught, or «اكتبه مرّة أخرى» if not.
+  if p_key = 'menu_capture_country' then
+    v_cap := public.capture_country_text(p_parent_id, p_country_code);
+    if (v_cap->>'captured')::boolean then
+      if (v_cap->>'joined')::boolean then
+        v_moment := 'menu_waitlist_joined'; v_done := 'waitlisted';
+      else
+        v_moment := 'country_recorded'; v_done := 'country_recorded';
+      end if;
+    else
+      v_moment := 'country_not_recognised'; v_done := 'country_unrecognised';
+    end if;
+    return coalesce(public.get_conversation_moment(v_moment, p_parent_id), '{}'::jsonb)
+        || jsonb_build_object('action_done', v_done)
+        || jsonb_build_object('captured', coalesce((v_cap->>'captured')::boolean, false));
+  end if;
+
   if nullif(btrim(coalesce(p_country_code,'')), '') is not null then
     v_rec := public.record_country(p_parent_id, p_country_code);
 
