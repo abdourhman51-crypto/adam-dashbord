@@ -2,6 +2,41 @@
 
 One file, so a new session does not replay the old one. Everything below is verified, not remembered.
 
+## Latest — 2026-08-06 (start here)
+
+Where we stopped, newest first. Read this block, then the rest as needed.
+
+- **Working branch is now `claude/connect-language-gate-n8n-5cmia3`.** It was
+  fast-forwarded to contain everything on `claude/install-product-skills-ayvz5e`
+  plus the language-gate wiring. Commit and push there. (The older
+  `install-product-skills` branch is its ancestor — same history up to the gate work.)
+- **The language gate is wired and published.** `paid aget adam → Gate - Agent
+  Reply → FA - Send Reply1`. `Gate - Agent Reply` POSTs to `gate_agent_reply`;
+  `FA - Send Reply1` withholds and substitutes the `reply_withheld` copy when
+  `blocked === true`, else sends unchanged. Fails open (onError:
+  continueRegularOutput). Live in `ADAM - Machine 1+2`, active version `6b851201`.
+  Mirrors + full note: `docs/workflows/agent-reply-gate-wire.md`,
+  `W1-Gate-Agent-Reply.body.js`, `W1-FA-Send-Reply1.body.js`.
+- **The «بلد آخر» typed-country branch is live and confirmed.** Executions
+  6173–6178 all succeeded after publish; the old switch error (6172) was
+  pre-fix. An `Is Country Answer?` IF node routes `track === 'country_answer'`
+  to `Tap - Get Parent` before `M2 - Track Switch` (Switch V1 caps at 4 outputs,
+  which was the bug). Built on `capture_country_text` +
+  `20260807270000_the_other_country_branch.sql`.
+- **W1 is now 63 nodes** (not the 126 the table below still says — a big cleanup
+  happened; trust n8n, not the count here).
+- **One manual step still open for the founder:** attach the `adam Supabase`
+  credential (`EI2e62pg3bxhCSMJ`) to `Gate - Agent Reply` in the n8n UI. Until
+  then the gate is present but fails open — no enforcement, no regression. The
+  MCP tool cannot bind `supabaseApi` to an httpRequest node (confirmed again).
+- **Still deliberately paused:** W2/W3/W4. Do not re-activate without asking.
+  No data collection until launch — founder's standing rule.
+- **Full remaining pre-launch checklist:** `docs/what-is-missing.md`. The
+  running build record: `docs/IMPLEMENTATION_LOG.md`.
+- **Offline tests need no DB.** See the "Tests" section below; the test suite
+  now includes `country_branch_test.sql`, `after_arrival_test.sql`,
+  `adam_reading_test.sql`, `waitlist_test.sql`, `agent_gate_test.sql`.
+
 ## What ADAM is
 
 Read in this order, and only as far as you need:
@@ -102,4 +137,6 @@ Open founder decision: «شيء آخر» on every button set — see Part 3 F9.
 
 ## Branch
 
-`claude/install-product-skills-ayvz5e`. Commit and push there; never to the default branch.
+`claude/connect-language-gate-n8n-5cmia3` (current — see the Latest block at the top).
+Commit and push there; never to the default branch. Its ancestor branch
+`claude/install-product-skills-ayvz5e` carries the same history up to the gate work.
