@@ -222,7 +222,8 @@ where cb not in (select cb from taps)
 
 -- A menu_-prefixed callback is used verbatim as the moment key, so the moment
 -- must exist — unless get_moment_after_tap deliberately redirects it, which
--- only the three hour keys do.
+-- the three hour keys and menu_waitlist_join (joins, then picks the moment
+-- from the join's own result) do.
 with buttons as (
   select distinct b->>'cb' as cb
   from public.conversation_moments c, jsonb_array_elements(c.buttons) b
@@ -232,5 +233,5 @@ select case when count(*) = 0 then 'PASS' else 'FAIL' end as menu_callbacks_have
 from buttons
 where cb like 'menu\_%'
   and cb not in ('menu_settings_hour_morning','menu_settings_hour_evening',
-                 'menu_settings_hour_night')
+                 'menu_settings_hour_night','menu_waitlist_join')
   and not exists (select 1 from public.conversation_moments m where m.key = buttons.cb);
