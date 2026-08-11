@@ -242,7 +242,7 @@ on:
 | 1 | `agree_objective` + the two goal-agreement moments (step 2) | nothing | small | ✅ **done 2026-08-11** — `20260811120000`, 31 assertions, zero n8n change |
 | 2 | `activate_subscription` reads the agreed goal (step 4) | 1 | small | ✅ **done 2026-08-11** — `20260811130000`, cashier never types the goal |
 | 3 | `compose_journey_step` + its offline test on a synthetic family (step 5) | nothing | **the real work** | ✅ **done 2026-08-11** — `20260811140000`, 16 assertions, facts+posture for the composer |
-| 4 | `journey_step` route in `get_rhythm_due` (step 5) | 3 | small | pending |
+| 4 | `journey_step` route in `get_rhythm_due` (step 5) | 3 | small | ✅ **done 2026-08-11** — `20260811150000`, morning give → journey_step |
 | 5 | W3's `journey_step` branch — compose + send | 4 | wiring, W3 stays paused until launch | pending |
 
 Steps 1–4 are pure database with an offline suite, the same shape as everything

@@ -6,6 +6,16 @@ One file, so a new session does not replay the old one. Everything below is veri
 
 Where we stopped, newest first. Read this block, then the rest as needed.
 
+- **2026-08-11 — the rhythm routes the journey step** (`get_rhythm_due`,
+  `20260811150000`). Built on the live revive_the_rhythm_gate version (14-col
+  return, is_first_proactive/footer_ar preserved): when the morning give would be
+  a `seed` and the parent has a live stage, it becomes `journey_step`, grounded by
+  `compose_journey_step` and gated by its `can_send` (no outcome → silent, not a
+  fallback seed). A journey_step is never a first proactive, so those columns come
+  back false/null for it. Free parents unaffected. 5 assertions in
+  `rhythm_journey_route_test.sql`, zero regression (rhythm_gate still 14).
+  **Remaining: W3's journey_step branch** (compose + send + stamp seed_sent_at so
+  the evening harvest still fires) — W3 stays paused until launch.
 - **2026-08-11 — the daily plan composer is BUILT** (`compose_journey_step`,
   `20260811140000`, 16 assertions). The paid journey's «مخصّص» daily step: a
   facts+posture function (the sibling of `get_harvest_context`) that hands the
