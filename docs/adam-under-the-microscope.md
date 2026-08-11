@@ -2,9 +2,28 @@
 
 **Written:** 2026-08-11. **The analysis below is approved** (founder, 2026-08-11).
 **The Contract section is the ratified definition — read it first if you are
-building.** Everything after it is BUILT, tested, and (state noted per item)
-either deployed or staged for review. The original research (unchanged) follows
-for the reasoning and evidence trail.
+building.**
+
+## Build status — 2026-08-11
+
+**Built and offline-tested (31 new assertions, `grounded_reply_test.sql`; zero
+regression across all 31 suites). NOT deployed to production — staged for
+review.**
+
+| Piece | Migration | What it does |
+|---|---|---|
+| `gate_grounded_reply(uuid,text)` | `20260811190000` | The guardrail itself: blocks memory-announcement, past-session-reference, and unfounded repetition/count claims. Calibrated against all 2,378 real replies in `n8n_chat_histories` — two real false-positive classes found and designed around (see the migration's own header). |
+| `gate_agent_reply` extended | `20260811190000` | Calls `gate_grounded_reply` internally; zero n8n change — same node, same call. Vocabulary/commercial checks untouched. |
+| `get_agent_context` extended | `20260811170000` | Adds a `JOURNEY` facts block (objective/phase/progress) for a parent with a live stage, via `stage_state()`. Absent for free parents. |
+| `get_agent_bundle` extended | `20260811180000` | `allowed_moves` now returned as data (`knowledge_depth().now_possible`); the permission line names the same violations the gate enforces; a journey directive (silent in `hold`) is appended for a paid parent. |
+| Prompt: honest-ignorance clause | `docs/prompts/adam-conversation-agent.md` | Reflect/ask/hold is stated as a *complete* success, not a fallback — reduces the pressure that produces invention. **Not yet pushed to the live node** — see the file's own header. |
+
+**Deployment (SQL to production, prompt text to the live n8n node) is a decision
+for the founder, not yet taken.** The gate's guarantee only takes effect once
+`gate_agent_reply`'s new body is applied to production — until then, production
+still runs the 2026-08-01 version with no grounding check.
+
+The original research and reasoning (unchanged) follow.
 
 ## The ADAM Contract — ratified 2026-08-11
 
