@@ -6,6 +6,17 @@ One file, so a new session does not replay the old one. Everything below is veri
 
 Where we stopped, newest first. Read this block, then the rest as needed.
 
+- **2026-08-11 — the daily plan composer is BUILT** (`compose_journey_step`,
+  `20260811140000`, 16 assertions). The paid journey's «مخصّص» daily step: a
+  facts+posture function (the sibling of `get_harvest_context`) that hands the
+  composer tonight's single step from the agreed objective, the phase
+  (observe→build→hold from `v_stage_progress`), the child's situation, and last
+  night's outcome. observe = change nothing / build = one step on what worked /
+  hold = ADAM fades. No fixed plans, no plan-authoring screen; the LLM writes the
+  language at send time under the copy law. **Not yet deployed to production**
+  (pure new read, zero risk). **Next:** route a live-journey parent to a
+  `journey_step` action in `get_rhythm_due` (step 4), then W3's branch — W3 stays
+  paused until launch.
 - **2026-08-11 — لحظة الاتفاق (the conversion moment) is BUILT.** The free→paid
   hinge. Design: `docs/the-agreement-moment.md` + `docs/the-conversion-seam.md`.
   Build: `supabase/migrations/20260811120000_the_agreement_moment.sql`,

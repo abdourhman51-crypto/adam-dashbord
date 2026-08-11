@@ -173,7 +173,7 @@ the parent's own confirmation.
 proposal's objective when the caller does not pass one. The dashboard's "confirm
 payment" screen loses its goal field.
 
-### 5 — The daily plan · 🔴 new (this is the real work)
+### 5 — The daily plan · ✅ composer BUILT 2026-08-11 (routing + W3 branch pending)
 
 Each day, for a parent in a live journey, the rhythm sends a `journey_step`
 instead of an ordinary seed. A new composer builds tonight's single small step
@@ -241,7 +241,7 @@ on:
 |---|---|---|---|---|
 | 1 | `agree_objective` + the two goal-agreement moments (step 2) | nothing | small | ✅ **done 2026-08-11** — `20260811120000`, 31 assertions, zero n8n change |
 | 2 | `activate_subscription` reads the agreed goal (step 4) | 1 | small | ✅ **done 2026-08-11** — `20260811130000`, cashier never types the goal |
-| 3 | `compose_journey_step` + its offline test on a synthetic family (step 5) | nothing | **the real work** | pending |
+| 3 | `compose_journey_step` + its offline test on a synthetic family (step 5) | nothing | **the real work** | ✅ **done 2026-08-11** — `20260811140000`, 16 assertions, facts+posture for the composer |
 | 4 | `journey_step` route in `get_rhythm_due` (step 5) | 3 | small | pending |
 | 5 | W3's `journey_step` branch — compose + send | 4 | wiring, W3 stays paused until launch | pending |
 
