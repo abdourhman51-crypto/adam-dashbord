@@ -6,6 +6,21 @@ One file, so a new session does not replay the old one. Everything below is veri
 
 Where we stopped, newest first. Read this block, then the rest as needed.
 
+- **2026-08-11 — the W3 journey-step branch is SPECIFIED, not wired.**
+  `docs/workflows/w3-journey-step-branch.md`. W3 (`Vb4ADCkPsevPRWRN`) stays
+  `active: false` — nothing was touched in n8n. Today `Seed Or Harvest`'s switch
+  has only two rules (seed/harvest) and no fallback, so an `action='journey_step'`
+  row from `get_rhythm_due` is silently dropped — that is the entire remaining
+  gap, now precisely specified as four new nodes: a third switch rule, `Compose
+  Journey Step` (fans out from the existing `Seed Model` — no new AI credential),
+  `Send Journey Step` (clones `Send Seed`'s literal Telegram URL — no credential
+  at all), and `Record Journey Step Sent` (reuses `record_seed_sent` — no new SQL
+  — with the one real gotcha spelled out: `p_grounded_on` must be a non-empty
+  array built from `compose_journey_step`'s object shape, not passed through
+  raw, or the call raises `seed_not_grounded`). Applying it needs the same manual
+  `adam Supabase` credential attach every other new credentialed node has needed.
+  With this applied and W3 turned on, the free→paid→daily-plan flow is complete
+  end to end.
 - **2026-08-11 — the rhythm routes the journey step** (`get_rhythm_due`,
   `20260811150000`). When the morning give would be a `seed` and the parent has a
   live stage, it becomes `journey_step`, grounded by `compose_journey_step` and
