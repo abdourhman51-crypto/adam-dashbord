@@ -9,35 +9,36 @@
 -- Harvest, which already handles a journey parent.
 --
 -- ------------------------------------------------------------
--- What changes, precisely
+-- Built on the LIVE production version, not the repo's stale one
 --
--- Built on the live version (20260801150000 revive_the_rhythm_gate): the
--- 14-column return, the LEFT join on checkin_state, is_first_proactive
--- and footer_ar are all preserved exactly. The timing, window, strain,
--- quiet hours, pause, cadence and once-per-day ceiling are byte-for-byte
--- the same. Only the decision layer gains one rule and the final select
--- gains branches, all marked ⭐:
+-- A drift predating this work: production's get_rhythm_due had already
+-- moved to the "exit is owed until shown" model — owes_exit derived from
+-- followers.proactive_footer_at, the footer carried by whichever
+-- proactive message comes next (seed OR harvest). The repo's
+-- 20260801190000 added the column but never updated get_rhythm_due, so
+-- the repo still built the older is_first_proactive (not-exists) version.
+-- Rebuilding on the repo's copy and deploying would have REVERTED the
+-- live fix. This migration is therefore transcribed from the live
+-- function and adds only the journey routing — which also realigns the
+-- repo with production.
+--
+-- ------------------------------------------------------------
+-- What this adds, precisely (all marked ⭐)
 --
 --   ⭐ when the morning action would be 'seed' AND the parent has a live
 --      stage, it becomes 'journey_step';
---   ⭐ 'journey_step' is gated by compose_journey_step(...).can_send and
---      grounded by compose_journey_step(...), exactly as 'seed' is gated
---      by can_ground_seed. No outcome yet → no row: the journey is silent
---      this morning, it does NOT fall back to a generic seed (§5).
+--   ⭐ 'journey_step' is grounded by compose_journey_step and gated by
+--      its can_send, exactly as 'seed' is by can_ground_seed. No outcome
+--      yet → no row: the journey is silent this morning, it does NOT fall
+--      back to a generic seed (§5).
 --
--- A parent with no journey is completely unaffected. And because a
--- journey_step is never action='seed', is_first_proactive and footer_ar
--- come back false/null for it automatically — correct, since a parent in
--- a paid journey is long past their first uninvited message.
+-- owes_exit / is_first_proactive / footer_ar are preserved verbatim: a
+-- journey_step is just another proactive message, so it carries the exit
+-- footer on the rare row where the debt still stands, exactly as a seed
+-- or harvest would. A parent with no journey is entirely unaffected.
 --
--- ------------------------------------------------------------
--- The evening still fires, because delivery stamps the same slot
---
--- The Harvest is keyed on seed_sent_at. When W3 sends a journey_step it
--- must stamp seed_sent_at just as the seed branch does, so the evening
--- question still fires. That is the delivery layer's contract (the W3
--- journey_step branch, still to be built); get_rhythm_due reads the stamp
--- and needs no change for it.
+-- Delivery contract for W3 (still to build): sending a journey_step must
+-- stamp seed_sent_at like the seed branch, so the evening harvest fires.
 -- ============================================================
 
 begin;
@@ -60,10 +61,12 @@ with base as (
     f.id            as parent_id,
     f.platform_user_id,
     ct.iana_tz,
-    (now() at time zone ct.iana_tz)             as local_ts,
     (now() at time zone ct.iana_tz)::date       as local_date,
     extract(hour from (now() at time zone ct.iana_tz))::smallint as local_hour,
-    coalesce(ps.level, 1)                       as strain_level
+    -- The exit is owed until it has actually been shown. A fact about
+    -- the parent, not about any one message: a send that fails to carry
+    -- it leaves the debt standing.
+    (f.proactive_footer_at is null)             as owes_exit
   from public.followers f
   join public.country_timezone ct
     on upper(btrim(f.country)) = ct.code
@@ -90,11 +93,7 @@ ctx as (
     d.id    as day_id,
     d.seed_sent_at,
     d.harvest_sent_at,
-    d.seed_text,
-    not exists (
-      select 1 from public.daily_logs d2
-      where d2.follower_id = a.parent_id and d2.seed_sent_at is not null
-    ) as is_first_proactive
+    d.seed_text
   from awake a
   left join lateral (
     select c.id, c.name from public.children c
@@ -142,17 +141,9 @@ routed as (
   from decided d
 )
 select
-  r.parent_id,
-  r.platform_user_id,
-  r.action,
-  r.local_date,
-  r.local_hour,
-  r.child_id,
-  r.child_name,
-  r.situation_id,
-  r.situation_key,
-  r.day_id,
-  r.seed_text,
+  r.parent_id, r.platform_user_id, r.action, r.local_date, r.local_hour,
+  r.child_id, r.child_name, r.situation_id, r.situation_key,
+  r.day_id, r.seed_text,
   -- ⭐ grounding per action: seed from can_ground_seed, journey step from
   -- compose_journey_step. The harvest carries none (composed at send).
   case
@@ -160,10 +151,10 @@ select
     when r.action = 'journey_step' then public.compose_journey_step(r.parent_id)
     else null
   end as grounding,
-  -- Only a seed can be a first contact; a journey_step never is (the parent
-  -- has been messaged throughout the free tier).
-  (r.action = 'seed' and r.is_first_proactive) as is_first_proactive,
-  case when r.action = 'seed' and r.is_first_proactive
+  r.owes_exit as is_first_proactive,
+  -- Carried by whichever proactive message comes next — seed, harvest, or
+  -- journey step. The debt is a fact about the parent, not the message.
+  case when r.owes_exit
        then (select cm.body_ar from public.conversation_moments cm
               where cm.key = 'proactive_first_footer')
        else null end as footer_ar
@@ -183,7 +174,7 @@ limit p_limit;
 $function$;
 
 comment on function public.get_rhythm_due(integer) is
-  'Who is due a proactive message right now, and which one: harvest, seed, or — for a parent inside a live journey — journey_step in the morning give slot, grounded by compose_journey_step and gated by its can_send (no outcome yet → silent, not a fallback seed). A missing checkin_state row means no preference, not refusal. is_first_proactive/footer_ar are carried for a seed only; a journey_step is never a first contact.';
+  'Who is due a proactive message right now, and which one: harvest, seed, or — for a parent inside a live journey — journey_step in the morning give slot, grounded by compose_journey_step and gated by its can_send (no outcome yet → silent, not a fallback seed). owes_exit (from followers.proactive_footer_at) carries the first-contact footer on whichever proactive message comes next. A missing checkin_state row means no preference, not refusal.';
 
 revoke all on function public.get_rhythm_due(integer) from anon, authenticated, public;
 grant execute on function public.get_rhythm_due(integer) to service_role;

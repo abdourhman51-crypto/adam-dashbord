@@ -127,14 +127,29 @@ begin
       where g.parent_id = p and g.action = 'harvest';
     perform pg_temp.chk('with a seed sent, the harvest is due after the window', n = 1);
 
-    perform pg_temp.chk('a harvest is never flagged as ADAM''s first message',
+    -- The exit is owed until it has been SHOWN (followers.proactive_footer_at),
+    -- and it rides whichever proactive message comes next — seed OR harvest.
+    -- This parent has never been shown it, so tonight's harvest carries it:
+    -- the debt is a fact about the parent, not about which message pays it.
+    perform pg_temp.chk('an unpaid exit rides tonight''s harvest',
+      (select coalesce(bool_or(g.is_first_proactive), false)
+             from public.get_rhythm_due(200) g
+             where g.parent_id = p and g.action = 'harvest')
+      and (select coalesce(bool_and(g.footer_ar is not null), false)
+             from public.get_rhythm_due(200) g
+             where g.parent_id = p and g.action = 'harvest'),
+      'owes_exit: the footer is carried by the next proactive message, seed or harvest');
+
+    -- Once shown, it is never shown again — on a harvest or anything else.
+    update public.followers set proactive_footer_at = now() where id = p;
+    perform pg_temp.chk('a paid exit never rides a harvest again',
       not (select coalesce(bool_or(g.is_first_proactive), false)
              from public.get_rhythm_due(200) g
              where g.parent_id = p and g.action = 'harvest')
       and (select coalesce(bool_and(g.footer_ar is null), true)
              from public.get_rhythm_due(200) g
              where g.parent_id = p and g.action = 'harvest'),
-      'the exit rides on the seed, which always came first');
+      'once shown, the exit does not repeat');
   elsif hr >= 23 or hr < 7 then
     -- Not a skip: the quiet window is itself a rule worth defending. A parent
     -- with a seed sent and the window long closed must still hear nothing at
