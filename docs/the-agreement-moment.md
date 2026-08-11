@@ -284,10 +284,16 @@ gets one new caller, not a rewrite. The two agreement buttons carry
 `menu_goal_agreed` (menu-prefixed, so it routes with no Router edit) and `other`
 (the escape hatch, already the open free space).
 
-**Deliberately left for the next reviewed step:** letting `activate_subscription`
-read `agreed_objective` so the human at the cashier confirms money and never types
-the goal. That touches the payment function, so it is built and reviewed on its
-own rather than folded in here.
+**The cashier's read side — BUILT 2026-08-11**
+(`supabase/migrations/20260811130000_the_cashier_never_types_the_goal.sql`).
+`activate_subscription`, called with no goal — exactly what a payment confirmation
+passes — now reads `agreed_objective` and starts the journey from the goal the
+parent agreed, then consumes the receipt. An explicitly passed goal still wins; a
+payment with no goal and no receipt still records the money and returns
+`journey.started=false, objective_required`, unchanged. Only the ten-argument body
+changed, additively, with the signature untouched (a true replace, not an
+overload). The security posture from `20260807160000` is re-affirmed in the same
+file. Covered by three cases in `agreement_moment_test.sql` (38 assertions total).
 
 The design above is drawn from the code as it stands on 2026-08-11; the build
 matches it.

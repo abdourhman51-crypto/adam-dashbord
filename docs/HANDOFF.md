@@ -19,8 +19,11 @@ Where we stopped, newest first. Read this block, then the rest as needed.
   today's offer surface, unchanged. New fns: `should_agree_first`,
   `compose_agreement_moment`, `agree_objective`; `get_moment_after_tap` copied
   verbatim + two branches. `get_conversation_moment` was NOT touched.
-  **Next reviewed step:** let `activate_subscription` read `agreed_objective` so
-  the human at the cashier confirms money and never types the goal.
+  The cashier's read side is built too (`20260811130000`): `activate_subscription`
+  called with no goal reads `agreed_objective`, starts the journey from it, and
+  consumes the receipt — an explicit goal still wins, and no-goal+no-receipt still
+  returns `objective_required`. 38 assertions in `agreement_moment_test.sql`, zero
+  regression across all suites.
 - **Working branch is now `claude/connect-language-gate-n8n-5cmia3`.** It was
   fast-forwarded to contain everything on `claude/install-product-skills-ayvz5e`
   plus the language-gate wiring. Commit and push there. (The older

@@ -209,6 +209,62 @@ begin
 end $$;
 
 
+\echo '=== 8. THE CASHIER NEVER TYPES THE GOAL ==='
+do $$
+declare p uuid; r jsonb; v_obj jsonb; v_problem text;
+begin
+  -- A parent who agreed a goal, then paid — the cashier passes money, no goal.
+  p := pg_temp.family('كريم', true);
+  perform public.agree_objective(p);
+
+  r := public.activate_subscription(p, 30, null, null, 'confirmed by hand');
+
+  -- The payment is recorded, and the journey started FROM THE RECEIPT.
+  perform pg_temp.chk('cashier: journey started from the agreed goal',
+    (r->'journey'->>'started')::boolean = true, (r->'journey')::text);
+  perform pg_temp.chk('cashier: a live stage exists',
+    exists (select 1 from public.stages where parent_id = p
+            and status in ('active','extended')));
+  select problem_key into v_problem
+  from public.stages where parent_id = p order by created_at desc limit 1;
+  perform pg_temp.chk('cashier: the stage carries the agreed problem',
+    v_problem = 'sleep', v_problem);
+
+  -- The receipt is consumed once it becomes a journey.
+  select agreed_objective into v_obj from public.followers where id = p;
+  perform pg_temp.chk('cashier: receipt consumed after the journey starts',
+    v_obj is null);
+end $$;
+
+do $$
+declare p uuid; r jsonb;
+begin
+  -- No agreement, no goal passed → money recorded, journey withheld loudly.
+  -- (The pre-existing safety behaviour must survive this change.)
+  p := pg_temp.family('بلا', true);   -- ready, but never agreed
+  r := public.activate_subscription(p, 30, null, null, null);
+  perform pg_temp.chk('no receipt + no goal: payment recorded',
+    exists (select 1 from public.payments where follower_id = p));
+  perform pg_temp.chk('no receipt + no goal: journey withheld, objective_required',
+    (r->'journey'->>'started')::boolean = false
+    and r->'journey'->>'reason' = 'objective_required', (r->'journey')::text);
+end $$;
+
+do $$
+declare p uuid; r jsonb; v_problem text;
+begin
+  -- An explicitly passed goal still wins over any receipt.
+  p := pg_temp.family('صريح', true);
+  perform public.agree_objective(p);   -- receipt says 'sleep'
+  r := public.activate_subscription(p, 30, null, null, null,
+         'defiance', 'ثلاث ليالٍ من خمس بلا معركة', 3, 5, 20);
+  select problem_key into v_problem from public.stages
+  where parent_id = p order by created_at desc limit 1;
+  perform pg_temp.chk('explicit goal overrides the receipt',
+    v_problem = 'defiance', v_problem);
+end $$;
+
+
 \echo '=== RESULTS ==='
 \pset format unaligned
 select lpad(n::text,2) || '  ' || rpad(result,4) || '  ' || name
