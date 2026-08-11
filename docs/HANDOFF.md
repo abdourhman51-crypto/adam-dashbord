@@ -7,15 +7,21 @@ One file, so a new session does not replay the old one. Everything below is veri
 Where we stopped, newest first. Read this block, then the rest as needed.
 
 - **2026-08-11 — the rhythm routes the journey step** (`get_rhythm_due`,
-  `20260811150000`). Built on the live revive_the_rhythm_gate version (14-col
-  return, is_first_proactive/footer_ar preserved): when the morning give would be
-  a `seed` and the parent has a live stage, it becomes `journey_step`, grounded by
-  `compose_journey_step` and gated by its `can_send` (no outcome → silent, not a
-  fallback seed). A journey_step is never a first proactive, so those columns come
-  back false/null for it. Free parents unaffected. 5 assertions in
-  `rhythm_journey_route_test.sql`, zero regression (rhythm_gate still 14).
+  `20260811150000`). When the morning give would be a `seed` and the parent has a
+  live stage, it becomes `journey_step`, grounded by `compose_journey_step` and
+  gated by its `can_send` (no outcome → silent, not a fallback seed). Free parents
+  unaffected. **Deployed to production 2026-08-11 and smoke-verified live**
+  (free→seed+footer, journey→journey_step, rolled back). A safety check before
+  deploy caught a pre-existing repo↔production drift: production's `get_rhythm_due`
+  had already moved to the owes_exit model (`followers.proactive_footer_at`, the
+  footer carried by the next proactive of any kind — seed OR harvest) but the repo
+  never updated the function, only the column. The migration was rebased onto the
+  live owes_exit body so deploy did not revert it, which also realigned the repo;
+  `rhythm_gate_test` #12 was corrected from the superseded semantics (now 15/15).
   **Remaining: W3's journey_step branch** (compose + send + stamp seed_sent_at so
-  the evening harvest still fires) — W3 stays paused until launch.
+  the evening harvest still fires) — W3 stays paused until launch. With that, the
+  whole free→paid→daily-plan flow is DB-complete and deployed; only the paused
+  delivery workflow is left.
 - **2026-08-11 — the daily plan composer is BUILT** (`compose_journey_step`,
   `20260811140000`, 16 assertions). The paid journey's «مخصّص» daily step: a
   facts+posture function (the sibling of `get_harvest_context`) that hands the
