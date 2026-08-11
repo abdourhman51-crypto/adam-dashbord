@@ -6,6 +6,21 @@ One file, so a new session does not replay the old one. Everything below is veri
 
 Where we stopped, newest first. Read this block, then the rest as needed.
 
+- **2026-08-11 — لحظة الاتفاق (the conversion moment) is BUILT.** The free→paid
+  hinge. Design: `docs/the-agreement-moment.md` + `docs/the-conversion-seam.md`.
+  Build: `supabase/migrations/20260811120000_the_agreement_moment.sql`,
+  `supabase/tests/agreement_moment_test.sql` (31 assertions). **Zero n8n change,
+  no engine turned on, no data collected** — the whole moment is in the database,
+  reached through the existing tap pipeline. When a ready parent taps «نشتغل عليه»
+  (or /journey), the door now opens onto the AGREEMENT — mirror + one falsifiable
+  goal + «نعم / المشكلة الأكبر شيء آخر» — before any price; «نعم» writes a
+  reversible receipt (`followers.agreed_objective`) and then shows the offer.
+  Strain, an existing journey, or missing evidence all fall straight through to
+  today's offer surface, unchanged. New fns: `should_agree_first`,
+  `compose_agreement_moment`, `agree_objective`; `get_moment_after_tap` copied
+  verbatim + two branches. `get_conversation_moment` was NOT touched.
+  **Next reviewed step:** let `activate_subscription` read `agreed_objective` so
+  the human at the cashier confirms money and never types the goal.
 - **Working branch is now `claude/connect-language-gate-n8n-5cmia3`.** It was
   fast-forwarded to contain everything on `claude/install-product-skills-ayvz5e`
   plus the language-gate wiring. Commit and push there. (The older

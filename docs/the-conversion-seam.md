@@ -126,7 +126,7 @@ The evening harvest, on a good night, once ever:
 «لاحظنا شيئاً يتكرّر مع يوسف. هل نتركه يتكرّر... أم نشتغل عليه حتى يتغيّر؟»
 Tap «نشتغل عليه». (`take_offer_moment`, live.)
 
-### 2 — Agree the goal, in the chat · 🔴 new (small)
+### 2 — Agree the goal, in the chat · ✅ BUILT 2026-08-11
 
 Before any price is shown, ADAM proposes the concrete goal it already knows how to
 compute, and asks the parent to own it:
@@ -237,13 +237,13 @@ software in steps 2 and 5.
 Smallest and safest first, each one offline-testable, none of it turning an engine
 on:
 
-| # | Build | Depends on | Cost |
-|---|---|---|---|
-| 1 | `agree_objective` + the two goal-agreement moments (step 2) | nothing | small |
-| 2 | `activate_subscription` reads the pending proposal (step 4) | 1 | small |
-| 3 | `compose_journey_step` + its offline test on a synthetic family (step 5) | nothing | **the real work** |
-| 4 | `journey_step` route in `get_rhythm_due` (step 5) | 3 | small |
-| 5 | W3's `journey_step` branch — compose + send | 4 | wiring, and W3 stays paused until launch |
+| # | Build | Depends on | Cost | State |
+|---|---|---|---|---|
+| 1 | `agree_objective` + the two goal-agreement moments (step 2) | nothing | small | ✅ **done 2026-08-11** — `20260811120000`, 31 assertions, zero n8n change |
+| 2 | `activate_subscription` reads the agreed goal (step 4) | 1 | small | next reviewed step |
+| 3 | `compose_journey_step` + its offline test on a synthetic family (step 5) | nothing | **the real work** | pending |
+| 4 | `journey_step` route in `get_rhythm_due` (step 5) | 3 | small | pending |
+| 5 | W3's `journey_step` branch — compose + send | 4 | wiring, W3 stays paused until launch | pending |
 
 Steps 1–4 are pure database with an offline suite, the same shape as everything
 built this month. Step 5 is the only one that touches a live workflow, and it

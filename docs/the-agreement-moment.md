@@ -1,10 +1,18 @@
 # لحظة الاتفاق — the conversion moment, under the microscope
 
-**Written:** 2026-08-11. A design pass on the single most important moment in the
-product's life: the crossing from free to paid. Nothing here is built. It expands
-step 2 of `docs/the-conversion-seam.md` into the depth the founder asked for — the
-funnel that delivers a parent to this moment, how the moment appears, how the menu
-phrases the door, and the failure modes a world-class version has to pre-empt.
+**Written:** 2026-08-11. **BUILT the same day** —
+`supabase/migrations/20260811120000_the_agreement_moment.sql`,
+`supabase/tests/agreement_moment_test.sql` (31 assertions, zero failures on the
+real migrated schema), and **zero n8n change**: the whole moment lives in the
+database, reached through the tap pipeline that already exists. No engine was
+turned on and no data is collected. What follows is the design; the "how it was
+built" note is at the end.
+
+A design pass on the single most important moment in the product's life: the
+crossing from free to paid. It expands step 2 of `docs/the-conversion-seam.md`
+into the depth the founder asked for — the funnel that delivers a parent to this
+moment, how the moment appears, how the menu phrases the door, and the failure
+modes a world-class version has to pre-empt.
 
 Grounded in the live functions: `take_offer_moment`, `suggest_objective`,
 `is_team_question`, `get_telegram_surface` (`meaning='open_question'`),
@@ -257,5 +265,29 @@ whole moment in silence; and the agreement writes a reversible receipt that lets
 human, at the end, do the one thing the constitution leaves them: confirm the money
 arrived.
 
-Nothing here is built. It is the design of the moment, drawn from the code as it
-stands on 2026-08-11.
+## How it was built (2026-08-11)
+
+The moment is entirely in the database, so it needed no workflow edit and turned
+no engine on. The tap pipeline already calls `get_moment_after_tap`, and any
+callback beginning with `menu_` flows through it untouched.
+
+| Piece | What it does |
+|---|---|
+| `followers.agreed_objective` / `agreed_at` | the reversible receipt — the goal the parent agreed, and when. A fact about the parent, like `offer_fork_at`. |
+| `should_agree_first(parent)` | the gatekeeper: ready (`suggest_objective`), commerce not withdrawn by strain, no live journey, no still-fresh prior agreement. |
+| `compose_agreement_moment(parent)` | the screen — mirror + falsifiable goal + ownership question, no price, composed at read time; falls back to the offer rather than inventing a goal. |
+| `agree_objective(parent)` | records the «نعم»: writes the receipt and a pending `stage_proposals` row. Takes no money, starts no clock, idempotent, refuses at strain / in-journey / before evidence. |
+| `get_moment_after_tap` | copied verbatim from `20260807270000` with two branches added: `menu_journey` → the agreement when `should_agree_first`; `menu_goal_agreed` → record, then show the offer. |
+
+`get_conversation_moment` was **not** touched — a large, critical, live function
+gets one new caller, not a rewrite. The two agreement buttons carry
+`menu_goal_agreed` (menu-prefixed, so it routes with no Router edit) and `other`
+(the escape hatch, already the open free space).
+
+**Deliberately left for the next reviewed step:** letting `activate_subscription`
+read `agreed_objective` so the human at the cashier confirms money and never types
+the goal. That touches the payment function, so it is built and reviewed on its
+own rather than folded in here.
+
+The design above is drawn from the code as it stands on 2026-08-11; the build
+matches it.
