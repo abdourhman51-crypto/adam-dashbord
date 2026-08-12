@@ -20,8 +20,11 @@ begin
   values (gen_random_uuid()::text, p_country) returning id into v;
   insert into public.children (follower_id, name, is_primary)
   values (v, 'يوسف', true) returning id into c;
-  insert into public.situations (child_id, key, status, evidence_count, window_start, window_end)
-  values (c, 'sleep', 'confirmed', 4, p_win_start, (p_win_start + 2)::smallint);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 4, p_win_start, (p_win_start + 2)::smallint
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   return v;
 end $$;
 
@@ -104,7 +107,12 @@ declare p uuid; n int; hr int;
 begin
   select extract(hour from (now() at time zone 'Africa/Algiers'))::int into hr;
 
-  if hr >= 10 then
+  -- The upper bound is not optional. get_rhythm_due() considers nobody
+  -- outside `local_hour >= 7 and local_hour < 23` — ADAM is silent at night
+  -- by design — so between 23:00 and 07:00 Algiers time every assertion in
+  -- this block was failing for the one reason that is not a bug. A suite
+  -- that is red for eight hours a day teaches people to ignore it.
+  if hr >= 10 and hr < 23 then
     -- window closed hours ago, and no seed was ever sent today
     p := pg_temp.ready_parent('DZ', 7::smallint);
     select count(*) into n from public.get_rhythm_due(200) g
@@ -119,14 +127,39 @@ begin
       where g.parent_id = p and g.action = 'harvest';
     perform pg_temp.chk('with a seed sent, the harvest is due after the window', n = 1);
 
-    perform pg_temp.chk('a harvest is never flagged as ADAM''s first message',
+    -- The exit is owed until it has been SHOWN (followers.proactive_footer_at),
+    -- and it rides whichever proactive message comes next — seed OR harvest.
+    -- This parent has never been shown it, so tonight's harvest carries it:
+    -- the debt is a fact about the parent, not about which message pays it.
+    perform pg_temp.chk('an unpaid exit rides tonight''s harvest',
+      (select coalesce(bool_or(g.is_first_proactive), false)
+             from public.get_rhythm_due(200) g
+             where g.parent_id = p and g.action = 'harvest')
+      and (select coalesce(bool_and(g.footer_ar is not null), false)
+             from public.get_rhythm_due(200) g
+             where g.parent_id = p and g.action = 'harvest'),
+      'owes_exit: the footer is carried by the next proactive message, seed or harvest');
+
+    -- Once shown, it is never shown again — on a harvest or anything else.
+    update public.followers set proactive_footer_at = now() where id = p;
+    perform pg_temp.chk('a paid exit never rides a harvest again',
       not (select coalesce(bool_or(g.is_first_proactive), false)
              from public.get_rhythm_due(200) g
              where g.parent_id = p and g.action = 'harvest')
       and (select coalesce(bool_and(g.footer_ar is null), true)
              from public.get_rhythm_due(200) g
              where g.parent_id = p and g.action = 'harvest'),
-      'the exit rides on the seed, which always came first');
+      'once shown, the exit does not repeat');
+  elsif hr >= 23 or hr < 7 then
+    -- Not a skip: the quiet window is itself a rule worth defending. A parent
+    -- with a seed sent and the window long closed must still hear nothing at
+    -- 2am, and that is the assertion this branch makes.
+    p := pg_temp.ready_parent('DZ', 7::smallint);
+    insert into public.daily_logs (follower_id, log_date, seed_text, seed_sent_at)
+    values (p, (now() at time zone 'Africa/Algiers')::date, 'خطوة', now());
+    select count(*) into n from public.get_rhythm_due(200) g where g.parent_id = p;
+    perform pg_temp.chk('nothing is ever due between 23:00 and 07:00, seed or no seed',
+      n = 0, 'Algiers hour ' || hr::text);
   else
     perform pg_temp.chk('SKIPPED: too early in Algiers for a closed window', true, hr::text);
   end if;

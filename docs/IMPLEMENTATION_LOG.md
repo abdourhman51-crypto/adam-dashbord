@@ -5,6 +5,980 @@ Newest first. Every entry names the evidence, not the intention.
 
 ---
 
+## 2026-08-07 · قراءة آدم, the waitlist, and the country that was thrown away
+
+Three features and a bug, in one pass, with nothing switched on.
+
+**قراءة آدم** is the paid tier's centre: a reading of your own house that nobody
+else could write, because it is built from your child's nights and nobody else's.
+Four states, and the founder's correction is the reason there are four — my first
+version needed fifteen logged nights before it said anything, which means a parent
+pays and meets an empty screen. `opened` now fires on the payment itself, with the
+child, the situation, the agreed goal, and when more appears.
+
+A free parent sees it `locked`: **one true line from their own data**, never an
+invented preview, and an admission when ADAM does not know the house yet. The
+credibility is the conversion tool.
+
+Rendering it found three defects no passing assertion would have caught alone: it
+ranked "what calms" on `step_given`, which the rhythm never writes — so the single
+most valuable line in the whole feature was silently empty; the stage key is
+`objective_text`, so the goal line was missing; and Arabic counts 3–10 nights as
+ليالٍ, not ليلة.
+
+**The waitlist** is a pipe laid for production, collecting nothing today. Two
+decisions carry it. `waitlist` is set by the tap and never inferred from geography,
+because that column routes `M2 - Classify Track` and inferring it would move every
+parent in an unsupported country onto a different track without one of them asking.
+And the country is asked *for* the signup rather than assumed, because demand with
+no address is the one number it must not produce.
+
+Both features reach the parent through **two branches in `get_moment_after_tap`**
+rather than two new n8n nodes. Every HTTP node added to W1 needs a credential the
+MCP API cannot bind, so each one is a manual step and another place the service key
+is pasted in plaintext. The tap pipeline already existed; it is 61 lines.
+
+**And the bug the wiring exposed.** The Router handled a country button by
+discarding the code unless it was one of three hardcoded markets — so a parent in an
+unsupported country could tap their own flag and ADAM would still not know where
+they were. The waitlist built that morning would have collected exactly the thing it
+was designed never to collect. Every country is recorded now, and the hardcoded
+`SUPPORTED` list is gone: `supported_countries.is_active` is the only source, so a
+market can be opened with a row instead of a deploy.
+
+Earlier the same day, two more: `record_harvest_answer` accepted an unknown outcome,
+stamped the night as answered and wrote nothing — silent loss of the evidence the
+whole product rests on. And my own cleanup broke erasure, by dropping
+`session_tracker` while `execute_erasure` still deleted from it. The founder found
+that one by using the product. The suite had not, because erasure was tested by
+calling the function directly and never through the tap — a function tested only
+where nobody calls it is tested in the wrong place. Both are fixed, both now have
+cases on the path a parent can actually reach.
+
+23 suites, **638 assertions, zero failures** on the real schema.
+
+---
+
+## 2026-08-07 · The fixture is deleted — the tests now run on the real schema
+
+`fixture_minimal.sql` described the database by hand, because the repository could not
+build the real one. That stopped being true this morning (§6b), so the suites were pointed
+at the schema `supabase/migrations/*` actually builds. **All 19 suites, 589 assertions,
+zero failures — and no hand-written description of the database anywhere in the repo.**
+
+The offline suite and the rebuild check are now the same act: a migration that cannot apply
+to an empty database means the tests do not run at all.
+
+Getting there took fixing nine suites, and **not one of them was a failing assertion**.
+Every one was a constraint violation — a row the tests had been writing that production
+would have refused:
+
+- **`situations` inserts omitted `parent_id`, `label_ar`, `window_start`, `window_end`** —
+  21 sites, all four NOT NULL in production. The rhythm's windows had been null in every
+  test and never in production.
+- **`daily_logs.situation_id` was set to a child id** in three places. The fixture carried
+  no foreign key, so three nights pointed at a situation that did not exist and every
+  assertion still passed.
+- **`/child` read back a pattern with `safe_for_record = true`** that
+  `guard_safe_for_record` makes impossible to create: the flag can only be raised through
+  `set_pattern_record_visibility()`, which writes an audit row naming who approved it and
+  why. The test had been asserting behaviour for a row the disclosure safeguard would never
+  release. That one is not schema hygiene.
+- `child_patterns.status = 'confirmed'` — a value `child_patterns_status_check` has never
+  allowed. `child_patterns.follower_id` omitted, NOT NULL in production.
+- `night_result = 'skip'` — not one of `calm` / `hard` / `normal`. The production shape is
+  `step_status = 'not_tried'`, and `parent_effort` counts identically either way because it
+  only ever counts calm and hard.
+- `funnel_stage = 'paid_active'` with no `subscription_expires_at`, which
+  `chk_active_has_expiry` refuses: paid access always has an end.
+- Four suites activated a market with prices missing, which
+  `chk_active_market_has_pricing` refuses: an active market carries every price it can be
+  asked for.
+
+None of this was caught by 589 passing assertions, because the fixture agreed with the
+tests. A fixture the tests agree with is not evidence — it is a second opinion from the
+same source. Its replacement is `seed_test.sql`: four rows of prices, which are business
+data and not schema. `fixture_mirror.sql` went with it; the real `v_child_record` exists.
+
+---
+
+## 2026-08-07 · The legacy evening system is gone, and two things it was hiding
+
+§3 of `what-is-missing.md` said: delete the legacy layer. The database half is done, and
+almost nothing about it went the way the list said it would.
+
+**`activate_subscription` was not duplicated — it was broken.** Production was returning
+`ERROR: 42725: function activate_subscription(uuid, integer, numeric, text, text) is not
+unique` for every five-argument call, which is exactly how the dashboard confirms a
+payment. `CREATE OR REPLACE FUNCTION` with a longer parameter list does not replace; it
+creates an overload, and because arguments six to ten all had defaults, both candidates
+matched a five-argument call equally. I introduced it myself hours earlier, adding the
+journey parameters. Nobody noticed because nobody has been paying — the first sale would
+have. There is now one function, and a five-argument call records the payment and returns
+`journey.started = false, reason = objective_required`.
+
+**`checkin_state` was on the deletion list and should not have been.** The table was never
+replaced; the rhythm adopted it. `get_rhythm_due` skips a stopped cadence through it,
+`get_telegram_surface` shows a paused parent «كيف نعود؟» from it, `record_harvest_answer`
+resets her streak in it, `get_moment_after_tap` writes her pause/resume/stop taps to it,
+and `set_checkin_hour` stores the hour she chose. Dropping it would have deleted every
+means a parent has of controlling when ADAM speaks. The list had been written from what
+objects were *named*, not from what still *reads* them — which is the whole argument for
+doing a deletion slowly.
+
+**`decay_checkin_consent` looked dead and was merely inert — the worse case.** It is the
+consent model: five ignored nights quieten the rhythm to weekly, nine more stop it, one
+reply resets the streak. It counted ignored nights from `checkin_state.last_sent_date`, and
+the only writer of that column was `record_checkin_sent`, replaced by the rhythm on 30
+July. So for eight days the live product had the *recovery* half working and the *decay*
+half counting nothing: it could come back from silence it was structurally unable to
+notice, and would have gone on asking nightly, forever, of someone who had stopped
+answering weeks ago. For a product whose first principle is that it must be possible to be
+left alone, that is the worse half to have working. Deleting it with the rest of the engine
+would have removed the principle without anyone deciding to.
+
+Rebuilt on the rhythm's own evidence — an ignored night is one where `harvest_sent_at is
+not null and harvest_answered_at is null`, so a night the sender never ran is our silence
+and not hers — with a `last_decayed_on` watermark making the scan idempotent within a day
+and able to catch up after a day it did not run. 22 assertions
+(`supabase/tests/consent_decay_test.sql`).
+
+One of those assertions was wrong when written, and the disagreement was worth having. The
+legacy `record_checkin_response` revived a stopped cadence on any answer; `record_harvest_answer`
+does not, and I first assumed that was a regression. It is not. 'stopped' is reached two
+ways — she tapped stop, or decay stopped her — and the table does not distinguish them, so
+auto-reviving would silently override an explicit choice, the one thing the old
+`ensure_checkin_state` comment said never to do. She is not stranded: her keyboard offers
+«كيف نعود؟» and the resume tap sets it back. Coming back stays her decision, made once, out
+loud. The test now asserts that silence.
+
+**Actually deleted:** `get_checkin_batch`, `record_checkin_sent`, `record_checkin_response`,
+`ensure_checkin_state`, and `followers.checkin_opt_in / checkin_opted_at /
+last_checkin_sent_date` — 15 rows archived to `archive.followers_checkin_20260807` first,
+because they record what parents were asked and what they answered.
+
+**And a measurement that replaces a guess.** §3 estimated 17 orphan nodes in the live
+workflow. Walking `connections` forward from the trigger, and backwards along
+`ai_languageModel` / `ai_memory` edges, **64 of 126 nodes are unreachable** — the whole old
+onboarding (27), the whole old CTA flow (13), the daily cap (4), country, waitlist,
+referral, pinning, reactivation. That also answers §7's «`check_daily_message_cap` runs on
+nobody»: its node is in a dead branch. Not deleted — it is half a live workflow, four times
+the estimate, and no offline suite can prove the survivors still work. It wants the
+founder's go-ahead.
+
+Production and a from-zero rebuild now agree at **84 functions**. Nineteen suites, **589
+assertions, zero failures**.
+
+Still open, and now visible: `decay_checkin_consent` has no scheduled caller. The rule is
+correct, tested, and fires never.
+
+---
+
+## 2026-08-07 · The repo rebuilds production — and the rebuild found a way in
+
+**A blank Postgres database now becomes production from this repository alone.** 66
+migrations, zero failures, 29 tables, 12 views, 88 functions — the same names production
+has, verified by set difference rather than by counting. That was never true before today,
+and the entry below this one, written hours earlier, was wrong about why.
+
+**The gap was never functions.** This migration history begins at week 0 on a database
+that already existed and already held 310 families. Fourteen tables and five views had no
+DDL in git at all: `followers`, `children`, `daily_logs`, `n8n_chat_histories`,
+`memory_snapshots`, the dashboard's funnel views. No number of restored functions would
+have made a rebuild possible. They are now in three baseline files dated before week 0,
+plus a tail file for the foreign keys and triggers that point at objects later migrations
+create — split rather than guarded, because a baseline that silently skips a binding
+produces a database that merely *looks* like production.
+
+**Only running the rebuild found the rest.** Reading found twelve missing functions.
+Attempting the rebuild found `get_agent_context`, `commerce_allowed`, five views, and
+three migrations that could not apply to a fresh database at all — week 0's revocations
+aborting on two tables since dropped, week 0's search_path pins aborting on six functions
+deleted an hour later by the cleanup migration, and a `COMMENT` naming a signature no
+migration creates. All three are now guarded loops. This is the argument for the rebuild
+being a routine check: it is the only test a fixture cannot satisfy by agreeing with
+itself.
+
+### And it found a live privilege escalation
+
+Four SECURITY DEFINER functions were executable in production **with the public anon key**:
+`activate_subscription` (the ten-argument one — it grants paid access and starts a
+journey), `get_conversation_for` (any parent's entire history), `heart_commit` (overwrite
+what ADAM remembers about any family), and `write_child_name`.
+
+Two causes, and neither was a mistake in the security model:
+
+1. The ten-argument `activate_subscription` is an **overload**, created on 2026-08-07 when
+   the journey engine gained its start parameters. New functions are born with EXECUTE
+   granted to PUBLIC, and week 0 had revoked the five-argument one *by exact signature*. My
+   own migration reopened the door week 0 closed. A signature protects a function; it does
+   not protect a capability.
+2. Week 0 wrote `REVOKE … ON FUNCTION public.get_heart_batch()`. That function takes
+   `p_limit integer default 40`. The signature matched nothing, the statement raised, and
+   the two revocations written after it — `heart_commit` and `write_child_name` — never
+   ran. One wrong signature silently cancelled the rest of the list, and nobody looked for
+   twelve days.
+
+A third, found only by verifying the fix on a bare cluster: `REVOKE … FROM anon` does not
+remove a privilege `anon` holds through **PUBLIC**. Supabase happens to revoke PUBLIC and
+grant `anon` explicitly, so week 0's revoke worked there and would have been a no-op
+anywhere else.
+
+Closed by `20260807160000_nobody_grants_themselves_a_journey.sql`, **applied to
+production** and verified: `anon` has EXECUTE on none of them, `service_role` still has all
+88. Revocation is now by function *name*, so every present and future overload is covered,
+and `alter default privileges` closes the door the next new function would walk through.
+Nothing in the product lost access — n8n authenticates as `service_role`.
+
+### Two more things the rebuild surfaced
+
+**`activate_subscription` has two live overloads.** The ten-argument one starts a journey.
+The five-argument one — the one the dashboard calls — does not. A payment confirmed
+through the old path still produces `paid_active` with no stage, which is exactly the gap
+the journey engine was built to close. Named in §1 and §3 rather than fixed here, because
+deleting the old overload is the legacy deletion, not a side effect of a baseline.
+
+**`commerce_allowed`'s recovery window is dead code.** Its body reads
+`ps.level = 1 and (ps.entered_at < now() - interval '14 days' or ps.level = 1)` — the
+second half is true whenever the first already passed, so the fourteen-day settling period
+after strain steps down never applies. Restored exactly as it runs and named in §7:
+whether ADAM should wait two weeks before mentioning money to someone who was drowning
+last week is the founder's decision, not a thing to change quietly inside a migration
+titled "restored".
+
+Eighteen suites, **567 assertions, zero failures** — and three of them now run the real
+`get_agent_context` instead of a fixture stub, because the real one finally has a source.
+
+---
+
+## 2026-08-07 · Twelve functions came home, and a number I got wrong
+
+**Correction first.** The previous entry, and `docs/what-is-missing.md` §6b, said "34 of
+88 production functions have no source in this repo". That is wrong. The diff was taken
+against the **offline test chain** — the 35 migration files the harness loads on top of
+`fixture_minimal.sql` — and not against the **repository**, which holds 64. Everything the
+chain does not load counted as absent when it was merely untested.
+
+Re-checked name by name against all 64 files:
+
+| | |
+|---|---|
+| Production functions | 88 |
+| No source anywhere in git | **12** |
+| In git, not loaded by the chain, therefore untested | 17 |
+| Restored earlier the same day with their own migrations | 6 |
+
+The seventeen that were in git the whole time include the entire child-record and erasure
+family and the entire checkin family. Restoring them would have created a *second* source
+for each — the exact disease being treated.
+
+**The twelve that were genuinely nowhere** are now in
+`20260807140000_the_repo_can_rebuild_production.sql`, read out of production with
+`pg_get_functiondef`: `writer_commit`, `_ensure_child`, `get_extraction_batch`,
+`write_child_name`, `get_heart_batch`, `heart_commit`, `get_conversation_for`,
+`get_free_session_state`, `check_daily_message_cap`, `surface_changing_item`,
+`return_to_free`, `set_updated_at`. Between them they are the whole of W2's writing, the
+free tier's memory, and the session clock — running for weeks with no source and therefore
+no test, which is the same thing as nobody knowing what they do.
+
+`supabase/tests/restored_functions_test.sql` is the test they never had: 65 assertions on
+the promises the bodies make. A recorded child's name is never replaced by a new
+inference. With two children the orphan nights are left orphaned, because a sibling's
+nights must never be reassigned on a guess. An `event_type` the model invented is clamped
+to `other` and a weight of 99 becomes 5. Five blank fields write nothing **and do not
+stamp the freshness clock**, so the parent is retried rather than skipped forever. When
+commerce is blocked the keyboard label is *identical* to the ordinary one — a withheld
+journey is silent, never announced.
+
+**The real gap, which restoring twelve functions does not close.** This migration history
+begins at `week0` on a database that already existed. Fourteen tables — `followers`,
+`children`, `daily_logs`, `n8n_chat_histories` and ten more — have **no `CREATE TABLE`
+anywhere in git**. A blank database still cannot be brought to production's shape from
+this repository. That baseline is now step 2b in `what-is-missing.md`, ahead of the legacy
+deletion, because deleting from a system you cannot rebuild is the one irreversible move
+on that list. The seventeen present-but-unloaded functions have also never been compared
+against what production actually runs; they are *present*, not *verified equal*.
+
+**Two things the work caught on the way.**
+
+`fixture_minimal.children.is_primary` was nullable; production's is `NOT NULL DEFAULT
+false`. Every "primary child, else any child" reader orders by `is_primary desc`, and
+`DESC` puts NULLs **first** — so a child with a null flag outranked the actual primary
+child, in the fixture and in no other database. Third time a fixture looseness has
+produced a failure that looked like a product bug.
+
+`mirror_engine_test.sql` had been silently unrunnable. When the journey engine landed,
+`fixture_minimal.sql` gained a `crisis_flags` table, and `fixture_mirror.sql` still
+created its own stub of the same name; the second `CREATE` aborted that file at line 16,
+took `v_child_record` with it, and the suite failed on a missing view rather than on
+anything about the Mirror. Ten assertions recovered, and the mirror migrations are now
+part of the standard chain.
+
+Eighteen suites, **567 assertions, zero failures**.
+
+The migration is deliberately **not applied to production** — every function in it already
+exists there, byte-identical in behaviour, so applying would rewrite `prosrc` to no effect.
+It exists so a rebuild produces them.
+
+---
+
+## 2026-08-07 · One family, walked — and 34 functions that only existed in the database
+
+> The figure **34 is wrong**; it was 12. See the correction in the entry above. The rest
+> of this entry stands.
+
+The next gap after the journey engine was the one the founder's decision creates: with
+ADAM stopped and nobody being messaged, the time-and-evidence machines will never
+accumulate data, so no path can be *watched* working. `lifecycle_test.sql` answers that —
+35 cases walking one synthetic family from stranger to finished journey in seconds, every
+row written by the production function the live product would call.
+
+**But writing it uncovered something bigger.** Three migration files —
+`rhythm_write_side`, `situation_catalog_and_detection`,
+`strain_detection_and_graded_return` — contained **no SQL at all**. Nine, fourteen and
+twenty-six lines of comment describing objects that had been applied straight to the
+database and never written down.
+
+That is not an isolated slip. Checked properly against a full offline load:
+
+> **34 of 88 production functions cannot be rebuilt from this repo.**
+
+Among them `commit_situation`, `record_harvest_answer`, `set_strain_level`,
+`request_erasure`, `execute_erasure`, `get_child_record` — live product logic whose only
+copy is the running database. The consequences: the offline suite can never cover them, a
+rebuild would produce a product missing whole layers, and the repo's claim to be the
+source of truth is false for over a third of the logic.
+
+Six of them came home today — the three files above now carry their real definitions,
+pulled from production with `pg_get_functiondef` and verified by the suite that now
+exercises them. The remaining 28 are on the list.
+
+**The harness caught the product three times while it was being written**, and none of
+them were assertion bugs:
+
+| The harness assumed | The product actually does |
+|---|---|
+| answering a harvest is enough | the harvest is **sent** first; without `record_harvest_sent` the gate still says an evening question is owed on a day already answered |
+| strain drops when a parent recovers | L2 **holds three days** before stepping to L1 — nobody is declared recovered on one calm sentence |
+| the journey clock counts the nights before it | it counts days on or after `started_at`; the free-tier nights before the sale are not borrowed |
+
+**And the STABLE snapshot trap, for the fourth time.** `set_strain_level` is volatile,
+`offer_ready` is stable; called in one expression the read sees the snapshot from before
+the write and reports the offer still withdrawn — indistinguishable from a real bug. It
+has now cost debugging in four separate suites and is written up in each.
+
+**Fixture:** `situation_catalog` handed back to its migration where it belongs;
+`erasure_requests`, `aha_moments`, the full `checkin_state` and `parent_strain` column
+sets added — each one added the moment a production writer turned out to touch it.
+
+Fifteen suites, 453 assertions, zero failures.
+
+---
+
+## 2026-08-07 · The journey can be started
+
+Founder's decision first: ADAM is stopped, nobody is being messaged, and the build is to
+be finished before any launch — the paused workflows are paused deliberately, to stop
+them burning credit for nothing. So the order changed from «turn something on» to
+«finish the parts that do not exist», and this is the most important of them.
+
+Until today the complete list of journey functions in production was `can_propose_stage`.
+A gate, and nothing to gate. `stages` held the shape, `v_stage_progress` derived the
+phase and the clock, and **nothing had ever written a row**, so none of it had ever run.
+
+Which means the offer shipped on 2026-08-06 sold this —
+
+> نتّفق قبل أن نبدأ على هدف واضح ترونه بأعينكم.
+> وإن لم نصل إليه في المدّة، أُكمل معكم نصف المدّة كاملةً مجاناً حتى نصل.
+
+— while the only tool that turned a payment into access granted 30 calendar days on a
+clock, with no goal, no measurement, and nothing for «نصل» to refer to.
+
+**Four functions, and one rewritten:**
+
+| | |
+|---|---|
+| `suggest_objective(parent)` | the sentence فريق آدم agrees with the parent, built from the situation already confirmed. Returns `ready=false` with a reason rather than inventing a goal for a house we do not know |
+| `start_stage(...)` | the journey begins, once |
+| `stage_state(parent)` | the live journey, its progress, its clock and its phase, in one call |
+| `close_stage(stage)` | met → completed; missed → the extension; missed again → failed |
+| `activate_subscription` | unchanged signature, same payment row — now also starts the journey, and reports whether one exists |
+
+**The extension is granted by the same call that detects the miss.** That is what lets
+the offer promise it «بلا أن تطلبوا»: there is no path where a parent has to ask and no
+path where an operator has to remember.
+
+**What `start_stage` deliberately does not enforce.** `can_propose_stage` blocks on a
+30-day cadence, a lifetime cap per problem, and an improving trend — rules about when
+ADAM may *raise* the subject. Applying them at start would mean refusing to begin a
+journey someone had already agreed and paid for. That is not a safeguard; it is a bug
+that takes money. `start_stage` enforces only structural invariants.
+
+**The objective has no default, on purpose.** A goal nobody agreed is not a goal, and a
+fallback here would recreate the gap in a new place. So `activate_subscription` without
+one still records the money and returns `journey.started = false, reason =
+objective_required` — the half-state made loud instead of silent.
+
+**Tested:** 36 assertions walking two families through a whole journey — one missed,
+extended by 14 in the same call, missed again, failed; one that reached it and completed
+*before* the clock. All fourteen suites green (396 assertions). Verified on production
+with a disposable family: suggest → start → 29 hard nights → `hold`, exhausted →
+`close_stage` → extended by 14, allowed_days 43, live again.
+
+**The walk is the first piece of the simulation harness** the next step needs. With
+nobody being messaged, walking a synthetic family through time is the only way any
+time-and-evidence path can be seen working.
+
+**Two fixture findings on the way.** `fixture_minimal.stages` carried four loose columns
+where production has a dozen with constraints — so `telegram_surface_test` had been
+creating stages production would refuse, and tightening the fixture caught it
+immediately. And `situations` is still looser than production (`parent_id`, `label_ar`,
+`window_start`, `window_end` are NOT NULL there). That one is recorded in the fixture and
+in `docs/what-is-missing.md` §7 rather than fixed quietly at the end of an unrelated
+change: it means moving ~25 raw inserts onto `commit_situation()`.
+
+---
+
+## 2026-08-06 · The setting that made ADAM answer blind
+
+The handover shipped, the database returned it correctly with the link — and parents
+still got the model's one-line deflection. The cause was one option on
+`M2 - Get Memory Snapshot`:
+
+    options.response.response.responseFormat = "text"
+
+With that set, n8n does not parse the JSON body. It puts the whole thing in a **string**
+under `data`. So `$json.handled` was `undefined`, the IF fell to false, and the model ran
+the turn it was supposed to never see.
+
+**And the same setting had been breaking two much bigger things, silently:**
+
+| Reader | What it asked for | What it got |
+|---|---|---|
+| `M2 - Build Paid Context` | `b.context`, `b.family_context`, `b.knowledge_level` | undefined — so **every reply was written with no knowledge of the family at all**, always falling back to «لا توجد ذاكرة مسجلة بعد» at level 0 |
+| `FA - Send Reply1` | `b.ask`, `b.ask_body` | undefined — the country question was never appended to a reply |
+
+`get_agent_bundle` was built precisely so the agent would stop answering strangers, and
+it has been returning the right answer to a node that could not read it. Personalisation
+— the thing the offer sells — was never reaching the model. That reframes the founder's
+standing complaint about reply quality: the prompt was not the only problem. The model
+was working blind.
+
+Fixed by clearing the option, and by making all four readers unwrap `data` when it is a
+string, so flipping one dropdown can never again break three features without a word.
+
+**The lesson, and it is the same one twice this week:** every layer reported success. The
+function returned correct JSON. The node returned HTTP 200. The IF evaluated without
+error. The reply sent. Nothing anywhere was red. Only reading an actual execution showed
+it — which is why «حل كامل» has to mean *verified in a live execution*, not *applied and
+green offline*.
+
+---
+
+## 2026-08-06 · «هل انت مجاني» is the same question
+
+Three messages, one turn apart: «بخصوص المرافقة الكاملة» caught, «بكم الاشتراك» caught,
+«هل انت مجاني» **not** caught — it carries no word about a price, a subscription or
+paying, so it reached the model.
+
+It is the same question. A parent asking whether ADAM is free is asking what they get for
+nothing and what costs money.
+
+**And the answer was the wrong shape, not only missing.** «هذا يتولّاه فريق آدم» in
+response to «هل انت مجاني» is close to a refusal: they asked whether they owe anything
+and ADAM declined to say. He *can* answer that half — what is free is the relationship he
+is in, not a commercial term he lacks facts for. So the moment now answers first and
+hands over second:
+
+    🌿 كل ما بيننا الآن مجاني، ويبقى مجانياً.        ← he knows this
+    🤝 وهناك مرافقة كاملة… يتولّاها فريق آدم وحده     ← he does not
+
+One moment serves all three messages, and every one of them ends with the link.
+
+`تدفع` and `فلوس` were **not** added, and that is the discipline of this list in two
+words: «تدفعه للنوم بالقوة» is a parent pushing a child, and «يطلب فلوس كل يوم للمدرسة»
+is pocket money. Both are now false-positive cases in the suite.
+
+---
+
+## 2026-08-06 · A question for فريق آدم is not a question for آدم
+
+A parent asked «اريد ان اعرف بخصوص المرافقة الكاملة». The model answered at length, and
+invented this:
+
+> «وسيتواصلون معكم لتوضيح كل شيء قريباً»
+
+Nobody was going to contact them. Nothing schedules that and no human was told. The
+reply also carried no link — so a parent who had raised their own hand was left with a
+promise that will not arrive and no way to act. That is the worst possible outcome on
+the one turn that matters commercially.
+
+**The prompt could not have fixed this.** It already forbids quoting a price, and the
+model obeyed that. The failure was not vocabulary: it was a model answering a question
+it has no facts for, and filling the gap the way models do. So the fix is to stop
+asking it. `is_team_question()` recognises the shape and the reply becomes a fixed
+moment with the فريق آدم button on it. The model never sees the turn.
+
+**And the prompt got shorter, not longer** — the founder's constraint, and the right
+one. The worked example teaching the model how to answer «كم يكلّف هذا؟» is deleted,
+because that turn no longer reaches it, and the prohibition is now one sentence that
+also forbids the specific thing that went wrong: «ولا تعد بأن أحداً سيتّصل». Net −127
+characters.
+
+**Precision over reach, deliberately.** The two errors are not symmetrical: a missed
+phrasing costs one ordinary reply, a false positive hands a sales card to a parent
+telling us their child hit their brother. So the dangerous near-misses are excluded and
+sit in the test file as cases:
+
+| Excluded | Because |
+|---|---|
+| `بكم` | «أهلاً بكم» — `بكام` is kept |
+| `شحال` · `قداش` | «شحال من مرة قلت له» is a count — `بشحال` · `بقداش` are kept |
+| `الدفع` | «الدفع بينهم صار عادة» is pushing — `طريقة الدفع` is kept |
+| `رحلة` | a real journey to the grandmother's — `المرافقة الكاملة` is exact |
+
+**Ordering matters more than it looks.** The team check runs *before*
+`capture_intention`. «اشتراك» is short, carries no question mark and is one line — the
+capture would have taken it and written it into that parent's intention permanently, as
+who they hoped to be. There is a test for exactly that.
+
+**The branch generalised.** `intention_captured` became `handled` / `handled_reason` /
+`handled_body` / `handled_buttons`, so the bundle can answer a turn itself for more than
+one reason. The nodes are now `BD - Handled?` and `BD - Send Handled`, and the sender
+renders `url` buttons, so the handover carries a link rather than a wait.
+
+**The prompt doc had drifted from the node** — example order and three diacritics,
+because the node had been edited directly. A prompt doc that differs from the node is
+worse than no doc: it describes rules the model never sees. The doc now mirrors the live
+node byte for byte, and says so.
+
+**Tested:** 17 assertions in `team_question_test.sql`, all thirteen suites green.
+Verified live on production: «اريد ان اعرف بخصوص المرافقة الكاملة» and «بشحال؟» both
+return the handover with the link and «💬 نكمل مع أحمد»; «أحمد دفع أخاه اليوم» is
+untouched and still reaches the model.
+
+---
+
+## 2026-08-06 · One promise, one next step
+
+The offer stacked five reassurances — logged days, an extension, a refund,
+one-journey-at-a-time, and a vow of silence on an improving trend. Each was true.
+Together they read as a legal notice, and a parent skims a legal notice. Founder's
+call: **one guarantee**.
+
+    نتّفق قبل أن نبدأ على هدف واضح ترونه بأعينكم.
+    وإن لم نصل إليه في المدّة، أُكمل معكم نصف المدّة كاملةً مجاناً حتى نصل.
+
+**The refund left the design with it, and that cost nothing** — because it was never
+built. No function has ever written `stages.refunded_at`; the refund existed as a
+sentence in a column comment saying one "follows instead". A promise that lives only
+in a comment cannot be kept, so the comment is what went. `'refunded'` survives as a
+status an operator may set by hand — `can_propose_stage`, `get_telegram_surface` and
+the erasure view all read it. `erasure_requests.refund_due` is untouched: money back
+pro-rata when a parent erases everything mid-journey is a right, not a sales
+guarantee, and a different thing entirely.
+
+**٢٩ is now the engine's number, not an advert's.** `planned_logged_days` had no
+default at all, so the first stage فريق آدم started by hand would have hit a NOT NULL.
+It defaults to 29, and the column comment says the offer and the column move together.
+
+**The offer rebuilt on the value equation**, one section per term:
+
+| Term | What carries it |
+|---|---|
+| Outcome | a problem *they* name stops repeating — four named, so it is concrete before they imagine it |
+| Belief | the goal is agreed and observable **before** money moves; the guarantee; and «لا أعدكم بطفلٍ مثالي» — a smaller promise made honestly is believed more than a large one |
+| Wait | «خلال ٢٩ يوماً». Named and finite |
+| Effort | a minute or two a day, and «اليوم الذي لا تحتملونه لا يُحسب عليكم» |
+
+That last line is the honest edge of the ٢٩: the clock counts logged days, never
+calendar days. Said as a caveat it shrinks the offer; said as relief it grows it. Same
+fact either way — and that is where it now sits, in the effort section, not the
+guarantee.
+
+**Personalisation is the sale**, so it got its own section with the child's name in
+it, seven capabilities, one emoji each: the child row, yesterday's result feeding
+today's step, the counted repeats, the single evening question, `parent_strain`
+backing off, the §2.6 refusal to send anything generic, and erasure.
+
+**The buttons finally tell the truth.** ADAM is forbidden to say a price and does not
+know the terms — the agent prompt has said so since it was written. The old second
+button was «🤔 عندي سؤال قبل أن أقرّر» routed to ADAM, *who by design cannot answer
+it*: a dead end dressed as help, sitting on the conversion screen. Now:
+
+    📞 أتحدّث مع فريق آدم عن يوسف   → the humans, named, and the child named
+    🌿 ليس الآن — نكمل مجاناً       → new moment menu_not_now
+
+Declining had to become a real destination. If saying no costs a parent something, the
+safest move is never to open the offer at all. `menu_not_now` says the refusal was
+heard, restates that nothing was lost, and returns to the conversation in one line. The
+`menu_` prefix means the Router dispatches it with no code change. The same boundary is
+now stated in `menu_how`, where a parent reading about the method learns where the
+method stops.
+
+**Two test findings worth keeping.**
+
+*The escape-hatch rule was too literal.* `country_state` asserted every composed button
+set contains `cb='other'`. The offer's exit is «ليس الآن — نكمل مجاناً», which is a
+better exit than a generic one — it names what declining costs (nothing) — and it lands
+on a moment that itself offers `other`. The check now **follows the link** rather than
+matching a literal, which makes it stricter, not looser: a decline button pointing at a
+dead end now fails, where before it was merely absent.
+
+*A suite that is red for eight hours a day teaches people to ignore it.*
+`rhythm_gate` guarded its harvest block with `if hr >= 10` and no upper bound, but
+`get_rhythm_due` considers nobody outside `local_hour >= 7 and local_hour < 23` — ADAM
+is silent at night by design. Every night from 23:00 Algiers time the suite went red for
+the one reason that is not a bug. The guard now has its upper bound and the night branch
+asserts the quiet window instead of skipping it.
+
+**Tested:** 35 assertions in `offer_surface_test.sql`, all eleven suites green.
+`fixture_minimal` gained `planned_logged_days` and `extension_days` — the moment copy
+started promising what a column holds, the fixture had to hold it too. Applied to
+production and verified there: the Moroccan offer renders with «110 دراهم مغربية، لمدّة
+٢٩ يوماً», both buttons correct, and `menu_not_now` returns its own escape.
+
+---
+
+## 2026-08-05 · The offer sells the result, and stops underselling the product
+
+Three faults on the one screen where a parent decides whether to pay.
+
+**Bold that was never bold.** Nothing in this product sends with a `parse_mode`, so
+every `**عنوان**` reached the parent as literal asterisks — on `/faq`, `/how`, `/why`
+and the offer itself. Removed everywhere, and a CHECK constraint
+(`chk_body_no_dead_markup`) now refuses the next one. Deliberately a constraint on
+stored copy rather than a new `copy_violations()` rule: that function also gates what
+the model writes at send time, and an LLM reaching for markdown would start costing
+real sends. The bug was in copy we wrote, so the guard sits exactly there.
+
+**The offer described the machinery.** A parent at 10pm is not buying a method; they
+are buying the end of a night that keeps coming back. Rewritten around that: what the
+free side already gives and that it is permanent, then the enemy named
+(«ترجع الأسبوع القادم، وبعده، وبعده»), then how we get there — including the fourth
+step, which is the whole differentiator: «ثم أتراجع أنا عمداً… لا أريدكم أن تحتاجوني
+بعد شهر».
+
+**And we had been underselling it.** The journey engine already implements three
+promises the offer never mentioned, each one a column, not a claim:
+
+| The line the parent reads | What enforces it |
+|---|---|
+| «الأيام تُحسب حين تكونون معي، لا حين يمرّ التقويم» | `v_stage_progress.logged_days` counts logged days, never calendar days |
+| «أُكمل معكم نصفها كاملاً، مجاناً، وبلا أن تطلبوا» | `stages.extension_days` — the column comment says *unrequested* |
+| «ولم نصل بعدها؟ يرجع مالكم» | `stages.refunded_at`; a second extension is never granted |
+| «رحلة واحدة في المرّة» | `uq_one_live_stage_per_parent` |
+| «وإن رأيت الأمور تتحسّن عندكم، أصمت» | `can_propose_stage` → `trend_improving` |
+
+The last two are refusals, and they buy more trust than any claim precisely because
+they cost us money. They were free to say — they were already true.
+
+**The call to action is a button now.** `get_conversation_moment` may emit a button
+carrying `url` instead of `cb`, and `Tap - Send Fixed` renders it as a Telegram link
+button. The label carries the child's name when we know it — «💚 نبدأ رحلة يوسف» is a
+decision about one child; a bare `t.me` address in the message body was not. Ordered
+carefully: the sender shipped and was published *before* the migration, because the
+reverse order would have sent a button with `callback_data: undefined` and Telegram
+would have rejected the whole offer.
+
+**The command list has its emoji.** Written by `setMyCommands` from a new one-shot
+workflow (`ADAM · Bot Commands`, `Wlc3VSq3YYmZZdZj`, manual trigger, never scheduled)
+because api.telegram.org is not reachable from this session's proxy. Both calls
+returned `ok:true`. The word «القائمة» beside the input box is Telegram's own
+localisation of "Menu" for a `commands`-type menu button — the Bot API exposes no text
+field for it, so that one is not ours to move.
+
+**Tested:** 22 new assertions in `offer_surface_test.sql`, which pins each promise to
+its schema counterpart so the offer cannot quietly shrink back to the modest version.
+Regressions clean across all eleven suites. Two `country_state` assertions were
+rewritten: they pinned the old implementation («no buttons at all», «the body contains
+the t.me address») rather than the rule, which was always *فريق آدم is the only next
+step and nothing in the bot takes money*. A third was passing vacuously —
+`position(a) < position(b)` is true whenever `a` is missing, so a copy rewrite had
+silently turned it into a test of nothing; both needles are now asserted present first.
+
+---
+
+## 2026-08-05 · The answer is kept
+
+ADAM asked the one question the whole promise hangs on — «أيّ أب أو أمّ تمنّيتم أن
+تكونوا له؟» — and threw the answer away. `record_intention()` had existed, tested,
+since `give_before_asking`, called from nowhere. Without that sentence stored,
+«تقتربون ممّن أردتم أن تكونوا له» has no referent: the Mirror's closing line is a
+promise about a thing the database does not hold.
+
+Worse than missing: the parent typed the most personal sentence they will ever type
+into this product and got an ordinary conversational reply, as if it were small talk
+about bedtime.
+
+**The ask now says how to answer.** It had no buttons by design — an intention cannot
+be picked from a list — but it also never said that typing was the move. A buttonless
+message with no instruction reads as an announcement, and an announcement gets no
+reply. Third line added: «اكتبوها بكلماتكم الآن، سطر واحد يكفي.»
+
+**And the answer gets an answer.** New `intention_kept`, the one moment ADAM replies
+to a typed message with fixed copy. Not a receipt — a parent who has just written who
+they hoped to be does not need «تم الحفظ». It says what the sentence is *for*:
+
+    🌱 هذه الجملة تكفي، ولن أسألكم عنها ثانية.
+
+    لن أطلب منكم أن تصيروها هذه الليلة.
+    لكن في كلّ مرّة يهدأ شيء، سأريكم أنّكم اقتربتم منها خطوة.
+
+**Most of the work is refusing to capture.** `intention_text` is written once and never
+overwritten, so a wrong capture is permanent. `capture_intention()` holds every guard in
+one place — not awaiting, more than 36h after the ask, under 3 characters, over 240,
+starts with `/`, ends with `؟` or `?`, more than three lines — and anything it declines
+writes nothing and falls through to the ordinary reply. `كيف يعني؟` is the case that
+mattered: the most likely reply to a question a parent did not expect, and the one a
+naive capture would have frozen into their identity forever.
+
+**No new authenticated node.** `supabase/tests/README.md` states why the count cannot go
+up. `get_agent_bundle` gained a second argument and now performs the capture on the call
+`M2 - Get Memory Snapshot` was already making; two credential-free nodes — `IN - Kept?`
+(IF) and `IN - Send Kept` (Telegram, token in URL like every other sender) — do the
+branching. Two arities, no default: a default makes the one-argument call ambiguous and
+would have broken the live node between apply and publish, so `get_agent_bundle(uuid)`
+survives as a thin forward.
+
+`M2 - Get Memory Snapshot` also gained `onError: continueRegularOutput`. It sits on every
+free and paid message, and until today a failure there took the whole reply with it. Now
+a failed bundle degrades to «لا توجد ذاكرة مسجلة بعد» and `intention_captured` reads
+false — the parent still gets answered.
+
+**Tested:** 29 new assertions in `intention_capture_test.sql`, offline, with a separate
+parent per guard so a capture in one case cannot make the next pass for the wrong reason.
+Regressions clean: conversation_law 27/27, knowledge_gate 25/25, one_send 35/35,
+give_before_asking 29/29, country_state 71/71, agent_gate 27/27, agent_bundle 19/19,
+composed_gate 32/32, rhythm_gate 7/7, telegram_surface 21/21. Applied to production and
+verified there on a disposable parent: `كيف يعني؟` → not captured, nothing stored;
+`أب هادئ، يسمع قبل ما يحكم` → captured, stored verbatim, `intention_kept` returned with
+its escape button, country ask not spent; the next message → ordinary bundle, 217-character
+context. W1 published.
+
+**One stale assertion fixed on the way.** `give_before_asking` had `/progress opens with
+what THEY did` pinned to `like 'هذا الأسبوع: جرّبتم%'` — a prefix that stopped being the
+prefix when `no_message_assumes_you_know_adam` added the «📊 رحلتكم مع» heading. Same
+class as the three `one_send` assertions fixed two days ago: the copy rewrite was right,
+the test was pinned to wording instead of to what it was defending.
+
+**And a trap in the test harness itself.** `composed_reply_gate` was missing from the
+README's migration chain. Appending it at the end — where a reader naturally appends —
+silently reverted four later migrations and turned 32 green assertions into 24 red ones
+that looked exactly like a broken change. The chain is now complete and ordered by
+timestamp, with the trap written down next to it.
+
+---
+
+## 2026-08-05 · A soft funnel, from the first tap to the payment link
+
+`/faq` was a single 34-line wall. A document, not a journey: the parent either
+reads all of it or none of it, and either way reaches the offer only by accident.
+
+Now four stops, each short, each ending in a button that opens the next:
+
+    ١. 🌿 ما هو آدم؟        the hook + the result, in three lines
+    ٢. ⚙️ كيف يشتغل؟         the method, and the time it costs
+    ٣. ✨ ما الذي يميّزه؟     personalisation — the whole sale
+    ٤. 🎯 المرافقة والسعر    the offer and the فريق آدم link
+
+`first_contact` had no buttons at all — the very first message a parent ever
+sees was a dead end. It now opens the funnel: «🌿 ما هو آدم؟».
+
+**Why personalisation is the sale.** The Arab parent has already tried videos,
+articles and advice from every direction, and most of it did not work. Not
+because it was bad — because it was about *children*, not about *their* child.
+That is the sentence that sells, and it is the one thing a video or a general
+assistant cannot claim: to know the name, remember what was tried, and count
+what recurs.
+
+Every ✅ claim maps to something actually built, and nothing is inflated:
+
+| الادّعاء | ما يسنده |
+|---|---|
+| يعرف طفلكم بالاسم وأصعب لحظة عنده | `children` · `situations` |
+| يتذكّر ما جرّبتموه وما نفع | `daily_logs.step_given` / `step_status` |
+| يعدّ ما يتكرّر — «هذه ثالث مرة» | `get_harvest_prompt` |
+| يسأل عن النتيجة ويتعلّم | الحصاد المسائي |
+
+**Objection handling is placed where the objection appears**, not collected at
+the end: step 2 answers "how much of my time does this cost" (دقيقة في اليوم)
+before it is asked, because that is the silent objection at exactly that point.
+
+Emojis are used as section markers, not decoration — headings, the four numbered
+steps, and the ✅ feature list — so the surface scans like an app rather than a
+letter.
+
+Routing lesson applied from yesterday: every new key is `menu_`-prefixed so the
+Router's generic rule dispatches it with no code change, and the routing test
+added yesterday confirms all funnel buttons are live — `every_button_routes`
+PASS, `menu_callbacks_have_moments` PASS.
+
+Tests: conversation_law 27/27 + both routing assertions, one_send 35/35,
+knowledge_gate 25/25, country_state 71/71, composed_gate 32/32.
+
+---
+
+## 2026-08-04 · Seven dead buttons, and the method the FAQ never explained
+
+Third founder review, on a live session. He tapped «امحوا كل ما قلته» and was
+answered «لم أفهم هذه تماماً». Same for «أوقفوا الرسالة اليومية». Not a copy
+defect — **dead buttons**.
+
+**The evidence, not a guess.** Searched all 262,000 characters of the workflow
+JSON: `quiet_hours`, `pause`, `erase`, `resume_tomorrow`, `stay_paused`,
+`review_yes`, `review_stay` appear **zero times**. The Router's dispatch ends
+with `else { route = 'menu_tap'; cbdata = 'rescue'; }`, so every one of them
+fell to the rescue. Seven buttons promised an action and delivered an apology.
+Pre-existing — my better labels only made them more inviting to press.
+
+**Fixed without touching the Router.** It already has a generic rule —
+`else if (cbdata.indexOf('menu_') === 0) route = 'menu_tap'` — which dispatches
+any `menu_`-prefixed callback verbatim as the moment key. Naming the new
+callbacks accordingly makes them live with a **database change alone**, instead
+of hand-editing a 7,000-character Code node, which would be the riskiest
+possible way to fix a copy bug. `review_yes`/`review_stay` needed no new moments
+at all: they now point at `menu_journey` and `menu_open_question`, both always
+routable.
+
+`get_moment_after_tap` becomes the one place a tap performs its action — the
+pattern it already used to record the country. The action runs **before** the
+moment is composed, so a confirmation can never describe something that did not
+happen. Verified end to end against production with a disposable parent:
+
+    الوقت → لا فعل · صباحاً → local_hour=8 · قبل النوم → local_hour=21
+    إيقاف → cadence=stopped · إعادة → cadence=nightly
+    طلب المحو → لا فعل، الوالد باقٍ · تأكيد المحو → 0 صفوف
+
+**Erasure is two taps now.** The old copy promised «بضغطة واحدة وبلا أسئلة» — a
+one-tap irreversible delete of the parent row. "No questions asked" stays true
+(we never ask why), but the act is confirmed once so a misplaced thumb cannot
+erase a family. After erasure the moment is composed with a null id, because
+the parent row no longer exists.
+
+**A test that would have caught it.** `conversation_law_test.sql` now asserts
+that every button callback in the table is routable by the Router's actual
+rules, and that every `menu_`-prefixed callback has a moment. The copy law
+passed for weeks while the product was broken because nothing tested routing.
+
+**The FAQ still described the machine.** Added «كيف نصل إلى ذلك؟» — the method
+in four steps, each starting with the parent, ending at "after three times I
+show you the situation that repeats in your house and what calms your child" —
+plus «كم يأخذ منّي هذا؟» (a minute a day) and «هل ستصلني رسائل كثيرة؟», because
+a parent does not know ADAM sends anything at all, so «إيقاف الرسائل» read as a
+setting for a thing they had never been told about.
+
+**Why the founder never saw the new commercial copy.** His own test account
+carried `strain_level = 2`, set by W2's classifier during his earlier probing
+(«انت خطر»). `commerce_allowed` was false, so `menu_journey` was correctly
+suppressed and `/journey` fell to `menu_journey_presence` every time. Correct
+product behaviour, invisible cause. Reset to 1 on his account only, and
+`/journey` now renders the full offer with the price.
+
+Tests: conversation_law 29/29 (two new), one_send 35/35, knowledge_gate 25/25,
+country_state 71/71, composed_gate 32/32.
+
+---
+
+## 2026-08-04 · The copy stops describing the machine, and the prompt stops being a rulebook
+
+Founder review of a live Telegram session: the replies are weak, the button copy is poor, there is no
+clear line between free and paid, and nothing anywhere gives a parent a reason to want the paid thing.
+All four were true. **All four were already answered in the brand bible — the product simply never
+carried the answers.**
+
+**«المجاني: أن تكون القصة أخفّ. / المرافقة: ألّا تتكرّر القصة.»** is the sharpest sentence this product
+owns, decided in `adam-promise.md`, and it appeared in **zero** live strings. It is the entire answer to
+"what am I paying for", understood in one second without explanation. It now opens every commercial
+surface: `menu_journey`, `menu_faq`, `menu_journey_presence`.
+
+**«شيء آخر» — nine times, meaning nothing.** `chk_escape_hatch` requires a button whose *callback* is
+`other`; it says nothing about the *label*. Every escape hatch shipped with the same placeholder, so a
+parent who does not know ADAM read nine dead ends. The constraint was never the cause — laziness was.
+Each label is now written for its context («عندي موقف آخر» · «عندي سؤال آخر» · «صار شيء آخر» ·
+«أفضّل ألّا أقول»). Zero dead-end buttons remain, verified by query.
+
+**The command that sells could not be named.** Verified against production `copy_violations()`: the
+literal string `/journey` is blocked as `internal:latin`. So the one command reaching the paid offer was
+unwritable in stored copy — the FAQ literally could not tell a parent where to go, and that is a hard
+conversion blocker nobody had noticed. Fixed without loosening the rule: a **button** carrying
+`cta_full_companion`, which the Router already maps to `menu_journey`. No typing, no hunting, lexicon
+still banned.
+
+**The evening buttons blamed the parent.** «ما صارت الفرصة» makes an exhausted parent report in the
+language of a missed obligation, and an unanswered demand from an app produces guilt — which ends
+subscriptions before they start. Now «اليوم كان أثقل»: same fact, none of the blame. And «نجحت» became
+«مرّ أهدأ», because `parent_effort()` exists precisely so the score is about the parent, not a verdict on
+the step.
+
+**Also corrected:** `menu_journey` said «ليالٍ أهدأ». `adam-promise.md` names night-shaped vocabulary as
+the sleep-product leak that tells a morning-battle parent this is not for them — one sentence that loses
+them. Now «الموقف», domain-neutral by design.
+
+### The system prompt — a compliance document became a character
+
+The replies were cold because of the prompt's *architecture*, not the model. ~60% of it was prohibitions;
+under heavy negative constraint a model optimises for the shortest output that violates nothing.
+«قاعدتك الأولى: أقلّ كلاماً» led the document, anchoring brevity above warmth. And there were almost no
+worked examples — while W3's seed prompt has three and is visibly warmer for it.
+
+Rewritten around: a success criterion first (*that the parent feels someone knows their house in
+particular, and that they are not alone*), **four worked exchanges** (guilt disclosure, collapse,
+recurrence, the price question), and an explicit split the founder asked for by name — **defaults that
+bend for the parent** (length, opening, shape, whether to give a step at all; *"the default is two or
+three lines; if their moment needs five, give five… do not cut until it goes cold"*) versus **lines never
+crossed**. The commercial bans were deliberately left firm: `gate_agent_reply` *blocks* a reply that
+breaks them, so loosening them buys more blocking, not more warmth. Full text and rationale now live in
+`docs/prompts/adam-conversation-agent.md`, which is the source of truth; the node is pushed from it.
+
+Every string was checked against production's own `copy_violations()` and `content_line_count()` **before**
+the migration was written. Applied and published; `conversation_law` 27/27, `knowledge_gate` 25/25,
+`country_state` 71/71, `one_send` 34/34 clean.
+
+---
+
+## 2026-08-04 · The Mirror carries the intention forward — as a flag, never a quote
+
+`intention_text` (`give_before_asking` migration) has been write-only since it shipped: asked, stored,
+read by nothing. The Mirror — the one surface built to show a parent evidence of their own change — is
+where §10 item 4 always meant it to surface.
+
+**Why a flag, not the text.** `intention_text` is free text an exhausted parent typed once, and
+`record_intention()` only ever *wrote* it — it never had to be safe to *send*. Every other proactive
+message in this product passes `gate_agent_reply` or `gate_composed_reply` before a parent sees it.
+Piping `intention_text` into a Mirror payload that an LLM (or template) then echoes would quietly skip
+that entire discipline for exactly the kind of text most likely to be personal, mistyped, or unsafe to
+repeat back verbatim. So `generate_first_mirror` now emits `has_intention: boolean` only. The sentence
+the Mirror should actually say is fixed, pre-approved copy that shows *approach* without quoting her —
+`وتقتربون، خطوة بخطوة، ممّن أردتم أن تكونوا له.` — verified clean against production's own
+`copy_violations()`. Documented here rather than wired into a render step because **W4 (First Mirror
+Sender, `pj19WNHEqU4xDDjy`) is currently archived** — the payload is ready; there is no live workflow to
+carry the line yet.
+
+**Why the first Mirror, with no repetition guard needed.** `generate_first_mirror` is the only
+implemented Mirror kind — `weekly`, `stage_report`, and `parent` (the "identity payoff" kind that would
+be the more natural semantic home for this) are declared in the `mirrors.kind` CHECK constraint and
+never built. `uq_one_first_mirror_per_child` already guarantees the first Mirror fires at most once per
+child, so a fixed intention line here can never repeat to the same family without any new guard.
+
+**This engine had zero test coverage before today** — a live, revenue/retention-adjacent function with
+no assertions at all. New `supabase/tests/mirror_engine_test.sql` (10/10 passing) covers the pre-existing
+behavior it had never had tested (not-due-before-3-nights, generates-once, crisis suppression) alongside
+the new flag, including an explicit leak check: the parent's literal words are asserted absent from the
+payload's serialized text. `supabase/tests/fixture_mirror.sql` stubs `v_child_record`/`crisis_flags` —
+the real ones sit behind the journey_engine/child_record chain, which assumes columns
+(`stages.started_at`, `stages.created_at`) that predate this repo's migration history and cannot be
+reproduced from a blank fixture, the same constraint noted for `give_before_asking_test.sql`'s
+`ar_occasions` gap.
+
+**Also found while investigating where this consumer would even deliver:** W2 (Knowledge Writer) and W3
+(Rhythm Sender) are both currently `active: false` with `activeVersionId: null` — not merely paused, no
+published version exists to run. Confirmed with the founder: **deliberate**, to control cost while ADAM
+is pre-launch with no real users and known copywriting/UX gaps still being found through his own manual
+testing. Not a bug; left untouched. Recorded so a future session doesn't "fix" it.
+
+---
+
 ## 2026-08-04 · The offer moment — the fork, presented once, on the harvest
 
 `offer_ready()` (§10.5, the conversion moment) was built and tested and called from nowhere. Wired it

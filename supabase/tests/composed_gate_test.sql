@@ -12,7 +12,11 @@ declare p uuid; c uuid; g jsonb; ctx jsonb; i int;
 begin
   insert into public.followers (platform_user_id, country) values ('hg-1','DZ') returning id into p;
   insert into public.children (follower_id, name, is_primary) values (p,'يوسف',true) returning id into c;
-  insert into public.situations (child_id,key,status,evidence_count) values (c,'sleep','confirmed',4);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 4, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   for i in 1..5 loop
     insert into public.daily_logs (follower_id, log_date, night_result, step_status, step_given)
     values (p, current_date - i, case when i<=3 then 'calm' else 'hard' end, 'done', 'تنبيه قبل الانتقال');
@@ -84,8 +88,14 @@ begin
   begin
     insert into public.followers (platform_user_id, country) values ('hg-3','MA') returning id into p3;
     insert into public.children (follower_id, name, is_primary) values (p3,'ريان',true) returning id into c;
-    s3 := c;
-    insert into public.situations (child_id,key,status,evidence_count) values (s3,'sleep','confirmed',4);
+    -- s3 is the SITUATION, not the child — same fix as s4 and s5 below.
+    insert into public.situations (child_id, parent_id, key, label_ar, status,
+                                   evidence_count, window_start, window_end)
+    select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 4,
+           sc.window_start, sc.window_end
+      from public.children ch, public.situation_catalog sc
+     where ch.id = c and sc.key = 'sleep'
+    returning id into s3;
 
     ctx3 := public.get_harvest_context(p3, 'ok');
     perform pg_temp.chk('no ask before anything has worked — night one is not the moment',
@@ -121,8 +131,14 @@ begin
   begin
     insert into public.followers (platform_user_id, country) values ('hg-4','DZ') returning id into p4;
     insert into public.children (follower_id, name, is_primary) values (p4,'يوسف',true) returning id into c;
-    s4 := c;
-    insert into public.situations (child_id,key,status,evidence_count) values (s4,'sleep','confirmed',4);
+    -- s4 is the SITUATION, not the child — same fix as s5 below.
+    insert into public.situations (child_id, parent_id, key, label_ar, status,
+                                   evidence_count, window_start, window_end)
+    select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 4,
+           sc.window_start, sc.window_end
+      from public.children ch, public.situation_catalog sc
+     where ch.id = c and sc.key = 'sleep'
+    returning id into s4;
 
     -- All the evidence at once, without ever composing a harvest in between,
     -- so this parent is BOTH offer-ready and intention-due on the same night.
@@ -162,8 +178,17 @@ begin
   begin
     insert into public.followers (platform_user_id, country) values ('hg-5','DZ') returning id into p5;
     insert into public.children (follower_id, name, is_primary) values (p5,'مالك',true) returning id into c;
-    s5 := c;
-    insert into public.situations (child_id,key,status,evidence_count) values (s5,'sleep','confirmed',4);
+    -- s5 is the SITUATION, not the child. It used to be assigned the child's id
+    -- and then passed as daily_logs.situation_id; the fixture carried no foreign
+    -- key, so three nights pointed at a situation that did not exist and every
+    -- assertion here still passed.
+    insert into public.situations (child_id, parent_id, key, label_ar, status,
+                                   evidence_count, window_start, window_end)
+    select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 4,
+           sc.window_start, sc.window_end
+      from public.children ch, public.situation_catalog sc
+     where ch.id = c and sc.key = 'sleep'
+    returning id into s5;
     insert into public.daily_logs (follower_id, log_date, night_result, situation_id) values
       (p5, current_date - 2, 'calm', s5),
       (p5, current_date - 1, 'calm', s5),

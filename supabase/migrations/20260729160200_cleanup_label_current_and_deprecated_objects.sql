@@ -127,8 +127,20 @@ comment on function public.return_to_free(uuid) is
   'app/actions/activate.ts. Resets the legacy funnel columns; it does not touch '
   'payments or conversations.';
 
-comment on function public.activate_subscription(uuid, integer, numeric, text, text) is
-  'CURRENT. Manual payment activation from the dashboard. Payment collection is '
-  'manual by design — there is no payment processor.';
+-- The five-argument activate_subscription predates this repository and is not
+-- created by any migration in it, so a rebuild never has it to comment on.
+-- Guarded rather than retargeted at the ten-argument version, because the two
+-- are NOT the same function: 20260807090000 added an overload that starts a
+-- journey, and left this one — the one the dashboard actually calls — starting
+-- nothing. Both exist in production today. See docs/what-is-missing.md §3.
+do $label$
+begin
+  if to_regprocedure('public.activate_subscription(uuid, integer, numeric, text, text)') is not null then
+    execute $c$comment on function public.activate_subscription(uuid, integer, numeric, text, text) is
+      'DEPRECATED. Manual payment activation from the dashboard, from before the '
+      'journey engine existed: it moves the funnel columns and starts no stage. '
+      'The ten-argument overload is the one that starts a journey.'$c$;
+  end if;
+end $label$;
 
 commit;

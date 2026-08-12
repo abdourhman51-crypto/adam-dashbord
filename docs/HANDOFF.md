@@ -2,6 +2,185 @@
 
 One file, so a new session does not replay the old one. Everything below is verified, not remembered.
 
+## Latest — 2026-08-12 (start here)
+
+Where we stopped, newest first. Read this block, then the rest as needed.
+
+- **2026-08-12 — the ADAM Contract + Paid Snapshot v1 are DEPLOYED to production.**
+  `set_checkin_hour`, `get_agent_context`, `get_agent_bundle`,
+  `gate_grounded_reply` (new), `gate_agent_reply`, `stage_state`,
+  `capture_stage_baseline` (new), `record_harvest_answer` — five migrations
+  (`the_hour_picker_writes_a_real_cadence`,
+  `adam_receives_the_journey`,
+  `knowledge_level_becomes_an_enforced_moveset`,
+  `the_grounding_gate`,
+  `the_baseline_is_written_once`), applied in that order, live now. This is
+  the same SQL that had been sitting staged since 2026-08-11, plus the new
+  Paid Snapshot v1 baseline (`docs/adam-snapshot-value-test.md`) built and
+  reviewed on 2026-08-12.
+  - **Why this deployed today and not in isolation:** the new baseline
+    migration extends `get_agent_context`'s `JOURNEY` block, which did not
+    exist on production before today — deploying it alone would have
+    silently activated the undeployed 2026-08-11 JOURNEY/knowledge-level/
+    grounding-gate set as a side effect, half-paired with nothing. Caught
+    before deploying (production's live function bodies were read directly
+    and compared, not assumed), the founder chose to bundle and transition-
+    test all five together rather than deploy either alone.
+  - **Verification before deploy:** all five migrations' DDL, plus a smoke
+    suite, were run against real production **inside a transaction that was
+    rolled back** (`begin; ... rollback;`) — a full dry-run of the actual
+    transition, not an offline copy. 13/13 smoke checks passed; zero
+    residual rows confirmed after rollback.
+  - **Then deployed for real** via five `apply_migration` calls, and
+    **re-verified live** with a second synthetic-parent smoke test against
+    the now-actually-updated functions (4/4 passed): price/vocabulary gate
+    unchanged, the grounding gate blocks a real memory claim, a real paid
+    journey (through `record_seed_sent`/`record_harvest_sent`/
+    `record_harvest_answer`) shows `== JOURNEY ==` and the new
+    `- baseline:` line in `get_agent_context`, and `get_agent_bundle` carries
+    `in_journey`/`allowed_moves`/the phase directive. Zero residual test
+    data confirmed again after.
+  - **What's now live that wasn't yesterday:** `gate_grounded_reply`
+    (memory-claim / past-reference / unfounded-repetition blocking, merged
+    into `gate_agent_reply` — zero n8n change needed, W1 already calls
+    `gate_agent_reply`); `get_agent_context`'s `JOURNEY` block for paid
+    parents in a live stage; `get_agent_bundle`'s `allowed_moves`,
+    `in_journey`, and phase directive (silent in `hold`); and the Paid
+    Snapshot v1 — one deterministic, no-LLM baseline sentence written once
+    per stage, shown only when the live data is strictly better than where
+    the stage started.
+  - **Not touched:** n8n — no workflow, no node, was created or modified.
+    W2/W3/W4 remain exactly as before (W2/W3 `active: false`). The prompt
+    file changes and the memory-contamination fix from earlier on
+    2026-08-12 are still **not** pushed to the live n8n node — only SQL
+    moved today.
+  - **Still zero paid users, zero live stages** in production as of this
+    write — the deployed code is exercised the first time a real journey
+    starts, not before.
+
+- **2026-08-12 — ADAM built to `docs/adam-constitution.md`, staged, not deployed (superseded above — now live).**
+  Three files changed, nothing pushed to production or n8n:
+  - `docs/prompts/adam-conversation-agent.md` — five small additive edits inside
+    existing sections: the exact governing sentence ("عندما تقلّ الأدلة، تقلّ
+    درجة التحديد؛ لا يزيد الاختراع"), `[الرحلة]` directives stated as binding
+    (hold-phase refusal holds even under direct pressure; a paid parent's own
+    progress question is answered from `[الرحلة]`, never deflected, never a
+    day-count), a no-diagnosis line, a no-pretend-action line, a
+    single-topic-per-reply line. Still not pushed to the live `paid aget adam`
+    node — the file's own header tracks the byte-diff status.
+  - `supabase/tests/grounded_reply_test.sql` — extended from 31 to 42
+    assertions: knowledge levels 1/2/4 (previously only 0 and 3 were covered),
+    and the `build` phase directive (previously only `observe`/`hold`), closing
+    the exact gap the Constitution's Knowledge Levels table and Journey
+    Awareness section both specify.
+  - `docs/workflows/fix-paid-memory-contamination.md` — new. Confirmed by
+    reading the live `paid aget adam` node directly (not inferred): its `text`
+    parameter concatenates `family_context` into what
+    `Postgres Memory Paid` persists as the "human" turn, so the last 10
+    messages replay the system's own scaffolding back to the model labelled as
+    the parent's voice (Conflict 2, `adam-constitution.md`). The fix is two
+    parameter edits to one existing node — `text` becomes `message_text` alone,
+    `family_context` moves to a dynamic `systemMessage` expression instead (not
+    memorized, still fresh every turn) — fully specified, **not applied**;
+    `update_workflow` was never called.
+  - Full suite re-run after all changes: **783/783 passed, 0 regressions**
+    (30 test files, throwaway local Postgres, all 88 migrations applied in
+    order including the three staged 2026-08-11 ADAM-contract migrations,
+    unchanged and still undeployed).
+  - `gate_grounded_reply` was deliberately **not** touched or widened, per the
+    Constitution's Part 3 order-of-defence conclusion — it stays the narrow
+    last line, not the primary fix.
+- **2026-08-11 — the W3 journey-step branch is SPECIFIED, not wired.**
+  `docs/workflows/w3-journey-step-branch.md`. W3 (`Vb4ADCkPsevPRWRN`) stays
+  `active: false` — nothing was touched in n8n. Today `Seed Or Harvest`'s switch
+  has only two rules (seed/harvest) and no fallback, so an `action='journey_step'`
+  row from `get_rhythm_due` is silently dropped — that is the entire remaining
+  gap, now precisely specified as four new nodes: a third switch rule, `Compose
+  Journey Step` (fans out from the existing `Seed Model` — no new AI credential),
+  `Send Journey Step` (clones `Send Seed`'s literal Telegram URL — no credential
+  at all), and `Record Journey Step Sent` (reuses `record_seed_sent` — no new SQL
+  — with the one real gotcha spelled out: `p_grounded_on` must be a non-empty
+  array built from `compose_journey_step`'s object shape, not passed through
+  raw, or the call raises `seed_not_grounded`). Applying it needs the same manual
+  `adam Supabase` credential attach every other new credentialed node has needed.
+  With this applied and W3 turned on, the free→paid→daily-plan flow is complete
+  end to end.
+- **2026-08-11 — the rhythm routes the journey step** (`get_rhythm_due`,
+  `20260811150000`). When the morning give would be a `seed` and the parent has a
+  live stage, it becomes `journey_step`, grounded by `compose_journey_step` and
+  gated by its `can_send` (no outcome → silent, not a fallback seed). Free parents
+  unaffected. **Deployed to production 2026-08-11 and smoke-verified live**
+  (free→seed+footer, journey→journey_step, rolled back). A safety check before
+  deploy caught a pre-existing repo↔production drift: production's `get_rhythm_due`
+  had already moved to the owes_exit model (`followers.proactive_footer_at`, the
+  footer carried by the next proactive of any kind — seed OR harvest) but the repo
+  never updated the function, only the column. The migration was rebased onto the
+  live owes_exit body so deploy did not revert it, which also realigned the repo;
+  `rhythm_gate_test` #12 was corrected from the superseded semantics (now 15/15).
+  **Remaining: W3's journey_step branch** (compose + send + stamp seed_sent_at so
+  the evening harvest still fires) — W3 stays paused until launch. With that, the
+  whole free→paid→daily-plan flow is DB-complete and deployed; only the paused
+  delivery workflow is left.
+- **2026-08-11 — the daily plan composer is BUILT** (`compose_journey_step`,
+  `20260811140000`, 16 assertions). The paid journey's «مخصّص» daily step: a
+  facts+posture function (the sibling of `get_harvest_context`) that hands the
+  composer tonight's single step from the agreed objective, the phase
+  (observe→build→hold from `v_stage_progress`), the child's situation, and last
+  night's outcome. observe = change nothing / build = one step on what worked /
+  hold = ADAM fades. No fixed plans, no plan-authoring screen; the LLM writes the
+  language at send time under the copy law. **Not yet deployed to production**
+  (pure new read, zero risk). **Next:** route a live-journey parent to a
+  `journey_step` action in `get_rhythm_due` (step 4), then W3's branch — W3 stays
+  paused until launch.
+- **2026-08-11 — لحظة الاتفاق (the conversion moment) is BUILT.** The free→paid
+  hinge. Design: `docs/the-agreement-moment.md` + `docs/the-conversion-seam.md`.
+  Build: `supabase/migrations/20260811120000_the_agreement_moment.sql`,
+  `supabase/tests/agreement_moment_test.sql` (31 assertions). **Zero n8n change,
+  no engine turned on, no data collected** — the whole moment is in the database,
+  reached through the existing tap pipeline. When a ready parent taps «نشتغل عليه»
+  (or /journey), the door now opens onto the AGREEMENT — mirror + one falsifiable
+  goal + «نعم / المشكلة الأكبر شيء آخر» — before any price; «نعم» writes a
+  reversible receipt (`followers.agreed_objective`) and then shows the offer.
+  Strain, an existing journey, or missing evidence all fall straight through to
+  today's offer surface, unchanged. New fns: `should_agree_first`,
+  `compose_agreement_moment`, `agree_objective`; `get_moment_after_tap` copied
+  verbatim + two branches. `get_conversation_moment` was NOT touched.
+  The cashier's read side is built too (`20260811130000`): `activate_subscription`
+  called with no goal reads `agreed_objective`, starts the journey from it, and
+  consumes the receipt — an explicit goal still wins, and no-goal+no-receipt still
+  returns `objective_required`. 38 assertions in `agreement_moment_test.sql`, zero
+  regression across all suites.
+- **Working branch is now `claude/connect-language-gate-n8n-5cmia3`.** It was
+  fast-forwarded to contain everything on `claude/install-product-skills-ayvz5e`
+  plus the language-gate wiring. Commit and push there. (The older
+  `install-product-skills` branch is its ancestor — same history up to the gate work.)
+- **The language gate is wired and published.** `paid aget adam → Gate - Agent
+  Reply → FA - Send Reply1`. `Gate - Agent Reply` POSTs to `gate_agent_reply`;
+  `FA - Send Reply1` withholds and substitutes the `reply_withheld` copy when
+  `blocked === true`, else sends unchanged. Fails open (onError:
+  continueRegularOutput). Live in `ADAM - Machine 1+2`, active version `6b851201`.
+  Mirrors + full note: `docs/workflows/agent-reply-gate-wire.md`,
+  `W1-Gate-Agent-Reply.body.js`, `W1-FA-Send-Reply1.body.js`.
+- **The «بلد آخر» typed-country branch is live and confirmed.** Executions
+  6173–6178 all succeeded after publish; the old switch error (6172) was
+  pre-fix. An `Is Country Answer?` IF node routes `track === 'country_answer'`
+  to `Tap - Get Parent` before `M2 - Track Switch` (Switch V1 caps at 4 outputs,
+  which was the bug). Built on `capture_country_text` +
+  `20260807270000_the_other_country_branch.sql`.
+- **W1 is now 63 nodes** (not the 126 the table below still says — a big cleanup
+  happened; trust n8n, not the count here).
+- **One manual step still open for the founder:** attach the `adam Supabase`
+  credential (`EI2e62pg3bxhCSMJ`) to `Gate - Agent Reply` in the n8n UI. Until
+  then the gate is present but fails open — no enforcement, no regression. The
+  MCP tool cannot bind `supabaseApi` to an httpRequest node (confirmed again).
+- **Still deliberately paused:** W2/W3/W4. Do not re-activate without asking.
+  No data collection until launch — founder's standing rule.
+- **Full remaining pre-launch checklist:** `docs/what-is-missing.md`. The
+  running build record: `docs/IMPLEMENTATION_LOG.md`.
+- **Offline tests need no DB.** See the "Tests" section below; the test suite
+  now includes `country_branch_test.sql`, `after_arrival_test.sql`,
+  `adam_reading_test.sql`, `waitlist_test.sql`, `agent_gate_test.sql`.
+
 ## What ADAM is
 
 Read in this order, and only as far as you need:
@@ -20,10 +199,11 @@ Read in this order, and only as far as you need:
 |---|---|
 | Supabase | `aajqbmjasnbwwyvgrlzy` (Adam OS), Postgres 17.6 |
 | n8n | `adam-voices-n8n.hawiyat.cloud` |
-| **W1** Router + Agents | `42loY0bgUSwYmHFV` — 124 nodes, active |
-| **W2** Knowledge Writer | `7mTP12nVLS1Taokl` — 30 nodes, every 2h |
-| **W3** Rhythm Sender | `Vb4ADCkPsevPRWRN` — 11 nodes, hourly |
-| **W4** First Mirror | `pj19WNHEqU4xDDjy` |
+| **W1** Router + Agents | `42loY0bgUSwYmHFV` — 126 nodes, active |
+| **W2** Knowledge Writer | `7mTP12nVLS1Taokl` — 30 nodes, every 2h. **Paused** (`active:false`, `activeVersionId:null`) — founder-deliberate, to control cost pre-launch (2026-08-04). Do not re-activate without asking. |
+| **W3** Rhythm Sender | `Vb4ADCkPsevPRWRN` — 11 nodes, hourly. **Paused**, same reason as W2. No seed/harvest is currently being sent to anyone — the intention ask and offer fork (§10.4/5) are wired and correct but have nothing to trigger them until this is turned back on. |
+| **W4** First Mirror | `pj19WNHEqU4xDDjy` — **archived**. `generate_first_mirror`'s payload is ready (including `has_intention`, 2026-08-04) but there is no live workflow to render/send it. |
+| **Bot Commands** | `Wlc3VSq3YYmZZdZj` — 3 nodes, manual trigger, never scheduled. Writes the Telegram command list (`setMyCommands`) with its emoji. Run it by hand after changing the menu wording; the list lives in this workflow, not in the database. |
 
 ## State as of 2026-07-31
 
@@ -89,12 +269,18 @@ Open founder decision: «شيء آخر» on every button set — see Part 3 F9.
 1. ✅ إحياء البوّابة — live
 2. ✅ رسالة المساء تُعطي قبل أن تسأل — `get_harvest_prompt`, live
 3. ✅ قلب المقياس إلى الوالد — `parent_effort`, live
-4. ✅ عنصر النيّة — `should_ask_intention`/`record_intention_ask` ride the harvest, live (2026-08-04)
+4. ✅ عنصر النيّة — `should_ask_intention`/`record_intention_ask` ride the harvest, live (2026-08-04); the parent's typed answer is captured and answered (`capture_intention`, live 2026-08-05). Consumer built: `generate_first_mirror` emits `has_intention` (flag only, never the text — 2026-08-04), but W4 is archived so nothing renders it yet.
 5. ✅ لحظة العرض — `offer_ready`/`take_offer_moment` ride the harvest as the fork, live (2026-08-04). Buttons reuse live callbacks (`cta_full_companion` → menu_journey → فريق آدم; `not_now`). Fires once per parent when earned (3 attempts, 2 outcomes, confirmed situation, no strain). 0 parents earned it yet.
 6. 🔴 ما بعد الوصول — **not designed**, not just unwired (`docs/adam-system.md` §7/§10). Needs a design pass before any DB/n8n work.
 
-**Not wired: the parent's typed answers.** The intention ask and the offer fork's «نتركه يتكرّر» let a parent type a reply that nothing records — `record_intention()` is called from nowhere. Both asks are stamped once regardless, so this never causes a repeat; it only means a typed answer is not stored. Capturing it needs a routing decision in `M2 - Classify Track` (the way `survey_mode` intercepts), keyed on `intention_asked_at is not null and intention_text is null`.
+**The intention answer is now captured** (2026-08-05, `capture_intention`). A parent whose ask is stamped and unanswered gets their next typed message read as the answer — if it looks like one. `get_agent_bundle(p_follower_id, p_message)` performs the capture on the call `M2 - Get Memory Snapshot` was already making, and two credential-free nodes (`IN - Kept?`, `IN - Send Kept`) branch to the fixed `intention_kept` reply. Anything that does not look like an answer — a command, a question back, an essay, a message more than 36h late — captures nothing and falls through to the ordinary reply, because the intention is written once and never overwritten.
+
+**Still not wired: the offer fork's «نتركه يتكرّر».** A parent who taps it and then types gets an ordinary reply; nothing records that they chose to let it repeat. Lower value than the intention (the fork is stamped once regardless, and the «نشتغل عليه» side is fully live), and it needs a moment written for it before any wiring.
+
+**Nothing in §10.4/5 is currently reaching anyone.** W3 (which sends the seed/harvest messages this all rides on) is paused — see Live system table. This is deliberate, not a bug: no real users yet, product still has known copywriting/UX gaps the founder is finding by testing manually. Founder's plan: finish the remaining threads, then a comprehensive review pass, testing live and reporting errors one at a time.
 
 ## Branch
 
-`claude/install-product-skills-ayvz5e`. Commit and push there; never to the default branch.
+`claude/connect-language-gate-n8n-5cmia3` (current — see the Latest block at the top).
+Commit and push there; never to the default branch. Its ancestor branch
+`claude/install-product-skills-ayvz5e` carries the same history up to the gate work.

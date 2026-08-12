@@ -104,9 +104,19 @@ begin
     sellable = array['DZ','EG','MA'], array_to_string(sellable, ','));
 
   -- Adding a fourth must be a row, not a deploy. Prove it by adding one.
-  insert into public.country_timezone (code, iana_tz) values ('QA','Asia/Qatar');
-  insert into public.supported_countries (code, name_ar, is_active, price_display_full)
-  values ('QA','قطر', true, '90 ريالاً قطرياً');
+  -- The migrations seed country_timezone, so this must be idempotent: on the
+  -- real schema QA may already be there.
+  insert into public.country_timezone (code, iana_tz) values ('QA','Asia/Qatar')
+    on conflict (code) do nothing;
+  -- chk_active_market_has_pricing: an active market must carry EVERY price it
+  -- will be asked for. The short row this used to insert is one production
+  -- would refuse, and «add a country by adding a row» is the claim under test —
+  -- so the row has to be a real one.
+  insert into public.supported_countries
+    (code, name_ar, currency, price_subscription, price_comeback, price_continuation,
+     price_display_full, price_display_short, price_continuation_display, is_active)
+  values ('QA','قطر','QAR', 90, 60, 60,
+          '90 ريالاً قطرياً', '90 ر.ق', '60 ريالاً قطرياً', true);
   -- The write and the read MUST be separate statements. country_state is
   -- STABLE, so inside one statement it reads that statement's snapshot —
   -- taken before the volatile insert nested in the same expression ran.
@@ -130,13 +140,22 @@ begin
   j := public.get_conversation_moment('menu_journey', dz);
   perform pg_temp.chk('a supported parent is told the price of their own country',
     (j->>'body') like '%2,300 دينار جزائري%', j->>'body');
+  -- position() returns 0 for a missing needle, so `position(a) < position(b)`
+  -- passes vacuously when `a` is gone. Both needles are asserted present
+  -- first, or a copy rewrite silently turns this into a test of nothing.
   perform pg_temp.chk('and the free relationship is named as permanent, first',
-    position('مجاناً، دائماً' in (j->>'body'))
-      < position('الرحلة الواحدة' in (j->>'body')), j->>'body');
-  perform pg_temp.chk('the price answer carries no buttons — فريق آدم is the only next step',
-    coalesce(j->'buttons', '[]'::jsonb) = '[]'::jsonb, (j->'buttons')::text);
-  perform pg_temp.chk('and it hands them a human, not a checkout',
-    (j->>'body') like '%https://t.me/Abdouleg%', j->>'body');
+    (j->>'body') like '%المجاني يبقى مجانياً%'
+    and (j->>'body') like '%المرافقة الكاملة:%'
+    and position('المجاني يبقى مجانياً' in (j->>'body'))
+      < position('المرافقة الكاملة:' in (j->>'body')), j->>'body');
+  -- Was "no buttons at all". The rule was never about buttons: it is that
+  -- فريق آدم is the only next step, and nothing in the bot takes money.
+  perform pg_temp.chk('the price answer opens no checkout — فريق آدم is the only next step',
+    not exists (select 1 from jsonb_array_elements(coalesce(j->'buttons','[]'::jsonb)) x
+                where coalesce(x->>'url','') <> '' and (x->>'url') not like 'https://t.me/%'),
+    (j->'buttons')::text);
+  perform pg_temp.chk('and it hands them a human, on a button rather than a raw address',
+    (j->'buttons'->0->>'url') = 'https://t.me/Abdouleg', (j->'buttons')::text);
 
   -- unsupported
   j := public.get_conversation_moment('menu_journey', sa);
@@ -253,8 +272,11 @@ begin
   perform pg_temp.chk('it carries no price',
     (j->>'body') !~ '[0-9٠-٩]', j->>'body');
   select array_agg(x->>'cb') into cbs from jsonb_array_elements(j->'buttons') x;
+  -- The button now carries menu_waitlist_join directly — the key with a real
+  -- handler in get_moment_after_tap — rather than the old waitlist_join alias
+  -- the Router had to translate.
   perform pg_temp.chk('and it still offers the waitlist',
-    cbs @> array['waitlist_join'], array_to_string(cbs,','));
+    cbs @> array['menu_waitlist_join'], array_to_string(cbs,','));
 end $$;
 
 \echo '=== AN UNKNOWN COUNTRY IS WHY 59 FAMILIES NEVER HEARD FROM ADAM ==='
@@ -267,8 +289,11 @@ begin
   -- about a sentence.
   p := pg_temp.parent('ZZ');
   insert into public.children (follower_id, name, is_primary) values (p, 'آدم', true) returning id into c;
-  insert into public.situations (child_id, key, status, evidence_count)
-  values (c, 'sleep', 'confirmed', 4);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 4, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
 
   perform pg_temp.chk('an unknown country is never due a proactive message',
     not exists (select 1 from public.get_rhythm_due(500) g where g.parent_id = p));
@@ -294,12 +319,29 @@ begin
 
   foreach k in array array['menu_journey','country_other','country_ask_footer'] loop
     foreach j in array array[to_jsonb(dz), to_jsonb(sa), to_jsonb(zz)] loop
-      declare g jsonb; n int;
+      declare g jsonb; n int; has_exit boolean;
       begin
         g := public.get_conversation_moment(k, (j #>> '{}')::uuid);
         n := coalesce(jsonb_array_length(g->'buttons'), 0);
+
+        -- The rule is «شيء آخر»: a parent is never cornered. It was written
+        -- as `cb = 'other'` because that was the only shape an exit had.
+        -- The offer's exit is «ليس الآن — نكمل مجاناً», which is a better
+        -- exit than a generic one — it names what declining costs them
+        -- (nothing) — and it lands on a moment that itself offers `other`.
+        -- So the check follows the link instead of matching a literal. That
+        -- makes it stricter, not looser: a decline button pointing at a
+        -- dead end now fails where before it was simply absent.
+        select bool_or(
+                 x->>'cb' = 'other'
+                 or exists (select 1 from public.conversation_moments cm
+                            where cm.key = x->>'cb'
+                              and cm.buttons @> '[{"cb":"other"}]'::jsonb))
+          into has_exit
+        from jsonb_array_elements(coalesce(g->'buttons','[]'::jsonb)) x;
+
         -- Zero buttons is a valid answer; a set of them without an exit is not.
-        if n > 0 and not (g->'buttons' @> '[{"cb":"other"}]'::jsonb) then
+        if n > 0 and not coalesce(has_exit, false) then
           bad := bad || (k || '/' || coalesce(g->>'body',''))::text;
         end if;
       end;

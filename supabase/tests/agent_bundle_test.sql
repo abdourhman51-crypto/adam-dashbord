@@ -73,8 +73,14 @@ begin
     (b->>'knowledge_level')::int = 0, b->>'knowledge_level');
   -- The failure mode this exists to stop: a warm machine implying memory
   -- it does not have, which is the enemy wearing the product's own face.
-  perform pg_temp.chk('and the model is told explicitly not to imply memory',
-    (b->>'family_context') like '%ولا تُلمّح إلى أنك تتذكّر شيئاً%', b->>'family_context');
+  -- Wording rewritten 2026-08-11 (docs/adam-under-the-microscope.md, the
+  -- ADAM Contract) to name the forbidden move explicitly, in the same
+  -- terms gate_grounded_reply enforces at the gate; the underlying rule
+  -- (do not imply memory or repetition that does not exist) is unchanged
+  -- and is now also guaranteed by the gate, not only advised by the prompt.
+  perform pg_temp.chk('and the model is told explicitly not to imply memory or repetition',
+    (b->>'family_context') like '%ممنوع%' and (b->>'family_context') like '%تكرار%',
+    b->>'family_context');
   perform pg_temp.chk('an unknown family is named as unknown, not left blank',
     (b->>'family_context') like '%لا شيء مسجّل عن هذا البيت بعد%', b->>'family_context');
 
@@ -145,9 +151,13 @@ begin
     (m->'country_recorded'->>'reason') = 'unknown_code'
     and (select coalesce(country,'') from public.followers where id = p) = 'ZZ',
     (m->'country_recorded')::text);
-  -- P11: having failed to record it, ADAM must not claim he did.
+  -- P11: having failed to record it, ADAM must not claim he did. An unplaceable
+  -- code is «بلد آخر», so the answer is now the honest unavailable-here offer
+  -- (20260807270000) rather than a bare "not recognised" — but the invariant is
+  -- the same: it never says it saved a country.
   perform pg_temp.chk('and the answer does not pretend the country was recorded',
-    (m->>'body') like '%لم أتعرّف على البلد%', m->>'body');
+    (m->>'body') not like '%سجّلنا%' and (m->>'action_done') = 'country_unknown',
+    m->>'body');
 end $$;
 
 \echo '=== RESULTS ==='

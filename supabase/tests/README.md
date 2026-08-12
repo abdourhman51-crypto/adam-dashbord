@@ -11,38 +11,42 @@ su postgres -c "$PGBIN/initdb -D $DATA -U postgres --auth=trust"
 su postgres -c "$PGBIN/pg_ctl -D $DATA -o '-k $RUN -p 55432 -c listen_addresses=' -l $DATA/log start"
 
 export PGHOST=$RUN PGPORT=55432 PGUSER=postgres
-psql -v ON_ERROR_STOP=1 -f supabase/tests/fixture_minimal.sql
-for m in 20260731090000_telegram_surface_state \
-         20260731120000_conversation_copy_and_button_law \
-         20260731150000_knowledge_gate_and_uniqueness \
-         20260801095000_moments_missing_from_repo \
-         20260801100000_one_moment_one_send \
-         20260801120000_rescue_floor_and_silent_journey \
-         20260801130000_the_enemy_is_not_a_time_of_day \
-         20260801150000_revive_the_rhythm_gate \
-         20260801170000_give_before_asking \
-         20260801190000_the_exit_is_owed_until_shown \
-         20260801200000_situation_other_is_not_grounding \
-         20260801220000_three_countries_and_the_unknown \
-         20260801230000_ask_the_59 \
-         20260801240000_claim_the_country_ask \
-         20260801250000_the_agent_speaks_under_law \
-         20260803120000_one_call_per_node ; do
-  psql -v ON_ERROR_STOP=1 -q -f supabase/migrations/$m.sql || break
+createdb adam_test; export PGDATABASE=adam_test
+
+# The three platform roles Supabase provides. Everything else comes from git.
+psql -q -c "create role service_role; create role authenticated; create role anon"
+
+# The real schema, built from the repository in timestamp order.
+for f in $(ls supabase/migrations/*.sql | sort); do
+  psql -v ON_ERROR_STOP=1 -q -f "$f" || echo "MIGRATION FAILED: $f"
 done
 
-for t in telegram_surface conversation_law knowledge_gate one_send \
-         rhythm_gate give_before_asking country_state \
-         agent_gate agent_bundle ; do
-  psql -q -f supabase/tests/${t}_test.sql
-done
+# Prices — business data, which no migration carries.
+psql -v ON_ERROR_STOP=1 -q -f supabase/tests/seed_test.sql
+
+for t in supabase/tests/*_test.sql; do psql -q -f "$t"; done
 ```
+
+Expected: **19 suites, 589 assertions, zero failures**, and zero failed migrations.
+
+Because the suites now run on the schema the migrations build, this is simultaneously
+the rebuild check: if a migration cannot apply to an empty database, the tests do not run
+at all.
 
 **The order is the whole point.** Each migration replaces functions the earlier
 ones defined, so loading a subset tests a schema that has never existed. Run the
 list, not a favourite file from it.
 
-Current: **21 + 27 + 25 + 34 + 14 + 29 + 71 + 27 + 19 assertions, zero failures.**
+That is not a style note. `composed_reply_gate` was missing from this list for
+days; adding it *at the end* — where a reader naturally appends — silently
+reverted four later migrations and turned 32 green assertions into 24 red ones
+that looked exactly like a broken change. Append by timestamp, never by habit.
+
+Current: **21 + 27 + 25 + 35 + 14 + 29 + 71 + 27 + 19 + 32 + 29 + 35 + 18 + 36 + 35 assertions, zero failures.**
+
+`rhythm_gate` reports 5 or 14 depending on the hour in Algiers — the harvest block
+only runs when the harvest window is genuinely closed, and the 23:00–07:00 branch
+asserts the quiet window instead. Both are green; only the count moves.
 
 ### Proving the repo *is* production
 
@@ -62,11 +66,18 @@ lost an argument and a whole `pinned.lines` key while still creating cleanly —
 Postgres does not resolve function calls inside a `plpgsql` body at `CREATE`
 time, so a wrong call site is a runtime error, not a deploy error.
 
-## `fixture_minimal.sql`
+## ~~`fixture_minimal.sql`~~ — deleted 2026-08-07
 
-The columns `get_telegram_surface()` actually reads, and nothing else. Names and types are copied from the real migrations rather than invented, so a rename in production shows up here as a failure instead of passing quietly.
+It described the schema by hand, because the repository could not build the real one. Every
+place its description drifted from production was a place the suites tested the fixture
+instead of the product: it produced three failures that looked like product bugs and were
+not, and it hid at least six rows production would have refused — including
+`daily_logs.situation_id` values that were actually child ids, and a `safe_for_record`
+pattern the disclosure safeguard makes impossible to create.
 
-**It is deliberately not the full schema.** A fixture that tries to mirror everything drifts silently and then lies. This one covers one function, and its scope is checkable by reading it.
+`supabase/migrations/*` builds the real schema now, so there is nothing left to describe.
+What replaced it is `seed_test.sql`: four rows of prices, which are business data rather
+than schema. `fixture_mirror.sql` went with it — the real `v_child_record` exists.
 
 ## `telegram_surface_test.sql`
 
@@ -169,3 +180,297 @@ Machinery words (`خطة`, `نظام`) are **recorded and allowed** in `reply_ga
 n8n's MCP API cannot attach a `supabaseApi` credential to a new `httpRequest` node: `setNodeCredential` and `addNode` both reject the pair. Pre-existing nodes hold their credential server-side and the API omits it from every response, so they *look* bare and work. Three nodes added this way failed at runtime with `Credentials not found` — one of them, `Tap - Record Country`, had been silently discarding every country a parent tapped for two days.
 
 The number of Supabase-authenticated nodes in W1 cannot go up. The workaround — copying the hardcoded `apikey` header the older nodes use — is how the `service_role` key came to appear 116 times in plaintext, so existing calls carry more instead.
+
+## `intention_capture_test.sql`
+
+29 cases. ADAM asked a parent the one question the whole promise hangs on — *«أيّ أب أو أمّ تمنّيتم أن تكونوا له؟»* — and then threw the answer away. `record_intention()` had existed, tested, since `give_before_asking`, called from nowhere.
+
+Most of this file is about **not** capturing. The intention is written once and never overwritten, so a wrong capture is permanent, and every guard gets its own case with its own parent — a captured answer would close the door for every case after it and the suite would pass for the wrong reason:
+
+| The parent types | Verdict |
+|---|---|
+| `أب هادئ، لا يصرخ في أولاده`, same night | kept |
+| the same, four days later | `window_closed` |
+| `ok` | `too_short` |
+| `/faq` | `command` |
+| `كيف يعني؟` · `what do you mean?` | `a_question` |
+| a paragraph about tonight | `too_long` |
+| four lines about tonight | `not_a_sentence` |
+| a second answer, after one was kept | `not_awaiting`, and the first survives |
+
+The pair that matters most is the last group: a **declined message stores nothing**, and the real answer sent right after it still lands. Declining is only safe if it is not also destructive.
+
+Four cases guard the carrier rather than the rule — a captured message must not *also* spend the country ask or build a context for a model that will never run, and an ordinary message must come back with the identical bundle it always did.
+
+## `offer_surface_test.sql`
+
+22 cases on the one screen where a parent decides whether to pay.
+
+Two of them are about markup. Nothing in this product sends with a `parse_mode`, so
+`**عنوان**` reached parents as literal asterisks for as long as it was there. The test
+asserts no stored moment carries `**`, and then tries to insert one and asserts the
+database refuses it.
+
+The rest pin **each promise in the offer to the thing that enforces it**, so the copy
+cannot quietly shrink back to the modest version that undersold the product:
+
+| The line | Enforced by |
+|---|---|
+| «لا حين يمرّ التقويم» | `v_stage_progress.logged_days` |
+| «أُكمل معكم نصفها… بلا أن تطلبوا» | `stages.extension_days` |
+| «يرجع مالكم» | `stages.refunded_at` |
+| «رحلة واحدة في المرّة» | `uq_one_live_stage_per_parent` |
+| «إن رأيت الأمور تتحسّن… أصمت» | `can_propose_stage` → `trend_improving` |
+
+> **A promise with no column behind it is a lie with a deadline.**
+
+The call-to-action cases check the button carries a `url` rather than the message body
+carrying an address, that its label names the child when we know one — and that it
+falls back to a general label when we don't, rather than putting «طفلكم» on a button.
+
+### The `STABLE` snapshot trap, again
+
+Every case here creates its parent in **its own statement**, never nested inside the
+call under test:
+
+```sql
+p := pg_temp.parent('DZ', 'يوسف');   -- statement 1
+j := pg_temp.offer(p);               -- statement 2
+```
+
+`country_state()` is `STABLE`, so written on one line it reads the snapshot taken
+*before* the insert and every supported-country case fails looking exactly like a
+broken function. This is the third time the same trap has cost real debugging; it is
+in this README twice now for that reason.
+
+## `team_question_test.sql`
+
+17 cases. A parent asked «اريد ان اعرف بخصوص المرافقة الكاملة» and the model answered
+at length, invented «وسيتواصلون معكم قريباً» — nobody was going to — and gave no link.
+The prompt already forbade quoting a price; it cannot forbid inventing a follow-up,
+because the failure is not vocabulary. It is a model answering a question it has no
+facts for.
+
+`is_team_question()` recognises the shape and the reply becomes a fixed moment with the
+فريق آدم button on it, so the model never sees the turn.
+
+**Most of the file is the false-positive set**, because the two errors are not
+symmetrical. A missed phrasing costs one ordinary reply. A false positive hands a sales
+card to a parent telling us their child hit their brother.
+
+| Excluded token | The message it would have broken |
+|---|---|
+| `بكم` | «أهلاً بكم، سعيدة بوجودكم» |
+| `شحال` | «شحال من مرة قلت له لا ينفع» — a count |
+| `قداش` | «قداش من ليلة وأنا صاحية معه» |
+| `الدفع` | «الدفع بينهم كل يوم صار عادة» — pushing, not paying |
+| `رحلة` | «رحلتنا إلى بيت جدّته كانت متعبة» |
+
+Their narrower cousins are kept: `بكام`, `بشحال`, `بقداش`, `طريقة الدفع`,
+`المرافقة الكاملة`.
+
+Three cases guard the ordering inside `get_agent_bundle`: the team check runs **before**
+`capture_intention`, because «اشتراك» is short, has no question mark and is one line —
+the capture would have taken it and written it into that parent's intention permanently,
+as who they hoped to be.
+
+## `journey_engine_test.sql`
+
+36 cases, and the first of them could not have been written before this week: until
+`20260807090000` the entire journey engine was a schema, a gate and a view, and **nothing
+had ever written a row**, so none of it had ever run.
+
+Two families are walked through a whole journey, day by day:
+
+| Family | What happens |
+|---|---|
+| آدم | 29 hard nights → clock exhausted, objective missed → **extended by 14 in the same call that detected the miss** → 14 more hard nights → `failed` |
+| ليان | 3 calm nights (not enough), 6 hard, then a full calm week → `objective_met` → `completed` **before** the clock ran out |
+
+The «3 calm nights is not five of seven» case is the one worth keeping: `objective_met`
+requires a **full measurement window**, so a good week cannot be declared a finished
+journey. That rule lives in `v_stage_progress` and is asserted here, not restated —
+restating a rule is how two versions of it start to disagree.
+
+### The walk is the beginning of the simulation harness
+
+`pg_temp.walk(parent, nights, result)` writes N distinct `log_date` rows, because
+`daily_logs` is unique on `(follower_id, log_date)` — the same constraint that makes the
+clock count **days** rather than messages. With nobody being messaged in production, this
+is currently the only way any time-and-evidence path can be seen working at all.
+
+### What start_stage deliberately does not check
+
+`can_propose_stage` refuses on a 30-day cadence, a lifetime cap per problem, and an
+improving trend. Those govern when ADAM may *raise* the subject. `start_stage` ignores
+them on purpose and enforces only structural invariants — one live journey, a target
+inside its window, a clock of 7..60 logged days.
+
+> **Refusing to start a journey someone has already agreed and paid for is not a
+> safeguard. It is a bug that takes money.**
+
+The last two cases cover the half-state this migration exists to remove: paying **with**
+an agreed goal starts the journey, and paying **without** one still records the money but
+returns `journey.started = false, reason = objective_required` — loudly, in the return
+value, instead of leaving a paid parent silently adrift.
+
+## `lifecycle_test.sql` — the simulation harness
+
+35 cases walking **one synthetic family from stranger to finished journey**, in seconds.
+
+This file exists because of a decision, not a preference. ADAM is stopped and nobody is
+being messaged until the build is finished — but every engine here is a **time and
+evidence machine** (three attempts, two calm nights, fifteen outcomes), so with no
+traffic none of them will ever accumulate the data that makes them run. Offline, walking
+a synthetic family through time is the only way these paths can be watched working at
+all.
+
+**Every row is written by the production function the live product would call:**
+
+```
+commit_child_name → commit_situation → record_seed_sent
+→ record_harvest_sent → record_harvest_answer → start_stage → close_stage
+```
+
+Nothing inserts a `daily_logs` row by hand. That is the difference between a harness and
+a fiction: a harness that invents its own rows tests the harness. The one place history
+must be aged — `record_harvest_answer` only ever writes today — moves the **date** of a
+row the real function produced and never its contents, and one assertion pins the aged
+shape to a live one.
+
+What it watches, in order: `knowledge_depth` 0→1→2→3→4 each for its own reason;
+`can_send` flipping for seed, harvest and mirror; `offer_ready` becoming true on the
+exact night it is earned; strain withdrawing the offer and the recovery window holding it
+withdrawn; then the journey started, missed, extended and reached.
+
+### It caught the product three times while being written
+
+| The harness assumed | The product actually does |
+|---|---|
+| answering a harvest is enough | the harvest is **sent** before it is answered — `record_harvest_sent` sets `harvest_sent_at`, and without it `can_send('harvest')` still says an evening question is owed on a day already answered |
+| strain drops the moment a parent recovers | L2 **holds for three days** before it may step to L1. Nobody is declared recovered on one calm sentence |
+| the journey clock counts the nights before it | it counts days on or after `started_at` — the free-tier nights before the sale are deliberately not borrowed |
+
+None of those were assertion bugs. All three were the harness being wrong about the
+product, which is the whole reason to write one.
+
+### And the STABLE snapshot trap, a fourth time
+
+`set_strain_level` is VOLATILE and `offer_ready` is STABLE. Calling both inside a single
+expression makes `offer_ready` read the snapshot from **before** the step-down and report
+the offer still withdrawn — a failure that looks exactly like a broken product. The write
+and the read must be separate statements. This trap has now cost real debugging in
+`country_state`, `offer_surface`, `journey_engine` and here.
+
+---
+
+## `restored_functions_test.sql` — the twelve that lived only in the database
+
+Sixty-five assertions over the functions restored by
+`20260807140000_the_repo_can_rebuild_production.sql`. Every one of them had been running
+in production for weeks with no source in git, and therefore no test — which is the same
+thing as nobody knowing what they do.
+
+The cases do not re-describe the bodies. They assert the promises the bodies make:
+
+- **`_ensure_child`** — the same name twice is one child, a different name is a different
+  child, no name resolves to the *primary* child, and a parent with no children at all
+  gets exactly one placeholder.
+- **`write_child_name`** — a recorded name is never replaced by a new inference; an empty
+  one is filled in and the orphan nights back-linked; and with **two** children the orphan
+  nights are left orphaned, because a sibling's nights must never be reassigned on a guess.
+- **`writer_commit`** — everything it takes is model output, so: the placeholder is
+  promoted rather than left beside the real name, blank fields write nothing, an invented
+  `event_type` is clamped to `other`, a weight of 99 becomes 5, a second sighting of a
+  pattern raises evidence instead of duplicating the row, the read watermark only moves
+  forward, and a blank snapshot never erases the one we had.
+- **`heart_commit`** — five blank fields write nothing, report `false`, and **do not stamp
+  the freshness clock**, so the parent is retried next cycle rather than skipped forever.
+- **`get_free_session_state`** — a session is a gap, not a clock; and coming back *twice*
+  is what makes a parent golden.
+- **`surface_changing_item`** — when commerce is blocked the label is **identical** to the
+  ordinary one. A withheld journey is silent, never announced as a thing being withheld.
+- **`return_to_free`** — the subscription clock is cleared and the payment row is not
+  touched.
+
+### Two failures that were the fixture, not the product
+
+`_ensure_child` orders by `is_primary desc, created_at asc`. In Postgres `DESC` puts NULLs
+**first**, and `fixture_minimal.children.is_primary` was nullable while production's is
+`NOT NULL DEFAULT false` — so a child with a null flag outranked the actual primary child,
+in the fixture and in no other database. The fixture was wrong; the readers were right.
+This is the third time a looseness in the fixture has produced a failure that looked like
+a product bug (see §`fixture_minimal.sql`), and the answer each time is the same: copy the
+column definition from `information_schema`, not from memory.
+
+The other two were `now()`. Inside one transaction `now()` is constant, so a chat row
+inserted "after" a memory write ties with it, and a `BEFORE UPDATE` trigger's stamp equals
+one taken moments earlier. Both tests now say so explicitly rather than asserting a strict
+`>` that only holds in production.
+
+### The Mirror suite had been unrunnable, silently
+
+`mirror_engine_test.sql` (10 assertions) was orphaned from the offline chain. When the
+journey engine landed, `fixture_minimal.sql` gained a `crisis_flags` table — and
+`fixture_mirror.sql` still created its own stub of the same name. The second `CREATE`
+aborted `fixture_mirror.sql` at line 16, taking `v_child_record` with it, and the whole
+suite failed on a missing view rather than on anything about the Mirror.
+
+The stub is deleted rather than guarded with `IF NOT EXISTS`: two fixtures owning one
+table is exactly how the shapes drift apart. The mirror migrations are now part of the
+standard chain, so the suite runs with everything else.
+
+---
+
+## The rebuild check — the one a fixture cannot fake
+
+Since 2026-08-07 the repository can build production from an empty database. That is worth
+running as a check, not just claiming once:
+
+```bash
+createdb rebuild
+psql -d rebuild -c "create role service_role; create role authenticated; create role anon"
+for f in $(ls supabase/migrations/*.sql | sort); do
+  psql -d rebuild -v ON_ERROR_STOP=1 -q -f "$f" || echo "FAIL $f"
+done
+```
+
+Expected: **0 failures, 29 tables, 12 views, 88 functions**, matching production by name.
+
+It earns its place because it catches a class of problem the offline suite structurally
+cannot. `fixture_minimal.sql` describes the schema the tests need; when it disagrees with
+production, the tests still pass — they are agreeing with the fixture. The rebuild has no
+fixture to agree with. On its first run it found two functions that reading had missed
+(`get_agent_context`, `commerce_allowed`), five views nobody had noticed were sourceless,
+three migrations that could not apply to a fresh database, and a live privilege escalation
+in production.
+
+**The natural next step is to stop needing the fixture.** Every table it stubs now has real
+DDL in git, so the suites could run against the rebuilt schema instead — and the three
+places `fixture_minimal.sql` still admits to being looser than production (`situations`,
+and its simplified `commerce_allowed` and `can_ground_seed`) would stop being drift and
+start being nothing at all.
+
+## The fixture is gone — 19 of 19 on the real schema
+
+The suites run against the schema `supabase/migrations/*` builds. There is no longer a
+hand-written description of the database anywhere in this repository.
+
+Getting there took fixing nine suites, and **every one of them was writing rows production
+would refuse** — not failing assertions, failing constraints:
+
+| What the tests did | What production says |
+|---|---|
+| `situations` inserts with no `parent_id`, `label_ar`, `window_start`, `window_end` — **21 sites** | all four NOT NULL. The rhythm's windows had been null in every test and never in production. |
+| `daily_logs.situation_id` set to a **child** id — 3 sites | `daily_logs_situation_id_fkey`. Three nights pointed at a situation that did not exist, and every assertion still passed. |
+| `child_patterns` with `safe_for_record => true` | `guard_safe_for_record` forces it false on INSERT; only `set_pattern_record_visibility()` can raise it, with an audit row naming who approved it and why. **`/child` had been reading back a row the disclosure safeguard would never release.** |
+| `child_patterns.status = 'confirmed'` | `child_patterns_status_check` allows `active`, `improving`, `resolved`, `dormant`. Nothing else. |
+| `child_patterns` with no `follower_id` | NOT NULL. |
+| `night_result = 'skip'` | `daily_logs_night_result_check` allows `calm`, `hard`, `normal`. The production shape for a night too tired to try is `step_status = 'not_tried'`; `parent_effort` counts identically either way, since it only ever counts calm and hard. |
+| `funnel_stage = 'paid_active'` with no `subscription_expires_at` | `chk_active_has_expiry`. Paid access always has an end. |
+| activating a market with some prices missing | `chk_active_market_has_pricing`. An active market carries every price it can be asked for. |
+
+None of these were caught by 589 passing assertions, because the fixture agreed with the
+tests. A fixture the tests agree with is not evidence — it is a second opinion from the
+same source.
+

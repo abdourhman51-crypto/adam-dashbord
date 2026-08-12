@@ -16,8 +16,11 @@ begin
   values (gen_random_uuid()::text, 'DZ') returning id into v;
   insert into public.children (follower_id, name, is_primary)
   values (v, p_name, true) returning id into c;
-  insert into public.situations (child_id, key, status, evidence_count)
-  values (c, 'sleep', 'confirmed', 4);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 4, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   return v;
 end $$;
 
@@ -72,8 +75,11 @@ declare p uuid; s1 uuid; c uuid; s2 uuid; t text;
 begin
   p := pg_temp.family('سارة'); s1 := pg_temp.sit_of(p);
   select id into c from public.children where follower_id = p;
-  insert into public.situations (child_id, key, status, evidence_count)
-  values (c, 'meal', 'confirmed', 2) returning id into s2;
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'meal', sc.label_ar, 'confirmed', 2, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'meal' returning id into s2;
 
   insert into public.daily_logs (follower_id, log_date, step_given, situation_id, seed_sent_at)
   values (p, current_date, 'خطوة اليوم', s1, now());
@@ -98,7 +104,12 @@ begin
     (p, current_date,     'hard', s),
     (p, current_date - 1, 'hard', s),
     (p, current_date - 2, 'calm', s),
-    (p, current_date - 3, 'skip', s),
+    -- A night too tired to try. It used to be written as night_result 'skip',
+    -- which daily_logs_night_result_check has never allowed — calm, hard and
+    -- normal are the only values. The production shape is step_status
+    -- 'not_tried' with no night_result, and parent_effort counts identically
+    -- either way because it only ever counts calm and hard.
+    (p, current_date - 3, null, s),
     (p, current_date - 9, 'hard', s);
 
   e := public.parent_effort(p);
@@ -108,7 +119,11 @@ begin
     (e->>'tried_this_week')::int = 3, 'skip is honest, not a failure');
 
   b := public.compose_menu_body('menu_progress', p);
-  perform pg_temp.chk('/progress opens with what THEY did', b like 'هذا الأسبوع: جرّبتم%', b);
+  -- Not `like 'هذا الأسبوع%'`: the surface now opens with a heading naming the
+  -- child, because a parent tapping /progress for the first time was landing
+  -- mid-sentence. What the assertion is actually for survives that: the first
+  -- thing said ABOUT THE WEEK is what the parent did, not what the child did.
+  perform pg_temp.chk('/progress opens with what THEY did', b like '%هذا الأسبوع: جرّبتم%', b);
   -- "١ منها" reads like a spreadsheet row. One and two are words.
   perform pg_temp.chk('small counts are words, not digits', b not like '%١ منها%', b);
   perform pg_temp.chk('the child''s outcome is evidence, not the headline',

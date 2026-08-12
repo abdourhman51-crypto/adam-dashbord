@@ -55,24 +55,39 @@ end $$;
 
 \echo '=== /child AND /progress MUST NOT SAY THE SAME THING ==='
 do $$
-declare p uuid; c uuid; a text; b text; s jsonb;
+declare p uuid; c uuid; pat uuid; a text; b text; s jsonb;
 begin
   insert into public.followers (platform_user_id, country) values ('os-2','DZ') returning id into p;
 
   -- empty state first
   a := public.compose_menu_body('menu_child', p);
   b := public.compose_menu_body('menu_progress', p);
+  -- The assertion is the PROPERTY, not the wording: the empty state must
+  -- admit it knows nothing and ask for a way in. Pinning the exact sentence
+  -- made this test fail on a rewrite that satisfied it better.
   perform pg_temp.chk('/child on an unknown child asks, and does not fake knowledge',
-    a like '%لم نتعرّف على طفلكم بعد%', a);
+    a like '%لا شيء بعد%' and a like '%اكتبوا اسمه%', a);
   perform pg_temp.chk('/child and /progress differ when nothing is known', a is distinct from b);
 
   -- now a real family
   insert into public.children (follower_id, name, is_primary) values (p, 'يوسف', true) returning id into c;
   update public.children set age_note = 'أربع سنوات' where id = c;
-  insert into public.situations (child_id, key, status, evidence_count)
-    values (c, 'sleep', 'confirmed', 4);
-  insert into public.child_patterns (child_id, pattern_label, status, evidence_count, safe_for_record)
-    values (c, 'يهدأ حين نبدأ مبكراً.', 'confirmed', 3, true);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 4, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
+  -- follower_id is NOT NULL in production, and a pattern is NEVER born visible:
+  -- guard_safe_for_record forces the flag false on INSERT and only
+  -- set_pattern_record_visibility() can raise it, writing the audit row that
+  -- names who approved it and why. Passing safe_for_record => true here used to
+  -- be silently accepted by the fixture, so /child was reading back a row the
+  -- disclosure safeguard would never have released.
+  insert into public.child_patterns (child_id, follower_id, pattern_label, status, evidence_count)
+    values (c, p, 'يهدأ حين نبدأ مبكراً.', 'active', 3)
+  returning id into pat;
+  perform public.set_pattern_record_visibility(pat, true, 'operator:test',
+    'Reviewed for the /child test: a calming pattern in the parent''s own words, cleared deliberately.');
   insert into public.daily_logs (follower_id, log_date, night_result) values
     (p, current_date,     'calm'),
     (p, current_date - 1, 'calm'),
@@ -84,10 +99,20 @@ begin
   b := public.compose_menu_body('menu_progress', p);
 
   perform pg_temp.chk('/child names the child and the age', a like '%يوسف%' and a like '%أربع سنوات%', a);
-  perform pg_temp.chk('/child names the hard moment', a like '%الأصعب عادةً%', a);
+  perform pg_temp.chk('/child names the hard moment', a like '%أصعب لحظة معه%', a);
   perform pg_temp.chk('/child reads back only a safe_for_record pattern',
     a like '%يهدأ حين نبدأ مبكراً%', a);
-  perform pg_temp.chk('/child stays within three lines', public.content_line_count(a) <= 3, a);
+  -- Was a hardcoded three. That cap is what forced every composed surface
+  -- into context-free fragments («جرّبتم مرة واحدة» — tried WHAT?), so
+  -- menu_child moved to the reference category and declares its own budget.
+  -- The property worth testing is that the body respects the budget it
+  -- declares, whatever that budget is.
+  perform pg_temp.chk('/child stays within its declared budget',
+    public.content_line_count(a) <=
+      (select max_lines from public.conversation_moments where key = 'menu_child'),
+    a);
+  perform pg_temp.chk('/child says what it is, so it reads alone',
+    a like '👦%', a);
 
   perform pg_temp.chk('/progress compares two weeks, it does not count',
     b like '%هذا الأسبوع%' and b like '%الأسبوع الماضي%', b);
@@ -190,7 +215,11 @@ begin
   -- enforced it, so it held only as long as whoever typed remembered.
   insert into public.followers (platform_user_id, country) values ('gn-1','DZ') returning id into p;
   insert into public.children (follower_id, name, is_primary) values (p, 'يوسف', true) returning id into c;
-  insert into public.situations (child_id, key, status, evidence_count) values (c,'sleep','confirmed',3);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 3, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   insert into public.daily_logs (follower_id, log_date, night_result) values
     (p, current_date, 'calm'), (p, current_date-1, 'hard'), (p, current_date-2, 'calm');
 

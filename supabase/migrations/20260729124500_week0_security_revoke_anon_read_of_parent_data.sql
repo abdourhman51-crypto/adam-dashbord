@@ -48,7 +48,6 @@ DROP POLICY IF EXISTS anon_select_followers               ON public.followers;
 DROP POLICY IF EXISTS dashboard_read                      ON public.followers;
 DROP POLICY IF EXISTS anon_select_payments                ON public.payments;
 DROP POLICY IF EXISTS dashboard_read                      ON public.payments;
-DROP POLICY IF EXISTS dashboard_read                      ON public.messages;
 DROP POLICY IF EXISTS anon_read_children                  ON public.children;
 DROP POLICY IF EXISTS anon_read_child_patterns            ON public.child_patterns;
 DROP POLICY IF EXISTS anon_read_daily_logs                ON public.daily_logs;
@@ -58,12 +57,10 @@ DROP POLICY IF EXISTS anon_select_plan_sessions           ON public.plan_session
 DROP POLICY IF EXISTS anon_read_session_tracker           ON public.session_tracker;
 DROP POLICY IF EXISTS anon_read_weekly_plans              ON public.weekly_plans;
 DROP POLICY IF EXISTS anon_read_follower_insights         ON public.follower_insights;
-DROP POLICY IF EXISTS anon_read_collective_intelligence   ON public.collective_intelligence;
 
 REVOKE SELECT ON public.n8n_chat_histories      FROM anon, authenticated;
 REVOKE SELECT ON public.followers               FROM anon, authenticated;
 REVOKE SELECT ON public.payments                FROM anon, authenticated;
-REVOKE SELECT ON public.messages                FROM anon, authenticated;
 REVOKE SELECT ON public.children                FROM anon, authenticated;
 REVOKE SELECT ON public.child_patterns          FROM anon, authenticated;
 REVOKE SELECT ON public.daily_logs              FROM anon, authenticated;
@@ -73,8 +70,24 @@ REVOKE SELECT ON public.plan_sessions           FROM anon, authenticated;
 REVOKE SELECT ON public.session_tracker         FROM anon, authenticated;
 REVOKE SELECT ON public.weekly_plans            FROM anon, authenticated;
 REVOKE SELECT ON public.follower_insights       FROM anon, authenticated;
-REVOKE SELECT ON public.collective_intelligence FROM anon, authenticated;
 REVOKE SELECT ON public.survey_responses        FROM anon, authenticated;
+
+-- `messages` and `collective_intelligence` were revoked here too when this ran.
+-- Both tables have since been dropped, so a rebuild from this repository never
+-- creates them and the unguarded statements aborted the whole file — taking the
+-- rest of the revocations with them and leaving anon able to read parent data,
+-- which is the exact opposite of what this migration is for. Guarded rather than
+-- deleted: the revocation genuinely happened, and a database restored from an
+-- old backup would still need it.
+DO $legacy$
+DECLARE t text;
+BEGIN
+  FOREACH t IN ARRAY ARRAY['messages','collective_intelligence'] LOOP
+    IF to_regclass('public.' || t) IS NOT NULL THEN
+      EXECUTE format('REVOKE SELECT ON public.%I FROM anon, authenticated', t);
+    END IF;
+  END LOOP;
+END $legacy$;
 
 -- Dashboard views are SECURITY DEFINER and bypass RLS; leaving anon able to
 -- SELECT them would reinstate the whole exposure through the back door.
@@ -87,14 +100,30 @@ REVOKE SELECT ON public.v_renewal_summary       FROM anon, authenticated;
 -- SECURITY DEFINER functions callable without signing in. activate_subscription
 -- is the most serious: it grants paid access, and any holder of the public
 -- anon key could call it for any follower id.
-REVOKE EXECUTE ON FUNCTION public.activate_subscription(uuid, integer, numeric, text, text) FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.return_to_free(uuid)                  FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.check_daily_message_cap(uuid)         FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.get_conversation_for(text)            FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.get_free_session_state(text, numeric) FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.get_heart_batch()                     FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.heart_commit(text, jsonb)             FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.write_child_name(text, text)          FROM anon, authenticated;
+-- get_heart_batch was written here as `get_heart_batch()`. It takes
+-- `p_limit integer default 40`, so that signature matches nothing and the
+-- statement raised — taking heart_commit and write_child_name, the two lines
+-- after it, down with it. Both were still executable by anon in production on
+-- 2026-08-07, twelve days later. Corrected to (integer) and guarded, so one bad
+-- signature can never again silently cancel the revocations that follow it.
+DO $revoke$
+DECLARE f text;
+BEGIN
+  FOREACH f IN ARRAY ARRAY[
+    'public.activate_subscription(uuid, integer, numeric, text, text)',
+    'public.return_to_free(uuid)',
+    'public.check_daily_message_cap(uuid)',
+    'public.get_conversation_for(text)',
+    'public.get_free_session_state(text, numeric)',
+    'public.get_heart_batch(integer)',
+    'public.heart_commit(text, jsonb)',
+    'public.write_child_name(text, text)'
+  ] LOOP
+    IF to_regprocedure(f) IS NOT NULL THEN
+      EXECUTE 'REVOKE EXECUTE ON FUNCTION ' || f || ' FROM anon, authenticated';
+    END IF;
+  END LOOP;
+END $revoke$;
 
 -- n8n authenticates as service_role; these grants keep it working.
 GRANT SELECT   ON ALL TABLES    IN SCHEMA public TO service_role;

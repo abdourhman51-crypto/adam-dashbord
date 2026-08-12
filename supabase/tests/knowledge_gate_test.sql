@@ -38,8 +38,11 @@ begin
     public.can_send('seed', p)->>'reason');
 
   -- level 2: a situation
-  insert into public.situations (child_id, key, status, evidence_count)
-  values (c, 'sleep', 'confirmed', 3);
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c, ch.follower_id, 'sleep', sc.label_ar, 'confirmed', 3, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c and sc.key = 'sleep';
   d := public.knowledge_depth(p);
   perform pg_temp.chk('depth 2 once a situation is detected', (d->>'level')::int = 2);
   perform pg_temp.chk('seed sends once grounded',
@@ -88,8 +91,13 @@ begin
   -- =============================================================
   -- §2.8 — provenance, not content filtering
   -- =============================================================
-  insert into public.child_patterns (child_id, pattern_label, status, safe_for_record)
-  values (c, 'التنقل بين ثلاث عائلات', 'confirmed', false);   -- a real live row
+  -- follower_id is NOT NULL in production; derived rather than passed so the
+  -- caller cannot get the pair wrong.
+  insert into public.child_patterns (child_id, follower_id, pattern_label, status, safe_for_record)
+  -- 'active', not 'confirmed': child_patterns_status_check allows only
+  -- active / improving / resolved / dormant, so 'confirmed' was a row production
+  -- would refuse.
+  values (c, p, 'التنقل بين ثلاث عائلات', 'active', false);   -- a real live row
   perform pg_temp.chk('a disclosure never becomes a family token',
     not (public.family_tokens(p)->'measured' @> '["التنقل بين ثلاث عائلات"]'::jsonb),
     public.family_tokens(p)->>'measured');
@@ -98,8 +106,15 @@ begin
   perform pg_temp.chk('a message quoting a disclosure does not send',
     not (u->>'passes')::boolean, u->>'reason');
 
-  update public.child_patterns set safe_for_record = true
-   where child_id = c and pattern_label = 'التنقل بين ثلاث عائلات';
+  -- Cleared through the ONLY door production leaves open. A bare UPDATE is
+  -- refused by guard_safe_for_record, which demands an audit row written in the
+  -- same transaction naming who approved it and why — so the bare UPDATE this
+  -- used to do was setting a flag the disclosure safeguard makes unsettable.
+  perform public.set_pattern_record_visibility(
+    (select id from public.child_patterns
+      where child_id = c and pattern_label = 'التنقل بين ثلاث عائلات'),
+    true, 'operator:test',
+    'Reviewed for the record test: the label is the parent''s own wording and was cleared deliberately.');
   perform pg_temp.chk('the same label DOES count once explicitly cleared',
     public.family_tokens(p)->'measured' @> '["التنقل بين ثلاث عائلات"]'::jsonb,
     'safe_for_record is the only thing that changed');
@@ -142,7 +157,11 @@ begin
   values ('k-test-2','EG') returning id into p2;
   insert into public.children (follower_id, name, is_primary)
   values (p2, 'سارة', true) returning id into c2;
-  insert into public.situations (child_id, key, status) values (c2, 'study', 'confirmed');
+  insert into public.situations (child_id, parent_id, key, label_ar, status,
+                               evidence_count, window_start, window_end)
+select c2, ch.follower_id, 'study', sc.label_ar, 'confirmed', 1, sc.window_start, sc.window_end
+  from public.children ch, public.situation_catalog sc
+ where ch.id = c2 and sc.key = 'study';
 
   msg := 'تجربة التنبيه قبل الانتقال نجحت مع يوسف أكثر من مرة — نبني عليها.';
 
