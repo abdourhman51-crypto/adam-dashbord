@@ -6,7 +6,59 @@ One file, so a new session does not replay the old one. Everything below is veri
 
 Where we stopped, newest first. Read this block, then the rest as needed.
 
-- **2026-08-12 — ADAM built to `docs/adam-constitution.md`, staged, not deployed.**
+- **2026-08-12 — the ADAM Contract + Paid Snapshot v1 are DEPLOYED to production.**
+  `set_checkin_hour`, `get_agent_context`, `get_agent_bundle`,
+  `gate_grounded_reply` (new), `gate_agent_reply`, `stage_state`,
+  `capture_stage_baseline` (new), `record_harvest_answer` — five migrations
+  (`the_hour_picker_writes_a_real_cadence`,
+  `adam_receives_the_journey`,
+  `knowledge_level_becomes_an_enforced_moveset`,
+  `the_grounding_gate`,
+  `the_baseline_is_written_once`), applied in that order, live now. This is
+  the same SQL that had been sitting staged since 2026-08-11, plus the new
+  Paid Snapshot v1 baseline (`docs/adam-snapshot-value-test.md`) built and
+  reviewed on 2026-08-12.
+  - **Why this deployed today and not in isolation:** the new baseline
+    migration extends `get_agent_context`'s `JOURNEY` block, which did not
+    exist on production before today — deploying it alone would have
+    silently activated the undeployed 2026-08-11 JOURNEY/knowledge-level/
+    grounding-gate set as a side effect, half-paired with nothing. Caught
+    before deploying (production's live function bodies were read directly
+    and compared, not assumed), the founder chose to bundle and transition-
+    test all five together rather than deploy either alone.
+  - **Verification before deploy:** all five migrations' DDL, plus a smoke
+    suite, were run against real production **inside a transaction that was
+    rolled back** (`begin; ... rollback;`) — a full dry-run of the actual
+    transition, not an offline copy. 13/13 smoke checks passed; zero
+    residual rows confirmed after rollback.
+  - **Then deployed for real** via five `apply_migration` calls, and
+    **re-verified live** with a second synthetic-parent smoke test against
+    the now-actually-updated functions (4/4 passed): price/vocabulary gate
+    unchanged, the grounding gate blocks a real memory claim, a real paid
+    journey (through `record_seed_sent`/`record_harvest_sent`/
+    `record_harvest_answer`) shows `== JOURNEY ==` and the new
+    `- baseline:` line in `get_agent_context`, and `get_agent_bundle` carries
+    `in_journey`/`allowed_moves`/the phase directive. Zero residual test
+    data confirmed again after.
+  - **What's now live that wasn't yesterday:** `gate_grounded_reply`
+    (memory-claim / past-reference / unfounded-repetition blocking, merged
+    into `gate_agent_reply` — zero n8n change needed, W1 already calls
+    `gate_agent_reply`); `get_agent_context`'s `JOURNEY` block for paid
+    parents in a live stage; `get_agent_bundle`'s `allowed_moves`,
+    `in_journey`, and phase directive (silent in `hold`); and the Paid
+    Snapshot v1 — one deterministic, no-LLM baseline sentence written once
+    per stage, shown only when the live data is strictly better than where
+    the stage started.
+  - **Not touched:** n8n — no workflow, no node, was created or modified.
+    W2/W3/W4 remain exactly as before (W2/W3 `active: false`). The prompt
+    file changes and the memory-contamination fix from earlier on
+    2026-08-12 are still **not** pushed to the live n8n node — only SQL
+    moved today.
+  - **Still zero paid users, zero live stages** in production as of this
+    write — the deployed code is exercised the first time a real journey
+    starts, not before.
+
+- **2026-08-12 — ADAM built to `docs/adam-constitution.md`, staged, not deployed (superseded above — now live).**
   Three files changed, nothing pushed to production or n8n:
   - `docs/prompts/adam-conversation-agent.md` — five small additive edits inside
     existing sections: the exact governing sentence ("عندما تقلّ الأدلة، تقلّ
