@@ -2,10 +2,42 @@
 
 One file, so a new session does not replay the old one. Everything below is verified, not remembered.
 
-## Latest — 2026-08-06 (start here)
+## Latest — 2026-08-12 (start here)
 
 Where we stopped, newest first. Read this block, then the rest as needed.
 
+- **2026-08-12 — ADAM built to `docs/adam-constitution.md`, staged, not deployed.**
+  Three files changed, nothing pushed to production or n8n:
+  - `docs/prompts/adam-conversation-agent.md` — five small additive edits inside
+    existing sections: the exact governing sentence ("عندما تقلّ الأدلة، تقلّ
+    درجة التحديد؛ لا يزيد الاختراع"), `[الرحلة]` directives stated as binding
+    (hold-phase refusal holds even under direct pressure; a paid parent's own
+    progress question is answered from `[الرحلة]`, never deflected, never a
+    day-count), a no-diagnosis line, a no-pretend-action line, a
+    single-topic-per-reply line. Still not pushed to the live `paid aget adam`
+    node — the file's own header tracks the byte-diff status.
+  - `supabase/tests/grounded_reply_test.sql` — extended from 31 to 42
+    assertions: knowledge levels 1/2/4 (previously only 0 and 3 were covered),
+    and the `build` phase directive (previously only `observe`/`hold`), closing
+    the exact gap the Constitution's Knowledge Levels table and Journey
+    Awareness section both specify.
+  - `docs/workflows/fix-paid-memory-contamination.md` — new. Confirmed by
+    reading the live `paid aget adam` node directly (not inferred): its `text`
+    parameter concatenates `family_context` into what
+    `Postgres Memory Paid` persists as the "human" turn, so the last 10
+    messages replay the system's own scaffolding back to the model labelled as
+    the parent's voice (Conflict 2, `adam-constitution.md`). The fix is two
+    parameter edits to one existing node — `text` becomes `message_text` alone,
+    `family_context` moves to a dynamic `systemMessage` expression instead (not
+    memorized, still fresh every turn) — fully specified, **not applied**;
+    `update_workflow` was never called.
+  - Full suite re-run after all changes: **783/783 passed, 0 regressions**
+    (30 test files, throwaway local Postgres, all 88 migrations applied in
+    order including the three staged 2026-08-11 ADAM-contract migrations,
+    unchanged and still undeployed).
+  - `gate_grounded_reply` was deliberately **not** touched or widened, per the
+    Constitution's Part 3 order-of-defence conclusion — it stays the narrow
+    last line, not the primary fix.
 - **2026-08-11 — the W3 journey-step branch is SPECIFIED, not wired.**
   `docs/workflows/w3-journey-step-branch.md`. W3 (`Vb4ADCkPsevPRWRN`) stays
   `active: false` — nothing was touched in n8n. Today `Seed Or Harvest`'s switch

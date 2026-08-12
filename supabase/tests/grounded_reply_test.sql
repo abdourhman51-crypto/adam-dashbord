@@ -15,8 +15,10 @@ begin;
 -- switches off).
 --
 -- Also covers: knowledge_level as an enforced (not advisory) gate on
--- pattern claims; the journey directive reaching a paid parent and
--- being absent for a free one.
+-- pattern claims, all five levels (0-4, docs/adam-constitution.md's
+-- Knowledge Levels table); the journey directive reaching a paid parent
+-- and being absent for a free one, across all three phases
+-- (observe/build/hold, matching compose_journey_step's own vocabulary).
 -- ============================================================
 
 create table pg_temp.r (n int generated always as identity, name text, result text, detail text);
@@ -224,6 +226,47 @@ begin
 end $$;
 
 
+\echo '=== 8a. EVERY KNOWLEDGE LEVEL, NOT JUST 0 AND 3 (docs/adam-constitution.md Knowledge Levels table) ==='
+do $$
+declare p1 uuid; p2 uuid; p4 uuid; b1 jsonb; b2 jsonb; b4 jsonb;
+begin
+  -- Level 1: named child, no confirmed situation. May use the name; may not
+  -- claim a recurring pattern.
+  p1 := pg_temp.family('يوسف', false);
+  perform pg_temp.chk('setup: level 1 (name only, no confirmed situation)',
+    (public.knowledge_depth(p1)->>'level')::int = 1);
+  b1 := public.get_agent_bundle(p1, 'مرحباً');
+  perform pg_temp.chk('level 1: allowed_moves is answer_this_moment + speak_by_name',
+    b1->'allowed_moves' ? 'speak_by_name' and not (b1->'allowed_moves' ? 'aim_a_seed'),
+    (b1->'allowed_moves')::text);
+  perform pg_temp.chk('level 1: family_context forbids claiming a recurring pattern',
+    position('يتكرّر' in (b1->>'family_context')) > 0
+    and position('ممنوع' in (b1->>'family_context')) > 0, b1->>'family_context');
+
+  -- Level 2: name + a confirmed situation, no logged nights yet. May aim a
+  -- step at the confirmed situation; may not claim a count.
+  p2 := pg_temp.family('ريم', true);
+  perform pg_temp.chk('setup: level 2 (name + confirmed situation, no nights)',
+    (public.knowledge_depth(p2)->>'level')::int = 2);
+  b2 := public.get_agent_bundle(p2, 'مرحباً');
+  perform pg_temp.chk('level 2: allowed_moves includes aim_a_seed, not notice_a_pattern',
+    b2->'allowed_moves' ? 'aim_a_seed' and not (b2->'allowed_moves' ? 'notice_a_pattern'),
+    (b2->'allowed_moves')::text);
+  perform pg_temp.chk('level 2: family_context forbids naming "هذه المرة الثالثة" or any count',
+    position('هذه المرة الثالثة' in (b2->>'family_context')) > 0
+    or position('عدد تكرار' in (b2->>'family_context')) > 0, b2->>'family_context');
+
+  -- Level 4: a month of outcomes. May name a goal.
+  p4 := pg_temp.family('كريم', true);
+  perform pg_temp.walk(p4, 15, 'hard');
+  perform pg_temp.chk('setup: level 4 (>=15 outcomes)',
+    (public.knowledge_depth(p4)->>'level')::int = 4);
+  b4 := public.get_agent_bundle(p4, 'مرحباً');
+  perform pg_temp.chk('level 4: allowed_moves includes name_a_goal',
+    b4->'allowed_moves' ? 'name_a_goal', (b4->'allowed_moves')::text);
+end $$;
+
+
 \echo '=== 8. THE JOURNEY REACHES A PAID PARENT, AND ONLY A PAID PARENT ==='
 do $$
 declare p_free uuid; p_obs uuid; p_hold uuid; b jsonb; ctx text;
@@ -259,6 +302,18 @@ begin
   b := public.get_agent_bundle(p_hold, 'شكراً لكم');
   perform pg_temp.chk('paid/hold: directive explicitly forbids proposing a step',
     position('ممنوع اقتراح أي خطوة' in (b->>'family_context')) > 0, b->>'family_context');
+
+  -- Paid parent, build phase (middle of a 29-day journey: 10 logged nights,
+  -- clear of both the observe floor <3 and the hold ceiling 29-9=20).
+  perform pg_temp.chk('setup: build-phase boundaries for a 29-day journey put 10 logged nights in build',
+    10 >= 3 and 10 < (29 - greatest(3, 29/3)));
+  perform pg_temp.walk(p_obs, 8, 'hard');  -- p_obs already had 2 logged nights; 2 + 8 = 10 total
+  b := public.get_agent_bundle(p_obs, 'شنو نجرب الليلة؟');
+  perform pg_temp.chk('paid/build: phase is actually build at 10 logged nights',
+    (public.stage_state(p_obs)->>'phase') = 'build', (public.stage_state(p_obs))::text);
+  perform pg_temp.chk('paid/build: directive allows referencing the objective, does not forbid a step',
+    position('طور البناء' in (b->>'family_context')) > 0
+    and position('ممنوع اقتراح أي خطوة' in (b->>'family_context')) = 0, b->>'family_context');
 end $$;
 
 
