@@ -6,6 +6,59 @@ One file, so a new session does not replay the old one. Everything below is veri
 
 Where we stopped, newest first. Read this block, then the rest as needed.
 
+- **2026-08-12 — STEP 1 (buffer-contamination fix) is DEPLOYED to n8n. Nothing else touched.**
+  Founder approved exactly one thing: the previously-designed, previously-proven
+  fix for `docs/workflows/fix-paid-memory-contamination.md`, with an explicit
+  7-step sequence and an explicit "no STEP 2, no W2/W3/W4" boundary.
+  - **What changed, on the single live LangChain agent node** (named
+    `paid aget adam`, `id bca58129-…`, in `42loY0bgUSwYmHFV` — this one node
+    is shared by free and paid traffic; only its `family_context` input
+    differs by tier): `text` went from
+    `family_context + '\n\n[رسالة الأهل الآن]\n' + message_text` to plain
+    `message_text`; `options.systemMessage` went from a static string to
+    `` `<same static prompt, byte-for-byte>` + (family_context ? '\n\n' + family_context : '') ``
+    as a live expression. Net effect: what LangChain's `Postgres Memory Paid`
+    node persists and replays as the "human" turn is now the parent's real
+    words only — the system-authored scaffolding is still delivered fresh
+    every call (via `systemMessage`), it just stops being memorized and
+    replayed back mislabeled as something the parent said.
+  - **Verified before deploy:** read the live node's exact current
+    parameters first (no drift since the fix was designed); rebuilt the
+    proven local-Postgres + pinned-LangChain (`@langchain/core@0.3.66`,
+    `@langchain/community@0.3.49`, `langchain@0.3.37`) simulation harness;
+    pulled 4 real `family_context` strings from production via a
+    rolled-back transaction (`free`, `paid_observe`,
+    `paid_build_baseline_shown`, `paid_build_baseline_suppressed`); ran
+    current vs. proposed `text`/`systemMessage` through the real memory
+    classes — **27/27 checks passed**: byte-exact `family_context`
+    preserved in the model's prompt every time, stored "human" rows now
+    exactly equal the raw parent message, a 3-turn replay carries zero
+    scaffolding markers from history. Real token counts
+    (`gpt-tokenizer`, cl100k_base): per-turn prompt delta is **−7 tokens**
+    (only the now-unneeded `"[رسالة الأهل الآن]"` label) — no information
+    loss; the real win is the memorized/replayed row, **91–98% smaller**
+    per turn, compounding across the 10-message window. Grounding gate,
+    price gate, and a clean reply were re-checked live (rolled back) and
+    unaffected — this is an n8n-only change, no SQL touched.
+  - **Deployed:** one `update_workflow` `updateNodeParameters` call (draft),
+    then a separate, explicit `publish_workflow` call — the draft/publish
+    distinction was honored deliberately, per the Contract's own instruction
+    not to treat a save as a deploy. Re-fetched the published node
+    afterward: `text` and `systemMessage` match byte-for-byte, `active:
+    true`, `versionId == activeVersionId`.
+  - **Post-deploy verification, honestly reported:** the SQL side (gate/
+    grounding/price) was re-confirmed live, rolled back, 0 regressions. The
+    n8n side could **not** be confirmed against a real live message during
+    this session — zero followers currently have a non-expired subscription,
+    and no new `n8n_chat_histories` row landed in the ~minutes after
+    publish. The byte-exact deployed-parameter check is a direct fact, not
+    an inference, but it is not the same as watching one real reply get
+    stored clean. **Next real message through this node — free or paid — is
+    the first live confirmation; worth a spot-check the next time someone is
+    in here.**
+  - **Not touched:** SQL, W2, W3, W4, any other node, any other feature.
+    Exactly STEP 1, nothing else.
+
 - **2026-08-12 — the ADAM Contract + Paid Snapshot v1 are DEPLOYED to production.**
   `set_checkin_hour`, `get_agent_context`, `get_agent_bundle`,
   `gate_grounded_reply` (new), `gate_agent_reply`, `stage_state`,
@@ -53,7 +106,8 @@ Where we stopped, newest first. Read this block, then the rest as needed.
     W2/W3/W4 remain exactly as before (W2/W3 `active: false`). The prompt
     file changes and the memory-contamination fix from earlier on
     2026-08-12 are still **not** pushed to the live n8n node — only SQL
-    moved today.
+    moved today. *(Superseded by the STEP 1 entry above — the memory fix
+    was pushed to n8n later the same day.)*
   - **Still zero paid users, zero live stages** in production as of this
     write — the deployed code is exercised the first time a real journey
     starts, not before.
