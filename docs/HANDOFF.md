@@ -6,6 +6,15 @@ One file, so a new session does not replay the old one. Everything below is veri
 
 Where we stopped, newest first. Read this block, then the rest as needed.
 
+- **2026-08-13 — LIVE BUG FIXED on W1 (real traffic, not a STEP): the country-answer lock's escape button didn't actually escape.** Founder reported it with a real screenshot (a real parent stuck answering "🌍 لم أعرف هذا البلد" forever, even after tapping "↩︎ دعونا من هذا"). Root-caused by reading the exact execution (`42loY0bgUSwYmHFV`, execution 6342) live, not guessed:
+  - `M2 - Classify Track` (W1, unchanged) routes *any* non-empty typed text into `track='country_answer'` for 36h after `followers.country_asked_at` is set — by design, per its own comment, so the very next reply is heard as the country answer.
+  - The bug: `get_moment_after_tap()` never cleared `country_asked_at` when a parent escaped via a **button tap** instead of typing a country. A tap works for exactly one turn (taps carry no `message_text`, so `M2 - Classify Track` doesn't force them into the country track) — but since the DB flag stayed set, the parent's very next *typed* message fell straight back into the lock. Confirmed a second instance of the same root cause: tapping a `set_country_XX` flag button (a **successful** country selection) had the identical gap — it called `record_country()` directly, which also never clears `country_asked_at`, unlike the text path's `capture_country_text()` which does.
+  - **Fix, one function, `get_moment_after_tap`:** added a guard at the top — any tap whose key is not itself `menu_capture_country` (i.e., not a text-based country attempt) now clears `country_asked_at` if it's set. This can only ever fire for genuine button taps, never for typed text, because typed text is always forced into `menu_capture_country` upstream — so the designed "keep asking via text" behavior for actual bad-text attempts is untouched.
+  - **Verified before deploy**, rolled back against real production, 8/8: bad text still correctly fails and still doesn't clear the lock (regression-safe); tapping the escape button now clears it; the flag-button success path now also clears it; `menu_waitlist_join`'s own separate re-arm of the flag still works unchanged.
+  - **Deployed** via `apply_migration` (`fix_country_lock_not_cleared_on_tap_escape`). Re-verified live: the fix marker is present in the deployed function body; the real parent from the screenshot (`platform_user_id 7377091520`) already shows `country='DZ'`, `country_asked_at=null` — resolved.
+  - **Regression, real production, rolled back:** grounding gate and a clean reply still correct.
+  - **Not touched:** no n8n node changed — this was a pure SQL fix. W3 untouched, still `active: false`. Nothing about STEP 3 built or decided.
+
 - **2026-08-13 — STEP 2.2: one synthetic paid follower's entire journey
   simulated end to end — day 0 through hold phase — against the real W3
   pipeline. 24/24 checks pass. W3 still `active: false`. No SQL, no node,
