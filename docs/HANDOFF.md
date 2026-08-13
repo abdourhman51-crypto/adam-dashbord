@@ -6,6 +6,93 @@ One file, so a new session does not replay the old one. Everything below is veri
 
 Where we stopped, newest first. Read this block, then the rest as needed.
 
+- **2026-08-12 — STEP 2 build: the four `journey_step` nodes exist in W3
+  (`Vb4ADCkPsevPRWRN`), tested for real against isolated synthetic data.
+  **W3 is still `active: false` — nothing runs, nothing is live.**
+  - **Credential redaction resolved:** `get_workflow_details` never shows a
+    node's bound `credentials` — that's why earlier checks kept reporting
+    "no credential" on the 4 pre-existing HTTP nodes even after the founder
+    manually attached `adam Supabase` in the n8n UI. A real `test_workflow`
+    execution proved the founder right: the credential shows up in the
+    *execution trace* (`"credentials":{"supabaseApi":{...}}`), and
+    `Record Seed Sent` actually wrote a real row using it. **Lesson for next
+    time: never trust `get_workflow_details` for credential-bound state —
+    only a real execution proves it.**
+  - **What got built, exactly:** `Seed Or Harvest`'s switch gained a third
+    rule (`action equals journey_step`); `Seed Model` now fans its
+    `ai_languageModel` output to a new `Compose Journey Step` agent node too
+    (no new AI credential); `Compose Journey Step` → `Send Journey Step`
+    (Telegram, same bot-token-in-URL pattern as `Send Seed`, `onError:
+    continueRegularOutput`) → `Record Journey Step Sent` (reuses
+    `record_seed_sent`, same as the original spec) → loops back to `One
+    Parent At A Time`. `onError`/`retryOnFail`/`maxTries`/`waitBetweenTries`
+    on the two new HTTP nodes now match their siblings exactly (first pass
+    silently dropped these — `addNode`'s schema doesn't accept them,
+    `setNodeSettings` does; caught by re-reading the node back, not assumed).
+  - **One deliberate deviation from `docs/workflows/w3-journey-step-branch.md`
+    (2026-08-11), and why:** that spec fed `Compose Journey Step` raw
+    `JSON.stringify($json.grounding)`. `docs/adam-context-contract.md`
+    (2026-08-12, newer) explicitly forbids internal engine/table vocabulary
+    — including the literal word "journey" — ever reaching the model.
+    Re-reading `compose_journey_step`'s own prompt, only `phase_directive`
+    (already carries the child/situation/working-step baked in) and
+    `recent_steps` are actually used. Built instead: a small labeled Arabic
+    text block, no JSON, no field names. Verified twice — a standalone
+    Node.js simulation against real `compose_journey_step()` output
+    (observe/build/hold + a manually-added recent_steps case, 7/7 checks,
+    zero forbidden-vocabulary leaks) and, more importantly, the **real n8n
+    execution trace**, which shows the exact resolved Human-turn prompt sent
+    to the real model — clean natural Arabic, nothing else.
+  - **Real end-to-end test executions (`test_workflow`, W3 still inactive),
+    against real, isolated, cleaned-up-after synthetic followers — not
+    guessed:**
+    - `build`-phase journey_step: routed correctly through the new switch
+      rule, `Compose Journey Step`'s real resolved prompt was clean, the
+      real LLM (Gemini 3.1 Flash Lite) returned a concrete small step tied
+      to the child/situation, `Send Journey Step` failed harmlessly on the
+      fake `chat_id` (`400 chat not found` — expected, proves `onError`
+      works), execution reached `Record Journey Step Sent`.
+    - `observe`-phase journey_step: same path; the real model correctly
+      produced an observation-only message with **no step suggested** —
+      matches `phase_directive` exactly.
+    - Free `seed` action: **fully succeeded end to end for real** —
+      real `Compose Seed` call, real (harmless) Telegram failure, real
+      `Record Seed Sent` write (`daily_logs` row + `A1_first` aha moment) —
+      proof the new switch rule and Seed Model fan-out did not disturb the
+      existing free path at all.
+    - `harvest` action: **found a real, pre-existing bug, untouched by
+      tonight's build** — `Harvest Prompt` calls `get_harvest_prompt()`,
+      which returns `text`; PostgREST returns that as a raw string, and the
+      node's response parser expects JSON, so it throws
+      `"Response body is not valid JSON"`. This is the *original,
+      founder-approved* node from before this session touched W3 — it has
+      never been execution-tested until tonight because W3 has never run.
+      **This blocks the harvest message for every parent, free or paid, the
+      moment W3 is ever activated — unrelated to journey_step, but a real
+      launch blocker for W3 as a whole.** Not fixed — out of STEP 2 scope.
+    - No-double-send: a parent whose `seed_sent_at` is already stamped for
+      today correctly gets **zero rows** from `get_rhythm_due` — confirmed
+      directly in SQL, unchanged behavior.
+  - **Still blocking full end-to-end proof:** `Record Journey Step Sent` is
+    a *brand-new* node tonight — it has no credential attached yet (separate
+    from the 4 pre-existing nodes the founder already bound), so its final
+    Supabase write could not be executed for real. Everything upstream of it
+    (routing, composition, the real LLM call, the real Telegram attempt) was
+    proven live; the write itself was verified only by direct expression
+    simulation, matching the already-proven `record_seed_sent` semantics.
+    **Founder action needed:** attach `adam Supabase` to `Record Journey
+    Step Sent` in the n8n UI, same as the other four.
+  - **Regression check, real production, rolled back:** grounding/price/
+    clean-reply gates and a full journey (build phase, `== JOURNEY ==`
+    block, baseline line, `get_agent_bundle`'s phase directive) all still
+    correct — zero SQL was touched tonight (`get_rhythm_due`'s fallback fix
+    was the *previous* deploy), this just re-confirms nothing drifted.
+  - **Zero residual data:** every synthetic follower (`step2e2e-%` prefix)
+    and its children/situations/stages/daily_logs deleted after testing;
+    `stages` back to 0, matching pre-test production.
+  - **W3's `active` flag never changed — still `false`, `activeVersionId:
+    null`.** No production rollout happened or was attempted.
+
 - **2026-08-12 — STEP 2, first sub-piece only: the First-Day Seed Fallback is DEPLOYED to `get_rhythm_due`. W3 itself is still untouched, still `active: false`, still zero new nodes.**
   Context: STEP 2 is "wire W3's daily proactive journey_step path" — approved in principle, but the founder required an audit-before-build pass first (`docs/step2-w3-journey-step-design.md` already covered design/dependencies/cost/failure-modes/Telegram-UX/test-plan). That audit surfaced two blockers the founder had to rule on before any build: (1) four existing W3 HTTP nodes have no credential bound at all — still unresolved, founder action required in the n8n UI, not done yet; (2) a real gap in `get_rhythm_due`'s existing routing — a brand-new journey's very first morning (before any night result is logged) got silently dropped entirely, no message at all, because the router unconditionally reclassified the morning slot as `journey_step` the instant a stage went live, then `can_send('journey_step',…)` rejected it for lacking a logged outcome, with no fallback. Founder chose, explicitly: fall back to the ordinary `seed` message on day 0 instead of silence.
   - **The fix:** one `CASE` condition changed inside `get_rhythm_due`'s `routed` CTE — reroute to `journey_step` only when `compose_journey_step(...).can_send` is actually true; otherwise the row stays `seed` and flows through the pre-existing seed path unchanged. No other line of the function touched.
