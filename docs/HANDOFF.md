@@ -6,6 +6,38 @@ One file, so a new session does not replay the old one. Everything below is veri
 
 Where we stopped, newest first. Read this block, then the rest as needed.
 
+- **2026-08-12 — STEP 2.1: the `Harvest Prompt` bug (flagged in the STEP 2
+  entry below) is FIXED, and the credential gap on `Record Journey Step
+  Sent` is CLOSED — W3's whole pipeline (seed, harvest, journey_step) now
+  runs end to end for real. Still `active: false`.**
+  - **The fix, minimal:** `Harvest Prompt` calls `get_harvest_prompt()`
+    (returns `text`); PostgREST returns that as a raw string, and the
+    node's default `responseFormat: autodetect` tried to JSON-parse it and
+    threw. Set `options.response.response.responseFormat = 'text'` and
+    `outputPropertyName = 'body'` — nothing else on the node changed. The
+    `'body'` name isn't arbitrary: `Send Harvest`'s existing (untouched)
+    expression already reads `raw.body` as a fallback path that had
+    presumably never actually been exercised — this fix makes that existing
+    code the live path instead of adding new logic.
+  - **Verified live, real `test_workflow` execution, one isolated synthetic
+    follower, cleaned up after:** `Harvest Prompt` now returns
+    `{"body":"اليوم جرّبنا مع مالك: خطوة اختبار.\n\nكيف مرّت؟"}` — the real
+    measured-first harvest content, unchanged — no parse error. `Send
+    Harvest` correctly used it (only failed on the fake `chat_id`, expected).
+    `Record Harvest Sent` succeeded for real. Whole execution: `status:
+    success`.
+  - **Regression, real executions, cleaned up after:** free `seed` action —
+    full success end to end. Paid `journey_step` (observe phase) — **also
+    fully succeeded this time**, including `Record Journey Step Sent`
+    (the founder attached its credential between the STEP 2 report and this
+    one) — real `daily_logs` row confirmed written with the exact composed
+    text and correct `seed_grounded_on` basis array. This closes the one
+    gap the STEP 2 report left open.
+  - **Zero residual data** — both synthetic followers and all dependent
+    rows deleted; `stages` back to 0.
+  - **Not touched:** message content, harvest logic, any other node, any
+    other workflow. `active: false`, `activeVersionId: null`, unchanged.
+
 - **2026-08-12 — STEP 2 build: the four `journey_step` nodes exist in W3
   (`Vb4ADCkPsevPRWRN`), tested for real against isolated synthetic data.
   **W3 is still `active: false` — nothing runs, nothing is live.**
