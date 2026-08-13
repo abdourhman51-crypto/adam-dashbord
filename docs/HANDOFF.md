@@ -2,9 +2,52 @@
 
 One file, so a new session does not replay the old one. Everything below is verified, not remembered.
 
-## Latest — 2026-08-12 (start here)
+## Latest — 2026-08-13 (start here)
 
 Where we stopped, newest first. Read this block, then the rest as needed.
+
+- **2026-08-13 — STEP 2.2: one synthetic paid follower's entire journey
+  simulated end to end — day 0 through hold phase — against the real W3
+  pipeline. 24/24 checks pass. W3 still `active: false`. No SQL, no node,
+  no other workflow touched — this was verification only.**
+  - **The single continuous story, all real (not offline-simulated):** one
+    follower, one child, one stage, driven through `start_stage` → real
+    `test_workflow` execution (day 0, zero outcomes) → confirmed `seed`
+    fallback fires, not `journey_step`, not silence → real harvest
+    execution that evening → `record_harvest_answer` (the real function a
+    button-tap would call) logs the first outcome → next real execution:
+    `get_rhythm_due` now correctly returns `journey_step`, `observe` phase.
+    Advanced through nights via the real writers (`record_seed_sent`/
+    `record_harvest_sent`/`record_harvest_answer`, date-shifted to
+    simulate elapsed nights — the same technique used throughout this
+    session) to the 3rd logged night: `capture_stage_baseline` fired for
+    real, phase flipped to `build`. A real `test_workflow` execution at
+    `build` produced an actual small step; continued advancing to 20
+    logged nights (this journey's `hold` threshold), a real execution
+    there produced a no-step, presence-only message — matching each
+    phase's directive exactly, every time, with the real model.
+  - **Baseline show/hide tested in both directions, live-data-wins
+    confirmed both ways:** captured with `baseline_calm_count=1`. Right
+    after capture (recent 3 = same 3 nights = 1 calm) — suppressed, not
+    strictly better. Two calm nights later (recent 3 = 2 calm > 1) —
+    shown. Two hard nights after that (recent 3 back down to 1 calm = 1) —
+    **suppressed again**, even though the baseline sentence itself never
+    changed. This is the concrete proof that current live data governs
+    what's told, not a frozen claim from three weeks ago.
+  - **No-repeat confirmed structurally, not assumed:** the same day that
+    both `seed` and `harvest` fire, `get_rhythm_due` returns nothing more
+    for that follower — checked directly, not inferred.
+  - **Free path re-confirmed unaffected**, a third time this build cycle,
+    with a fresh isolated follower — real `Compose Seed` call, real
+    (harmless) Telegram failure, real `daily_logs` write.
+  - **Regression:** grounding/price/clean-reply gates re-checked live,
+    rolled back — unaffected, as expected (no SQL changed since STEP 2.1).
+  - **Zero residual data** — the one paid follower and the one free
+    follower, and everything under them, deleted after; `stages` back to 0.
+  - **W3 untouched this round** — no `update_workflow` call was made at
+    all in STEP 2.2, only `test_workflow` executions and direct SQL state
+    advancement. `active: false`, `activeVersionId: null`, confirmed
+    unchanged at the end.
 
 - **2026-08-12 — STEP 2.1: the `Harvest Prompt` bug (flagged in the STEP 2
   entry below) is FIXED, and the credential gap on `Record Journey Step
