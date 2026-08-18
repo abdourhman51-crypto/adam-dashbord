@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
-import Header from "@/components/Header";
+import Sidebar from "@/components/layout/Sidebar";
+import Header from "@/components/layout/Header";
 
 const plexArabic = IBM_Plex_Sans_Arabic({
   subsets: ["arabic", "latin"],
@@ -39,10 +39,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Sidebar />
           <div className="flex min-w-0 flex-1 flex-col">
             <Header />
-            <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
+            <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-20 pt-6 sm:px-6 md:pb-6 lg:px-8">
               {children}
             </main>
-            <footer className="border-t px-6 py-4 text-center text-xs text-[color:var(--text-muted)]">
+            <footer className="no-print hidden border-t px-6 py-4 text-center text-xs text-[color:var(--text-muted)] md:block">
               مركز قيادة آدم — بيانات حيّة من Supabase · جميع الأرقام من قاعدة البيانات الفعلية
             </footer>
           </div>
