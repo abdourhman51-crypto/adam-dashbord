@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     template: "%s · مركز قيادة آدم",
   },
   description: "لوحة التحليلات والقيادة التشغيلية لمنصة آدم للمرافقة التربوية",
-  icons: { icon: "/logo.png" },
+  icons: { icon: "/brand/tree-mark.png" },
 };
 
 const themeInit = `

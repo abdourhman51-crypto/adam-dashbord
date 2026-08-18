@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { NAV_ITEMS } from "./nav";
 
@@ -18,8 +19,8 @@ export default function Sidebar() {
       {/* سطح المكتب: عمود جانبي ثابت */}
       <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-l border-[color:var(--border)] bg-[color:var(--surface)] md:flex">
         <div className="flex items-center gap-2.5 px-5 py-5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--primary-soft)] text-base font-bold text-[color:var(--primary)]">
-            آ
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--primary-soft)] p-1.5">
+            <Image src="/brand/tree-mark.png" alt="" width={36} height={36} className="h-full w-full object-contain" />
           </div>
           <div>
             <p className="text-sm font-bold text-[color:var(--text)]">مركز قيادة آدم</p>
