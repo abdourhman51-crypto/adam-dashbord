@@ -12,7 +12,7 @@ interface ChildResponse {
 }
 
 export default function ChildPage() {
-  const result = useScreenData<ChildResponse>("/api/child");
+  const [result] = useScreenData<ChildResponse>("/api/child");
 
   if (result.state === "loading") return <LoadingState />;
   if (result.state === "outside_telegram") return <OutsideTelegramState />;

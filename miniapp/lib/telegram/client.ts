@@ -10,6 +10,23 @@ export function getInitDataRaw(): string | null {
   return wa?.initData && wa.initData.length > 0 ? wa.initData : null;
 }
 
+export function openLink(url: string) {
+  const wa = getWebApp();
+  if (wa?.openTelegramLink && url.startsWith("https://t.me/")) {
+    wa.openTelegramLink(url);
+    return;
+  }
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+export function haptic(style: "light" | "medium" | "heavy" = "light") {
+  try {
+    getWebApp()?.HapticFeedback?.impactOccurred(style);
+  } catch {
+    // تجاهل بأمان — ليست كل الأجهزة تدعم الاهتزاز
+  }
+}
+
 export function initWebApp() {
   const wa = getWebApp();
   if (!wa) return;

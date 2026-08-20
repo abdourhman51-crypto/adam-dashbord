@@ -160,6 +160,21 @@ body {
   transform: scale(0.97);
 }
 
+/* ─── طمس تسويقي عاطفي: الشكل والذهبي يلمعان، التفاصيل لا ─── */
+.blur-content {
+  filter: blur(7px);
+  user-select: none;
+  pointer-events: none;
+}
+
+.blur-badge {
+  background: var(--bg-deep);
+  border: 1px solid var(--glass-border-gold);
+  border-radius: var(--radius-full);
+  color: var(--gold-strong);
+  font-weight: 600;
+}
+
 .tree-backdrop {
   position: absolute;
   inset: 0;
@@ -184,6 +199,62 @@ body {
 }
 .rise-in {
   animation: rise-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes leaf-grow-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.leaf-grow-in {
+  animation: leaf-grow-in 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes confetti-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(0deg) translateY(0);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--confetti-rot)) translateY(var(--confetti-dist));
+  }
+}
+.confetti-particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  animation: confetti-burst 1100ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes celebration-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.celebration-pop {
+  animation: celebration-pop 500ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 @keyframes glow-pulse {
@@ -213,7 +284,10 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .rise-in,
-  .glow-pulse {
+  .glow-pulse,
+  .leaf-grow-in,
+  .confetti-particle,
+  .celebration-pop {
     animation: none;
   }
   html {

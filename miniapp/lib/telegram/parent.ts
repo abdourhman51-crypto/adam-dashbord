@@ -4,7 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 export const INIT_DATA_HEADER = "x-telegram-init-data";
 
 export type ResolveResult =
-  | { ok: true; parentId: string; childName: string | null }
+  | { ok: true; parentId: string; childName: string | null; isPaid: boolean; country: string | null }
   | { ok: false; status: number; message: string };
 
 /**
@@ -22,7 +22,7 @@ export async function resolveParent(request: Request): Promise<ResolveResult> {
   const platformUserId = String(verified.user.id);
   const { data, error } = await supabaseAdmin()
     .from("followers")
-    .select("id, children:children(name, is_primary)")
+    .select("id, funnel_stage, country, children:children(name, is_primary)")
     .eq("platform", "telegram")
     .eq("platform_user_id", platformUserId)
     .maybeSingle();
@@ -39,5 +39,11 @@ export async function resolveParent(request: Request): Promise<ResolveResult> {
     children.find((c) => c.is_primary && c.name && !["الطفل", "الطفلة"].includes(c.name)) ??
     children.find((c) => c.name && !["الطفل", "الطفلة"].includes(c.name));
 
-  return { ok: true, parentId: data.id as string, childName: primary?.name ?? null };
+  return {
+    ok: true,
+    parentId: data.id as string,
+    childName: primary?.name ?? null,
+    isPaid: data.funnel_stage === "paid_active",
+    country: (data.country as string | null) ?? null,
+  };
 }

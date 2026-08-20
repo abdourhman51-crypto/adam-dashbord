@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { fetchScreen, type ScreenFetchResult } from "@/lib/telegram/fetcher";
 import { initWebApp } from "@/lib/telegram/client";
 
@@ -8,6 +8,7 @@ export function useScreenData<T>(url: string) {
   const [result, setResult] = useState<ScreenFetchResult<T> | { state: "loading" }>({
     state: "loading",
   });
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     initWebApp();
@@ -18,7 +19,9 @@ export function useScreenData<T>(url: string) {
     return () => {
       cancelled = true;
     };
-  }, [url]);
+  }, [url, reloadKey]);
 
-  return result;
+  const refetch = useCallback(() => setReloadKey((k) => k + 1), []);
+
+  return [result, refetch] as const;
 }

@@ -4,11 +4,15 @@ import { useScreenData } from "@/lib/telegram/useScreenData";
 import { ScreenShell } from "@/components/ScreenShell";
 import { AdamIntro } from "@/components/AdamIntro";
 import { GlassCard } from "@/components/GlassCard";
+import { CriticalWindowIndicator } from "@/components/CriticalWindowIndicator";
+import { UpsellButton } from "@/components/UpsellButton";
 import { LoadingState, OutsideTelegramState, NotFoundState, ErrorState } from "@/components/states";
 import { formatNumber } from "@/lib/format";
+import type { CriticalWindowSnapshot } from "@/lib/criticalWindow";
 
 interface JourneyResponse {
-  inStage: boolean;
+  isPaid: boolean;
+  inStage?: boolean;
   childName: string | null;
   objectiveText?: string | null;
   objectiveTarget?: number | null;
@@ -22,10 +26,45 @@ interface JourneyResponse {
   extended?: boolean;
   phaseAr?: string | null;
   baselineText?: string | null;
+  criticalWindow?: CriticalWindowSnapshot | null;
+}
+
+function FreeTierPreview() {
+  return (
+    <ScreenShell>
+      <AdamIntro text="هذي شاشة رحلتكم — تُفتح لمّا نتّفق سوا على هدف واضح مع المرافقة الكاملة. هذا شكلها:" />
+
+      <div className="blur-content pointer-events-none flex flex-col gap-5" aria-hidden="true">
+        <GlassCard variant="gold" className="rise-in">
+          <p className="text-xs font-medium text-text-muted">الهدف اللي اتفقنا عليه</p>
+          <p className="font-display mt-2 text-[20px] leading-relaxed text-text">
+            ينام طفلكم بهدوء بلا صراخ 5 ليالٍ من كل 7
+          </p>
+          <div className="mt-5">
+            <div className="h-3 w-full overflow-hidden rounded-full bg-glass-bg">
+              <div className="h-full w-[45%] rounded-full bg-gradient-to-l from-gold to-gold-strong" />
+            </div>
+          </div>
+        </GlassCard>
+        <GlassCard className="rise-in grid grid-cols-2 gap-4 text-center">
+          <div>
+            <p className="font-display text-2xl text-text">١٨</p>
+            <p className="mt-1 text-xs text-text-muted">يوم سجّلتوه</p>
+          </div>
+          <div>
+            <p className="font-display text-2xl text-text">١٢</p>
+            <p className="mt-1 text-xs text-text-muted">يوم متبقّي</p>
+          </div>
+        </GlassCard>
+      </div>
+
+      <UpsellButton label="🔒 تفتح رحلتكم الحقيقية مع المرافقة الكاملة" />
+    </ScreenShell>
+  );
 }
 
 export default function JourneyPage() {
-  const result = useScreenData<JourneyResponse>("/api/journey");
+  const [result] = useScreenData<JourneyResponse>("/api/journey");
 
   if (result.state === "loading") return <LoadingState />;
   if (result.state === "outside_telegram") return <OutsideTelegramState />;
@@ -34,10 +73,12 @@ export default function JourneyPage() {
 
   const j = result.data;
 
+  if (!j.isPaid) return <FreeTierPreview />;
+
   if (!j.inStage) {
     return (
       <ScreenShell>
-        <AdamIntro text="هذي شاشة رحلتكم المدفوعة — وين وصلتوا بالضبط بالهدف اللي اتفقنا عليه." />
+        <AdamIntro text="هذي شاشة رحلتكم — وين وصلتوا بالضبط بالهدف اللي اتفقنا عليه." />
         <GlassCard className="text-center">
           <p className="text-sm leading-relaxed text-text-muted">
             ما عندكم رحلة نشطة الحين. لمّا نتّفق على هدف واضح سوا، تتابعون تقدّمكم فيه هنا خطوة بخطوة.
@@ -55,6 +96,16 @@ export default function JourneyPage() {
   return (
     <ScreenShell>
       <AdamIntro text="هذي رحلتكم بالضبط — الهدف اللي اتفقنا عليه، وكم قطعتوا منه لين الحين." />
+
+      {j.criticalWindow && (
+        <CriticalWindowIndicator
+          labelAr={j.criticalWindow.labelAr}
+          windowStartHour={j.criticalWindow.windowStartHour}
+          windowEndHour={j.criticalWindow.windowEndHour}
+          serverNowMinutes={j.criticalWindow.serverNowMinutes}
+          serverTimestampMs={j.criticalWindow.serverTimestampMs}
+        />
+      )}
 
       <GlassCard variant="gold" className="rise-in">
         <p className="text-xs font-medium text-text-muted">الهدف اللي اتفقنا عليه</p>

@@ -1,11 +1,15 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { useScreenData } from "@/lib/telegram/useScreenData";
 import { ScreenShell } from "@/components/ScreenShell";
 import { AdamIntro } from "@/components/AdamIntro";
 import { GlassCard } from "@/components/GlassCard";
+import { QuickReplyCard } from "@/components/QuickReplyCard";
+import { AchievementCelebration } from "@/components/AchievementCelebration";
 import { LoadingState, OutsideTelegramState, NotFoundState, ErrorState } from "@/components/states";
 import { formatNightLabel } from "@/lib/format";
+import { computeStreak, isMilestone } from "@/lib/streak";
 
 interface TimelineNight {
   logDate: string;
@@ -17,6 +21,7 @@ interface TimelineNight {
 interface TimelineResponse {
   childName: string | null;
   trendLine: string | null;
+  todayOpen: boolean;
   nights: TimelineNight[];
   patterns: { label: string; description: string | null }[];
 }
@@ -27,15 +32,33 @@ const STEP_LABEL: Record<string, string> = {
   not_tried: "لم تُجرَّب",
 };
 
+function celebratedKey(streak: number) {
+  return `adam_celebrated_streak_${streak}`;
+}
+
 export default function TimelinePage() {
-  const result = useScreenData<TimelineResponse>("/api/timeline");
+  const [result, refetch] = useScreenData<TimelineResponse>("/api/timeline");
+  const [celebrating, setCelebrating] = useState(false);
+
+  const streak = useMemo(() => {
+    if (result.state !== "ok") return 0;
+    return computeStreak(result.data.nights);
+  }, [result]);
+
+  useEffect(() => {
+    if (streak === 0 || !isMilestone(streak)) return;
+    const key = celebratedKey(streak);
+    if (window.localStorage.getItem(key)) return;
+    window.localStorage.setItem(key, "1");
+    setCelebrating(true);
+  }, [streak]);
 
   if (result.state === "loading") return <LoadingState />;
   if (result.state === "outside_telegram") return <OutsideTelegramState />;
   if (result.state === "not_found") return <NotFoundState />;
   if (result.state === "error") return <ErrorState message={result.message} />;
 
-  const { childName, trendLine, nights, patterns } = result.data;
+  const { childName, trendLine, todayOpen, nights, patterns } = result.data;
   const child = childName ?? "طفلكم";
 
   return (
@@ -43,6 +66,8 @@ export default function TimelinePage() {
       <AdamIntro
         text={`هذي كل ليلة حكيتوا لي عنها مع ${child}، مرتّبة كما حصلت فعلاً — نقطة ذهبية للّيلة الهادئة، ونقطة رمادية هادئة للصعبة، بلا حكم على أي منهما.`}
       />
+
+      {todayOpen && <QuickReplyCard onAnswered={refetch} />}
 
       {trendLine && (
         <GlassCard variant="strong" className="rise-in text-center">
@@ -119,6 +144,10 @@ export default function TimelinePage() {
             ))}
           </div>
         </GlassCard>
+      )}
+
+      {celebrating && (
+        <AchievementCelebration streak={streak} childName={child} onClose={() => setCelebrating(false)} />
       )}
     </ScreenShell>
   );

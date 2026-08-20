@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { resolveParent } from "@/lib/telegram/parent";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { getCriticalWindow } from "@/lib/supabase/criticalWindow.server";
 
 export const dynamic = "force-dynamic";
 
@@ -28,21 +29,28 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: parent.message }, { status: parent.status });
   }
 
-  const { data, error } = await supabaseAdmin().rpc("stage_state", {
-    p_parent_id: parent.parentId,
-  });
+  // مستخدم مجاني: لا توجد بيانات رحلة حقيقية أصلاً — لا نستعلم، لا نُرجع أي رقم حقيقي.
+  if (!parent.isPaid) {
+    return NextResponse.json({ isPaid: false, childName: parent.childName });
+  }
 
-  if (error) {
+  const [stageRes, criticalWindow] = await Promise.all([
+    supabaseAdmin().rpc("stage_state", { p_parent_id: parent.parentId }),
+    getCriticalWindow(parent.parentId, parent.country),
+  ]);
+
+  if (stageRes.error) {
     return NextResponse.json({ error: "تعذّر قراءة الرحلة" }, { status: 500 });
   }
 
-  const stage = (data ?? { in_stage: false }) as StageStateRpc;
+  const stage = (stageRes.data ?? { in_stage: false }) as StageStateRpc;
 
   if (!stage.in_stage) {
-    return NextResponse.json({ inStage: false, childName: parent.childName });
+    return NextResponse.json({ isPaid: true, inStage: false, childName: parent.childName });
   }
 
   return NextResponse.json({
+    isPaid: true,
     inStage: true,
     childName: parent.childName,
     objectiveText: stage.objective_text ?? null,
@@ -57,5 +65,6 @@ export async function GET(request: Request) {
     extended: stage.extended ?? false,
     phaseAr: stage.phase_ar ?? null,
     baselineText: stage.baseline_text ?? null,
+    criticalWindow,
   });
 }

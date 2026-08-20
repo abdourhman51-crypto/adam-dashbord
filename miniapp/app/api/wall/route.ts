@@ -32,6 +32,7 @@ export async function GET(request: Request) {
   const moments = (data ?? []) as DoneRow[];
 
   return NextResponse.json({
+    isPaid: parent.isPaid,
     childName: parent.childName,
     moments: moments.map((m) => ({ logDate: m.log_date, stepGiven: m.step_given })),
   });

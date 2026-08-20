@@ -1,16 +1,31 @@
 const numberFormatter = new Intl.NumberFormat("ar", { maximumFractionDigits: 0 });
-const dayLabelFormatter = new Intl.DateTimeFormat("ar", { day: "numeric", month: "long" });
 const weekdayFormatter = new Intl.DateTimeFormat("ar", { weekday: "long" });
+
+/** أسماء الأشهر بالدارجة المستخدمة بالجزائر والمغرب العربي — لا الفصحى المشرقية */
+const MAGHREBI_MONTHS = [
+  "جانفي",
+  "فيفري",
+  "مارس",
+  "أفريل",
+  "ماي",
+  "جوان",
+  "جويلية",
+  "أوت",
+  "سبتمبر",
+  "أكتوبر",
+  "نوفمبر",
+  "ديسمبر",
+] as const;
 
 export function formatNumber(n: number | null | undefined) {
   if (n === null || n === undefined || Number.isNaN(n)) return "٠";
   return numberFormatter.format(n);
 }
 
-/** "الثلاثاء، ١٢ أغسطس" — لنقاط الخط الزمني */
+/** "الثلاثاء، 12 جانفي" — لنقاط الخط الزمني، بأشهر الدارجة المغاربية */
 export function formatNightLabel(logDate: string) {
   const d = new Date(`${logDate}T12:00:00`);
-  return `${weekdayFormatter.format(d)}، ${dayLabelFormatter.format(d)}`;
+  return `${weekdayFormatter.format(d)}، ${d.getDate()} ${MAGHREBI_MONTHS[d.getMonth()]}`;
 }
 
 export function safeParseLightMemory(raw: string | null): Record<string, string> | null {

@@ -27,3 +27,30 @@ export async function fetchScreen<T>(url: string): Promise<ScreenFetchResult<T>>
   const data = (await res.json()) as T;
   return { state: "ok", data };
 }
+
+export async function postAction<T>(
+  url: string,
+  body: unknown
+): Promise<ScreenFetchResult<T>> {
+  const initData = getInitDataRaw();
+  if (!initData) return { state: "outside_telegram" };
+
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: "POST",
+      headers: { "x-telegram-init-data": initData, "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    return { state: "error", message: "تعذّر الاتصال. تأكد من اتصالك بالإنترنت." };
+  }
+
+  if (res.status === 404) return { state: "not_found" };
+  if (!res.ok) {
+    return { state: "error", message: "تعذّر تسجيل الإجابة. حاول مرة أخرى." };
+  }
+
+  const data = (await res.json()) as T;
+  return { state: "ok", data };
+}

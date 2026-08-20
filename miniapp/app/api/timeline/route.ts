@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { resolveParent } from "@/lib/telegram/parent";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { getLocalDateString } from "@/lib/supabase/localDate.server";
 
 export const dynamic = "force-dynamic";
 
@@ -41,8 +42,9 @@ export async function GET(request: Request) {
   }
 
   const db = supabaseAdmin();
+  const today = await getLocalDateString(parent.country);
 
-  const [nightsRes, effortRes, patternsRes] = await Promise.all([
+  const [nightsRes, effortRes, patternsRes, todayRes] = await Promise.all([
     db
       .from("daily_logs")
       .select("log_date, night_result, step_given, step_status")
@@ -58,6 +60,12 @@ export async function GET(request: Request) {
       .eq("safe_for_record", true)
       .order("last_observed", { ascending: false })
       .limit(6),
+    db
+      .from("daily_logs")
+      .select("seed_sent_at, harvest_answered_at")
+      .eq("follower_id", parent.parentId)
+      .eq("log_date", today)
+      .maybeSingle(),
   ]);
 
   if (nightsRes.error || effortRes.error || patternsRes.error) {
@@ -67,10 +75,13 @@ export async function GET(request: Request) {
   const nights = (nightsRes.data ?? []) as NightRow[];
   const patterns = (patternsRes.data ?? []) as PatternRow[];
   const effort = (effortRes.data ?? {}) as Record<string, number>;
+  const todayRow = todayRes.data as { seed_sent_at: string | null; harvest_answered_at: string | null } | null;
+  const todayOpen = Boolean(todayRow?.seed_sent_at && !todayRow?.harvest_answered_at);
 
   return NextResponse.json({
     childName: parent.childName,
     trendLine: buildTrendLine(effort),
+    todayOpen,
     nights: nights.map((n) => ({
       logDate: n.log_date,
       result: n.night_result,
