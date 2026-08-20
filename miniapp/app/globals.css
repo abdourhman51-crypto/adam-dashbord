@@ -1,0 +1,225 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────
+   نظام تصميم آدم — Mini App. مرجع القرارات: DESIGN.md
+   زجاج فاخر فوق غابة آدم الداكنة — ألوان مصدرها dashboard/app/globals.css (.dark) حرفياً.
+   ───────────────────────────────────────────── */
+
+:root {
+  --bg-deep: #0d1a12;
+  --bg-mid: #102017;
+  --bg-glow: #1c3526;
+  --surface: #14251a;
+
+  --emerald: #5e9c74;
+  --emerald-strong: #7ab890;
+
+  --gold: #e3b23c;
+  --gold-strong: #f0c96a;
+  --gold-soft: #2c2410;
+
+  --text: #f1efe6;
+  --text-secondary: #d9d5c9;
+  --text-muted: #a3b0a4;
+
+  /* الليلة/اللحظة الصعبة: نفس --text-muted عمداً — رمادي-أخضر هادئ، بلا أي درجة حمراء بالتطبيق */
+  --hard: #a3b0a4;
+
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-bg-strong: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-border-gold: rgba(227, 178, 60, 0.35);
+  --glass-blur: 20px;
+
+  --radius-lg: 28px;
+  --radius-md: 20px;
+  --radius-full: 999px;
+
+  --font-display: "Noto Naskh Arabic", "Traditional Arabic", serif;
+  --font-body: "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+
+  --shadow-glass: 0 8px 32px rgb(0 0 0 / 0.35);
+  --shadow-gold-glow: 0 0 24px rgb(227 178 60 / 0.25);
+}
+
+@theme inline {
+  --color-bg-deep: var(--bg-deep);
+  --color-bg-mid: var(--bg-mid);
+  --color-bg-glow: var(--bg-glow);
+  --color-surface: var(--surface);
+  --color-emerald: var(--emerald);
+  --color-emerald-strong: var(--emerald-strong);
+  --color-gold: var(--gold);
+  --color-gold-strong: var(--gold-strong);
+  --color-gold-soft: var(--gold-soft);
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-hard: var(--hard);
+  --color-glass-border: var(--glass-border);
+  --color-glass-border-gold: var(--glass-border-gold);
+  --color-glass-bg: var(--glass-bg);
+  --color-glass-bg-strong: var(--glass-bg-strong);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+* {
+  border-color: var(--glass-border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100dvh;
+  background:
+    radial-gradient(120% 60% at 50% -10%, var(--bg-glow) 0%, transparent 60%),
+    linear-gradient(180deg, var(--bg-mid) 0%, var(--bg-deep) 55%, #081009 100%);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-feature-settings: "tnum";
+  -webkit-tap-highlight-color: transparent;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── الزجاج: للبطاقات والحاويات الكبرى فقط — أبداً للعناصر القابلة للضغط ─── */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--shadow-glass);
+}
+
+.glass-strong {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--shadow-glass);
+}
+
+.glass-soft {
+  background: var(--gold-soft);
+  border: 1px solid var(--glass-border-gold);
+  border-radius: var(--radius-lg);
+}
+
+.glass-gold {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border-gold);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--shadow-glass), var(--shadow-gold-glow);
+}
+
+/* ─── سطح صلب: كل عنصر قابل للضغط يستخدم هذا، لا الزجاج ─── */
+.pressable {
+  background: var(--surface);
+  border: 1.5px solid var(--emerald-strong);
+  border-radius: var(--radius-full);
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background 180ms ease;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+.pressable:active {
+  transform: scale(0.97);
+}
+.pressable[data-active="true"] {
+  background: linear-gradient(135deg, var(--emerald-strong), var(--emerald));
+  color: var(--bg-deep);
+  border-color: transparent;
+}
+
+/* محجوز حصراً لدعوة/زر المرافقة الكاملة — لا يظهر بأي مكان آخر */
+.pressable-gold {
+  background: linear-gradient(135deg, var(--gold), var(--gold-strong));
+  color: var(--bg-deep);
+  border: none;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-gold-glow);
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  touch-action: manipulation;
+  cursor: pointer;
+}
+.pressable-gold:active {
+  transform: scale(0.97);
+}
+
+.tree-backdrop {
+  position: absolute;
+  inset: 0;
+  background-image: url("/brand/tree.png");
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: min(520px, 140%) auto;
+  opacity: 0.07;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise-in {
+  animation: rise-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgb(227 178 60 / 0);
+  }
+  50% {
+    box-shadow: 0 0 18px rgb(227 178 60 / 0.35);
+  }
+}
+.glow-pulse {
+  animation: glow-pulse 2.4s ease-in-out infinite;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in,
+  .glow-pulse {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
