@@ -2,17 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Flame, Trophy, Heart, Sprout } from "lucide-react";
+import { Sparkles, BookOpenText, Sprout, MessageCircle } from "lucide-react";
+import { getChatLink } from "@/lib/upsell";
+import { openLink, haptic } from "@/lib/telegram/client";
 
 const TABS = [
-  { href: "/timeline", label: "الخط الصادق", icon: Flame },
-  { href: "/wall", label: "جدار الإنجاز", icon: Trophy },
-  { href: "/child", label: "طفلي", icon: Heart },
+  { href: "/", label: "اليوم", icon: Sparkles },
+  { href: "/insights", label: "ما يعرفه آدم", icon: BookOpenText },
   { href: "/journey", label: "رحلتي", icon: Sprout },
 ] as const;
 
 export function BottomNav() {
   const pathname = usePathname();
+  const chatHref = getChatLink();
 
   return (
     <nav
@@ -35,6 +37,21 @@ export function BottomNav() {
             </Link>
           );
         })}
+
+        {chatHref && (
+          <button
+            type="button"
+            onClick={() => {
+              haptic("light");
+              openLink(chatHref);
+            }}
+            className="pressable-gold flex flex-1 flex-col items-center gap-1 px-2 py-2 text-center"
+            aria-label="تحدّث مع آدم"
+          >
+            <MessageCircle size={22} strokeWidth={2} />
+            <span className="text-[11px] font-medium leading-none">آدم</span>
+          </button>
+        )}
       </div>
     </nav>
   );

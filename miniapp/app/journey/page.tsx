@@ -1,11 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useScreenData } from "@/lib/telegram/useScreenData";
 import { ScreenShell } from "@/components/ScreenShell";
 import { AdamIntro } from "@/components/AdamIntro";
 import { GlassCard } from "@/components/GlassCard";
 import { CriticalWindowIndicator } from "@/components/CriticalWindowIndicator";
-import { UpsellButton } from "@/components/UpsellButton";
 import { LoadingState, OutsideTelegramState, NotFoundState, ErrorState } from "@/components/states";
 import { formatNumber } from "@/lib/format";
 import type { CriticalWindowSnapshot } from "@/lib/criticalWindow";
@@ -58,7 +58,9 @@ function FreeTierPreview() {
         </GlassCard>
       </div>
 
-      <UpsellButton label="🔒 تفتح رحلتكم الحقيقية مع المرافقة الكاملة" />
+      <Link href="/journey/start" className="pressable-gold flex items-center justify-center px-5 py-3 text-sm font-semibold">
+        🎯 نبني خطتكم الآن — نصف دقيقة، بلا التزام
+      </Link>
     </ScreenShell>
   );
 }

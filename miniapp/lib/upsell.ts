@@ -8,3 +8,10 @@ export function getUpgradeDeepLink(): string | null {
   if (!username) return null;
   return `https://t.me/${username}?start=journey`;
 }
+
+/** رابط محادثة آدم العادية — بلا start payload، لأي دعوة عامة للحديث معه. */
+export function getChatLink(): string | null {
+  const username = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME;
+  if (!username) return null;
+  return `https://t.me/${username}`;
+}
