@@ -1,0 +1,358 @@
+@import url("https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────
+   نظام تصميم آدم — Mini App. مرجع القرارات: DESIGN.md
+   زجاج فاخر فوق غابة آدم الداكنة — ألوان مصدرها dashboard/app/globals.css (.dark) حرفياً.
+   ───────────────────────────────────────────── */
+
+:root {
+  --bg-deep: #0d1a12;
+  --bg-mid: #102017;
+  --bg-glow: #1c3526;
+  --surface: #14251a;
+
+  --emerald: #5e9c74;
+  --emerald-strong: #7ab890;
+
+  --gold: #e3b23c;
+  --gold-strong: #f0c96a;
+  --gold-soft: #2c2410;
+
+  --text: #f1efe6;
+  --text-secondary: #d9d5c9;
+  --text-muted: #a3b0a4;
+
+  /* الليلة/اللحظة الصعبة: نفس --text-muted عمداً — رمادي-أخضر هادئ، بلا أي درجة حمراء بالتطبيق */
+  --hard: #a3b0a4;
+
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-bg-strong: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-border-gold: rgba(227, 178, 60, 0.35);
+  --glass-blur: 20px;
+
+  --radius-lg: 28px;
+  --radius-md: 20px;
+  --radius-full: 999px;
+
+  --font-display: "Baloo Bhaijaan 2", "Segoe UI", Tahoma, sans-serif;
+  --font-body: "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+
+  --shadow-glass: 0 8px 32px rgb(0 0 0 / 0.35);
+  --shadow-gold-glow: 0 0 24px rgb(227 178 60 / 0.25);
+
+  /* معدن حقيقي لا لون مسطّح — تدرّجات متعددة الطبقات بانعكاس ضوئي بزاوية ثابتة */
+  --gold-metal: linear-gradient(
+    135deg,
+    #6b4e0e 0%,
+    #a8720f 14%,
+    #d4a017 30%,
+    #f4d675 46%,
+    #fff6d6 54%,
+    #f0c96a 64%,
+    #b8860b 82%,
+    #e3b23c 100%
+  );
+  --emerald-metal: linear-gradient(
+    135deg,
+    #0b2015 0%,
+    #163a22 16%,
+    #2c5c3c 32%,
+    #5e9c74 48%,
+    #a8d9b8 56%,
+    #5e9c74 66%,
+    #1f4d2e 84%,
+    #0f2818 100%
+  );
+}
+
+@theme inline {
+  --color-bg-deep: var(--bg-deep);
+  --color-bg-mid: var(--bg-mid);
+  --color-bg-glow: var(--bg-glow);
+  --color-surface: var(--surface);
+  --color-emerald: var(--emerald);
+  --color-emerald-strong: var(--emerald-strong);
+  --color-gold: var(--gold);
+  --color-gold-strong: var(--gold-strong);
+  --color-gold-soft: var(--gold-soft);
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-hard: var(--hard);
+  --color-glass-border: var(--glass-border);
+  --color-glass-border-gold: var(--glass-border-gold);
+  --color-glass-bg: var(--glass-bg);
+  --color-glass-bg-strong: var(--glass-bg-strong);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+* {
+  border-color: var(--glass-border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100dvh;
+  background:
+    radial-gradient(120% 60% at 50% -10%, var(--bg-glow) 0%, transparent 60%),
+    linear-gradient(180deg, var(--bg-mid) 0%, var(--bg-deep) 55%, #081009 100%);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-feature-settings: "tnum";
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+/* نسيج عميق فاخر — grain دقيق عبر SVG turbulence، بلا أي اعتماد على أصل خارجي */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── الزجاج: للبطاقات والحاويات الكبرى فقط — أبداً للعناصر القابلة للضغط ─── */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--shadow-glass);
+}
+
+.glass-strong {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--shadow-glass);
+}
+
+.glass-soft {
+  background: var(--gold-soft);
+  border: 1px solid var(--glass-border-gold);
+  border-radius: var(--radius-lg);
+}
+
+.glass-gold {
+  background-color: var(--glass-bg-strong);
+  background-image:
+    linear-gradient(var(--glass-bg-strong), var(--glass-bg-strong)),
+    url("https://d8j0ntlcm91z4.cloudfront.net/user_3CPnImgjiKIeQIfolIn0s2fo89h/hf_20260822_012137_865f0989-a60b-4e2f-8b65-15597f0ca8e4.png");
+  background-size: cover, cover;
+  background-position: center, center;
+  border: 1px solid var(--glass-border-gold);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--shadow-glass), var(--shadow-gold-glow);
+}
+
+/* ─── سطح صلب: كل عنصر قابل للضغط يستخدم هذا، لا الزجاج ─── */
+.pressable {
+  background: var(--surface);
+  border: 1.5px solid var(--emerald-strong);
+  border-radius: var(--radius-full);
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background 180ms ease;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+.pressable:active {
+  transform: scale(0.97);
+}
+.pressable[data-active="true"] {
+  background: var(--emerald-metal);
+  color: var(--bg-deep);
+  border-color: transparent;
+}
+
+/* محجوز حصراً لدعوة/زر المرافقة الكاملة — لا يظهر بأي مكان آخر */
+.pressable-gold {
+  background: var(--gold-metal);
+  color: var(--bg-deep);
+  border: none;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-gold-glow);
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  touch-action: manipulation;
+  cursor: pointer;
+}
+.pressable-gold:active {
+  transform: scale(0.97);
+}
+
+/* ─── طمس تسويقي عاطفي: الشكل والذهبي يلمعان، التفاصيل لا ─── */
+.blur-content {
+  filter: blur(7px);
+  user-select: none;
+  pointer-events: none;
+}
+
+.blur-badge {
+  background: var(--bg-deep);
+  border: 1px solid var(--glass-border-gold);
+  border-radius: var(--radius-full);
+  color: var(--gold-strong);
+  font-weight: 600;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise-in {
+  animation: rise-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes leaf-grow-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.leaf-grow-in {
+  animation: leaf-grow-in 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes confetti-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(0deg) translateY(0);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--confetti-rot)) translateY(var(--confetti-dist));
+  }
+}
+.confetti-particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  animation: confetti-burst 1100ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes celebration-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.celebration-pop {
+  animation: celebration-pop 500ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes tree-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.tree-loader-ring {
+  background: conic-gradient(from 0deg, transparent 0%, var(--gold) 35%, var(--gold-strong) 50%, transparent 65%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  animation: tree-loader-spin 1.3s linear infinite;
+}
+@keyframes tree-loader-breathe {
+  0%,
+  100% {
+    transform: scale(0.94);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+.tree-loader-breathe {
+  animation: tree-loader-breathe 1.3s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgb(227 178 60 / 0.4));
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgb(227 178 60 / 0);
+  }
+  50% {
+    box-shadow: 0 0 18px rgb(227 178 60 / 0.35);
+  }
+}
+.glow-pulse {
+  animation: glow-pulse 2.4s ease-in-out infinite;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in,
+  .glow-pulse,
+  .leaf-grow-in,
+  .confetti-particle,
+  .celebration-pop,
+  .tree-loader-ring,
+  .tree-loader-breathe {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}

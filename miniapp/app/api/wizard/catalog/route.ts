@@ -1,0 +1,50 @@
+import { NextResponse } from "next/server";
+import { resolveParent } from "@/lib/telegram/parent";
+import { supabaseAdmin } from "@/lib/supabase/admin";
+
+export const dynamic = "force-dynamic";
+
+interface ProblemRow {
+  key: string;
+  emoji: string;
+  label_ar: string;
+}
+
+interface MenuButton {
+  label: string;
+  cb?: string;
+  url?: string;
+}
+
+export async function GET(request: Request) {
+  const parent = await resolveParent(request);
+  if (!parent.ok) {
+    return NextResponse.json({ error: parent.message }, { status: parent.status });
+  }
+
+  const db = supabaseAdmin();
+
+  const [problemsRes, countryRes, journeyMomentRes] = await Promise.all([
+    db.from("journey_problem_catalog").select("key, emoji, label_ar").order("sort_order"),
+    db.rpc("country_state", { p_parent_id: parent.parentId }),
+    db.rpc("get_conversation_moment", { p_key: "menu_journey", p_parent_id: parent.parentId }),
+  ]);
+
+  if (problemsRes.error) {
+    return NextResponse.json({ error: "تعذّر قراءة قائمة المواقف" }, { status: 500 });
+  }
+
+  const problems = (problemsRes.data ?? []) as ProblemRow[];
+  const countryState = countryRes.data as { state?: string; price?: string; name_ar?: string } | null;
+  const journeyMoment = journeyMomentRes.data as { buttons?: MenuButton[] } | null;
+  const teamUrl = journeyMoment?.buttons?.find((b) => b.url)?.url ?? null;
+
+  return NextResponse.json({
+    childName: parent.childName,
+    problems: problems.map((p) => ({ key: p.key, emoji: p.emoji, label: p.label_ar })),
+    countrySupported: countryState?.state === "supported",
+    price: countryState?.price ?? null,
+    countryName: countryState?.name_ar ?? null,
+    teamUrl,
+  });
+}
