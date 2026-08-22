@@ -17,7 +17,10 @@ npm run dev
 | `NEXT_PUBLIC_SUPABASE_URL` | مشروع Supabase `aajqbmjasnbwwyvgrlzy` |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Project Settings → API (سرّي، سيرفر فقط) |
 | `TELEGRAM_BOT_TOKEN` | BotFather (سرّي، سيرفر فقط — للتحقق من initData) |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | اسم مستخدم بوت آدم بلا `@` — لبناء رابط "المرافقة الكاملة" (`t.me/<username>?start=journey`) |
+
+أزرار "التحدث مع آدم" و"المرافقة الكاملة" لا تحتاج أي اسم مستخدم للبوت —
+تستخدم `WebApp.close()` لإرجاع الوالد لنفس محادثة البوت التي فتح منها
+التطبيق المصغّر، وهذا يعمل دائماً بلا أي إعداد إضافي.
 
 ## تسجيله عند BotFather كـ Mini App
 

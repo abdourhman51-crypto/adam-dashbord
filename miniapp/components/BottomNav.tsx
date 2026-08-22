@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sparkles, BookOpenText, Sprout, MessageCircle } from "lucide-react";
-import { getChatLink } from "@/lib/upsell";
-import { openLink, haptic } from "@/lib/telegram/client";
+import { returnToAdamChat } from "@/lib/upsell";
+import { haptic } from "@/lib/telegram/client";
 
 const TABS = [
   { href: "/", label: "اليوم", icon: Sparkles },
@@ -14,7 +14,6 @@ const TABS = [
 
 export function BottomNav() {
   const pathname = usePathname();
-  const chatHref = getChatLink();
 
   return (
     <nav
@@ -38,20 +37,18 @@ export function BottomNav() {
           );
         })}
 
-        {chatHref && (
-          <button
-            type="button"
-            onClick={() => {
-              haptic("light");
-              openLink(chatHref);
-            }}
-            className="pressable-gold flex flex-1 flex-col items-center gap-1 px-2 py-2 text-center"
-            aria-label="تحدّث مع آدم"
-          >
-            <MessageCircle size={22} strokeWidth={2} />
-            <span className="text-[11px] font-medium leading-none">آدم</span>
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => {
+            haptic("light");
+            returnToAdamChat();
+          }}
+          className="pressable-gold flex flex-1 flex-col items-center gap-1 px-2 py-2 text-center"
+          aria-label="تحدّث مع آدم"
+        >
+          <MessageCircle size={22} strokeWidth={2} />
+          <span className="text-[11px] font-medium leading-none">آدم</span>
+        </button>
       </div>
     </nav>
   );

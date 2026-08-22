@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { BottomNav } from "@/components/BottomNav";
-import { Sidebar } from "@/components/Sidebar";
+import { TopBar } from "@/components/TopBar";
 import { WelcomeSplash } from "@/components/WelcomeSplash";
 
 export const metadata: Metadata = {
@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ar" dir="rtl">
       <body>
         <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
-        <Sidebar />
+        <TopBar />
         {children}
         <BottomNav />
         <WelcomeSplash />
