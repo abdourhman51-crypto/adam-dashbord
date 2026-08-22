@@ -1,27 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Leaf } from "lucide-react";
+import Image from "next/image";
 import { getInitDataRaw } from "@/lib/telegram/client";
-import { MAX_LEAVES, leafPosition } from "@/lib/treeLeaves";
-import { GoldLeaf } from "@/components/GoldLeaf";
 import { TreeLightbox } from "@/components/TreeLightbox";
 import { formatNumber } from "@/lib/format";
 
 const SEEN_KEY = "adam_tree_seen_calm_count";
 
+/**
+ * الشجرة كشعار آدم — علامة صغيرة واضحة كاملة الوضوح (لا خلفية خافتة)، وهي نفسها
+ * زر فتح الشجرة الحية (الأوراق الذهبية والتكبير) داخل TreeLightbox.
+ */
 export function LivingTree() {
   const [calmCount, setCalmCount] = useState<number | null>(null);
-  const [seenCount, setSeenCount] = useState(0);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const initData = getInitDataRaw();
     if (!initData) return;
     let cancelled = false;
-
-    const seen = Number(window.localStorage.getItem(SEEN_KEY) ?? "0");
-    setSeenCount(Number.isFinite(seen) ? seen : 0);
 
     fetch("/api/tree", { headers: { "x-telegram-init-data": initData } })
       .then((res) => (res.ok ? res.json() : null))
@@ -37,52 +35,24 @@ export function LivingTree() {
     };
   }, []);
 
-  const visibleLeaves = Math.min(calmCount ?? 0, MAX_LEAVES);
-
   return (
     <>
       <button
         type="button"
-        onClick={() => calmCount !== null && setOpen(true)}
-        className="absolute inset-x-0 top-0 z-0 h-[420px] cursor-pointer border-0 bg-transparent p-0"
+        onClick={() => setOpen(true)}
+        className="pressable fixed start-4 top-4 z-20 flex h-12 w-12 items-center justify-center !rounded-2xl border-[1.5px] border-gold p-0"
         style={{ touchAction: "manipulation" }}
-        aria-label="افتحوا الشجرة لتكبيرها"
+        aria-label="شجرة آدم — افتحوها لتكبيرها"
       >
-        <div className="tree-backdrop" aria-hidden="true" />
-        {calmCount !== null &&
-          Array.from({ length: visibleLeaves }, (_, i) => {
-            const p = leafPosition(i);
-            const isNew = i >= seenCount;
-            return (
-              <GoldLeaf
-                key={i}
-                left={`${p.leftPct}%`}
-                top={`${p.topPct * 0.9 + 4}%`}
-                width={p.sizePx}
-                rotateDeg={p.rotateDeg}
-                grow={isNew}
-                delayMs={(i - seenCount) * 90}
-              />
-            );
-          })}
+        <Image src="/brand/tree.png" alt="آدم" width={40} height={40} className="h-8 w-8 object-contain" priority />
+        {calmCount !== null && calmCount > 0 && (
+          <span className="glass-gold absolute -end-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-bold text-gold-strong">
+            <span className="tabular">{formatNumber(calmCount)}</span>
+          </span>
+        )}
       </button>
 
-      {calmCount !== null && (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="pressable absolute start-4 top-4 z-20 flex items-center gap-1.5 px-3 py-1.5 text-xs"
-          style={{ touchAction: "manipulation" }}
-          aria-label="افتحوا شجرتكم لتكبيرها"
-        >
-          <Leaf size={14} className="text-gold-strong" strokeWidth={2.2} />
-          <span className="tabular font-medium">{formatNumber(calmCount)}</span>
-        </button>
-      )}
-
-      {open && calmCount !== null && (
-        <TreeLightbox leafCount={calmCount} onClose={() => setOpen(false)} />
-      )}
+      {open && <TreeLightbox leafCount={calmCount ?? 0} onClose={() => setOpen(false)} />}
     </>
   );
 }

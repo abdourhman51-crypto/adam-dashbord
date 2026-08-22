@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Calendar, CalendarDays, Waves, ClipboardList, Gift, Shield, Gem, Phone, type LucideIcon } from "lucide-react";
 import { ScreenShell } from "@/components/ScreenShell";
 import { AdamIntro } from "@/components/AdamIntro";
 import { GlassCard } from "@/components/GlassCard";
+import { TreeLoader } from "@/components/TreeLoader";
 import { LoadingState, OutsideTelegramState, ErrorState } from "@/components/states";
 import { fetchScreen } from "@/lib/telegram/fetcher";
 import { openLink, haptic } from "@/lib/telegram/client";
+import { IconGlyph, IconText } from "@/lib/emojiIcons";
 
 interface CatalogResponse {
   childName: string | null;
@@ -22,11 +25,11 @@ interface OutcomesResponse {
   promises: string[];
 }
 
-const FREQUENCIES = [
-  { key: "daily", label: "📅 كل يوم تقريباً", confirmLabel: "كل يوم تقريباً" },
-  { key: "weekly", label: "🗓️ عدة مرات في الأسبوع", confirmLabel: "عدة مرات في الأسبوع" },
-  { key: "occasional", label: "〰️ بين فترة وأخرى، لكنه يوجع حين يحدث", confirmLabel: "بين فترة وأخرى" },
-] as const;
+const FREQUENCIES: { key: string; label: string; confirmLabel: string; icon: LucideIcon }[] = [
+  { key: "daily", label: "كل يوم تقريباً", confirmLabel: "كل يوم تقريباً", icon: Calendar },
+  { key: "weekly", label: "عدة مرات في الأسبوع", confirmLabel: "عدة مرات في الأسبوع", icon: CalendarDays },
+  { key: "occasional", label: "بين فترة وأخرى، لكنه يوجع حين يحدث", confirmLabel: "بين فترة وأخرى", icon: Waves },
+];
 
 type Step = "problem" | "frequency" | "outcome" | "confirm";
 
@@ -111,7 +114,7 @@ export default function WizardPage() {
                 onClick={() => selectProblem(p.key)}
                 className="pressable !rounded-2xl px-4 py-5 text-center text-sm font-medium"
               >
-                <span className="mb-2 block text-2xl">{p.emoji}</span>
+                <IconGlyph emoji={p.emoji} size={26} className="mb-2 block text-gold-strong" />
                 {p.label}
               </button>
             ))}
@@ -128,8 +131,9 @@ export default function WizardPage() {
                 key={f.key}
                 type="button"
                 onClick={() => selectFrequency(f.key)}
-                className="pressable !rounded-2xl px-5 py-4 text-sm font-medium"
+                className="pressable flex items-center gap-3 !rounded-2xl px-5 py-4 text-sm font-medium"
               >
+                <f.icon size={18} className="text-gold-strong" strokeWidth={2.2} />
                 {f.label}
               </button>
             ))}
@@ -182,7 +186,9 @@ function OutcomeStep({
     <>
       <StepHeader step={3} title="ولو تغيّر أمر واحد فقط خلال 29 يوماً، ماذا تحبّون أن يحدث؟" />
       {loading || !outcomes ? (
-        <div className="glow-pulse mx-auto mt-6 h-10 w-10 rounded-full bg-gold-soft" />
+        <div className="mx-auto mt-6">
+          <TreeLoader />
+        </div>
       ) : (
         <div className="mt-2 flex flex-col gap-2.5">
           {outcomes.outcomes.map((o) => (
@@ -192,7 +198,7 @@ function OutcomeStep({
               onClick={() => onSelect(o)}
               className="pressable !rounded-2xl px-5 py-4 text-right text-sm font-medium"
             >
-              {o}
+              <IconText text={o} />
             </button>
           ))}
 
@@ -202,7 +208,7 @@ function OutcomeStep({
               <div className="flex flex-col gap-1.5">
                 {outcomes.promises.map((p) => (
                   <p key={p} className="text-xs leading-relaxed text-text-secondary">
-                    {p}
+                    <IconText text={p} />
                   </p>
                 ))}
               </div>
@@ -232,24 +238,33 @@ function ConfirmStep({
       <StepHeader step={4} title="آخر خطوة" />
 
       <GlassCard variant="gold" className="rise-in">
-        <p className="font-display text-[16px] text-gold-strong">📋 خطتكم جاهزة:</p>
+        <p className="font-display flex items-center gap-2 text-[16px] text-gold-strong">
+          <ClipboardList size={18} strokeWidth={2.2} />
+          خطتكم جاهزة:
+        </p>
         <div className="mt-4 flex flex-col gap-3 text-sm leading-relaxed text-text">
-          <p>
-            • الأمر الذي يتعبكم مع {who}: {problem.emoji} {problem.label}، {frequencyLabel}
+          <p className="flex items-start gap-2">
+            <IconGlyph emoji={problem.emoji} size={16} className="mt-0.5 shrink-0 text-gold-strong" />
+            <span>
+              الأمر الذي يتعبكم مع {who}: {problem.label}، {frequencyLabel}
+            </span>
           </p>
-          <p>• الهدف خلال 29 يوماً: {outcomeText}</p>
+          <p>الهدف خلال 29 يوماً: {outcomeText}</p>
         </div>
 
-        <p className="mt-4 text-sm leading-relaxed text-text-secondary">
-          🎁 ومعها تُفتح ✨ بصائر آدم — صفحة تتابعون فيها بالأرقام كل أسبوع: هل تحسّن الوضع فعلاً؟
+        <p className="mt-4 flex items-start gap-2 text-sm leading-relaxed text-text-secondary">
+          <Gift size={16} className="mt-0.5 shrink-0 text-gold-strong" strokeWidth={2.2} />
+          ومعها تُفتح بصائر آدم — صفحة تتابعون فيها بالأرقام كل أسبوع: هل تحسّن الوضع فعلاً؟
         </p>
-        <p className="mt-3 text-sm leading-relaxed text-text-secondary">
-          🛡️ وباتفاق واضح: إن لم نصل لهذا الهدف بالذات خلال المدة، أُكمل معكم نصف المدة إضافية مجاناً حتى نصل.
+        <p className="mt-3 flex items-start gap-2 text-sm leading-relaxed text-text-secondary">
+          <Shield size={16} className="mt-0.5 shrink-0 text-gold-strong" strokeWidth={2.2} />
+          وباتفاق واضح: إن لم نصل لهذا الهدف بالذات خلال المدة، أُكمل معكم نصف المدة إضافية مجاناً حتى نصل.
         </p>
 
         {catalog.countrySupported && catalog.price && (
-          <p className="mt-4 font-display text-[15px] text-gold-strong">
-            💎 الاستثمار: {catalog.price}، لمدّة 29 يوماً — لهذا الهدف بالذات، لا اشتراك عام.
+          <p className="font-display mt-4 flex items-center gap-2 text-[15px] text-gold-strong">
+            <Gem size={16} strokeWidth={2.2} />
+            الاستثمار: {catalog.price}، لمدّة 29 يوماً — لهذا الهدف بالذات، لا اشتراك عام.
           </p>
         )}
       </GlassCard>
@@ -261,9 +276,10 @@ function ConfirmStep({
             haptic("medium");
             openLink(catalog.teamUrl!);
           }}
-          className="pressable-gold w-full px-5 py-3.5 text-sm font-semibold"
+          className="pressable-gold flex w-full items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold"
         >
-          📞 نُفعّل الخطة مع فريق آدم
+          <Phone size={16} strokeWidth={2.2} />
+          نُفعّل الخطة مع فريق آدم
         </button>
       ) : (
         <p className="text-center text-sm text-text-muted">تواصلوا مع آدم على تيليغرام لتفعيل الخطة.</p>

@@ -15,6 +15,7 @@ import { useScrollReveal } from "@/components/useScrollReveal";
 import { LoadingState, OutsideTelegramState, NotFoundState, ErrorState } from "@/components/states";
 import { formatNightLabel, formatNumber } from "@/lib/format";
 import { computeStreak, isMilestone } from "@/lib/streak";
+import { IconText } from "@/lib/emojiIcons";
 
 function celebratedKey(streak: number) {
   return `adam_celebrated_streak_${streak}`;
@@ -97,7 +98,9 @@ export default function InsightsPage() {
           </div>
           {insight ? (
             <GlassCard variant="strong" className="text-right">
-              <p className="font-display text-[18px] leading-loose text-text">{insight}</p>
+              <p className="font-display text-[18px] leading-loose text-text">
+                <IconText text={insight} />
+              </p>
             </GlassCard>
           ) : (
             <GlassCard>
@@ -194,8 +197,12 @@ export default function InsightsPage() {
               {patterns.map((p) => (
                 <div key={p.label} className="flex items-start gap-2 border-e-2 border-e-emerald-strong pe-3">
                   <div>
-                    <p className="text-sm font-medium text-text">{p.label}</p>
-                    {p.description && <p className="mt-0.5 text-xs leading-relaxed text-text-muted">{p.description}</p>}
+                    <p className="text-sm font-medium text-text"><IconText text={p.label} /></p>
+                    {p.description && (
+                      <p className="mt-0.5 text-xs leading-relaxed text-text-muted">
+                        <IconText text={p.description} />
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}
@@ -241,7 +248,7 @@ export default function InsightsPage() {
         )}
         {hiddenCount > 0 && (
           <div className="mt-4">
-            <UpsellButton label="🔒 وفيه أكثر من هذا — يظهر كامل مع المرافقة الكاملة" />
+            <UpsellButton label="وفيه أكثر من هذا — يظهر كامل مع المرافقة الكاملة" />
           </div>
         )}
       </Section>

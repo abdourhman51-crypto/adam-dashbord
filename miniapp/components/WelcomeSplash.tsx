@@ -31,18 +31,18 @@ export function WelcomeSplash() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-end bg-bg-deep">
-      <div className="tree-backdrop" aria-hidden="true" style={{ opacity: 0.1 }} />
-      <div className="relative z-10 flex w-full flex-1 items-end justify-center overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={WELCOME_IMAGE_URL}
-          alt="آدم يرحّب بكم"
-          className="max-h-[65vh] w-auto object-contain"
-        />
-      </div>
-      <div className="relative z-10 flex flex-col items-center gap-4 px-6 pb-[max(env(safe-area-inset-bottom),32px)] pt-6 text-center">
-        <p className="font-display text-[22px] text-gold-strong">أهلاً، أنا آدم</p>
+    <div className="fixed inset-0 z-50 bg-bg-deep">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={WELCOME_IMAGE_URL} alt="آدم يرحّب بكم" className="absolute inset-0 h-full w-full object-cover" />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(8,16,9,0.05) 0%, rgba(8,16,9,0.15) 45%, rgba(8,16,9,0.75) 72%, var(--bg-deep) 96%)",
+        }}
+      />
+      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 px-6 pb-[max(env(safe-area-inset-bottom),32px)] pt-10 text-center">
+        <p className="font-display text-[26px] text-gold-strong">أهلاً، أنا آدم</p>
         <p className="max-w-xs text-sm leading-relaxed text-text-secondary">
           هذي مساحتكم الخاصة — أتابع فيها معكم كل خطوة، وأحكي لكم بصدق كيف تمشي الأمور.
         </p>

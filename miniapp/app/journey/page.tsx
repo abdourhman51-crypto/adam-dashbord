@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Target, Check } from "lucide-react";
 import { useScreenData } from "@/lib/telegram/useScreenData";
 import { ScreenShell } from "@/components/ScreenShell";
 import { AdamIntro } from "@/components/AdamIntro";
@@ -58,8 +59,12 @@ function FreeTierPreview() {
         </GlassCard>
       </div>
 
-      <Link href="/journey/start" className="pressable-gold flex items-center justify-center px-5 py-3 text-sm font-semibold">
-        🎯 نبني خطتكم الآن — نصف دقيقة، بلا التزام
+      <Link
+        href="/journey/start"
+        className="pressable-gold flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold"
+      >
+        <Target size={17} strokeWidth={2.2} />
+        نبني خطتكم الآن — نصف دقيقة، بلا التزام
       </Link>
     </ScreenShell>
   );
@@ -122,7 +127,16 @@ export default function JourneyPage() {
           </div>
           <div className="mt-2 flex items-center justify-between text-xs text-text-muted">
             <span>{formatNumber(j.objectiveCurrent ?? 0)} من {formatNumber(j.objectiveTarget ?? 0)}</span>
-            <span>{j.objectiveMet ? "تحقّق الهدف ✓" : `${progress}٪`}</span>
+            <span className="flex items-center gap-1">
+              {j.objectiveMet ? (
+                <>
+                  <Check size={13} strokeWidth={2.5} />
+                  تحقّق الهدف
+                </>
+              ) : (
+                `${progress}٪`
+              )}
+            </span>
           </div>
         </div>
 

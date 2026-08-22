@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────
@@ -36,11 +36,35 @@
   --radius-md: 20px;
   --radius-full: 999px;
 
-  --font-display: "Noto Naskh Arabic", "Traditional Arabic", serif;
+  --font-display: "Baloo Bhaijaan 2", "Segoe UI", Tahoma, sans-serif;
   --font-body: "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
 
   --shadow-glass: 0 8px 32px rgb(0 0 0 / 0.35);
   --shadow-gold-glow: 0 0 24px rgb(227 178 60 / 0.25);
+
+  /* معدن حقيقي لا لون مسطّح — تدرّجات متعددة الطبقات بانعكاس ضوئي بزاوية ثابتة */
+  --gold-metal: linear-gradient(
+    135deg,
+    #6b4e0e 0%,
+    #a8720f 14%,
+    #d4a017 30%,
+    #f4d675 46%,
+    #fff6d6 54%,
+    #f0c96a 64%,
+    #b8860b 82%,
+    #e3b23c 100%
+  );
+  --emerald-metal: linear-gradient(
+    135deg,
+    #0b2015 0%,
+    #163a22 16%,
+    #2c5c3c 32%,
+    #5e9c74 48%,
+    #a8d9b8 56%,
+    #5e9c74 66%,
+    #1f4d2e 84%,
+    #0f2818 100%
+  );
 }
 
 @theme inline {
@@ -83,6 +107,19 @@ body {
   font-family: var(--font-body);
   font-feature-settings: "tnum";
   -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+/* نسيج عميق فاخر — grain دقيق عبر SVG turbulence، بلا أي اعتماد على أصل خارجي */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 .font-display {
@@ -119,7 +156,12 @@ body {
 }
 
 .glass-gold {
-  background: var(--glass-bg-strong);
+  background-color: var(--glass-bg-strong);
+  background-image:
+    linear-gradient(var(--glass-bg-strong), var(--glass-bg-strong)),
+    url("https://d8j0ntlcm91z4.cloudfront.net/user_3CPnImgjiKIeQIfolIn0s2fo89h/hf_20260822_012137_865f0989-a60b-4e2f-8b65-15597f0ca8e4.png");
+  background-size: cover, cover;
+  background-position: center, center;
   border: 1px solid var(--glass-border-gold);
   border-radius: var(--radius-lg);
   backdrop-filter: blur(var(--glass-blur));
@@ -140,14 +182,14 @@ body {
   transform: scale(0.97);
 }
 .pressable[data-active="true"] {
-  background: linear-gradient(135deg, var(--emerald-strong), var(--emerald));
+  background: var(--emerald-metal);
   color: var(--bg-deep);
   border-color: transparent;
 }
 
 /* محجوز حصراً لدعوة/زر المرافقة الكاملة — لا يظهر بأي مكان آخر */
 .pressable-gold {
-  background: linear-gradient(135deg, var(--gold), var(--gold-strong));
+  background: var(--gold-metal);
   color: var(--bg-deep);
   border: none;
   border-radius: var(--radius-full);
@@ -173,18 +215,6 @@ body {
   border-radius: var(--radius-full);
   color: var(--gold-strong);
   font-weight: 600;
-}
-
-.tree-backdrop {
-  position: absolute;
-  inset: 0;
-  background-image: url("/brand/tree.png");
-  background-repeat: no-repeat;
-  background-position: top center;
-  background-size: min(520px, 140%) auto;
-  opacity: 0.07;
-  pointer-events: none;
-  z-index: 0;
 }
 
 @keyframes rise-in {
@@ -257,6 +287,33 @@ body {
   animation: celebration-pop 500ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
+@keyframes tree-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.tree-loader-ring {
+  background: conic-gradient(from 0deg, transparent 0%, var(--gold) 35%, var(--gold-strong) 50%, transparent 65%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  animation: tree-loader-spin 1.3s linear infinite;
+}
+@keyframes tree-loader-breathe {
+  0%,
+  100% {
+    transform: scale(0.94);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+.tree-loader-breathe {
+  animation: tree-loader-breathe 1.3s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgb(227 178 60 / 0.4));
+}
+
 @keyframes glow-pulse {
   0%,
   100% {
@@ -287,7 +344,9 @@ body {
   .glow-pulse,
   .leaf-grow-in,
   .confetti-particle,
-  .celebration-pop {
+  .celebration-pop,
+  .tree-loader-ring,
+  .tree-loader-breathe {
     animation: none;
   }
   html {

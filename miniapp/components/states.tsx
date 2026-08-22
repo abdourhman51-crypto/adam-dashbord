@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { GlassCard } from "@/components/GlassCard";
+import { TreeLoader } from "@/components/TreeLoader";
 
 function StateShell({
   title,
@@ -34,7 +35,7 @@ function StateShell({
 export function LoadingState() {
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center gap-3">
-      <div className="glow-pulse h-16 w-16 rounded-full bg-gold-soft" aria-hidden="true" />
+      <TreeLoader size="lg" />
       <p className="text-sm text-text-muted">آدم يجهّز الشاشة…</p>
     </div>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, MessageCircle } from "lucide-react";
 import { useScreenData } from "@/lib/telegram/useScreenData";
 import { ScreenShell } from "@/components/ScreenShell";
 import { AdamIntro } from "@/components/AdamIntro";
@@ -59,7 +59,7 @@ export default function HomePage() {
             احكوا لي كيف كان يومكم مع {child}، وأعطيكم شيئاً واحداً صغيراً تجرّبونه الليلة.
           </p>
           <div className="mt-5">
-            <ChatCTAButton label="💬 احكوا لآدم عن يومكم" />
+            <ChatCTAButton label="احكوا لآدم عن يومكم" />
           </div>
         </GlassCard>
       </ScreenShell>
@@ -87,9 +87,16 @@ export default function HomePage() {
               type="button"
               onClick={commit}
               disabled={committing}
-              className="pressable-gold px-5 py-3 text-sm font-semibold disabled:opacity-60"
+              className="pressable-gold flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold disabled:opacity-60"
             >
-              {committing ? "جاري التسجيل…" : "✅ سأطبّق ذلك"}
+              {committing ? (
+                "جاري التسجيل…"
+              ) : (
+                <>
+                  <CheckCircle2 size={17} strokeWidth={2.2} />
+                  سأطبّق ذلك
+                </>
+              )}
             </button>
             {chatHref && (
               <button
@@ -98,9 +105,10 @@ export default function HomePage() {
                   haptic("light");
                   openLink(chatHref);
                 }}
-                className="pressable px-5 py-3 text-sm font-medium"
+                className="pressable flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium"
               >
-                💬 عندي استفسار آخر
+                <MessageCircle size={16} strokeWidth={2.2} />
+                عندي استفسار آخر
               </button>
             )}
             {error && (

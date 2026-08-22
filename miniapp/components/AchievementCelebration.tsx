@@ -6,6 +6,8 @@ import { drawAchievementCard, canvasToBlob, shareOrDownload } from "@/lib/shareC
 import { haptic } from "@/lib/telegram/client";
 
 const PARTICLE_COLORS = ["#e3b23c", "#f0c96a", "#7ab890"];
+const BADGE_URL =
+  "https://d8j0ntlcm91z4.cloudfront.net/user_3CPnImgjiKIeQIfolIn0s2fo89h/hf_20260822_012434_506babf3-1a49-4ad7-b33d-22ff5d7a4700.png";
 
 function Confetti() {
   const particles = useRef(
@@ -85,7 +87,13 @@ export function AchievementCelebration({
         <X size={20} />
       </button>
 
-      <div className="celebration-pop text-center">
+      <div className="celebration-pop relative text-center">
+        <img
+          src={BADGE_URL}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-40 w-40 -translate-x-1/2 -translate-y-1/2 opacity-30"
+        />
         <p className="font-display text-[22px] text-gold-strong">وصلتوا محطة جديدة!</p>
         <p className="mt-1 text-sm text-text-muted">{streak} ليلة متتالية حكيتوا لي فيها كيف مرّت</p>
       </div>
