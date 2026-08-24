@@ -56,6 +56,7 @@ export default function WizardPage() {
   const [outcomes, setOutcomes] = useState<OutcomesResponse | null>(null);
   const [outcomeText, setOutcomeText] = useState<string | null>(null);
   const [loadingOutcomes, setLoadingOutcomes] = useState(false);
+  const [outcomesError, setOutcomesError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchScreen<CatalogResponse>("/api/wizard/catalog").then((r) => {
@@ -88,8 +89,10 @@ export default function WizardPage() {
   async function goToOutcome() {
     if (!problemKey) return;
     setLoadingOutcomes(true);
+    setOutcomesError(null);
     const r = await fetchScreen<OutcomesResponse>(`/api/wizard/outcomes?problem=${encodeURIComponent(problemKey)}`);
     if (r.state === "ok") setOutcomes(r.data);
+    else setOutcomesError(r.state === "error" ? r.message : "تعذّر تحميل الخيارات الآن.");
     setLoadingOutcomes(false);
   }
 
@@ -146,6 +149,7 @@ export default function WizardPage() {
           who={who}
           outcomes={outcomes}
           loading={loadingOutcomes}
+          error={outcomesError}
           onEnter={goToOutcome}
           onSelect={selectOutcome}
         />
@@ -168,27 +172,40 @@ function OutcomeStep({
   who,
   outcomes,
   loading,
+  error,
   onEnter,
   onSelect,
 }: {
   who: string;
   outcomes: OutcomesResponse | null;
   loading: boolean;
+  error: string | null;
   onEnter: () => void;
   onSelect: (text: string) => void;
 }) {
   useEffect(() => {
-    if (!outcomes && !loading) onEnter();
+    if (!outcomes && !loading && !error) onEnter();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <>
       <StepHeader step={3} title="ولو تغيّر أمر واحد فقط خلال 29 يوماً، ماذا تحبّون أن يحدث؟" />
-      {loading || !outcomes ? (
+      {loading ? (
         <div className="mx-auto mt-6">
           <TreeLoader />
         </div>
+      ) : error || !outcomes ? (
+        <GlassCard className="rise-in mt-4 text-center">
+          <p className="text-sm leading-relaxed text-text-muted">{error ?? "تعذّر تحميل الخيارات الآن."}</p>
+          <button
+            type="button"
+            onClick={onEnter}
+            className="pressable-gold mt-4 px-5 py-2.5 text-sm font-semibold"
+          >
+            حاول مرة أخرى
+          </button>
+        </GlassCard>
       ) : (
         <div className="mt-2 flex flex-col gap-2.5">
           {outcomes.outcomes.map((o) => (
