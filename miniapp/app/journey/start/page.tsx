@@ -57,13 +57,18 @@ export default function WizardPage() {
   const [outcomeText, setOutcomeText] = useState<string | null>(null);
   const [loadingOutcomes, setLoadingOutcomes] = useState(false);
   const [outcomesError, setOutcomesError] = useState<string | null>(null);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
 
   function loadCatalog() {
     setCatalog(null);
+    setCatalogError(null);
     fetchScreen<CatalogResponse>("/api/wizard/catalog").then((r) => {
       if (r.state === "ok") setCatalog(r.data);
       else if (r.state === "outside_telegram") setCatalog("outside");
-      else setCatalog("error");
+      else {
+        setCatalog("error");
+        setCatalogError(r.state === "error" ? r.message : "تعذّر تحميل الاستمارة الآن.");
+      }
     });
   }
 
@@ -74,7 +79,9 @@ export default function WizardPage() {
 
   if (catalog === null) return <LoadingState />;
   if (catalog === "outside") return <OutsideTelegramState />;
-  if (catalog === "error") return <ErrorState message="تعذّر تحميل الاستمارة الآن." onRetry={loadCatalog} />;
+  if (catalog === "error") {
+    return <ErrorState message={catalogError ?? "تعذّر تحميل الاستمارة الآن."} onRetry={loadCatalog} />;
+  }
 
   const who = catalog.childName ?? "طفلكم";
   const problem = catalog.problems.find((p) => p.key === problemKey);
