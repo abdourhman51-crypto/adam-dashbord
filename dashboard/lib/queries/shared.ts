@@ -15,7 +15,9 @@ import type {
 /**
  * جداول المشروع صغيرة (مئات الصفوف) — نجلبها كاملة مرة واحدة لكل طلب (مُخزَّنة
  * عبر React cache) ونُجري التجميعات في الخادم بدل استعلامات SQL مركّبة هشة.
- * كل دالة تستبعد حسابي الاختبار افتراضياً.
+ * كل دالة تستبعد حسابي الاختبار افتراضياً؛ مرّر includeTest=true صراحةً لعرضهما
+ * (مثلاً لفتح صفحة عميل بعينها أو تفعيل اشتراك تجريبي) — لا يؤثر هذا على أي
+ * إحصائية أو قائمة أخرى تستدعي بلا هذا الوسيط.
  */
 
 async function fetchAllPages<T>(
@@ -35,20 +37,22 @@ async function fetchAllPages<T>(
   return all;
 }
 
-export const getFollowers = cache(async (): Promise<Follower[]> => {
-  return fetchAllPages<Follower>((from, to) =>
-    supabaseAdmin()
+export const getFollowers = cache(async (includeTest = false): Promise<Follower[]> => {
+  return fetchAllPages<Follower>((from, to) => {
+    let query = supabaseAdmin()
       .from("followers")
       .select(
         "id, platform, platform_user_id, username, first_name, first_seen, last_active, funnel_stage, country, payment_status, subscription_started_at, subscription_expires_at, light_memory, light_memory_updated_at, parent_gender, intention_text, agreed_objective, agreed_at, journey_form_state"
-      )
-      .not("platform_user_id", "in", `(${TEST_PLATFORM_USER_IDS.join(",")})`)
-      .range(from, to)
-  );
+      );
+    if (!includeTest) {
+      query = query.not("platform_user_id", "in", `(${TEST_PLATFORM_USER_IDS.join(",")})`);
+    }
+    return query.range(from, to);
+  });
 });
 
-export const getChildren = cache(async (): Promise<Child[]> => {
-  const followers = await getFollowers();
+export const getChildren = cache(async (includeTest = false): Promise<Child[]> => {
+  const followers = await getFollowers(includeTest);
   const ids = new Set(followers.map((f) => f.id));
   const rows = await fetchAllPages<Child>((from, to) =>
     supabaseAdmin()
@@ -59,8 +63,8 @@ export const getChildren = cache(async (): Promise<Child[]> => {
   return rows.filter((c) => ids.has(c.follower_id));
 });
 
-export const getDailyLogs = cache(async (): Promise<DailyLog[]> => {
-  const followers = await getFollowers();
+export const getDailyLogs = cache(async (includeTest = false): Promise<DailyLog[]> => {
+  const followers = await getFollowers(includeTest);
   const ids = new Set(followers.map((f) => f.id));
   const rows = await fetchAllPages<DailyLog>((from, to) =>
     supabaseAdmin()
@@ -73,8 +77,8 @@ export const getDailyLogs = cache(async (): Promise<DailyLog[]> => {
   return rows.filter((d) => ids.has(d.follower_id));
 });
 
-export const getStageProgress = cache(async (): Promise<StageProgress[]> => {
-  const followers = await getFollowers();
+export const getStageProgress = cache(async (includeTest = false): Promise<StageProgress[]> => {
+  const followers = await getFollowers(includeTest);
   const ids = new Set(followers.map((f) => f.id));
   const rows = await fetchAllPages<StageProgress>((from, to) =>
     supabaseAdmin().from("v_stage_progress").select("*").range(from, to)
@@ -82,8 +86,8 @@ export const getStageProgress = cache(async (): Promise<StageProgress[]> => {
   return rows.filter((s) => ids.has(s.parent_id));
 });
 
-export const getSituations = cache(async (): Promise<Situation[]> => {
-  const followers = await getFollowers();
+export const getSituations = cache(async (includeTest = false): Promise<Situation[]> => {
+  const followers = await getFollowers(includeTest);
   const ids = new Set(followers.map((f) => f.id));
   const rows = await fetchAllPages<Situation>((from, to) =>
     supabaseAdmin().from("situations").select("*").range(from, to)
@@ -91,8 +95,8 @@ export const getSituations = cache(async (): Promise<Situation[]> => {
   return rows.filter((s) => ids.has(s.parent_id));
 });
 
-export const getChildPatterns = cache(async (): Promise<ChildPattern[]> => {
-  const followers = await getFollowers();
+export const getChildPatterns = cache(async (includeTest = false): Promise<ChildPattern[]> => {
+  const followers = await getFollowers(includeTest);
   const ids = new Set(followers.map((f) => f.id));
   const rows = await fetchAllPages<ChildPattern>((from, to) =>
     supabaseAdmin().from("child_patterns").select("*").range(from, to)
@@ -100,8 +104,8 @@ export const getChildPatterns = cache(async (): Promise<ChildPattern[]> => {
   return rows.filter((p) => ids.has(p.follower_id));
 });
 
-export const getPayments = cache(async (): Promise<Payment[]> => {
-  const followers = await getFollowers();
+export const getPayments = cache(async (includeTest = false): Promise<Payment[]> => {
+  const followers = await getFollowers(includeTest);
   const ids = new Set(followers.map((f) => f.id));
   const rows = await fetchAllPages<Payment>((from, to) =>
     supabaseAdmin().from("payments").select("*").range(from, to)
@@ -109,8 +113,8 @@ export const getPayments = cache(async (): Promise<Payment[]> => {
   return rows.filter((p) => !p.follower_id || ids.has(p.follower_id));
 });
 
-export const getCheckinStates = cache(async (): Promise<CheckinState[]> => {
-  const followers = await getFollowers();
+export const getCheckinStates = cache(async (includeTest = false): Promise<CheckinState[]> => {
+  const followers = await getFollowers(includeTest);
   const ids = new Set(followers.map((f) => f.id));
   const rows = await fetchAllPages<CheckinState>((from, to) =>
     supabaseAdmin().from("checkin_state").select("*").range(from, to)
@@ -118,8 +122,8 @@ export const getCheckinStates = cache(async (): Promise<CheckinState[]> => {
   return rows.filter((s) => ids.has(s.parent_id));
 });
 
-export const getParentStrains = cache(async (): Promise<ParentStrain[]> => {
-  const followers = await getFollowers();
+export const getParentStrains = cache(async (includeTest = false): Promise<ParentStrain[]> => {
+  const followers = await getFollowers(includeTest);
   const ids = new Set(followers.map((f) => f.id));
   const rows = await fetchAllPages<ParentStrain>((from, to) =>
     supabaseAdmin().from("parent_strain").select("*").range(from, to)

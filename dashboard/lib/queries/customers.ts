@@ -15,6 +15,7 @@ export interface CustomerFilters {
   status?: string;
   from?: string;
   to?: string;
+  includeTest?: boolean;
 }
 
 function matches(f: Follower, filters: CustomerFilters) {
@@ -31,7 +32,7 @@ function matches(f: Follower, filters: CustomerFilters) {
 }
 
 export async function listCustomers(filters: CustomerFilters) {
-  const followers = await getFollowers();
+  const followers = await getFollowers(filters.includeTest ?? false);
   const filtered = followers.filter((f) => matches(f, filters));
   return filtered.sort((a, b) => +new Date(b.first_seen) - +new Date(a.first_seen));
 }
@@ -43,13 +44,16 @@ export async function listCountries() {
 }
 
 export async function getCustomerDetail(followerId: string) {
+  // includeTest=true دائماً هنا: زيارة صفحة عميل بمعرّف معروف فعل صريح — لا
+  // معنى لإخفاء حسابي الاختبار عن صاحب المنتج وهو يفتحهما بنفسه ليفعّل
+  // اشتراكاً تجريبياً. هذا لا يغيّر أي قائمة أو إحصائية أخرى.
   const [followers, children, stages, strains, checkins, payments] = await Promise.all([
-    getFollowers(),
-    getChildren(),
-    getStageProgress(),
-    getParentStrains(),
-    getCheckinStates(),
-    getPayments(),
+    getFollowers(true),
+    getChildren(true),
+    getStageProgress(true),
+    getParentStrains(true),
+    getCheckinStates(true),
+    getPayments(true),
   ]);
 
   const follower = followers.find((f) => f.id === followerId);
