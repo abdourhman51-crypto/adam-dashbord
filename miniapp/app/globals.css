@@ -97,6 +97,14 @@ html {
   scroll-behavior: smooth;
 }
 
+/* حلقة تركيز واضحة بذهبي العلامة — بلا هذا، مستخدمو لوحة المفاتيح (تيليغرام
+   ويب) لا يرون أين هم أبداً على خلفياتنا الداكنة المخصصة. */
+:focus-visible {
+  outline: 2px solid var(--gold-strong);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 body {
   min-height: 100dvh;
   background:
