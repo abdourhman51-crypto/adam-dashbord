@@ -6,13 +6,17 @@ function StateShell({
   title,
   body,
   showAdam = true,
+  onRetry,
 }: {
   title: string;
   body: string;
   showAdam?: boolean;
+  onRetry?: () => void;
 }) {
   return (
-    <div className="flex min-h-[70vh] flex-col items-center justify-center gap-4 px-6 text-center">
+    <div
+      className="flex min-h-dvh flex-col items-center justify-center gap-4 px-6 pb-32 pt-[calc(env(safe-area-inset-top)+84px)] text-center"
+    >
       {showAdam && (
         <div className="glass-gold h-20 w-20 overflow-hidden !rounded-full p-0">
           <Image
@@ -27,6 +31,11 @@ function StateShell({
       <GlassCard>
         <p className="font-display text-lg text-text">{title}</p>
         <p className="mt-2 text-sm leading-relaxed text-text-muted">{body}</p>
+        {onRetry && (
+          <button type="button" onClick={onRetry} className="pressable-gold mt-4 px-5 py-2.5 text-sm font-semibold">
+            حاول مرة أخرى
+          </button>
+        )}
       </GlassCard>
     </div>
   );
@@ -34,7 +43,7 @@ function StateShell({
 
 export function LoadingState() {
   return (
-    <div className="flex min-h-[70vh] flex-col items-center justify-center gap-3">
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-3 pb-32 pt-[calc(env(safe-area-inset-top)+84px)]">
       <TreeLoader size="lg" />
       <p className="text-sm text-text-muted">آدم يجهّز الشاشة…</p>
     </div>
@@ -59,6 +68,6 @@ export function NotFoundState() {
   );
 }
 
-export function ErrorState({ message }: { message: string }) {
-  return <StateShell title="تعذّر فتح الشاشة الآن" body={message} showAdam={false} />;
+export function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
+  return <StateShell title="تعذّر فتح الشاشة الآن" body={message} showAdam={false} onRetry={onRetry} />;
 }

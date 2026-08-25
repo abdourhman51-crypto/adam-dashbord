@@ -1,13 +1,28 @@
 "use client";
 
-import { useState } from "react";
-import { Menu, X, ChevronLeft, ArrowRight, Sparkles, Cog, Gem, Users, type LucideIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Menu,
+  X,
+  ChevronLeft,
+  ArrowRight,
+  Sparkles,
+  Cog,
+  Gem,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { GlassCard } from "@/components/GlassCard";
 import { TreeLoader } from "@/components/TreeLoader";
+import { TreeLightbox } from "@/components/TreeLightbox";
 import { IconText } from "@/lib/emojiIcons";
 import { fetchScreen } from "@/lib/telegram/fetcher";
-import { openLink, haptic } from "@/lib/telegram/client";
-import { getChatLink } from "@/lib/upsell";
+import { getInitDataRaw, openLink, haptic } from "@/lib/telegram/client";
+import { returnToAdamChat } from "@/lib/upsell";
+import { formatNumber } from "@/lib/format";
 
 interface MenuButton {
   label: string;
@@ -28,12 +43,50 @@ const ENTRIES: { key: string; label: string; icon: LucideIcon }[] = [
   { key: "menu_family", label: "عائلة آدم", icon: Users },
 ];
 
-export function Sidebar() {
+/**
+ * بعض أزرار المحتوى القادم من get_conversation_moment (مثل "🎯 أشوف
+ * المرافقة الكاملة" بمفتاح menu_journey، الظاهر داخل menu_pricing_diff و
+ * menu_why) لا يقابلها موضوع نصي داخل ENTRIES — هي أصلاً بوابة تجارية تقود
+ * لواجهة التخصيص الحقيقية، لا بطاقة نص. أي مفتاح هنا يُفتح كصفحة Next.js
+ * حقيقية بدل محاولة تحميله كموضوع من /api/menu (الذي سيفشل بصمت لأنه غير
+ * معرّف أصلاً بجدول conversation_moments كموضوع مستقل ذي محتوى).
+ */
+const ROUTE_TARGETS: Record<string, string> = {
+  menu_journey: "/journey/start",
+};
+
+/**
+ * الشريط العلوي الدائم للمنصة: شعار آدم + اسمه (يفتحان الشجرة الحيّة)، وزر
+ * القائمة، وزر ذهبي دائم يقود لواجهة التخصيص المدفوعة — كلها في شريط واحد
+ * واضح لا يغطي محتوى الشاشة (المحتوى يُزاح تحته دائماً، انظر ScreenShell).
+ */
+export function TopBar() {
+  const router = useRouter();
+  const [calmCount, setCalmCount] = useState<number | null>(null);
+  const [treeOpen, setTreeOpen] = useState(false);
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [moment, setMoment] = useState<MenuMoment | null>(null);
   const [loading, setLoading] = useState(false);
-  const chatHref = getChatLink();
+
+  useEffect(() => {
+    const initData = getInitDataRaw();
+    if (!initData) return;
+    let cancelled = false;
+
+    fetch("/api/tree", { headers: { "x-telegram-init-data": initData } })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { calmCount: number } | null) => {
+        if (cancelled || !data) return;
+        setCalmCount(data.calmCount);
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function loadKey(key: string) {
     setMenuOpen(false);
@@ -47,12 +100,17 @@ export function Sidebar() {
 
   function onButtonPress(b: MenuButton) {
     haptic("light");
+    if (b.cb && ROUTE_TARGETS[b.cb]) {
+      closeAll();
+      router.push(ROUTE_TARGETS[b.cb]);
+      return;
+    }
     if (b.url) {
       openLink(b.url);
       return;
     }
-    if (b.cb === "other" && chatHref) {
-      openLink(chatHref);
+    if (b.cb === "other") {
+      returnToAdamChat();
       return;
     }
     if (b.cb && ENTRIES.some((e) => e.key === b.cb)) {
@@ -74,14 +132,46 @@ export function Sidebar() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setMenuOpen(true)}
-        className="pressable fixed start-4 top-16 z-20 flex h-11 w-11 items-center justify-center !rounded-2xl border-[1.5px] border-emerald-strong"
-        aria-label="القائمة"
-      >
-        <Menu size={19} strokeWidth={2.3} />
-      </button>
+      <header className="glass-strong fixed inset-x-0 top-0 z-30 flex items-center justify-between gap-2 !rounded-none border-x-0 border-t-0 px-4 pb-3 pt-[max(env(safe-area-inset-top),14px)]">
+        <button
+          type="button"
+          onClick={() => setTreeOpen(true)}
+          className="flex items-center gap-2 border-0 bg-transparent p-0"
+          style={{ touchAction: "manipulation" }}
+          aria-label="شجرة آدم — افتحوها لتكبيرها"
+        >
+          <span className="relative flex h-9 w-9 shrink-0 items-center justify-center">
+            <Image src="/brand/tree.png" alt="" width={36} height={36} className="h-9 w-9 object-contain" priority />
+            {calmCount !== null && calmCount > 0 && (
+              <span className="glass-gold absolute -end-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold text-gold-strong">
+                <span className="tabular">{formatNumber(calmCount)}</span>
+              </span>
+            )}
+          </span>
+          <span className="font-display text-[21px] font-extrabold leading-none text-gold-strong">آدم</span>
+        </button>
+
+        <div className="flex shrink-0 items-center gap-2">
+          <Link
+            href="/journey/start"
+            onClick={() => haptic("light")}
+            className="pressable-gold flex items-center gap-1.5 whitespace-nowrap !rounded-full px-3.5 py-2.5 text-[13px] font-bold"
+          >
+            <Sparkles size={14} strokeWidth={2.4} />
+            بصيص أمل
+          </Link>
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            className="pressable flex h-10 w-10 shrink-0 items-center justify-center !rounded-2xl border-[1.5px] border-emerald-strong"
+            aria-label="القائمة"
+          >
+            <Menu size={19} strokeWidth={2.3} />
+          </button>
+        </div>
+      </header>
+
+      {treeOpen && <TreeLightbox leafCount={calmCount ?? 0} onClose={() => setTreeOpen(false)} />}
 
       {/* قائمة العناوين — درج جانبي */}
       {menuOpen && (

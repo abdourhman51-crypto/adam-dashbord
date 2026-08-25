@@ -8,6 +8,7 @@ interface TelegramWebApp {
   setBackgroundColor?: (color: string) => void;
   disableVerticalSwipes?: () => void;
   platform?: string;
+  close?: () => void;
   openTelegramLink?: (url: string) => void;
   showPopup?: (params: { title?: string; message: string; buttons?: { id?: string; type?: string; text?: string }[] }, callback?: (id: string) => void) => void;
   HapticFeedback?: {

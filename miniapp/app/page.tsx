@@ -9,8 +9,8 @@ import { GlassCard } from "@/components/GlassCard";
 import { ChatCTAButton } from "@/components/ChatCTAButton";
 import { LoadingState, OutsideTelegramState, NotFoundState, ErrorState } from "@/components/states";
 import { postAction } from "@/lib/telegram/fetcher";
-import { openLink, haptic } from "@/lib/telegram/client";
-import { getChatLink } from "@/lib/upsell";
+import { haptic } from "@/lib/telegram/client";
+import { returnToAdamChat } from "@/lib/upsell";
 
 interface TodayResponse {
   childName: string | null;
@@ -30,7 +30,6 @@ export default function HomePage() {
 
   const { childName, stepGiven, stepCommittedAt } = result.data;
   const child = childName ?? "طفلكم";
-  const chatHref = getChatLink();
 
   async function commit() {
     if (committing) return;
@@ -98,19 +97,17 @@ export default function HomePage() {
                 </>
               )}
             </button>
-            {chatHref && (
-              <button
-                type="button"
-                onClick={() => {
-                  haptic("light");
-                  openLink(chatHref);
-                }}
-                className="pressable flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium"
-              >
-                <MessageCircle size={16} strokeWidth={2.2} />
-                عندي استفسار آخر
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => {
+                haptic("light");
+                returnToAdamChat();
+              }}
+              className="pressable flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium"
+            >
+              <MessageCircle size={16} strokeWidth={2.2} />
+              عندي استفسار آخر
+            </button>
             {error && (
               <p className="text-center text-xs text-text-muted">ما قدرنا نسجّل، جرّبوا مرة ثانية.</p>
             )}
