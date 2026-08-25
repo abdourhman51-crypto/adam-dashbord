@@ -69,6 +69,7 @@ export function TopBar() {
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [moment, setMoment] = useState<MenuMoment | null>(null);
   const [loading, setLoading] = useState(false);
+  const [momentError, setMomentError] = useState<string | null>(null);
 
   useEffect(() => {
     const initData = getInitDataRaw();
@@ -93,8 +94,10 @@ export function TopBar() {
     setActiveKey(key);
     setLoading(true);
     setMoment(null);
+    setMomentError(null);
     const r = await fetchScreen<MenuMoment>(`/api/menu?key=${encodeURIComponent(key)}`);
     if (r.state === "ok") setMoment(r.data);
+    else setMomentError(r.state === "error" ? r.message : "تعذّر تحميل هذي الشاشة الآن.");
     setLoading(false);
   }
 
@@ -262,7 +265,16 @@ export function TopBar() {
                 )}
               </>
             ) : (
-              <p className="pt-16 text-center text-sm text-text-muted">تعذّر تحميل هذي الشاشة الآن.</p>
+              <div className="pt-16 text-center">
+                <p className="text-sm text-text-muted">{momentError ?? "تعذّر تحميل هذي الشاشة الآن."}</p>
+                <button
+                  type="button"
+                  onClick={() => loadKey(activeKey)}
+                  className="pressable-gold mt-4 px-5 py-2.5 text-sm font-semibold"
+                >
+                  حاول مرة أخرى
+                </button>
+              </div>
             )}
           </div>
         </div>

@@ -12,9 +12,11 @@ export const revalidate = 0;
 export default async function CustomersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; country?: string; status?: string; from?: string; to?: string }>;
+  searchParams: Promise<{ q?: string; country?: string; status?: string; from?: string; to?: string; includeTest?: string }>;
 }) {
-  const filters = await searchParams;
+  const raw = await searchParams;
+  const includeTest = raw.includeTest === "1";
+  const filters = { ...raw, includeTest };
   const [customers, countries] = await Promise.all([listCustomers(filters), listCountries()]);
 
   const columns: TableColumn<Follower>[] = [
@@ -76,6 +78,10 @@ export default async function CustomersPage({
           >
             تصفية
           </button>
+          <label className="flex items-center gap-2 text-sm text-[color:var(--text-muted)] lg:col-span-5">
+            <input type="checkbox" name="includeTest" value="1" defaultChecked={includeTest} className="h-4 w-4" />
+            إظهار حسابي الاختبار (مستبعَدان افتراضياً من كل القوائم والإحصائيات)
+          </label>
         </form>
       </Card>
 
