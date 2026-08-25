@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Menu,
   X,
@@ -43,11 +44,24 @@ const ENTRIES: { key: string; label: string; icon: LucideIcon }[] = [
 ];
 
 /**
+ * بعض أزرار المحتوى القادم من get_conversation_moment (مثل "🎯 أشوف
+ * المرافقة الكاملة" بمفتاح menu_journey، الظاهر داخل menu_pricing_diff و
+ * menu_why) لا يقابلها موضوع نصي داخل ENTRIES — هي أصلاً بوابة تجارية تقود
+ * لواجهة التخصيص الحقيقية، لا بطاقة نص. أي مفتاح هنا يُفتح كصفحة Next.js
+ * حقيقية بدل محاولة تحميله كموضوع من /api/menu (الذي سيفشل بصمت لأنه غير
+ * معرّف أصلاً بجدول conversation_moments كموضوع مستقل ذي محتوى).
+ */
+const ROUTE_TARGETS: Record<string, string> = {
+  menu_journey: "/journey/start",
+};
+
+/**
  * الشريط العلوي الدائم للمنصة: شعار آدم + اسمه (يفتحان الشجرة الحيّة)، وزر
  * القائمة، وزر ذهبي دائم يقود لواجهة التخصيص المدفوعة — كلها في شريط واحد
  * واضح لا يغطي محتوى الشاشة (المحتوى يُزاح تحته دائماً، انظر ScreenShell).
  */
 export function TopBar() {
+  const router = useRouter();
   const [calmCount, setCalmCount] = useState<number | null>(null);
   const [treeOpen, setTreeOpen] = useState(false);
 
@@ -86,6 +100,11 @@ export function TopBar() {
 
   function onButtonPress(b: MenuButton) {
     haptic("light");
+    if (b.cb && ROUTE_TARGETS[b.cb]) {
+      closeAll();
+      router.push(ROUTE_TARGETS[b.cb]);
+      return;
+    }
     if (b.url) {
       openLink(b.url);
       return;

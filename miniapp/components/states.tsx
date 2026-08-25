@@ -6,10 +6,12 @@ function StateShell({
   title,
   body,
   showAdam = true,
+  onRetry,
 }: {
   title: string;
   body: string;
   showAdam?: boolean;
+  onRetry?: () => void;
 }) {
   return (
     <div
@@ -29,6 +31,11 @@ function StateShell({
       <GlassCard>
         <p className="font-display text-lg text-text">{title}</p>
         <p className="mt-2 text-sm leading-relaxed text-text-muted">{body}</p>
+        {onRetry && (
+          <button type="button" onClick={onRetry} className="pressable-gold mt-4 px-5 py-2.5 text-sm font-semibold">
+            حاول مرة أخرى
+          </button>
+        )}
       </GlassCard>
     </div>
   );
@@ -61,6 +68,6 @@ export function NotFoundState() {
   );
 }
 
-export function ErrorState({ message }: { message: string }) {
-  return <StateShell title="تعذّر فتح الشاشة الآن" body={message} showAdam={false} />;
+export function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
+  return <StateShell title="تعذّر فتح الشاشة الآن" body={message} showAdam={false} onRetry={onRetry} />;
 }
