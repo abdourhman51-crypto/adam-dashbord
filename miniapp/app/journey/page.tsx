@@ -92,6 +92,13 @@ export default function JourneyPage() {
             ما عندكم رحلة نشطة الحين. لمّا نتّفق على هدف واضح سوا، تتابعون تقدّمكم فيه هنا خطوة بخطوة.
           </p>
         </GlassCard>
+        <Link
+          href="/journey/start"
+          className="pressable-gold flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold"
+        >
+          <Target size={17} strokeWidth={2.2} />
+          نبني هدفاً جديداً — نصف دقيقة، بلا التزام
+        </Link>
       </ScreenShell>
     );
   }
@@ -192,6 +199,14 @@ export default function JourneyPage() {
           )}
         </div>
       )}
+
+      <Link
+        href="/journey/start"
+        className="pressable flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-medium text-text-muted"
+      >
+        <Target size={16} strokeWidth={2.2} />
+        نبي نعدّل الهدف أو نبدأ استمارة جديدة
+      </Link>
     </ScreenShell>
   );
 }
