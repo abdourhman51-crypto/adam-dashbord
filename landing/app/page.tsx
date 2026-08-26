@@ -73,25 +73,16 @@ export default function LandingPage() {
           </div>
           <div className="rise-in relative mx-auto w-full max-w-sm" style={{ animationDelay: "120ms" }}>
             <div
-              className="absolute inset-0 -z-10 rounded-full opacity-80 blur-3xl"
-              style={{ background: "radial-gradient(circle, var(--gold-soft) 0%, transparent 62%)" }}
+              className="absolute inset-0 -z-10 rounded-full opacity-70 blur-3xl"
+              style={{ background: "radial-gradient(circle, var(--gold) 0%, transparent 65%)" }}
               aria-hidden="true"
             />
-            <div className="relative">
-              <Image
-                src="/brand/adam-character.webp"
-                alt="آدم"
-                width={800}
-                height={1000}
-                className="h-auto w-full object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.45)]"
-                priority
-              />
-              <div
-                className="absolute inset-x-[12%] bottom-[6%] -z-10 h-[10%] rounded-full opacity-70 blur-xl"
-                style={{ background: "radial-gradient(ellipse, rgba(0,0,0,0.55) 0%, transparent 75%)" }}
-                aria-hidden="true"
-              />
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://d8j0ntlcm91z4.cloudfront.net/user_3CPnImgjiKIeQIfolIn0s2fo89h/hf_20260826_172153_9e7c5b63-95af-40f9-9854-b4fcde3b04e5.png"
+              alt="آدم في غرفة دافئة، جزء من المشهد لا ملصق فوقه"
+              className="w-full rounded-[32px] object-cover shadow-[0_25px_70px_rgba(0,0,0,0.5)]"
+            />
           </div>
         </div>
       </section>
@@ -138,7 +129,7 @@ export default function LandingPage() {
               "طفلكم يرفض كل شيء.",
               "أعصابكم تصل إلى حدّها الأخير.",
             ].map((t, i) => (
-              <div key={t} className="glass rise-in p-6 text-right" style={{ animationDelay: `${i * 90}ms` }}>
+              <div key={t} className="glass tex-problem rise-in p-6 text-right" style={{ animationDelay: `${i * 90}ms` }}>
                 <p className="text-[15px] leading-relaxed text-[color:var(--text-secondary)]">{t}</p>
               </div>
             ))}
@@ -161,7 +152,7 @@ export default function LandingPage() {
               { icon: Repeat, title: "آدم يتذكر", body: "يتعلّم من المواقف السابقة، ويفهم طفلكم أكثر مع الوقت." },
               { icon: LineChart, title: "تشاهدون التغيير", body: "تتحوّل رحلتكم إلى دليل حقيقي على تطوّركم، لا مجرد أرقام." },
             ].map((b, i) => (
-              <div key={b.title} className="glass rise-in flex flex-col gap-3 p-7" style={{ animationDelay: `${i * 100}ms` }}>
+              <div key={b.title} className="glass tex-promise rise-in flex flex-col gap-3 p-7" style={{ animationDelay: `${i * 100}ms` }}>
                 <b.icon size={26} strokeWidth={2} className="text-gold-strong" />
                 <h3 className="font-display text-lg font-bold">{b.title}</h3>
                 <p className="text-sm leading-relaxed text-[color:var(--text-secondary)]">{b.body}</p>
@@ -194,6 +185,29 @@ export default function LandingPage() {
                 <p className="max-w-[22ch] text-sm leading-relaxed text-[color:var(--text-secondary)]">{s.body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== 5.5 لحظة مع آدم (فيديو) ===== */}
+      <section className="px-5 pb-24">
+        <div className="mx-auto max-w-3xl">
+          <div className="video-frame rise-in aspect-[9/16] max-h-[560px]">
+            <video
+              src="/brand/adam-moment.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="none"
+              aria-hidden="true"
+            />
+            <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-1.5 p-7 text-center">
+              <p className="font-display text-[1.35rem] font-bold text-text">هذا آدم — بصوته، بشخصيته.</p>
+              <p className="max-w-[26ch] text-sm leading-relaxed text-[color:var(--text-secondary)]">
+                ليس أيقونة، وليس روبوتاً باردًا؛ رفيق حقيقي يعرف طفلكم.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -311,7 +325,7 @@ export default function LandingPage() {
 
       {/* ===== 10. المرافقة الكاملة (بلا سعر موحّد) ===== */}
       <section className="px-5 pb-24">
-        <div className="glass-gold mx-auto max-w-3xl rise-in p-8 text-center sm:p-12">
+        <div className="glass-gold tex-gold-foil mx-auto max-w-3xl rise-in p-8 text-center sm:p-12">
           <Eyebrow>المرافقة الكاملة</Eyebrow>
           <h2 className="font-display mt-5 text-[1.6rem] font-bold sm:text-2xl">ابدأوا رحلة 29 يومًا مع آدم</h2>
           <ul className="mx-auto mt-6 flex max-w-sm flex-col gap-2.5 text-right text-[15px] text-[color:var(--text-secondary)]">
@@ -325,7 +339,7 @@ export default function LandingPage() {
           <p className="mx-auto mt-6 max-w-sm text-sm text-muted">
             يختلف السعر حسب بلدكم، ويظهر لكم بعملتكم المحلية مباشرة داخل المحادثة مع آدم. لا نعرض رقمًا واحدًا هنا لأن السعر ببساطة ليس نفسه في كل بلد.
           </p>
-          <div className="mx-auto mt-5 flex max-w-sm items-start gap-2.5 rounded-2xl border border-[color:var(--glass-border-gold)] bg-[color:var(--gold-soft)] p-4 text-right text-sm leading-relaxed text-[color:var(--text-secondary)]">
+          <div className="mx-auto mt-5 flex max-w-sm items-start gap-2.5 rounded-2xl border border-[color:var(--glass-border-gold)] bg-[color:var(--deep-metal)] p-4 text-right text-sm leading-relaxed text-[color:var(--text-secondary)]">
             <ShieldCheck size={18} strokeWidth={2} className="mt-0.5 shrink-0 text-gold-strong" />
             <span>
               <span className="font-semibold text-gold-strong">ضماننا: </span>

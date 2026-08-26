@@ -13,7 +13,8 @@
 
   --gold: #e3b23c;
   --gold-strong: #f0c96a;
-  --gold-soft: #2c2410;
+  /* deep emerald-black, replaces the old flat brown "gold-soft" fill */
+  --deep-metal: #101d15;
 
   --text: #f1efe6;
   --text-secondary: #d9d5c9;
@@ -28,6 +29,12 @@
   --font-body: "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
 
   --gold-metal: linear-gradient(135deg, #6b4e0e 0%, #a8720f 14%, #d4a017 30%, #f4d675 46%, #fff6d6 54%, #f0c96a 64%, #b8860b 82%, #e3b23c 100%);
+
+  /* Higgsfield-generated brand textures — distinct art per surface, no repeats */
+  --tex-bg-global: url("https://d8j0ntlcm91z4.cloudfront.net/user_3CPnImgjiKIeQIfolIn0s2fo89h/hf_20260826_172134_3a518b14-8bec-41aa-827f-491abc6d6385.png");
+  --tex-card-problem: url("https://d8j0ntlcm91z4.cloudfront.net/user_3CPnImgjiKIeQIfolIn0s2fo89h/hf_20260826_172134_c8b6cbe4-8eb6-4998-bafa-605ab47c8da4.png");
+  --tex-card-promise: url("https://d8j0ntlcm91z4.cloudfront.net/user_3CPnImgjiKIeQIfolIn0s2fo89h/hf_20260826_172134_5488323c-ee6a-4bde-b18a-039727d83f02.png");
+  --tex-card-gold: url("https://d8j0ntlcm91z4.cloudfront.net/user_3CPnImgjiKIeQIfolIn0s2fo89h/hf_20260826_172134_40a4e29b-9362-48c7-89ad-5cd38e32e0d8.png");
 }
 
 * {
@@ -57,9 +64,12 @@ body::before {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.07;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.16;
+  mix-blend-mode: soft-light;
+  background-image: var(--tex-bg-global);
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
 }
 
 body::after {
@@ -68,11 +78,9 @@ body::after {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.05;
-  mix-blend-mode: soft-light;
-  background-image: url("/brand/tree-emblem.webp");
-  background-size: 220px 220px;
-  background-repeat: repeat;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 .font-display {
@@ -103,9 +111,21 @@ body::after {
   mix-blend-mode: overlay;
 }
 
+/* Distinct generated texture per card family — never the same image reused */
+.glass.tex-problem::before {
+  background-image: var(--tex-card-problem);
+  opacity: 0.16;
+}
+
+.glass.tex-promise::before {
+  background-image: var(--tex-card-promise);
+  opacity: 0.18;
+  mix-blend-mode: soft-light;
+}
+
 .glass-gold {
   position: relative;
-  background: var(--gold-soft);
+  background: linear-gradient(160deg, var(--bg-mid) 0%, var(--deep-metal) 100%);
   border: 1px solid var(--glass-border-gold);
   border-radius: 28px;
   isolation: isolate;
@@ -122,6 +142,13 @@ body::after {
   background-position: center;
   opacity: 0.1;
   mix-blend-mode: overlay;
+}
+
+/* Pricing/guarantee card: rich gold-foil texture instead of a flat fill */
+.glass-gold.tex-gold-foil::before {
+  background-image: var(--tex-card-gold);
+  opacity: 0.32;
+  mix-blend-mode: screen;
 }
 
 .text-gold-strong {
@@ -167,7 +194,7 @@ body::after {
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 .btn-outline:hover {
-  background: var(--gold-soft);
+  background: var(--deep-metal);
 }
 
 @keyframes rise-in {
@@ -211,6 +238,28 @@ body::after {
 }
 
 ::selection {
-  background: var(--gold-soft);
+  background: var(--deep-metal);
   color: var(--gold-strong);
+}
+
+.video-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.video-frame video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(10, 18, 12, 0.92) 0%, rgba(10, 18, 12, 0.15) 45%, rgba(10, 18, 12, 0.05) 100%);
+  pointer-events: none;
 }
