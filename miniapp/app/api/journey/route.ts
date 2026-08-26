@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 
 interface StageStateRpc {
   in_stage: boolean;
+  stage_id?: string;
   objective_text?: string;
   objective_target?: number;
   objective_window?: number;
@@ -21,6 +22,36 @@ interface StageStateRpc {
   phase?: "observe" | "build" | "hold";
   phase_ar?: string;
   baseline_text?: string | null;
+}
+
+interface StoryRow {
+  log_date: string;
+  step_given: string | null;
+  step_status: "done" | "tried_failed" | "not_tried" | null;
+  night_result: "calm" | "hard" | "normal" | null;
+}
+
+/**
+ * سطر واحد لكل يوم مختار في قصة الرحلة — مبني حصراً من حقول حقيقية
+ * (step_given/step_status/night_result). ما نختلق حالة نفسية للوالد لم
+ * تُسجَّل فعلاً؛ الجملة تصف الفعل والنتيجة، لا تفسّرهما.
+ */
+function storyLine(row: StoryRow, child: string): string {
+  if (!row.step_given) {
+    if (row.night_result === "calm") return "ليلة هادئة، بلا خطوة محدّدة مسجّلة.";
+    if (row.night_result === "hard") return "ليلة صعبة — بدأنا نراقب.";
+    return "يوم البداية — بدأنا نراقب.";
+  }
+  if (row.step_status === "done" && row.night_result === "calm") {
+    return `جرّبتوا «${row.step_given}»، وهدأ ${child}.`;
+  }
+  if (row.step_status === "tried_failed") {
+    return `جرّبتوا «${row.step_given}»، لكن الليلة كانت صعبة.`;
+  }
+  if (row.step_status === "done") {
+    return `جرّبتوا «${row.step_given}».`;
+  }
+  return `آدم اقترح: «${row.step_given}».`;
 }
 
 export async function GET(request: Request) {
@@ -49,6 +80,32 @@ export async function GET(request: Request) {
     return NextResponse.json({ isPaid: true, inStage: false, childName: parent.childName });
   }
 
+  const child = parent.childName ?? "طفلكم";
+  let storyDays: { dayNumber: number; logDate: string; line: string }[] = [];
+
+  if (stage.stage_id) {
+    const stageRow = await supabaseAdmin().from("stages").select("started_at").eq("id", stage.stage_id).maybeSingle();
+    const startedAt = stageRow.data?.started_at as string | undefined;
+    if (startedAt) {
+      const startDate = startedAt.slice(0, 10);
+      const logsRes = await supabaseAdmin()
+        .from("daily_logs")
+        .select("log_date, step_given, step_status, night_result")
+        .eq("follower_id", parent.parentId)
+        .gte("log_date", startDate)
+        .order("log_date", { ascending: true })
+        .limit(60);
+      const rows = (logsRes.data ?? []) as StoryRow[];
+      const n = rows.length;
+      const indices = n === 0 ? [] : n <= 2 ? rows.map((_, i) => i) : [0, Math.floor((n - 1) / 2), n - 1];
+      storyDays = indices.map((i) => ({
+        dayNumber: i + 1,
+        logDate: rows[i].log_date,
+        line: storyLine(rows[i], child),
+      }));
+    }
+  }
+
   return NextResponse.json({
     isPaid: true,
     inStage: true,
@@ -65,6 +122,7 @@ export async function GET(request: Request) {
     extended: stage.extended ?? false,
     phaseAr: stage.phase_ar ?? null,
     baselineText: stage.baseline_text ?? null,
+    storyDays,
     criticalWindow,
   });
 }

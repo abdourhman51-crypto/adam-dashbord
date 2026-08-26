@@ -37,15 +37,20 @@ interface MenuMoment {
   buttons: MenuButton[];
 }
 
-const ENTRIES: { key: string; label: string; icon: LucideIcon }[] = [
-  { key: "menu_faq", label: "تعرّف على آدم", icon: Sparkles },
-  { key: "menu_how", label: "كيف يشتغل؟", icon: Cog },
-  { key: "menu_why", label: "وما الذي يميّزه؟", icon: Gem },
-  { key: "menu_pricing_diff", label: "المجاني مقابل المرافقة الكاملة", icon: Gem },
-  { key: "menu_family", label: "عائلة آدم", icon: Users },
-  { key: "menu_settings", label: "إعدادات الرسائل", icon: Settings },
-  { key: "menu_privacy", label: "الخصوصية وحذف البيانات", icon: ShieldCheck },
+const ENTRIES: { key: string; label: string; icon: LucideIcon; group: "about" | "settings" }[] = [
+  { key: "menu_faq", label: "تعرّف على آدم", icon: Sparkles, group: "about" },
+  { key: "menu_how", label: "كيف يشتغل؟", icon: Cog, group: "about" },
+  { key: "menu_why", label: "وما الذي يميّزه؟", icon: Gem, group: "about" },
+  { key: "menu_pricing_diff", label: "المجاني مقابل المرافقة الكاملة", icon: Gem, group: "about" },
+  { key: "menu_family", label: "عائلة آدم", icon: Users, group: "about" },
+  { key: "menu_settings", label: "إعدادات الرسائل", icon: Settings, group: "settings" },
+  { key: "menu_privacy", label: "الخصوصية وحذف البيانات", icon: ShieldCheck, group: "settings" },
 ];
+
+const GROUP_LABELS: Record<"about" | "settings", string> = {
+  about: "عن آدم",
+  settings: "الإعدادات",
+};
 
 /**
  * بعض أزرار المحتوى القادم من get_conversation_moment (مثل "🎯 أشوف
@@ -205,19 +210,25 @@ export function TopBar() {
                 <X size={17} />
               </button>
             </div>
-            {ENTRIES.map((e) => (
-              <button
-                key={e.key}
-                type="button"
-                onClick={() => loadKey(e.key)}
-                className="pressable flex items-center justify-between !rounded-2xl px-4 py-3.5 text-sm font-medium"
-              >
-                <span className="flex items-center gap-2.5">
-                  <e.icon size={17} className="text-gold-strong" strokeWidth={2.2} />
-                  {e.label}
-                </span>
-                <ChevronLeft size={16} />
-              </button>
+            {(["about", "settings"] as const).map((group) => (
+              <div key={group} className="flex flex-col gap-2">
+                <p className="mt-1 px-1 text-xs font-semibold text-text-muted">{GROUP_LABELS[group]}</p>
+                {ENTRIES.filter((e) => e.group === group).map((e) => (
+                  <button
+                    key={e.key}
+                    type="button"
+                    onClick={() => loadKey(e.key)}
+                    className="pressable rise-in flex items-center justify-between !rounded-2xl px-4 py-3.5 text-sm font-medium"
+                    style={{ animationDelay: `${ENTRIES.indexOf(e) * 45}ms` }}
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <e.icon size={17} className="text-gold-strong" strokeWidth={2.2} />
+                      {e.label}
+                    </span>
+                    <ChevronLeft size={16} />
+                  </button>
+                ))}
+              </div>
             ))}
           </div>
         </div>

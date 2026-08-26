@@ -257,6 +257,43 @@ body::before {
   animation: leaf-grow-in 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
+/* تمايل رياح خفيف ومستمر — كل ورقة بمدة/طور خاص بها (مضبوط عبر
+   animation-duration/-delay من GoldLeaf) فلا تتحرك كل الأوراق معاً كوحدة
+   واحدة، بل كأن نسمة تمر عبر التاج بفارق بسيط بين ورقة وأخرى. */
+@keyframes leaf-sway {
+  0% {
+    transform: rotate(-4deg) translateY(0);
+  }
+  50% {
+    transform: rotate(3.5deg) translateY(-1.5px);
+  }
+  100% {
+    transform: rotate(-4deg) translateY(0);
+  }
+}
+.leaf-sway {
+  transform-origin: 50% 6%;
+  animation-name: leaf-sway;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+/* "تشكّل" أوضح من rise-in العادية — للبطاقات المجمّعة (قصص، لحظات) لي
+   تحتاج تحسّ أنها تتكوّن أمام عينك، لا تظهر فجأة. */
+@keyframes card-form-in {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.card-form-in {
+  animation: card-form-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
 @keyframes confetti-burst {
   0% {
     opacity: 0;
@@ -351,6 +388,8 @@ body::before {
   .rise-in,
   .glow-pulse,
   .leaf-grow-in,
+  .leaf-sway,
+  .card-form-in,
   .confetti-particle,
   .celebration-pop,
   .tree-loader-ring,
