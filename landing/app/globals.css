@@ -42,7 +42,11 @@ body {
   direction: rtl;
   font-family: var(--font-body);
   color: var(--text);
-  background: var(--bg-deep);
+  background:
+    radial-gradient(60% 45% at 15% 0%, rgba(28, 53, 38, 0.55) 0%, transparent 70%),
+    radial-gradient(55% 50% at 100% 20%, rgba(28, 53, 38, 0.4) 0%, transparent 70%),
+    radial-gradient(70% 60% at 50% 100%, rgba(20, 37, 26, 0.6) 0%, transparent 70%),
+    var(--bg-deep);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
@@ -53,9 +57,22 @@ body::before {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.05;
+  opacity: 0.07;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: soft-light;
+  background-image: url("/brand/tree-emblem.webp");
+  background-size: 220px 220px;
+  background-repeat: repeat;
 }
 
 .font-display {
@@ -63,18 +80,48 @@ body::before {
 }
 
 .glass {
+  position: relative;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 28px;
   box-shadow: 0 8px 32px rgb(0 0 0 / 0.35);
+  isolation: isolate;
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: url("/brand/tree-embroidery-macro.webp");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
 }
 
 .glass-gold {
+  position: relative;
   background: var(--gold-soft);
   border: 1px solid var(--glass-border-gold);
   border-radius: 28px;
+  isolation: isolate;
+}
+
+.glass-gold::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: url("/brand/tree-embroidery-macro.webp");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.1;
+  mix-blend-mode: overlay;
 }
 
 .text-gold-strong {
