@@ -38,7 +38,7 @@ export default function LandingPage() {
       {/* ===== شريط علوي بسيط ===== */}
       <header className="relative z-20 mx-auto flex max-w-6xl items-center justify-between px-5 py-6">
         <div className="flex items-center gap-2.5">
-          <Image src="/brand/tree-emblem.png" alt="" width={36} height={36} className="h-9 w-9 object-contain" />
+          <Image src="/brand/tree-emblem.webp" alt="" width={36} height={36} className="h-9 w-9 object-contain" />
           <span className="font-display text-xl font-extrabold text-gold-strong">آدم</span>
         </div>
         <div className="hidden sm:block">
@@ -78,7 +78,7 @@ export default function LandingPage() {
               aria-hidden="true"
             />
             <Image
-              src="/brand/adam-character.png"
+              src="/brand/adam-character.webp"
               alt="آدم"
               width={800}
               height={1000}
@@ -222,7 +222,7 @@ export default function LandingPage() {
         <div className="mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-2">
           <div className="rise-in relative order-2 mx-auto w-full max-w-xs lg:order-1">
             <Image
-              src="/brand/tree-embroidery-macro.png"
+              src="/brand/tree-embroidery-macro.webp"
               alt="شجرة آدم"
               width={600}
               height={600}
