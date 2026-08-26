@@ -1,16 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, MessageCircle } from "lucide-react";
+import { CheckCircle2, MessageCircle, Sprout } from "lucide-react";
 import { useScreenData } from "@/lib/telegram/useScreenData";
 import { ScreenShell } from "@/components/ScreenShell";
 import { AdamIntro } from "@/components/AdamIntro";
 import { GlassCard } from "@/components/GlassCard";
 import { ChatCTAButton } from "@/components/ChatCTAButton";
+import { TreeLightbox } from "@/components/TreeLightbox";
 import { LoadingState, OutsideTelegramState, NotFoundState, ErrorState } from "@/components/states";
 import { postAction } from "@/lib/telegram/fetcher";
-import { haptic } from "@/lib/telegram/client";
+import { haptic, getInitDataRaw } from "@/lib/telegram/client";
 import { returnToAdamChat } from "@/lib/upsell";
+import { formatNumber } from "@/lib/format";
+
+/**
+ * جمل التحوّل — كل ليلة تُلتزم يُختار منها واحدة عشوائياً بدل "تم الحفظ" أو
+ * تهنئة عامة. الهدف: الأم تحس "أنا تغيّرت"، لا مجرد "الفعل تسجّل".
+ */
+const COMMIT_LINES = [
+  "ليلة أخرى اخترتم فيها طريقة جديدة.",
+  "هذه ليست مصادفة — هذا نمط بدأ يتكوّن.",
+  "خطوة أخرى، ونفس الاتجاه.",
+  "هذا بالذات ما يصنع الفرق مع الوقت.",
+];
 
 interface TodayResponse {
   childName: string | null;
@@ -22,6 +35,10 @@ export default function HomePage() {
   const [result, refetch] = useScreenData<TodayResponse>("/api/today");
   const [committing, setCommitting] = useState(false);
   const [error, setError] = useState(false);
+  const [leafCount, setLeafCount] = useState<number | null>(null);
+  const [treeOpen, setTreeOpen] = useState(false);
+  const [justCommitted, setJustCommitted] = useState(false);
+  const [commitLine] = useState(() => COMMIT_LINES[Math.floor(Math.random() * COMMIT_LINES.length)]);
 
   if (result.state === "loading") return <LoadingState />;
   if (result.state === "outside_telegram") return <OutsideTelegramState />;
@@ -38,7 +55,17 @@ export default function HomePage() {
     const r = await postAction<{ committed: boolean }>("/api/commit-step", {});
     if (r.state === "ok" && r.data.committed) {
       haptic("medium");
+      setJustCommitted(true);
       refetch();
+      const initData = getInitDataRaw();
+      if (initData) {
+        fetch("/api/tree", { headers: { "x-telegram-init-data": initData } })
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data: { calmCount: number } | null) => {
+            if (data) setLeafCount(data.calmCount);
+          })
+          .catch(() => {});
+      }
     } else {
       setError(true);
     }
@@ -75,7 +102,27 @@ export default function HomePage() {
         <p className="text-xs font-medium text-text-muted">خطوة اليوم</p>
         <p className="font-display mt-3 text-[22px] leading-loose text-text">{stepGiven}</p>
 
-        {committed ? (
+        {committed && justCommitted ? (
+          <div className="mt-5 flex flex-col items-center gap-3">
+            <svg viewBox="0 0 24 24" width={36} className="leaf-grow-in drop-shadow-[0_0_8px_rgba(227,178,60,0.55)]">
+              <path d="M12 2c5 3 8 7 8 11a8 8 0 0 1-16 0c0-4 3-8 8-11Z" fill="#e3b23c" />
+            </svg>
+            <p className="font-display text-center text-[16px] text-text">{commitLine}</p>
+            {leafCount !== null && (
+              <button
+                type="button"
+                onClick={() => {
+                  haptic("light");
+                  setTreeOpen(true);
+                }}
+                className="pressable flex items-center gap-1.5 !rounded-full px-4 py-2 text-xs font-medium text-text-muted"
+              >
+                <Sprout size={14} strokeWidth={2.2} />
+                شجرتكم كبرت لـ {formatNumber(leafCount)} ورقة — شوفوها
+              </button>
+            )}
+          </div>
+        ) : committed ? (
           <div className="mt-5 flex w-full items-center justify-center gap-2 rounded-full border-[1.5px] border-emerald-strong px-5 py-3 text-sm font-semibold text-emerald-strong">
             <CheckCircle2 size={18} strokeWidth={2.2} />
             <span>تم الالتزام</span>
@@ -114,6 +161,8 @@ export default function HomePage() {
           </div>
         )}
       </GlassCard>
+
+      {treeOpen && <TreeLightbox leafCount={leafCount ?? 0} onClose={() => setTreeOpen(false)} />}
     </ScreenShell>
   );
 }

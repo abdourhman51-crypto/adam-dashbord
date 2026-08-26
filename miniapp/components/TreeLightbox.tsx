@@ -18,8 +18,11 @@ export function TreeLightbox({ leafCount, onClose }: { leafCount: number; onClos
       aria-modal="true"
       aria-label="شجرة آدم — كبّروها وحرّكوها"
     >
-      <div className="flex items-center justify-between px-5 pt-[max(env(safe-area-inset-top),20px)]">
-        <p className="text-sm text-text-muted">مرّروا إصبعين لتكبير الشجرة، واسحبوا لتحريكها</p>
+      <div className="flex items-start justify-between gap-3 px-5 pt-[max(env(safe-area-inset-top),20px)]">
+        <div>
+          <p className="text-sm font-medium text-text">كل ورقة ذهبية = ليلة اخترتم فيها الهدوء مع طفلكم</p>
+          <p className="mt-1 text-xs text-text-muted">مرّروا إصبعين لتكبير الشجرة، واسحبوا لتحريكها</p>
+        </div>
         <button
           type="button"
           onClick={onClose}
