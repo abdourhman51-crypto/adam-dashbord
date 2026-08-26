@@ -20,21 +20,18 @@
   --text-secondary: #d9d5c9;
   --text-muted: #a3b0a4;
 
-  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-bg: rgba(255, 255, 255, 0.05);
   --glass-bg-strong: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.14);
-  --glass-border-gold: rgba(227, 178, 60, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-border-gold: rgba(227, 178, 60, 0.28);
 
   --font-display: "Baloo Bhaijaan 2", "Segoe UI", Tahoma, sans-serif;
   --font-body: "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
 
   --gold-metal: linear-gradient(135deg, #6b4e0e 0%, #a8720f 14%, #d4a017 30%, #f4d675 46%, #fff6d6 54%, #f0c96a 64%, #b8860b 82%, #e3b23c 100%);
 
-  /* Higgsfield-generated brand textures — distinct art per surface, no repeats */
+  /* Higgsfield-generated global grain — the only remaining CSS-level texture; every other surface is now a real full-bleed photo */
   --tex-bg-global: url("https://d8j0ntlcm91z4.cloudfront.net/user_3CPnImgjiKIeQIfolIn0s2fo89h/hf_20260826_172134_3a518b14-8bec-41aa-827f-491abc6d6385.png");
-  --tex-card-problem: url("https://d8j0ntlcm91z4.cloudfront.net/user_3CPnImgjiKIeQIfolIn0s2fo89h/hf_20260826_172134_c8b6cbe4-8eb6-4998-bafa-605ab47c8da4.png");
-  --tex-card-promise: url("https://d8j0ntlcm91z4.cloudfront.net/user_3CPnImgjiKIeQIfolIn0s2fo89h/hf_20260826_172134_5488323c-ee6a-4bde-b18a-039727d83f02.png");
-  --tex-card-gold: url("https://d8j0ntlcm91z4.cloudfront.net/user_3CPnImgjiKIeQIfolIn0s2fo89h/hf_20260826_172134_40a4e29b-9362-48c7-89ad-5cd38e32e0d8.png");
 }
 
 * {
@@ -94,8 +91,9 @@ body::after {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 28px;
-  box-shadow: 0 8px 32px rgb(0 0 0 / 0.35);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.3);
   isolation: isolate;
+  overflow: hidden;
 }
 
 .glass::before {
@@ -111,24 +109,13 @@ body::after {
   mix-blend-mode: overlay;
 }
 
-/* Distinct generated texture per card family — never the same image reused */
-.glass.tex-problem::before {
-  background-image: var(--tex-card-problem);
-  opacity: 0.16;
-}
-
-.glass.tex-promise::before {
-  background-image: var(--tex-card-promise);
-  opacity: 0.18;
-  mix-blend-mode: soft-light;
-}
-
 .glass-gold {
   position: relative;
   background: linear-gradient(160deg, var(--bg-mid) 0%, var(--deep-metal) 100%);
   border: 1px solid var(--glass-border-gold);
   border-radius: 28px;
   isolation: isolate;
+  overflow: hidden;
 }
 
 .glass-gold::before {
@@ -144,11 +131,20 @@ body::after {
   mix-blend-mode: overlay;
 }
 
-/* Pricing/guarantee card: rich gold-foil texture instead of a flat fill */
-.glass-gold.tex-gold-foil::before {
-  background-image: var(--tex-card-gold);
-  opacity: 0.32;
-  mix-blend-mode: screen;
+/* A group of related items sharing ONE soft panel instead of one bordered box per item — avoids the "many small boxes" clutter */
+.panel-group > * + * {
+  border-top: 1px solid var(--glass-border);
+}
+@media (min-width: 640px) {
+  .panel-group-row > * + * {
+    border-top: none;
+    border-inline-start: 1px solid var(--glass-border);
+  }
+}
+
+/* Text sitting directly on a photo, with no box behind it — legibility comes from the shadow, not from chrome */
+.text-on-image {
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .text-gold-strong {
@@ -242,24 +238,3 @@ body::after {
   color: var(--gold-strong);
 }
 
-.video-frame {
-  position: relative;
-  overflow: hidden;
-  border-radius: 28px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-}
-
-.video-frame video {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.video-frame::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(0deg, rgba(10, 18, 12, 0.92) 0%, rgba(10, 18, 12, 0.15) 45%, rgba(10, 18, 12, 0.05) 100%);
-  pointer-events: none;
-}

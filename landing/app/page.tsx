@@ -45,37 +45,48 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * كل صورة خلفية في الصفحة تذوب في نفس اللون الداكن أعلاها وأسفلها (طبقة
+ * التلاشي المشتركة)، بحيث تلتقي حافة صورة مع حافة التالية في نفس التدرّج
+ * بدل قطع حاد بينهما — هذا ما يجعل الصفحة تبدو صورة واحدة متصلة لا سلسلة
+ * صور منفصلة بخطوط فاصلة.
+ */
 function SectionImage({
   src,
   alt,
   align = "center",
-  scrim = "bottom",
+  focus = "bottom",
   minH = "640px",
   children,
 }: {
   src: string;
   alt: string;
   align?: "top" | "center" | "bottom";
-  scrim?: "top" | "bottom" | "center" | "full";
+  focus?: "top" | "bottom" | "center" | "full";
   minH?: string;
   children: React.ReactNode;
 }) {
-  const scrimBg =
-    scrim === "top"
-      ? "linear-gradient(180deg, rgba(8,14,10,0.93) 0%, rgba(8,14,10,0.35) 42%, rgba(8,14,10,0.08) 100%)"
-      : scrim === "bottom"
-      ? "linear-gradient(0deg, rgba(8,14,10,0.93) 0%, rgba(8,14,10,0.35) 42%, rgba(8,14,10,0.08) 100%)"
-      : scrim === "center"
-      ? "radial-gradient(65% 65% at 50% 50%, rgba(8,14,10,0.2) 0%, rgba(8,14,10,0.88) 100%)"
-      : "rgba(8,14,10,0.74)";
-  const alignClass = align === "top" ? "justify-start pt-16" : align === "bottom" ? "justify-end pb-16" : "justify-center";
+  const focusBg =
+    focus === "top"
+      ? "linear-gradient(180deg, rgba(8,14,10,0.5) 0%, transparent 55%)"
+      : focus === "bottom"
+      ? "linear-gradient(0deg, rgba(8,14,10,0.5) 0%, transparent 55%)"
+      : focus === "center"
+      ? "radial-gradient(60% 60% at 50% 50%, rgba(8,14,10,0.12) 0%, rgba(8,14,10,0.52) 100%)"
+      : "rgba(8,14,10,0.4)";
+  const alignClass = align === "top" ? "justify-start pt-20" : align === "bottom" ? "justify-end pb-20" : "justify-center";
 
   return (
     <section className="relative w-full overflow-hidden" style={{ minHeight: minH }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt={alt} className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-0" style={{ background: scrimBg }} aria-hidden="true" />
-      <div className={`relative z-10 mx-auto flex h-full max-w-2xl flex-col ${alignClass} gap-5 px-6 py-14 text-center`}>
+      <div
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(180deg, rgba(8,14,10,0.95) 0%, transparent 14%, transparent 86%, rgba(8,14,10,0.95) 100%)" }}
+        aria-hidden="true"
+      />
+      <div className="absolute inset-0" style={{ background: focusBg }} aria-hidden="true" />
+      <div className={`relative z-10 mx-auto flex h-full max-w-2xl flex-col ${alignClass} gap-5 px-6 py-16 text-center`}>
         {children}
       </div>
     </section>
@@ -98,26 +109,26 @@ export default function LandingPage() {
       </header>
 
       {/* ===== 1. Hero — الصورة كاملة، النصوص فوقها ===== */}
-      <SectionImage src={HERO_IMG} alt="آدم في لحظة هادئة داخل غرفته" align="top" scrim="top" minH="100dvh">
+      <SectionImage src={HERO_IMG} alt="آدم في لحظة هادئة داخل غرفته" align="top" focus="top" minH="100dvh">
         <Eyebrow>
           <Sparkles size={13} strokeWidth={2.4} />
           مرافق التربية الذكي
         </Eyebrow>
-        <h1 className="font-display text-[2.1rem] font-extrabold leading-[1.25] sm:text-[2.6rem]">
+        <h1 className="font-display text-on-image text-[2.1rem] font-extrabold leading-[1.25] sm:text-[2.6rem]">
           في اللحظة التي تشعرون فيها أنكم على وشك
           <span className="text-gold-strong"> الانفجار</span>… يعرف آدم ماذا يُقال.
         </h1>
-        <p className="mx-auto max-w-lg text-lg leading-relaxed text-[color:var(--text-secondary)]">
+        <p className="text-on-image mx-auto max-w-lg text-lg leading-relaxed text-[color:var(--text-secondary)]">
           مرافق تربية ذكي يساعدكم على التعامل مع أصعب لحظات التربية، خطوة بخطوة، انطلاقًا من معرفته الدقيقة بطفلكم.
         </p>
         <div className="flex flex-col items-center gap-3">
           <CTA />
-          <p className="text-sm text-muted">دون بطاقة بنكية، ويبدأ في أقل من دقيقة</p>
+          <p className="text-on-image text-sm text-muted">دون بطاقة بنكية، ويبدأ في أقل من دقيقة</p>
         </div>
       </SectionImage>
 
       {/* ===== 2. Show, don't tell ===== */}
-      <SectionImage src={CHAT_IMG} alt="محادثة دافئة مع آدم في الليل" align="center" scrim="center">
+      <SectionImage src={CHAT_IMG} alt="محادثة دافئة مع آدم في الليل" align="center" focus="center">
         <div className="glass rise-in mx-auto flex w-full max-w-md flex-col gap-4 p-6 text-right sm:p-8">
           <div className="flex justify-end">
             <div className="glass-gold max-w-[85%] rounded-2xl rounded-tl-md px-5 py-3.5 text-[15px] leading-relaxed">
@@ -138,21 +149,22 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-        <p className="text-center text-sm text-muted">محادثة حقيقية من آدم، دون شرح طويل ودون عشرين صفحة من النصائح.</p>
+        <p className="text-on-image text-center text-sm text-muted">محادثة حقيقية من آدم، دون شرح طويل ودون عشرين صفحة من النصائح.</p>
         <CTA label="جرّبوا محادثة مثلها" />
       </SectionImage>
 
       {/* ===== 3. المشكلة ===== */}
-      <SectionImage src={PROBLEM_IMG} alt="غرفة طفل هادئة ليلاً" align="top" scrim="top">
-        <h2 className="font-display text-[1.7rem] font-bold sm:text-3xl">
+      <SectionImage src={PROBLEM_IMG} alt="غرفة طفل هادئة ليلاً" align="top" focus="top">
+        <h2 className="font-display text-on-image text-[1.7rem] font-bold sm:text-3xl">
           المشكلة ليست أنكم لا تعرفون كيف تربّون.
         </h2>
-        <p className="mx-auto max-w-xl text-lg text-[color:var(--text-secondary)]">
+        <p className="text-on-image mx-auto max-w-xl text-lg text-[color:var(--text-secondary)]">
           المشكلة أنكم تحتاجون إلى مساعدة في اللحظة نفسها، لا بعد يوم، ولا في كتاب تقرؤونه حين يهدأ البيت.
         </p>
-        <div className="mx-auto mt-2 flex max-w-sm flex-col gap-2.5 text-[15px] text-[color:var(--text-secondary)]">
+        <div className="text-on-image mx-auto mt-1 flex max-w-sm flex-col gap-3 text-[15px] text-[color:var(--text-secondary)]">
           {["وقت النوم يتحوّل إلى معركة.", "طفلكم يرفض كل شيء.", "أعصابكم تصل إلى حدّها الأخير."].map((t) => (
-            <p key={t} className="glass rounded-2xl px-5 py-3">
+            <p key={t} className="flex items-center justify-center gap-2.5">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--gold-strong)]" aria-hidden="true" />
               {t}
             </p>
           ))}
@@ -161,16 +173,16 @@ export default function LandingPage() {
       </SectionImage>
 
       {/* ===== 4. الوعد الكبير ===== */}
-      <SectionImage src={PROMISE_IMG} alt="ضوء الصباح الدافئ في المنزل" align="bottom" scrim="bottom" minH="760px">
-        <h2 className="font-display text-[1.7rem] font-bold sm:text-3xl">آدم لا يمنحكم نصائح أكثر.</h2>
-        <p className="text-lg text-gold-strong">بل يساعدكم على الهدوء في المواقف التي كانت تُنهك أعصابكم.</p>
-        <div className="mt-2 grid gap-4 sm:grid-cols-3">
+      <SectionImage src={PROMISE_IMG} alt="ضوء الصباح الدافئ في المنزل" align="bottom" focus="bottom" minH="800px">
+        <h2 className="font-display text-on-image text-[1.7rem] font-bold sm:text-3xl">آدم لا يمنحكم نصائح أكثر.</h2>
+        <p className="text-on-image text-lg text-gold-strong">بل يساعدكم على الهدوء في المواقف التي كانت تُنهك أعصابكم.</p>
+        <div className="panel-group panel-group-row glass mt-1 grid sm:grid-cols-3">
           {[
             { icon: Sparkles, title: "خطوة واحدة الآن", body: "بدلًا من عشرين صفحة من النصائح، أمر واحد صغير تجرّبونه اليوم." },
             { icon: Repeat, title: "آدم يتذكر", body: "يتعلّم من المواقف السابقة، ويفهم طفلكم أكثر مع الوقت." },
             { icon: LineChart, title: "تشاهدون التغيير", body: "تتحوّل رحلتكم إلى دليل حقيقي على تطوّركم، لا مجرد أرقام." },
           ].map((b) => (
-            <div key={b.title} className="glass flex flex-col items-center gap-2 p-5 text-center">
+            <div key={b.title} className="flex flex-col items-center gap-2 p-6 text-center">
               <b.icon size={22} strokeWidth={2} className="text-gold-strong" />
               <h3 className="font-display text-base font-bold">{b.title}</h3>
               <p className="text-xs leading-relaxed text-[color:var(--text-secondary)]">{b.body}</p>
@@ -180,10 +192,10 @@ export default function LandingPage() {
         <CTA label="جرّبوا هذا معكم" />
       </SectionImage>
 
-      {/* ===== 5. كيف يعمل ===== */}
-      <SectionImage src={HOW_IMG} alt="طريق مضيء نحو الهدوء" align="center" scrim="full" minH="760px">
-        <h2 className="font-display text-center text-[1.7rem] font-bold sm:text-3xl">كيف يعمل؟</h2>
-        <div className="mt-2 grid gap-6 sm:grid-cols-3">
+      {/* ===== 5. كيف يعمل + لحظة مع آدم (فيديو، بنفس تدفّق الصور) ===== */}
+      <SectionImage src={HOW_IMG} alt="طريق مضيء نحو الهدوء" align="center" focus="full" minH="760px">
+        <h2 className="font-display text-on-image text-center text-[1.7rem] font-bold sm:text-3xl">كيف يعمل؟</h2>
+        <div className="mt-1 grid gap-8 sm:grid-cols-3">
           {[
             { n: "01", title: "احكوا لآدم", body: "أخبروه بما يحدث بكلامكم الخاص، دون استمارة." },
             { n: "02", title: "خذوا خطوة", body: "يمنحكم آدم التدخّل المناسب لهذه اللحظة تحديدًا." },
@@ -193,20 +205,33 @@ export default function LandingPage() {
               <div className="glass-gold flex h-12 w-12 items-center justify-center rounded-full font-display text-lg font-bold text-gold-strong">
                 {s.n}
               </div>
-              <h3 className="font-display text-base font-bold">{s.title}</h3>
-              <p className="max-w-[22ch] text-xs leading-relaxed text-[color:var(--text-secondary)]">{s.body}</p>
+              <h3 className="font-display text-on-image text-base font-bold">{s.title}</h3>
+              <p className="text-on-image max-w-[22ch] text-xs leading-relaxed text-[color:var(--text-secondary)]">{s.body}</p>
             </div>
           ))}
         </div>
         <CTA label="ابدأوا الخطوة الأولى" />
       </SectionImage>
 
-      {/* ===== 5.5 لحظة مع آدم (فيديو، بلا حواف جانبية) ===== */}
-      <section className="video-frame relative aspect-[9/16] max-h-[720px] w-full">
-        <video src="/brand/adam-moment.mp4" autoPlay muted loop playsInline preload="none" aria-hidden="true" />
-        <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-3 p-8 text-center">
-          <p className="font-display text-[1.35rem] font-bold text-text">هذا آدم — بصوته، بشخصيته.</p>
-          <p className="max-w-[26ch] text-sm leading-relaxed text-[color:var(--text-secondary)]">
+      <section className="relative w-full overflow-hidden" style={{ minHeight: "760px" }}>
+        <video
+          src="/brand/adam-moment.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="none"
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(180deg, rgba(8,14,10,0.95) 0%, transparent 16%, transparent 55%, rgba(8,14,10,0.9) 100%)" }}
+          aria-hidden="true"
+        />
+        <div className="relative z-10 mx-auto flex h-full max-w-2xl flex-col items-center justify-end gap-3 px-6 pb-20 text-center">
+          <p className="font-display text-on-image text-[1.35rem] font-bold text-text">هذا آدم — بصوته، بشخصيته.</p>
+          <p className="text-on-image max-w-[26ch] text-sm leading-relaxed text-[color:var(--text-secondary)]">
             ليس أيقونة، وليس روبوتاً باردًا؛ رفيق حقيقي يعرف طفلكم.
           </p>
           <CTA label="اسمعوا آدم بنفسكم" />
@@ -214,10 +239,10 @@ export default function LandingPage() {
       </section>
 
       {/* ===== 6. Personalization ===== */}
-      <SectionImage src={PERSONAL_IMG} alt="آدم يستمع بانتباه" align="bottom" scrim="bottom" minH="800px">
+      <SectionImage src={PERSONAL_IMG} alt="آدم يستمع بانتباه" align="bottom" focus="bottom" minH="800px">
         <Eyebrow>يعرف طفلكم تحديداً</Eyebrow>
-        <h2 className="font-display text-[1.7rem] font-bold sm:text-3xl">لا يمنح آدم النصيحة نفسها لكل بيت.</h2>
-        <ul className="mx-auto flex max-w-xs flex-col gap-2 text-[15px] text-[color:var(--text-secondary)]">
+        <h2 className="font-display text-on-image text-[1.7rem] font-bold sm:text-3xl">لا يمنح آدم النصيحة نفسها لكل بيت.</h2>
+        <ul className="text-on-image mx-auto flex max-w-xs flex-col gap-2 text-[15px] text-[color:var(--text-secondary)]">
           {["عمر طفلكم", "المواقف التي تتكرر معه", "ما الذي نفع سابقًا", "وما الذي لم ينفع", "الأنماط التي يلاحظها آدم"].map((li) => (
             <li key={li} className="flex items-center justify-center gap-2.5">
               <Check size={16} strokeWidth={2.6} className="shrink-0 text-gold-strong" />
@@ -235,58 +260,60 @@ export default function LandingPage() {
       </SectionImage>
 
       {/* ===== 7. الرحلة / الشجرة ===== */}
-      <SectionImage src={TREE_IMG} alt="شجرة آدم الذهبية" align="bottom" scrim="bottom" minH="760px">
-        <h2 className="font-display text-[1.7rem] font-bold sm:text-3xl">في كل مرة تختارون فيها الهدوء… تبنون شيئًا.</h2>
-        <p className="mx-auto max-w-lg text-lg leading-relaxed text-[color:var(--text-secondary)]">
+      <SectionImage src={TREE_IMG} alt="شجرة آدم الذهبية" align="bottom" focus="bottom" minH="760px">
+        <h2 className="font-display text-on-image text-[1.7rem] font-bold sm:text-3xl">في كل مرة تختارون فيها الهدوء… تبنون شيئًا.</h2>
+        <p className="text-on-image mx-auto max-w-lg text-lg leading-relaxed text-[color:var(--text-secondary)]">
           ليست نقاطًا، وليست لعبة؛ إنها لحظات حقيقية تغيّرت فيها طريقة تعاملكم، تتراكم في شجرة واحدة، ورقة بعد ورقة.
         </p>
         <CTA label="ابدأوا شجرتكم" />
       </SectionImage>
 
       {/* ===== 8. لماذا آدم ===== */}
-      <SectionImage src={COMPARE_IMG} alt="خلفية هادئة" align="center" scrim="full" minH="720px">
-        <h2 className="font-display text-center text-[1.7rem] font-bold sm:text-3xl">لماذا آدم، لا بحث Google؟</h2>
-        <div className="glass overflow-x-auto">
-          <table className="w-full min-w-[380px] text-right text-sm">
-            <thead>
-              <tr className="border-b border-[color:var(--glass-border)] text-muted">
-                <th className="p-4 font-medium">&nbsp;</th>
-                <th className="p-4 font-display font-bold text-gold-strong">آدم</th>
-                <th className="p-4 font-medium">بحث Google</th>
-                <th className="p-4 font-medium">نصائح عامة</th>
-              </tr>
-            </thead>
-            <tbody>
-              {["يعرف طفلكم", "يتذكّر السياق", "يساعدكم في اللحظة", "يتطوّر معكم"].map((row) => (
-                <tr key={row} className="border-b border-[color:var(--glass-border)] last:border-0">
-                  <td className="p-4 text-[color:var(--text-secondary)]">{row}</td>
-                  <td className="p-4">
-                    <Check size={18} strokeWidth={2.6} className="text-gold-strong" />
-                  </td>
-                  <td className="p-4">
-                    <Minus size={16} className="text-muted" />
-                  </td>
-                  <td className="p-4">
-                    <Minus size={16} className="text-muted" />
-                  </td>
+      <SectionImage src={COMPARE_IMG} alt="خلفية هادئة" align="center" focus="full" minH="720px">
+        <h2 className="font-display text-on-image text-center text-[1.7rem] font-bold sm:text-3xl">لماذا آدم، لا بحث Google؟</h2>
+        <div className="glass overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[380px] text-right text-sm">
+              <thead>
+                <tr className="border-b border-[color:var(--glass-border)] text-muted">
+                  <th className="p-4 font-medium">&nbsp;</th>
+                  <th className="p-4 font-display font-bold text-gold-strong">آدم</th>
+                  <th className="p-4 font-medium">بحث Google</th>
+                  <th className="p-4 font-medium">نصائح عامة</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {["يعرف طفلكم", "يتذكّر السياق", "يساعدكم في اللحظة", "يتطوّر معكم"].map((row) => (
+                  <tr key={row} className="border-b border-[color:var(--glass-border)] last:border-0">
+                    <td className="p-4 text-[color:var(--text-secondary)]">{row}</td>
+                    <td className="p-4">
+                      <Check size={18} strokeWidth={2.6} className="text-gold-strong" />
+                    </td>
+                    <td className="p-4">
+                      <Minus size={16} className="text-muted" />
+                    </td>
+                    <td className="p-4">
+                      <Minus size={16} className="text-muted" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         <CTA label="جرّبوا الفرق بنفسكم" />
       </SectionImage>
 
       {/* ===== 9. الخصوصية والثقة ===== */}
-      <SectionImage src={TRUST_IMG} alt="خزانة ذهبية رمز للثقة" align="center" scrim="center" minH="720px">
-        <h2 className="font-display text-[1.7rem] font-bold sm:text-3xl">خصوصيتكم أولاً.</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
+      <SectionImage src={TRUST_IMG} alt="خزانة ذهبية رمز للثقة" align="center" focus="center" minH="720px">
+        <h2 className="font-display text-on-image text-[1.7rem] font-bold sm:text-3xl">خصوصيتكم أولاً.</h2>
+        <div className="panel-group panel-group-row glass grid sm:grid-cols-3">
           {[
             { icon: Lock, title: "بياناتكم ملككم", body: "يمكنكم طلب محوها كاملة في أي وقت، بضغطة واحدة." },
             { icon: ShieldCheck, title: "حدود واضحة", body: "يقولها آدم بصراحة حين يحتاج الموقف إلى مختص حقيقي." },
             { icon: UserCheck, title: "لا انتحال صفة", body: "آدم لا يتحدّث باسم فريقنا ولا يعرض شيئاً لم نتّفق عليه." },
           ].map((t) => (
-            <div key={t.title} className="glass flex flex-col items-center gap-2 p-5 text-center">
+            <div key={t.title} className="flex flex-col items-center gap-2 p-6 text-center">
               <t.icon size={22} strokeWidth={2} className="text-gold-strong" />
               <h3 className="font-display text-sm font-bold">{t.title}</h3>
               <p className="text-xs leading-relaxed text-[color:var(--text-secondary)]">{t.body}</p>
@@ -297,10 +324,10 @@ export default function LandingPage() {
       </SectionImage>
 
       {/* ===== 10. المرافقة الكاملة (بلا سعر موحّد، نتيجة أولاً) ===== */}
-      <SectionImage src={PRICING_IMG} alt="خلفية ذهبية فاخرة" align="center" scrim="full" minH="820px">
+      <SectionImage src={PRICING_IMG} alt="خلفية ذهبية فاخرة" align="center" focus="full" minH="820px">
         <Eyebrow>المرافقة الكاملة</Eyebrow>
-        <h2 className="font-display text-[1.6rem] font-bold sm:text-2xl">29 يومًا حتى تشاهدوا فرقًا حقيقيًا</h2>
-        <ul className="mx-auto flex max-w-sm flex-col gap-2.5 text-[15px] text-[color:var(--text-secondary)]">
+        <h2 className="font-display text-on-image text-[1.6rem] font-bold sm:text-2xl">29 يومًا حتى تشاهدوا فرقًا حقيقيًا</h2>
+        <ul className="text-on-image mx-auto flex max-w-sm flex-col gap-2.5 text-[15px] text-[color:var(--text-secondary)]">
           {[
             "هدف واحد واضح، تشاهدون تحقّقه بأعينكم",
             "خطوة يومية مبنية على طفلكم تحديدًا",
@@ -313,7 +340,7 @@ export default function LandingPage() {
             </li>
           ))}
         </ul>
-        <p className="mx-auto max-w-sm text-sm text-muted">
+        <p className="text-on-image mx-auto max-w-sm text-sm text-muted">
           يختلف السعر حسب بلدكم، ويظهر لكم بعملتكم المحلية مباشرة داخل المحادثة مع آدم.
         </p>
         <div className="glass-gold mx-auto flex max-w-sm items-start gap-2.5 p-4 text-right text-sm leading-relaxed text-[color:var(--text-secondary)]">
@@ -327,9 +354,9 @@ export default function LandingPage() {
       </SectionImage>
 
       {/* ===== 11. أسئلة شائعة ===== */}
-      <SectionImage src={FAQ_IMG} alt="خلفية هادئة" align="center" scrim="full" minH="820px">
-        <h2 className="font-display text-center text-[1.7rem] font-bold sm:text-3xl">أسئلة شائعة</h2>
-        <div className="flex flex-col gap-3 text-right">
+      <SectionImage src={FAQ_IMG} alt="خلفية هادئة" align="center" focus="full" minH="820px">
+        <h2 className="font-display text-on-image text-center text-[1.7rem] font-bold sm:text-3xl">أسئلة شائعة</h2>
+        <div className="glass panel-group flex flex-col text-right">
           {[
             ["هل آدم بديل عن أخصائي؟", "لا. يرافقكم آدم يوميًا في اللحظات العادية، وإن احتاج الموقف إلى مختص حقيقي، يخبركم بذلك بصراحة."],
             ["كيف يعرف آدم طفلي؟", "من خلال حديثكم معه يومًا بعد يوم، دون استمارات طويلة أو أسئلة مكررة."],
@@ -339,7 +366,7 @@ export default function LandingPage() {
             ["كم السعر؟", "يختلف حسب بلدكم، ويظهر لكم بعملتكم المحلية مباشرة داخل المحادثة."],
             ["كيف ألغي المرافقة الكاملة؟", "برسالة واحدة إلى آدم، دون شروط أو التزام."],
           ].map(([q, a]) => (
-            <details key={q} className="glass group p-5">
+            <details key={q} className="group p-5">
               <summary className="flex cursor-pointer list-none items-center justify-between font-display text-[15px] font-bold">
                 {q}
                 <span className="text-gold-strong transition-transform group-open:rotate-45">+</span>
@@ -352,12 +379,12 @@ export default function LandingPage() {
       </SectionImage>
 
       {/* ===== 12. Final CTA ===== */}
-      <SectionImage src={FINAL_IMG} alt="باب مفتوح على ضوء دافئ" align="center" scrim="full" minH="640px">
-        <h2 className="font-display text-[1.8rem] font-bold sm:text-3xl">لستم بحاجة إلى أن تكونوا آباءً مثاليين.</h2>
-        <p className="text-lg text-gold-strong">تحتاجون فقط إلى معرفة ما تفعلونه في اللحظة القادمة.</p>
+      <SectionImage src={FINAL_IMG} alt="باب مفتوح على ضوء دافئ" align="center" focus="full" minH="640px">
+        <h2 className="font-display text-on-image text-[1.8rem] font-bold sm:text-3xl">لستم بحاجة إلى أن تكونوا آباءً مثاليين.</h2>
+        <p className="text-on-image text-lg text-gold-strong">تحتاجون فقط إلى معرفة ما تفعلونه في اللحظة القادمة.</p>
         <div className="flex flex-col items-center gap-3">
           <CTA label="ابدأوا مع آدم مجاناً" />
-          <p className="text-sm text-muted">يبدأ في أقل من دقيقة.</p>
+          <p className="text-on-image text-sm text-muted">يبدأ في أقل من دقيقة.</p>
         </div>
       </SectionImage>
 
