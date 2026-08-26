@@ -218,7 +218,8 @@ export function TopBar() {
                     key={e.key}
                     type="button"
                     onClick={() => loadKey(e.key)}
-                    className="pressable flex items-center justify-between !rounded-2xl px-4 py-3.5 text-sm font-medium"
+                    className="pressable rise-in flex items-center justify-between !rounded-2xl px-4 py-3.5 text-sm font-medium"
+                    style={{ animationDelay: `${ENTRIES.indexOf(e) * 45}ms` }}
                   >
                     <span className="flex items-center gap-2.5">
                       <e.icon size={17} className="text-gold-strong" strokeWidth={2.2} />

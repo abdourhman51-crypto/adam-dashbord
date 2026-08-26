@@ -55,6 +55,7 @@ export function TreeLightbox({ leafCount, onClose }: { leafCount: number; onClos
               return (
                 <GoldLeaf
                   key={i}
+                  index={i}
                   left={`${p.leftPct}%`}
                   top={`${p.topPct}%`}
                   width={p.sizePx * 1.6}

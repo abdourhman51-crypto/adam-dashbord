@@ -5,8 +5,7 @@ import { getWebApp } from "@/lib/telegram/client";
  * تيليغرام فعلياً لا حاجة له إطلاقاً — انظر returnToAdamChat أدناه.
  */
 function getChatLinkFallback(): string | null {
-  const username = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME;
-  if (!username) return null;
+  const username = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "adam_os_brain_bot";
   return `https://t.me/${username}`;
 }
 

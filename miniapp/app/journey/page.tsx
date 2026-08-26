@@ -168,8 +168,8 @@ export default function JourneyPage() {
           <p className="font-display mt-2 text-[16px] text-gold-strong">قصة رحلتكم</p>
           <div className="relative flex flex-col gap-4 ps-3">
             <div className="absolute bottom-2 top-2 w-px bg-glass-border" style={{ insetInlineStart: "7px" }} aria-hidden="true" />
-            {storyDays.map((d) => (
-              <div key={d.logDate} className="relative">
+            {storyDays.map((d, i) => (
+              <div key={d.logDate} className="card-form-in relative" style={{ animationDelay: `${i * 110}ms` }}>
                 <span
                   className="absolute top-1.5 h-3.5 w-3.5 rounded-full bg-gold"
                   style={{ insetInlineStart: "-3px" }}

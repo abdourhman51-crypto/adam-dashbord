@@ -104,8 +104,26 @@ export default function HomePage() {
 
         {committed && justCommitted ? (
           <div className="mt-5 flex flex-col items-center gap-3">
-            <svg viewBox="0 0 24 24" width={36} className="leaf-grow-in drop-shadow-[0_0_8px_rgba(227,178,60,0.55)]">
-              <path d="M12 2c5 3 8 7 8 11a8 8 0 0 1-16 0c0-4 3-8 8-11Z" fill="#e3b23c" />
+            <svg viewBox="0 0 24 28" width={36} className="leaf-grow-in drop-shadow-[0_0_8px_rgba(227,178,60,0.55)]">
+              <defs>
+                <linearGradient id="commitLeafGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#f4d675" />
+                  <stop offset="55%" stopColor="#e3b23c" />
+                  <stop offset="100%" stopColor="#b8860b" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M12 1.5C16.5 5 20 9.5 20 15c0 6.5-4.2 11-8 11.5C8.2 26 4 21.5 4 15 4 9.5 7.5 5 12 1.5Z"
+                fill="url(#commitLeafGrad)"
+              />
+              <path
+                d="M12 3.5v21.5M12 10l-3 2.2M12 14l3.4 2M12 18.5l-3 2"
+                stroke="#7a5410"
+                strokeWidth="0.6"
+                strokeLinecap="round"
+                fill="none"
+                opacity="0.55"
+              />
             </svg>
             <p className="font-display text-center text-[16px] text-text">{commitLine}</p>
             {leafCount !== null && (

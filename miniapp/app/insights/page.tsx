@@ -118,8 +118,12 @@ export default function InsightsPage() {
         {patterns.length > 0 ? (
           <GlassCard>
             <div className="flex flex-col gap-3">
-              {patterns.map((p) => (
-                <div key={p.label} className="flex items-start gap-2 border-e-2 border-e-emerald-strong pe-3">
+              {patterns.map((p, i) => (
+                <div
+                  key={p.label}
+                  className="rise-in flex items-start gap-2 border-e-2 border-e-emerald-strong pe-3"
+                  style={{ animationDelay: `${i * 70}ms` }}
+                >
                   <div>
                     <p className="text-sm font-medium text-text">
                       <IconText text={p.label} />
@@ -158,8 +162,12 @@ export default function InsightsPage() {
           </GlassCard>
         ) : (
           <div className="flex flex-col gap-3">
-            {visibleMoments.map((m) => (
-              <div key={m.logDate} className="glass-gold glow-pulse flex flex-col gap-2 !p-5">
+            {visibleMoments.map((m, i) => (
+              <div
+                key={m.logDate}
+                className="glass-gold glow-pulse card-form-in flex flex-col gap-2 !p-5"
+                style={{ animationDelay: `${i * 90}ms` }}
+              >
                 <span className="text-xs font-medium text-text-muted">{formatNightLabel(m.logDate)}</span>
                 <p className="font-display text-[17px] leading-relaxed text-text">
                   لمّا جرّبتوا «{m.stepGiven}»، هدأ {child}.
