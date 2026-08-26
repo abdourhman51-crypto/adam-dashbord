@@ -13,6 +13,8 @@ import {
   Cog,
   Gem,
   Users,
+  Settings,
+  ShieldCheck,
   type LucideIcon,
 } from "lucide-react";
 import { GlassCard } from "@/components/GlassCard";
@@ -41,6 +43,8 @@ const ENTRIES: { key: string; label: string; icon: LucideIcon }[] = [
   { key: "menu_why", label: "وما الذي يميّزه؟", icon: Gem },
   { key: "menu_pricing_diff", label: "المجاني مقابل المرافقة الكاملة", icon: Gem },
   { key: "menu_family", label: "عائلة آدم", icon: Users },
+  { key: "menu_settings", label: "إعدادات الرسائل", icon: Settings },
+  { key: "menu_privacy", label: "الخصوصية وحذف البيانات", icon: ShieldCheck },
 ];
 
 /**
@@ -118,6 +122,15 @@ export function TopBar() {
     }
     if (b.cb && ENTRIES.some((e) => e.key === b.cb)) {
       loadKey(b.cb);
+      return;
+    }
+    // أي زر آخر غير معروف هنا (مثل menu_privacy_erase_ask أو
+    // menu_settings_hours) هو إجراء يحتاج محادثة حقيقية مع البوت — يكتب
+    // بيانات، يسأل تأكيداً، يفتح منتقي وقت... التطبيق المصغّر قراءة فقط ولا
+    // يقدر يُكمل هذا هنا. أصح رد هو إرجاع الوالد لمحادثته الفعلية ليكمل هناك،
+    // لا تجاهل صامت لأي زر — هذا بالضبط الخلل الذي أصلحناه مع menu_journey.
+    if (b.cb) {
+      returnToAdamChat();
     }
   }
 

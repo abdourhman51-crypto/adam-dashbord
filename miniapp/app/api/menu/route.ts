@@ -10,6 +10,8 @@ const ALLOWED_KEYS = new Set([
   "menu_why",
   "menu_pricing_diff",
   "menu_family",
+  "menu_settings",
+  "menu_privacy",
 ]);
 
 interface MomentButton {
