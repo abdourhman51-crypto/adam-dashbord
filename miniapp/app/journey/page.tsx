@@ -27,6 +27,7 @@ interface JourneyResponse {
   extended?: boolean;
   phaseAr?: string | null;
   baselineText?: string | null;
+  storyDays?: { dayNumber: number; logDate: string; line: string }[];
   criticalWindow?: CriticalWindowSnapshot | null;
 }
 
@@ -100,9 +101,11 @@ export default function JourneyPage() {
       ? Math.min(100, Math.round(((j.objectiveCurrent ?? 0) / j.objectiveTarget) * 100))
       : 0;
 
+  const storyDays = j.storyDays ?? [];
+
   return (
     <ScreenShell>
-      <AdamIntro text="هذي رحلتكم بالضبط — الهدف اللي اتفقنا عليه، وكم قطعتوا منه لين الحين." />
+      <AdamIntro text="هذي رحلتكم — الهدف اللي اتفقنا عليه، وقصة الأيام اللي وصلتكم لين هنا." />
 
       {j.criticalWindow && (
         <CriticalWindowIndicator
@@ -113,6 +116,15 @@ export default function JourneyPage() {
           serverTimestampMs={j.criticalWindow.serverTimestampMs}
         />
       )}
+
+      <div className="rise-in flex items-center gap-2 px-1">
+        <span className="glass-gold !rounded-full px-3 py-1 text-xs font-semibold text-gold-strong">
+          اليوم {formatNumber(j.loggedDays ?? 0)}
+        </span>
+        {j.daysRemaining !== undefined && j.daysRemaining > 0 && (
+          <span className="text-xs text-text-muted">و{formatNumber(j.daysRemaining)} يوم متبقّي</span>
+        )}
+      </div>
 
       <GlassCard variant="gold" className="rise-in">
         <p className="text-xs font-medium text-text-muted">الهدف اللي اتفقنا عليه</p>
@@ -151,21 +163,34 @@ export default function JourneyPage() {
         </GlassCard>
       )}
 
-      <GlassCard className="rise-in grid grid-cols-2 gap-4 text-center">
-        <div>
-          <p className="font-display text-2xl text-text">{formatNumber(j.loggedDays ?? 0)}</p>
-          <p className="mt-1 text-xs text-text-muted">يوم سجّلتوه</p>
+      {storyDays.length > 0 && (
+        <div className="rise-in flex flex-col gap-3">
+          <p className="font-display mt-2 text-[16px] text-gold-strong">قصة رحلتكم</p>
+          <div className="relative flex flex-col gap-4 ps-3">
+            <div className="absolute bottom-2 top-2 w-px bg-glass-border" style={{ insetInlineStart: "7px" }} aria-hidden="true" />
+            {storyDays.map((d) => (
+              <div key={d.logDate} className="relative">
+                <span
+                  className="absolute top-1.5 h-3.5 w-3.5 rounded-full bg-gold"
+                  style={{ insetInlineStart: "-3px" }}
+                  aria-hidden="true"
+                />
+                <div className="ms-6">
+                  <GlassCard className="!p-4">
+                    <span className="text-xs font-semibold text-gold-strong">اليوم {formatNumber(d.dayNumber)}</span>
+                    <p className="mt-1 text-sm leading-relaxed text-text">{d.line}</p>
+                  </GlassCard>
+                </div>
+              </div>
+            ))}
+          </div>
+          {j.baselineText && (
+            <GlassCard variant="gold" className="text-center">
+              <p className="text-xs font-medium text-text-muted">هذا هو التغيير اللي لاحظه آدم</p>
+              <p className="mt-2 text-sm leading-relaxed text-text">{j.baselineText}</p>
+            </GlassCard>
+          )}
         </div>
-        <div>
-          <p className="font-display text-2xl text-text">{formatNumber(j.daysRemaining ?? 0)}</p>
-          <p className="mt-1 text-xs text-text-muted">يوم متبقّي</p>
-        </div>
-      </GlassCard>
-
-      {j.baselineText && (
-        <GlassCard className="rise-in">
-          <p className="text-sm leading-relaxed text-text-secondary">{j.baselineText}</p>
-        </GlassCard>
       )}
     </ScreenShell>
   );
