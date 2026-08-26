@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "آدم — مرافق التربية الذكي",
-  description: "آدم يفهم طفلك تحديداً، ويرافقك خطوة بخطوة في أصعب لحظات التربية.",
+  description: "آدم يفهم طفلكم تحديدًا، ويرافقكم خطوة بخطوة في أصعب لحظات التربية.",
 };
 
 export const viewport: Viewport = {
