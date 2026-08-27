@@ -43,59 +43,23 @@ function TextPanel({ children, className = "" }: { children: React.ReactNode; cl
 }
 
 /**
- * صورة أو فيديو في منطقته الخاصة، والنص في كتلة داكنة صلبة أسفله تمامًا —
- * لا تراكب أبدًا بين النص والشخصية/الرمز مهما كان تكوين الصورة أو الفيديو،
- * لأن النص لا يشارك نفس البكسلات مع الصورة إطلاقًا. يُستخدم في الأقسام التي
- * تحتوي وجوهًا أو رمزًا لا نعرف مساحته الفارغة بدقة (تأكّد فيديو آدم مع
- * الأم مثلاً أنه تكبير بطيء متواصل على لقطة كاملة الجسم بلا أي فراغ آمن
- * طوال حلقته الثمانية ثوانٍ، فحوّلناه لهذا النمط).
+ * كل صورة أو فيديو خلفية يحصل على طبقة مموّهة (blur) في نفس منطقة التغميق
+ * (focus) — لا حواف حادة بين صورة وأخرى، بل تلاشٍ ضبابي أنيق يجعل الصفحة
+ * كلها تبدو متصلة. النص يتموضع فوق هذه المنطقة المموّهة بالذات (عبر
+ * textAlign)، والزر (cta) دائمًا في أسفل القسم منفصلاً عن النص.
+ * object-top يمنع اقتصاص أعلى الصورة (كالرأس) عند التحجيم بـobject-cover.
  */
-function MediaThenText({
-  src,
-  alt,
-  isVideo = false,
-  mediaH = "56dvh",
-  children,
-}: {
-  src: string;
-  alt: string;
-  isVideo?: boolean;
-  mediaH?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <>
-      <div className="relative w-full overflow-hidden" style={{ height: mediaH }}>
-        {isVideo ? (
-          <video src={src} autoPlay muted loop playsInline preload="none" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
-        ) : (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={src} alt={alt} className="absolute inset-0 h-full w-full object-cover" />
-        )}
-        <div
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(180deg, transparent 0%, transparent 70%, rgba(8,14,10,0.97) 100%)" }}
-          aria-hidden="true"
-        />
-      </div>
-      <div className="bg-[rgba(8,14,10,0.97)] px-6 pb-10 pt-8 text-center">
-        <div className="mx-auto flex max-w-2xl flex-col items-center gap-4">{children}</div>
-      </div>
-    </>
-  );
+function maskForFocus(focus: "top" | "bottom" | "center" | "full") {
+  if (focus === "top") return "linear-gradient(180deg, black 0%, black 42%, transparent 62%)";
+  if (focus === "bottom") return "linear-gradient(0deg, black 0%, black 42%, transparent 62%)";
+  if (focus === "center") return "radial-gradient(55% 55% at 50% 50%, transparent 0%, black 100%)";
+  return "black";
 }
 
-/**
- * كل صورة خلفية تذوب في نفس اللون الداكن أعلاها وأسفلها، بحيث تلتقي حافة
- * صورة مع حافة التالية في نفس التدرّج بدل قطع حاد بينهما.
- *
- * الزر (cta) دائمًا مثبّت في أسفل القسم في منطقته الخاصة، منفصلاً عن محتوى
- * النص (content) الذي يتموضع في المساحة المتبقية أعلاه حسب textAlign —
- * هذا يضمن مسافة واضحة بين النص والزر، وأن الزر لا يظهر أبدًا في المنتصف.
- */
 function SectionImage({
   src,
   alt,
+  isVideo = false,
   textAlign = "center",
   focus = "bottom",
   minH = "640px",
@@ -104,6 +68,7 @@ function SectionImage({
 }: {
   src: string;
   alt: string;
+  isVideo?: boolean;
   textAlign?: "top" | "center" | "bottom";
   focus?: "top" | "bottom" | "center" | "full";
   minH?: string;
@@ -112,18 +77,41 @@ function SectionImage({
 }) {
   const focusBg =
     focus === "top"
-      ? "linear-gradient(180deg, rgba(8,14,10,0.45) 0%, transparent 55%)"
+      ? "linear-gradient(180deg, rgba(8,14,10,0.55) 0%, transparent 55%)"
       : focus === "bottom"
-      ? "linear-gradient(0deg, rgba(8,14,10,0.45) 0%, transparent 55%)"
+      ? "linear-gradient(0deg, rgba(8,14,10,0.55) 0%, transparent 55%)"
       : focus === "center"
-      ? "radial-gradient(60% 60% at 50% 50%, rgba(8,14,10,0.1) 0%, rgba(8,14,10,0.45) 100%)"
-      : "rgba(8,14,10,0.32)";
+      ? "radial-gradient(60% 60% at 50% 50%, rgba(8,14,10,0.1) 0%, rgba(8,14,10,0.5) 100%)"
+      : "rgba(8,14,10,0.4)";
+  const mask = maskForFocus(focus);
   const contentAlignClass = textAlign === "top" ? "justify-start pt-20" : textAlign === "bottom" ? "justify-end" : "justify-center";
+
+  const mediaProps = { className: "absolute inset-0 h-full w-full object-cover object-top" };
 
   return (
     <section className="relative w-full overflow-hidden" style={{ minHeight: minH }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt={alt} className="absolute inset-0 h-full w-full object-cover" />
+      {isVideo ? (
+        <video src={src} autoPlay muted loop playsInline preload="none" aria-hidden="true" {...mediaProps} />
+      ) : (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img src={src} alt={alt} {...mediaProps} />
+      )}
+      {isVideo ? (
+        <video
+          src={src}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="none"
+          aria-hidden="true"
+          {...mediaProps}
+          style={{ filter: "blur(28px)", WebkitMaskImage: mask, maskImage: mask }}
+        />
+      ) : (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img src={src} alt="" aria-hidden="true" {...mediaProps} style={{ filter: "blur(28px)", WebkitMaskImage: mask, maskImage: mask }} />
+      )}
       <div
         className="absolute inset-0"
         style={{ background: "linear-gradient(180deg, rgba(8,14,10,0.97) 0%, transparent 24%, transparent 76%, rgba(8,14,10,0.97) 100%)" }}
@@ -154,21 +142,34 @@ export default function LandingPage() {
         </Link>
       </header>
 
-      {/* ===== 1. Hero — الفيديو أولاً وكاملاً بلا أي نص فوقه (تأكّدنا أنه تكبير متواصل بلا فراغ آمن)، والنص أسفله في كتلة داكنة صلبة ===== */}
-      <MediaThenText src="/brand/adam-moment.mp4" alt="آدم وأمّه" isVideo mediaH="62dvh">
-        <h1 className="font-display text-[1.7rem] font-extrabold leading-[1.3] sm:text-[2.2rem]">
-          وراء كل تصرّف من طفلكم سبب.
-          <br />
-          <span className="text-gold-strong">آدم يكتشفه — لا يخمّنه.</span>
-        </h1>
-        <p className="max-w-md text-sm leading-relaxed text-[color:var(--text-secondary)]">
-          احكوا لآدم بكلامكم عمّا يمرّ به طفلكم، فيمنحكم خطوة اليوم: أمرًا عمليًا واحدًا مبنيًا عليه بالذات — لا نصيحة عامة كتلك التي يقدّمها أي بحث أو روبوت محادثة.
-        </p>
-        <div className="flex flex-col items-center gap-2 pt-2">
-          <CTA />
-          <p className="text-sm text-muted">دون بطاقة بنكية، ويبدأ في أقل من دقيقة</p>
-        </div>
-      </MediaThenText>
+      {/* ===== 1. Hero — الفيديو تحت الشريط العلوي مباشرة (لا يغطيه)؛ تلاشٍ ضبابي في الأسفل يحمل النص ===== */}
+      <div className="pt-16">
+        <SectionImage
+          src="/brand/adam-moment.mp4"
+          alt="آدم وأمّه"
+          isVideo
+          textAlign="bottom"
+          focus="bottom"
+          minH="calc(100dvh - 4rem)"
+          content={null}
+          cta={
+            <>
+              <h1 className="font-display text-[1.7rem] font-extrabold leading-[1.3] sm:text-[2.2rem]">
+                وراء كل تصرّف من طفلكم سبب.
+                <br />
+                <span className="text-gold-strong">آدم يكتشفه — لا يخمّنه.</span>
+              </h1>
+              <p className="max-w-md text-sm leading-relaxed text-[color:var(--text-secondary)]">
+                احكوا لآدم بكلامكم عمّا يمرّ به طفلكم، فيمنحكم خطوة اليوم: أمرًا عمليًا واحدًا مبنيًا عليه بالذات — لا نصيحة عامة كتلك التي يقدّمها أي بحث أو روبوت محادثة.
+              </p>
+              <div className="flex flex-col items-center gap-2 pt-2">
+                <CTA />
+                <p className="text-sm text-muted">دون بطاقة بنكية، ويبدأ في أقل من دقيقة</p>
+              </div>
+            </>
+          }
+        />
+      </div>
 
       {/* ===== 2. Show, don't tell ===== */}
       <SectionImage
@@ -290,43 +291,75 @@ export default function LandingPage() {
         cta={<CTA label="ابدأوا الخطوة الأولى" />}
       />
 
-      {/* ===== آدم ينظر إليكم مباشرة — الصورة التي كانت الـ Hero، منقولة إلى مكان الفيديو السابق. الصورة في منطقتها والنص أسفلها في كتلة صلبة — لا تراكب ممكن ===== */}
-      <MediaThenText src={HERO_IMG} alt="آدم ينظر إليكم مباشرة في غرفته" mediaH="52dvh">
-        <h2 className="font-display text-[1.3rem] font-bold sm:text-2xl">هذا آدم، بصوته وشخصيته.</h2>
-        <p className="max-w-[30ch] text-sm leading-relaxed text-[color:var(--text-secondary)]">
-          ليس أيقونة، وليس روبوتاً باردًا؛ رفيق حقيقي يعرف طفلكم.
-        </p>
-        <CTA label="اسمعوا آدم بنفسكم" />
-      </MediaThenText>
+      {/* ===== آدم ينظر إليكم مباشرة — الصورة التي كانت الـ Hero، منقولة إلى مكان الفيديو السابق. رأسه كاملاً غير مقطوع (object-top)، والنص فوق التلاشي الضبابي أسفلها ===== */}
+      <SectionImage
+        src={HERO_IMG}
+        alt="آدم ينظر إليكم مباشرة في غرفته"
+        textAlign="bottom"
+        focus="bottom"
+        minH="720px"
+        content={null}
+        cta={
+          <>
+            <h2 className="font-display text-[1.3rem] font-bold sm:text-2xl">هذا آدم، بصوته وشخصيته.</h2>
+            <p className="max-w-[30ch] text-sm leading-relaxed text-[color:var(--text-secondary)]">
+              ليس أيقونة، وليس روبوتاً باردًا؛ رفيق حقيقي يعرف طفلكم.
+            </p>
+            <CTA label="اسمعوا آدم بنفسكم" />
+          </>
+        }
+      />
 
-      {/* ===== 6. Personalization — الصورة في منطقتها والنص أسفلها في كتلة صلبة — لا تراكب ممكن مع وجه آدم ===== */}
-      <MediaThenText src={PERSONAL_IMG} alt="آدم يستمع بانتباه" mediaH="50dvh">
-        <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">لا يمنح آدم النصيحة نفسها لكل بيت.</h2>
-        <ul className="flex flex-col gap-2 text-[15px] text-[color:var(--text-secondary)]">
-          {["عمر طفلكم", "المواقف التي تتكرر معه", "ما الذي نفع سابقًا وما لم ينفع", "الأنماط التي يلاحظها آدم"].map((li) => (
-            <li key={li} className="flex items-center justify-center gap-2.5">
-              <Check size={16} strokeWidth={2.6} className="shrink-0 text-gold-strong" />
-              {li}
-            </li>
-          ))}
-        </ul>
-        <div className="glass-gold mx-auto max-w-md p-6">
-          <p className="font-display text-base leading-loose text-text">
-            «ألاحظ أنّ يوسف يتوتّر غالبًا عند الانتقال من اللعب إلى النوم؛ جرّبوا إخباره بالخطوة القادمة قبلها بخمس دقائق.»
-          </p>
-          <p className="mt-3 text-sm text-muted">هذا بالضبط ما يقوله آدم حين يعرف طفلكم فعلًا.</p>
-        </div>
-        <CTA label="خصّصوا آدم لطفلكم" />
-      </MediaThenText>
+      {/* ===== 6. Personalization — النص أعلى الصورة فوق التلاشي الضبابي، ووجه آدم في المنطقة الحادّة الواضحة أسفله ===== */}
+      <SectionImage
+        src={PERSONAL_IMG}
+        alt="آدم يستمع بانتباه"
+        textAlign="top"
+        focus="top"
+        minH="860px"
+        content={
+          <>
+            <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">لا يمنح آدم النصيحة نفسها لكل بيت.</h2>
+            <ul className="flex flex-col gap-2 text-[15px] text-[color:var(--text-secondary)]">
+              {["عمر طفلكم", "المواقف التي تتكرر معه", "ما الذي نفع سابقًا وما لم ينفع", "الأنماط التي يلاحظها آدم"].map((li) => (
+                <li key={li} className="flex items-center justify-center gap-2.5">
+                  <Check size={16} strokeWidth={2.6} className="shrink-0 text-gold-strong" />
+                  {li}
+                </li>
+              ))}
+            </ul>
+          </>
+        }
+        cta={
+          <>
+            <div className="glass-gold mx-auto max-w-md p-6">
+              <p className="font-display text-base leading-loose text-text">
+                «ألاحظ أنّ يوسف يتوتّر غالبًا عند الانتقال من اللعب إلى النوم؛ جرّبوا إخباره بالخطوة القادمة قبلها بخمس دقائق.»
+              </p>
+              <p className="mt-3 text-sm text-muted">هذا بالضبط ما يقوله آدم حين يعرف طفلكم فعلًا.</p>
+            </div>
+            <CTA label="خصّصوا آدم لطفلكم" />
+          </>
+        }
+      />
 
-      {/* ===== 7. الرحلة / الشجرة — الشجرة كاملة في منطقتها الخاصة بلا أي نص فوقها، والنص والزر أسفلها في كتلة صلبة ===== */}
-      <MediaThenText src={TREE_IMG} alt="شجرة آدم الذهبية" mediaH="54dvh">
-        <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">في كل مرة تختارون فيها الهدوء… تبنون شيئًا.</h2>
-        <p className="max-w-lg text-[15px] leading-relaxed text-[color:var(--text-secondary)]">
-          ليست نقاطًا، وليست لعبة؛ إنها لحظات حقيقية تغيّرت فيها طريقة تعاملكم، تتراكم في شجرة واحدة، ورقة بعد ورقة.
-        </p>
-        <CTA label="ابدأوا شجرتكم" />
-      </MediaThenText>
+      {/* ===== 7. الرحلة / الشجرة — النص فوق التلاشي الضبابي أعلى الصورة، والشجرة واضحة حادة في وسط وأسفل الإطار ===== */}
+      <SectionImage
+        src={TREE_IMG}
+        alt="شجرة آدم الذهبية"
+        textAlign="top"
+        focus="top"
+        minH="820px"
+        content={
+          <>
+            <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">في كل مرة تختارون فيها الهدوء… تبنون شيئًا.</h2>
+            <p className="max-w-lg text-[15px] leading-relaxed text-[color:var(--text-secondary)]">
+              ليست نقاطًا، وليست لعبة؛ إنها لحظات حقيقية تغيّرت فيها طريقة تعاملكم، تتراكم في شجرة واحدة، ورقة بعد ورقة.
+            </p>
+          </>
+        }
+        cta={<CTA label="ابدأوا شجرتكم" />}
+      />
 
       {/* ===== 8. لماذا آدم ===== */}
       <SectionImage
