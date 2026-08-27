@@ -15,7 +15,7 @@ import {
 const BOT_LINK = "https://t.me/adam_os_brain_bot";
 
 const IMG = "https://d8j0ntlcm91z4.cloudfront.net/user_3CPnImgjiKIeQIfolIn0s2fo89h/";
-const HERO_IMG = IMG + "hf_20260827_182015_24177d02-ca5a-4347-85ea-25206a8f350c.png";
+const HERO_IMG = IMG + "hf_20260827_095242_03a87048-5ee8-4ad1-a874-6bd849459c6e.png";
 const CHAT_IMG = IMG + "hf_20260826_195441_a01c8864-60c4-4802-8f3c-e1529967386b.png";
 const PROBLEM_IMG = IMG + "hf_20260826_195441_eab1d960-c1e7-45bd-aacd-866f17b038c5.png";
 const PROMISE_IMG = IMG + "hf_20260826_195441_8866ab2a-97a7-415f-a895-1c224a4a723c.png";
@@ -40,6 +40,31 @@ function CTA({ label = "جرّبوا آدم مجاناً", variant = "gold" }: {
 /** كتلة نص تجلس فوق صورة — إطار زجاجي بعمق خفيف يبقي النص واضحًا فوق أي صورة تحته */
 function TextPanel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <div className={`glass mx-auto flex w-full flex-col items-center gap-3 p-6 text-center sm:p-7 ${className}`}>{children}</div>;
+}
+
+/**
+ * صورة محتواة (بطاقة) بحواف مدوّرة، بلا أي نص فوقها إطلاقًا — النص يعيش
+ * دائمًا خارج حدود الصورة تمامًا، في خلفية الصفحة الصلبة أعلاها وأسفلها.
+ * هذا يجعل تغطية الوجه مستحيلة هندسيًا: لا يشترك النص والصورة في نفس
+ * البكسلات أبدًا، بصرف النظر عن تكوين الصورة الفعلي الذي لا يمكنني معاينته.
+ * تُستخدم فقط للأقسام التي محورها وجه أو رمز مركزي (آدم، الشجرة).
+ */
+function PhotoCard({ src, alt, aspect = "3 / 4" }: { src: string; alt: string; aspect?: string }) {
+  return (
+    <div className="mx-auto w-full max-w-xs overflow-hidden rounded-[28px] shadow-2xl sm:max-w-sm" style={{ aspectRatio: aspect }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt={alt} className="h-full w-full object-cover object-top" />
+    </div>
+  );
+}
+
+/** قسم عادي بخلفية الصفحة الصلبة (بلا صورة خلفية) — يحمل بطاقة صورة محتواة والنصوص من حولها بأمان تام */
+function PlainSection({ children }: { children: React.ReactNode }) {
+  return (
+    <section className="bg-[rgba(8,14,10,0.97)] px-6 py-16 text-center">
+      <div className="mx-auto flex max-w-2xl flex-col items-center gap-6">{children}</div>
+    </section>
+  );
 }
 
 /**
@@ -294,67 +319,46 @@ export default function LandingPage() {
         cta={<CTA label="ابدأوا الخطوة الأولى" />}
       />
 
-      {/* ===== آدم ينظر إليكم مباشرة — النص الآن مولّد داخل الصورة نفسها عبر Higgsfield (بلا أي طبقة CSS فوق وجهه)؛ الزر فقط فوق المساحة الفارغة المحجوزة أسفلها ===== */}
-      <SectionImage
-        src={HERO_IMG}
-        alt="هذا آدم، بصوته وشخصيته — ليس أيقونة، وليس روبوتاً باردًا؛ رفيق حقيقي يعرف طفلكم."
-        textAlign="bottom"
-        focus="none"
-        minH="760px"
-        content={null}
-        cta={<CTA label="اسمعوا آدم بنفسكم" />}
-      />
+      {/* ===== آدم ينظر إليكم مباشرة — بطاقة صورة محتواة؛ النص خارج الصورة تمامًا فلا يمكنه تغطية وجهه إطلاقًا ===== */}
+      <PlainSection>
+        <h2 className="font-display text-[1.5rem] font-bold sm:text-2xl">هذا آدم، بصوته وشخصيته.</h2>
+        <PhotoCard src={HERO_IMG} alt="آدم ينظر إليكم مباشرة في غرفته" />
+        <p className="max-w-[32ch] text-sm leading-relaxed text-[color:var(--text-secondary)]">
+          ليس أيقونة، وليس روبوتاً باردًا؛ رفيق حقيقي يعرف طفلكم.
+        </p>
+        <CTA label="اسمعوا آدم بنفسكم" />
+      </PlainSection>
 
-      {/* ===== 6. Personalization — النص أعلى الصورة فوق التلاشي الضبابي، ووجه آدم في المنطقة الحادّة الواضحة أسفله ===== */}
-      <SectionImage
-        src={PERSONAL_IMG}
-        alt="آدم يستمع بانتباه"
-        textAlign="top"
-        focus="top"
-        minH="860px"
-        content={
-          <>
-            <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">لا يمنح آدم النصيحة نفسها لكل بيت.</h2>
-            <ul className="flex flex-col gap-2 text-[15px] text-[color:var(--text-secondary)]">
-              {["عمر طفلكم", "المواقف التي تتكرر معه", "ما الذي نفع سابقًا وما لم ينفع", "الأنماط التي يلاحظها آدم"].map((li) => (
-                <li key={li} className="flex items-center justify-center gap-2.5">
-                  <Check size={16} strokeWidth={2.6} className="shrink-0 text-gold-strong" />
-                  {li}
-                </li>
-              ))}
-            </ul>
-          </>
-        }
-        cta={
-          <>
-            <div className="glass-gold mx-auto max-w-md p-6">
-              <p className="font-display text-base leading-loose text-text">
-                «ألاحظ أنّ يوسف يتوتّر غالبًا عند الانتقال من اللعب إلى النوم؛ جرّبوا إخباره بالخطوة القادمة قبلها بخمس دقائق.»
-              </p>
-              <p className="mt-3 text-sm text-muted">هذا بالضبط ما يقوله آدم حين يعرف طفلكم فعلًا.</p>
-            </div>
-            <CTA label="خصّصوا آدم لطفلكم" />
-          </>
-        }
-      />
+      {/* ===== 6. Personalization — بطاقة صورة محتواة؛ القائمة والاقتباس والزر كلها خارج حدود الصورة ===== */}
+      <PlainSection>
+        <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">لا يمنح آدم النصيحة نفسها لكل بيت.</h2>
+        <ul className="flex flex-col gap-2 text-[15px] text-[color:var(--text-secondary)]">
+          {["عمر طفلكم", "المواقف التي تتكرر معه", "ما الذي نفع سابقًا وما لم ينفع", "الأنماط التي يلاحظها آدم"].map((li) => (
+            <li key={li} className="flex items-center justify-center gap-2.5">
+              <Check size={16} strokeWidth={2.6} className="shrink-0 text-gold-strong" />
+              {li}
+            </li>
+          ))}
+        </ul>
+        <PhotoCard src={PERSONAL_IMG} alt="آدم يستمع بانتباه" aspect="4 / 5" />
+        <div className="glass-gold mx-auto max-w-md p-6">
+          <p className="font-display text-base leading-loose text-text">
+            «ألاحظ أنّ يوسف يتوتّر غالبًا عند الانتقال من اللعب إلى النوم؛ جرّبوا إخباره بالخطوة القادمة قبلها بخمس دقائق.»
+          </p>
+          <p className="mt-3 text-sm text-muted">هذا بالضبط ما يقوله آدم حين يعرف طفلكم فعلًا.</p>
+        </div>
+        <CTA label="خصّصوا آدم لطفلكم" />
+      </PlainSection>
 
-      {/* ===== 7. الرحلة / الشجرة — النص فوق التلاشي الضبابي أعلى الصورة، والشجرة واضحة حادة في وسط وأسفل الإطار ===== */}
-      <SectionImage
-        src={TREE_IMG}
-        alt="شجرة آدم الذهبية"
-        textAlign="top"
-        focus="top"
-        minH="820px"
-        content={
-          <>
-            <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">في كل مرة تختارون فيها الهدوء… تبنون شيئًا.</h2>
-            <p className="max-w-lg text-[15px] leading-relaxed text-[color:var(--text-secondary)]">
-              ليست نقاطًا، وليست لعبة؛ إنها لحظات حقيقية تغيّرت فيها طريقة تعاملكم، تتراكم في شجرة واحدة، ورقة بعد ورقة.
-            </p>
-          </>
-        }
-        cta={<CTA label="ابدأوا شجرتكم" />}
-      />
+      {/* ===== 7. الرحلة / الشجرة — بطاقة صورة محتواة؛ النص والزر خارج حدودها تمامًا ===== */}
+      <PlainSection>
+        <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">في كل مرة تختارون فيها الهدوء… تبنون شيئًا.</h2>
+        <p className="max-w-lg text-[15px] leading-relaxed text-[color:var(--text-secondary)]">
+          ليست نقاطًا، وليست لعبة؛ إنها لحظات حقيقية تغيّرت فيها طريقة تعاملكم، تتراكم في شجرة واحدة، ورقة بعد ورقة.
+        </p>
+        <PhotoCard src={TREE_IMG} alt="شجرة آدم الذهبية" aspect="3 / 4" />
+        <CTA label="ابدأوا شجرتكم" />
+      </PlainSection>
 
       {/* ===== 8. لماذا آدم ===== */}
       <SectionImage
