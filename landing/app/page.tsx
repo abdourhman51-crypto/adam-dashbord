@@ -57,7 +57,7 @@ function SectionImage({
 }: {
   src: string;
   alt: string;
-  align?: "top" | "center" | "bottom";
+  align?: "top" | "center" | "bottom" | "split";
   focus?: "top" | "bottom" | "center" | "full";
   minH?: string;
   children: React.ReactNode;
@@ -70,7 +70,14 @@ function SectionImage({
       : focus === "center"
       ? "radial-gradient(60% 60% at 50% 50%, rgba(8,14,10,0.1) 0%, rgba(8,14,10,0.45) 100%)"
       : "rgba(8,14,10,0.32)";
-  const alignClass = align === "top" ? "justify-start pt-24" : align === "bottom" ? "justify-end pb-24" : "justify-center";
+  const alignClass =
+    align === "top"
+      ? "justify-start pt-24"
+      : align === "bottom"
+      ? "justify-end pb-24"
+      : align === "split"
+      ? "justify-between py-20"
+      : "justify-center";
 
   return (
     <section className="relative w-full overflow-hidden" style={{ minHeight: minH }}>
@@ -105,26 +112,46 @@ export default function LandingPage() {
         </Link>
       </header>
 
-      {/* ===== 1. Hero — آدم ينظر للكاميرا مباشرة، النص أسفل الصورة في مساحتها الفارغة ===== */}
-      <SectionImage src={HERO_IMG} alt="آدم ينظر إليكم مباشرة في غرفته" align="bottom" focus="bottom" minH="100dvh">
-        <TextPanel>
-          <h1 className="font-display text-[1.85rem] font-extrabold leading-[1.3] sm:text-[2.3rem]">
-            وراء كل تصرّف من طفلكم سبب.
-            <br />
-            <span className="text-gold-strong">آدم يكتشفه — لا يخمّنه.</span>
-          </h1>
-          <p className="max-w-md text-[15px] leading-relaxed text-[color:var(--text-secondary)]">
-            احكوا لآدم بكلامكم عمّا يمرّ به طفلكم، فيفهم حالته وحالتكم، ويمنحكم خطوة اليوم: أمرًا عمليًا واحدًا مبنيًا على طفلكم بالذات، لا على أي طفل آخر.
-          </p>
-          <p className="max-w-md text-[13px] leading-relaxed text-muted">
-            ليست نصيحة عامة كتلك التي يقدّمها أي بحث أو أي روبوت محادثة — وكلّما حكيتم له أكثر عن طفلكم، كانت خطوته أدقّ.
-          </p>
-        </TextPanel>
-        <div className="flex flex-col items-center gap-2">
-          <CTA />
-          <p className="text-on-image text-sm text-muted">دون بطاقة بنكية، ويبدأ في أقل من دقيقة</p>
+      {/* ===== 1. Hero — الفيديو أولاً؛ الشخصيتان والوجهان واضحان بالكامل، والنص في المساحة السفلية فقط ===== */}
+      <section className="relative w-full overflow-hidden" style={{ minHeight: "100dvh" }}>
+        <video
+          src="/brand/adam-moment.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="none"
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(8,14,10,0.08) 0%, rgba(8,14,10,0.05) 48%, rgba(8,14,10,0.55) 66%, rgba(8,14,10,0.92) 84%, rgba(8,14,10,0.97) 100%)",
+          }}
+          aria-hidden="true"
+        />
+        <div className="relative z-10 mx-auto flex h-full max-w-2xl flex-col items-center justify-end gap-5 px-6 pb-12 text-center">
+          <TextPanel>
+            <h1 className="font-display text-[1.85rem] font-extrabold leading-[1.3] sm:text-[2.3rem]">
+              وراء كل تصرّف من طفلكم سبب.
+              <br />
+              <span className="text-gold-strong">آدم يكتشفه — لا يخمّنه.</span>
+            </h1>
+            <p className="max-w-md text-[15px] leading-relaxed text-[color:var(--text-secondary)]">
+              احكوا لآدم بكلامكم عمّا يمرّ به طفلكم، فيفهم حالته وحالتكم، ويمنحكم خطوة اليوم: أمرًا عمليًا واحدًا مبنيًا على طفلكم بالذات، لا على أي طفل آخر.
+            </p>
+            <p className="max-w-md text-[13px] leading-relaxed text-muted">
+              ليست نصيحة عامة كتلك التي يقدّمها أي بحث أو أي روبوت محادثة — وكلّما حكيتم له أكثر عن طفلكم، كانت خطوته أدقّ.
+            </p>
+          </TextPanel>
+          <div className="flex flex-col items-center gap-2">
+            <CTA />
+            <p className="text-on-image text-sm text-muted">دون بطاقة بنكية، ويبدأ في أقل من دقيقة</p>
+          </div>
         </div>
-      </SectionImage>
+      </section>
 
       {/* ===== 2. Show, don't tell ===== */}
       <SectionImage src={CHAT_IMG} alt="محادثة دافئة مع آدم في الليل" align="center" focus="center">
@@ -137,7 +164,7 @@ export default function LandingPage() {
           <div className="flex justify-start">
             <div className="flex max-w-[85%] items-start gap-3 rounded-2xl rounded-tr-md border border-[color:var(--glass-border)] bg-[color:var(--surface)] px-5 py-3.5 text-[15px] leading-relaxed">
               <span>
-                البكاء قبل النوم غالبًا نتيجة تعب متراكم، وليس عنادًا. الليلة، اجلسوا بجانبه دقائق بهدوء قبل محاولته النوم، دون كلام كثير.
+                بكاء يوسف قبل النوم غالبًا نتيجة تعب متراكم، وليس عنادًا منه. الليلة، اجلسوا بجانب يوسف دقائق بهدوء قبل محاولته النوم، دون كلام كثير.
               </span>
             </div>
           </div>
@@ -212,35 +239,19 @@ export default function LandingPage() {
         <CTA label="ابدأوا الخطوة الأولى" />
       </SectionImage>
 
-      <section className="relative w-full overflow-hidden" style={{ minHeight: "760px" }}>
-        <video
-          src="/brand/adam-moment.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="none"
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(180deg, rgba(8,14,10,0.97) 0%, transparent 24%, transparent 68%, rgba(8,14,10,0.35) 82%, rgba(8,14,10,0.75) 100%)" }}
-          aria-hidden="true"
-        />
-        <div className="relative z-10 mx-auto flex h-full max-w-2xl flex-col items-center justify-end gap-3 px-6 pb-10 text-center">
-          <div className="glass mx-auto flex w-full max-w-xs flex-col items-center gap-1.5 p-4">
-            <p className="font-display text-[1.05rem] font-bold text-text">هذا آدم — بصوته، بشخصيته.</p>
-            <p className="max-w-[26ch] text-xs leading-relaxed text-[color:var(--text-secondary)]">
-              ليس أيقونة، وليس روبوتاً باردًا؛ رفيق حقيقي يعرف طفلكم.
-            </p>
-          </div>
-          <CTA label="اسمعوا آدم بنفسكم" />
+      {/* ===== آدم ينظر إليكم مباشرة — الصورة التي كانت الـ Hero، منقولة إلى مكان الفيديو السابق ===== */}
+      <SectionImage src={HERO_IMG} alt="آدم ينظر إليكم مباشرة في غرفته" align="bottom" focus="bottom" minH="800px">
+        <div className="glass mx-auto flex w-full max-w-xs flex-col items-center gap-1.5 p-4">
+          <p className="font-display text-[1.05rem] font-bold text-text">هذا آدم — بصوته، بشخصيته.</p>
+          <p className="max-w-[26ch] text-xs leading-relaxed text-[color:var(--text-secondary)]">
+            ليس أيقونة، وليس روبوتاً باردًا؛ رفيق حقيقي يعرف طفلكم.
+          </p>
         </div>
-      </section>
+        <CTA label="اسمعوا آدم بنفسكم" />
+      </SectionImage>
 
-      {/* ===== 6. Personalization ===== */}
-      <SectionImage src={PERSONAL_IMG} alt="آدم يستمع بانتباه" align="bottom" focus="bottom" minH="820px">
+      {/* ===== 6. Personalization — النصوص أعلى الصورة بالكامل، بعيدًا عن وجه آدم في الأسفل ===== */}
+      <SectionImage src={PERSONAL_IMG} alt="آدم يستمع بانتباه" align="top" focus="top" minH="860px">
         <h2 className="font-display text-on-image text-[1.6rem] font-bold sm:text-3xl">لا يمنح آدم النصيحة نفسها لكل بيت.</h2>
         <TextPanel>
           <ul className="flex flex-col gap-2 text-[15px] text-[color:var(--text-secondary)]">
@@ -382,18 +393,21 @@ export default function LandingPage() {
         <CTA label="لا تزال لديكم أسئلة؟ جرّبوه مباشرة" />
       </SectionImage>
 
-      {/* ===== 12. Final CTA ===== */}
-      <SectionImage src={FINAL_IMG} alt="باب مفتوح على ضوء دافئ" align="center" focus="full" minH="640px">
-        <h2 className="font-display text-on-image text-[1.7rem] font-bold sm:text-3xl">لستم بحاجة إلى أن تكونوا آباءً مثاليين.</h2>
-        <p className="text-on-image text-[15px] text-gold-strong">تحتاجون فقط إلى معرفة ما تفعلونه في اللحظة القادمة.</p>
+      {/* ===== 12. Final CTA — العنوان في المنطقة الداكنة أعلى الصورة، والزر أسفلها بحيث يظهر الباب كاملاً ===== */}
+      <SectionImage src={FINAL_IMG} alt="باب مفتوح على ضوء دافئ" align="split" focus="top" minH="880px">
+        <TextPanel>
+          <h2 className="font-display text-[1.7rem] font-bold sm:text-3xl">لستم بحاجة إلى أن تكونوا آباءً مثاليين.</h2>
+          <p className="text-[15px] text-gold-strong">تحتاجون فقط إلى معرفة ما تفعلونه في اللحظة القادمة.</p>
+        </TextPanel>
         <div className="flex flex-col items-center gap-2">
           <CTA label="ابدأوا مع آدم مجاناً" />
           <p className="text-on-image text-sm text-muted">يبدأ في أقل من دقيقة.</p>
         </div>
       </SectionImage>
 
-      <footer className="border-t border-[color:var(--glass-border)] px-5 py-8 text-center text-sm text-muted">
-        <p>© آدم — مرافق التربية الذكي</p>
+      {/* امتداد أنيق وخفيف من ظل الصورة الأخيرة نفسه — لا حافة فاصلة، بل تلاشٍ فاخر ينتهي بختم العلامة */}
+      <footer className="bg-[rgba(8,14,10,0.97)] px-5 py-14 text-center">
+        <p className="font-display text-lg font-semibold text-gold-strong">آدم — مرافق التربية الذكي</p>
       </footer>
     </>
   );
