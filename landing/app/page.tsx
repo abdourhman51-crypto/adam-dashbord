@@ -89,7 +89,7 @@ function SectionImage({
   const mediaProps = { className: "absolute inset-0 h-full w-full object-cover object-top" };
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ minHeight: minH }}>
+    <section className="relative flex w-full flex-col overflow-hidden" style={{ minHeight: minH }}>
       {isVideo ? (
         <video src={src} autoPlay muted loop playsInline preload="none" aria-hidden="true" {...mediaProps} />
       ) : (
@@ -118,7 +118,7 @@ function SectionImage({
         aria-hidden="true"
       />
       <div className="absolute inset-0" style={{ background: focusBg }} aria-hidden="true" />
-      <div className="relative z-10 mx-auto flex h-full max-w-2xl flex-col px-6 py-14 text-center">
+      <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col px-6 py-14 text-center">
         <div className={`flex flex-1 flex-col ${contentAlignClass} gap-5`}>{content}</div>
         {cta && <div className="flex flex-col items-center gap-2 pb-2 pt-6">{cta}</div>}
       </div>
