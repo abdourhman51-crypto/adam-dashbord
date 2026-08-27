@@ -15,7 +15,7 @@ import {
 const BOT_LINK = "https://t.me/adam_os_brain_bot";
 
 const IMG = "https://d8j0ntlcm91z4.cloudfront.net/user_3CPnImgjiKIeQIfolIn0s2fo89h/";
-const HERO_IMG = IMG + "hf_20260827_095242_03a87048-5ee8-4ad1-a874-6bd849459c6e.png";
+const HERO_IMG = IMG + "hf_20260827_182015_24177d02-ca5a-4347-85ea-25206a8f350c.png";
 const CHAT_IMG = IMG + "hf_20260826_195441_a01c8864-60c4-4802-8f3c-e1529967386b.png";
 const PROBLEM_IMG = IMG + "hf_20260826_195441_eab1d960-c1e7-45bd-aacd-866f17b038c5.png";
 const PROMISE_IMG = IMG + "hf_20260826_195441_8866ab2a-97a7-415f-a895-1c224a4a723c.png";
@@ -49,10 +49,11 @@ function TextPanel({ children, className = "" }: { children: React.ReactNode; cl
  * textAlign)، والزر (cta) دائمًا في أسفل القسم منفصلاً عن النص.
  * object-top يمنع اقتصاص أعلى الصورة (كالرأس) عند التحجيم بـobject-cover.
  */
-function maskForFocus(focus: "top" | "bottom" | "center" | "full") {
+function maskForFocus(focus: "top" | "bottom" | "center" | "full" | "none") {
   if (focus === "top") return "linear-gradient(180deg, black 0%, black 42%, transparent 62%)";
   if (focus === "bottom") return "linear-gradient(0deg, black 0%, black 42%, transparent 62%)";
   if (focus === "center") return "radial-gradient(55% 55% at 50% 50%, transparent 0%, black 100%)";
+  if (focus === "none") return "transparent";
   return "black";
 }
 
@@ -70,7 +71,7 @@ function SectionImage({
   alt: string;
   isVideo?: boolean;
   textAlign?: "top" | "center" | "bottom";
-  focus?: "top" | "bottom" | "center" | "full";
+  focus?: "top" | "bottom" | "center" | "full" | "none";
   minH?: string;
   content: React.ReactNode;
   cta?: React.ReactNode;
@@ -82,6 +83,8 @@ function SectionImage({
       ? "linear-gradient(0deg, rgba(8,14,10,0.55) 0%, transparent 55%)"
       : focus === "center"
       ? "radial-gradient(60% 60% at 50% 50%, rgba(8,14,10,0.1) 0%, rgba(8,14,10,0.5) 100%)"
+      : focus === "none"
+      ? "transparent"
       : "rgba(8,14,10,0.4)";
   const mask = maskForFocus(focus);
   const contentAlignClass = textAlign === "top" ? "justify-start pt-20" : textAlign === "bottom" ? "justify-end" : "justify-center";
@@ -291,23 +294,15 @@ export default function LandingPage() {
         cta={<CTA label="ابدأوا الخطوة الأولى" />}
       />
 
-      {/* ===== آدم ينظر إليكم مباشرة — الصورة التي كانت الـ Hero، منقولة إلى مكان الفيديو السابق. رأسه كاملاً غير مقطوع (object-top)، والنص فوق التلاشي الضبابي أسفلها ===== */}
+      {/* ===== آدم ينظر إليكم مباشرة — النص الآن مولّد داخل الصورة نفسها عبر Higgsfield (بلا أي طبقة CSS فوق وجهه)؛ الزر فقط فوق المساحة الفارغة المحجوزة أسفلها ===== */}
       <SectionImage
         src={HERO_IMG}
-        alt="آدم ينظر إليكم مباشرة في غرفته"
+        alt="هذا آدم، بصوته وشخصيته — ليس أيقونة، وليس روبوتاً باردًا؛ رفيق حقيقي يعرف طفلكم."
         textAlign="bottom"
-        focus="bottom"
-        minH="720px"
+        focus="none"
+        minH="760px"
         content={null}
-        cta={
-          <>
-            <h2 className="font-display text-[1.3rem] font-bold sm:text-2xl">هذا آدم، بصوته وشخصيته.</h2>
-            <p className="max-w-[30ch] text-sm leading-relaxed text-[color:var(--text-secondary)]">
-              ليس أيقونة، وليس روبوتاً باردًا؛ رفيق حقيقي يعرف طفلكم.
-            </p>
-            <CTA label="اسمعوا آدم بنفسكم" />
-          </>
-        }
+        cta={<CTA label="اسمعوا آدم بنفسكم" />}
       />
 
       {/* ===== 6. Personalization — النص أعلى الصورة فوق التلاشي الضبابي، ووجه آدم في المنطقة الحادّة الواضحة أسفله ===== */}
