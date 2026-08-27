@@ -20,10 +20,10 @@
   --text-secondary: #d9d5c9;
   --text-muted: #a3b0a4;
 
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-bg-strong: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.09);
-  --glass-border-gold: rgba(227, 178, 60, 0.28);
+  --glass-bg: rgba(8, 18, 12, 0.58);
+  --glass-bg-strong: rgba(8, 18, 12, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border-gold: rgba(227, 178, 60, 0.3);
 
   --font-display: "Baloo Bhaijaan 2", "Segoe UI", Tahoma, sans-serif;
   --font-body: "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
@@ -88,10 +88,10 @@ body::after {
   position: relative;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
   border-radius: 28px;
-  box-shadow: 0 8px 32px rgb(0 0 0 / 0.3);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.07);
   isolation: isolate;
   overflow: hidden;
 }
@@ -114,6 +114,7 @@ body::after {
   background: linear-gradient(160deg, var(--bg-mid) 0%, var(--deep-metal) 100%);
   border: 1px solid var(--glass-border-gold);
   border-radius: 28px;
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   isolation: isolate;
   overflow: hidden;
 }
@@ -142,9 +143,17 @@ body::after {
   }
 }
 
-/* Text sitting directly on a photo, with no box behind it — legibility comes from the shadow, not from chrome */
+/* Bare headings sitting directly on a photo — legibility comes from the shadow, not from a box */
 .text-on-image {
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* The fixed top bar spans the full screen edge to edge — no floating rounded chip */
+.site-header {
+  background: rgba(7, 13, 9, 0.62);
+  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .text-gold-strong {
