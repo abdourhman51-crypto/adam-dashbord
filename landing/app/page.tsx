@@ -357,8 +357,8 @@ export default function LandingPage() {
         alt="شجرة آدم الذهبية"
         textAlign="top"
         focus="none"
-        minH="820px"
-        topPad={170}
+        minH="900px"
+        topPad={320}
         content={
           <>
             <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">في كل مرة تختارون فيها الهدوء… تبنون شيئًا.</h2>
