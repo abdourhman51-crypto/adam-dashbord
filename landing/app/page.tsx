@@ -176,7 +176,7 @@ export default function LandingPage() {
                 <span className="text-gold-strong">آدم يكتشفه — لا يخمّنه.</span>
               </h1>
               <p className="max-w-md text-sm leading-relaxed text-[color:var(--text-secondary)]">
-                احكوا لآدم بكلامكم عمّا يمرّ به طفلكم، فيمنحكم خطوة اليوم: أمرًا عمليًا واحدًا مبنيًا عليه بالذات — لا نصيحة عامة كتلك التي يقدّمها أي بحث أو روبوت محادثة.
+                احكوا لآدم بكلامكم عمّا يمرّ به طفلكم، فيمنحكم خطوة اليوم: أمرًا عمليًا واحدًا مبنيًا على حالة طفلكم بالذات — لا نصيحة عامة تصلح لكل الأطفال.
               </p>
               <div className="flex flex-col items-center gap-2 pt-2">
                 <CTA />
@@ -274,7 +274,7 @@ export default function LandingPage() {
             </div>
           </>
         }
-        cta={<CTA label="جرّبوا هذا معكم" />}
+        cta={<CTA label="جرّبوا خطوة اليوم" />}
       />
 
       {/* ===== 5. كيف يعمل ===== */}
@@ -440,7 +440,7 @@ export default function LandingPage() {
             </div>
           </>
         }
-        cta={<CTA label="ابدأوا بثقة" />}
+        cta={<CTA label="جرّبوا آدم بثقة تامة" />}
       />
 
       {/* ===== 10. المرافقة الكاملة — بطاقة، لا شاشة كاملة ===== */}
@@ -511,7 +511,7 @@ export default function LandingPage() {
             </div>
           </>
         }
-        cta={<CTA label="لا تزال لديكم أسئلة؟ جرّبوه مباشرة" />}
+        cta={<CTA label="لا تزال لديكم أسئلة؟ جرّبوا آدم مباشرة" />}
       />
 
       {/* ===== 12. Final CTA — العنوان في المنطقة الداكنة أعلى الصورة، والزر أسفلها بحيث يظهر الباب كاملاً ===== */}
