@@ -15,7 +15,7 @@ import {
 const BOT_LINK = "https://t.me/adam_os_brain_bot";
 
 const IMG = "https://d8j0ntlcm91z4.cloudfront.net/user_3CPnImgjiKIeQIfolIn0s2fo89h/";
-const HERO_IMG = IMG + "hf_20260827_095242_03a87048-5ee8-4ad1-a874-6bd849459c6e.png";
+const HERO_IMG = IMG + "hf_20260827_182015_24177d02-ca5a-4347-85ea-25206a8f350c.png";
 const CHAT_IMG = IMG + "hf_20260826_195441_a01c8864-60c4-4802-8f3c-e1529967386b.png";
 const PROBLEM_IMG = IMG + "hf_20260826_195441_eab1d960-c1e7-45bd-aacd-866f17b038c5.png";
 const PROMISE_IMG = IMG + "hf_20260826_195441_8866ab2a-97a7-415f-a895-1c224a4a723c.png";
@@ -43,42 +43,21 @@ function TextPanel({ children, className = "" }: { children: React.ReactNode; cl
 }
 
 /**
- * صورة محتواة (بطاقة) بحواف مدوّرة، بلا أي نص فوقها إطلاقًا — النص يعيش
- * دائمًا خارج حدود الصورة تمامًا، في خلفية الصفحة الصلبة أعلاها وأسفلها.
- * هذا يجعل تغطية الوجه مستحيلة هندسيًا: لا يشترك النص والصورة في نفس
- * البكسلات أبدًا، بصرف النظر عن تكوين الصورة الفعلي الذي لا يمكنني معاينته.
- * تُستخدم فقط للأقسام التي محورها وجه أو رمز مركزي (آدم، الشجرة).
- */
-function PhotoCard({ src, alt, aspect = "3 / 4" }: { src: string; alt: string; aspect?: string }) {
-  return (
-    <div className="mx-auto w-full max-w-xs overflow-hidden rounded-[28px] shadow-2xl sm:max-w-sm" style={{ aspectRatio: aspect }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt={alt} className="h-full w-full object-cover object-top" />
-    </div>
-  );
-}
-
-/** قسم عادي بخلفية الصفحة الصلبة (بلا صورة خلفية) — يحمل بطاقة صورة محتواة والنصوص من حولها بأمان تام */
-function PlainSection({ children }: { children: React.ReactNode }) {
-  return (
-    <section className="bg-[rgba(8,14,10,0.97)] px-6 py-16 text-center">
-      <div className="mx-auto flex max-w-2xl flex-col items-center gap-6">{children}</div>
-    </section>
-  );
-}
-
-/**
  * كل صورة أو فيديو خلفية يحصل على طبقة مموّهة (blur) في نفس منطقة التغميق
  * (focus) — لا حواف حادة بين صورة وأخرى، بل تلاشٍ ضبابي أنيق يجعل الصفحة
  * كلها تبدو متصلة. النص يتموضع فوق هذه المنطقة المموّهة بالذات (عبر
  * textAlign)، والزر (cta) دائمًا في أسفل القسم منفصلاً عن النص.
  * object-top يمنع اقتصاص أعلى الصورة (كالرأس) عند التحجيم بـobject-cover.
+ * focus="none" يوقف طبقة التمويه كليًا (بلا أي تمويه، لا حتى جزئي) — تُستخدم
+ * للصور التي نصّها مطبوع داخل البكسلات نفسها أو التي يجب أن تبقى حادة تمامًا.
+ * focus="topNarrow" مثل "top" لكن بمساحة تعتيم أقصر بكثير، محصورة في منطقة
+ * النص فقط، لتفادي تغطية عنصر بصري (كوجه) أسفل النص مباشرة.
  */
-function maskForFocus(focus: "top" | "bottom" | "center" | "full" | "none") {
+function maskForFocus(focus: "top" | "bottom" | "center" | "full" | "topNarrow") {
   if (focus === "top") return "linear-gradient(180deg, black 0%, black 42%, transparent 62%)";
+  if (focus === "topNarrow") return "linear-gradient(180deg, black 0%, black 20%, transparent 34%)";
   if (focus === "bottom") return "linear-gradient(0deg, black 0%, black 42%, transparent 62%)";
   if (focus === "center") return "radial-gradient(55% 55% at 50% 50%, transparent 0%, black 100%)";
-  if (focus === "none") return "transparent";
   return "black";
 }
 
@@ -89,6 +68,7 @@ function SectionImage({
   textAlign = "center",
   focus = "bottom",
   minH = "640px",
+  topPad = 80,
   content,
   cta,
 }: {
@@ -96,14 +76,18 @@ function SectionImage({
   alt: string;
   isVideo?: boolean;
   textAlign?: "top" | "center" | "bottom";
-  focus?: "top" | "bottom" | "center" | "full" | "none";
+  focus?: "top" | "bottom" | "center" | "full" | "none" | "topNarrow";
   minH?: string;
+  topPad?: number;
   content: React.ReactNode;
   cta?: React.ReactNode;
 }) {
+  const showBlur = focus !== "none";
   const focusBg =
     focus === "top"
       ? "linear-gradient(180deg, rgba(8,14,10,0.55) 0%, transparent 55%)"
+      : focus === "topNarrow"
+      ? "linear-gradient(180deg, rgba(8,14,10,0.6) 0%, transparent 34%)"
       : focus === "bottom"
       ? "linear-gradient(0deg, rgba(8,14,10,0.55) 0%, transparent 55%)"
       : focus === "center"
@@ -111,8 +95,9 @@ function SectionImage({
       : focus === "none"
       ? "transparent"
       : "rgba(8,14,10,0.4)";
-  const mask = maskForFocus(focus);
-  const contentAlignClass = textAlign === "top" ? "justify-start pt-20" : textAlign === "bottom" ? "justify-end" : "justify-center";
+  const mask = showBlur ? maskForFocus(focus) : undefined;
+  const contentAlignClass = textAlign === "top" ? "justify-start" : textAlign === "bottom" ? "justify-end" : "justify-center";
+  const contentStyle = textAlign === "top" ? { paddingTop: topPad } : undefined;
 
   const mediaProps = { className: "absolute inset-0 h-full w-full object-cover object-top" };
 
@@ -124,22 +109,23 @@ function SectionImage({
         /* eslint-disable-next-line @next/next/no-img-element */
         <img src={src} alt={alt} {...mediaProps} />
       )}
-      {isVideo ? (
-        <video
-          src={src}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="none"
-          aria-hidden="true"
-          {...mediaProps}
-          style={{ filter: "blur(28px)", WebkitMaskImage: mask, maskImage: mask }}
-        />
-      ) : (
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img src={src} alt="" aria-hidden="true" {...mediaProps} style={{ filter: "blur(28px)", WebkitMaskImage: mask, maskImage: mask }} />
-      )}
+      {showBlur &&
+        (isVideo ? (
+          <video
+            src={src}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="none"
+            aria-hidden="true"
+            {...mediaProps}
+            style={{ filter: "blur(28px)", WebkitMaskImage: mask, maskImage: mask }}
+          />
+        ) : (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img src={src} alt="" aria-hidden="true" {...mediaProps} style={{ filter: "blur(28px)", WebkitMaskImage: mask, maskImage: mask }} />
+        ))}
       <div
         className="absolute inset-0"
         style={{ background: "linear-gradient(180deg, rgba(8,14,10,0.97) 0%, transparent 24%, transparent 76%, rgba(8,14,10,0.97) 100%)" }}
@@ -147,7 +133,9 @@ function SectionImage({
       />
       <div className="absolute inset-0" style={{ background: focusBg }} aria-hidden="true" />
       <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col px-6 py-14 text-center">
-        <div className={`flex flex-1 flex-col ${contentAlignClass} gap-5`}>{content}</div>
+        <div className={`flex flex-1 flex-col ${contentAlignClass} gap-5`} style={contentStyle}>
+          {content}
+        </div>
         {cta && <div className="flex flex-col items-center gap-2 pb-2 pt-6">{cta}</div>}
       </div>
     </section>
@@ -319,46 +307,68 @@ export default function LandingPage() {
         cta={<CTA label="ابدأوا الخطوة الأولى" />}
       />
 
-      {/* ===== آدم ينظر إليكم مباشرة — بطاقة صورة محتواة؛ النص خارج الصورة تمامًا فلا يمكنه تغطية وجهه إطلاقًا ===== */}
-      <PlainSection>
-        <h2 className="font-display text-[1.5rem] font-bold sm:text-2xl">هذا آدم، بصوته وشخصيته.</h2>
-        <PhotoCard src={HERO_IMG} alt="آدم ينظر إليكم مباشرة في غرفته" />
-        <p className="max-w-[32ch] text-sm leading-relaxed text-[color:var(--text-secondary)]">
-          ليس أيقونة، وليس روبوتاً باردًا؛ رفيق حقيقي يعرف طفلكم.
-        </p>
-        <CTA label="اسمعوا آدم بنفسكم" />
-      </PlainSection>
+      {/* ===== آدم ينظر إليكم مباشرة — النص مولّد داخل الصورة نفسها عبر Higgsfield؛ focus="none" يمنع أي تمويه فوقها ===== */}
+      <SectionImage
+        src={HERO_IMG}
+        alt="هذا آدم، بصوته وشخصيته — ليس أيقونة، وليس روبوتاً باردًا؛ رفيق حقيقي يعرف طفلكم."
+        textAlign="bottom"
+        focus="none"
+        minH="760px"
+        content={null}
+        cta={<CTA label="اسمعوا آدم بنفسكم" />}
+      />
 
-      {/* ===== 6. Personalization — بطاقة صورة محتواة؛ القائمة والاقتباس والزر كلها خارج حدود الصورة ===== */}
-      <PlainSection>
-        <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">لا يمنح آدم النصيحة نفسها لكل بيت.</h2>
-        <ul className="flex flex-col gap-2 text-[15px] text-[color:var(--text-secondary)]">
-          {["عمر طفلكم", "المواقف التي تتكرر معه", "ما الذي نفع سابقًا وما لم ينفع", "الأنماط التي يلاحظها آدم"].map((li) => (
-            <li key={li} className="flex items-center justify-center gap-2.5">
-              <Check size={16} strokeWidth={2.6} className="shrink-0 text-gold-strong" />
-              {li}
-            </li>
-          ))}
-        </ul>
-        <PhotoCard src={PERSONAL_IMG} alt="آدم يستمع بانتباه" aspect="4 / 5" />
-        <div className="glass-gold mx-auto max-w-md p-6">
-          <p className="font-display text-base leading-loose text-text">
-            «ألاحظ أنّ يوسف يتوتّر غالبًا عند الانتقال من اللعب إلى النوم؛ جرّبوا إخباره بالخطوة القادمة قبلها بخمس دقائق.»
-          </p>
-          <p className="mt-3 text-sm text-muted">هذا بالضبط ما يقوله آدم حين يعرف طفلكم فعلًا.</p>
-        </div>
-        <CTA label="خصّصوا آدم لطفلكم" />
-      </PlainSection>
+      {/* ===== 6. Personalization — منطقة تعتيم/تمويه قصيرة (topNarrow) محصورة فوق النص فقط، فلا تصل إلى وجه آدم أسفلها ===== */}
+      <SectionImage
+        src={PERSONAL_IMG}
+        alt="آدم يستمع بانتباه"
+        textAlign="top"
+        focus="topNarrow"
+        minH="860px"
+        content={
+          <>
+            <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">لا يمنح آدم النصيحة نفسها لكل بيت.</h2>
+            <ul className="flex flex-col gap-2 text-[15px] text-[color:var(--text-secondary)]">
+              {["عمر طفلكم", "المواقف التي تتكرر معه", "ما الذي نفع سابقًا وما لم ينفع", "الأنماط التي يلاحظها آدم"].map((li) => (
+                <li key={li} className="flex items-center justify-center gap-2.5">
+                  <Check size={16} strokeWidth={2.6} className="shrink-0 text-gold-strong" />
+                  {li}
+                </li>
+              ))}
+            </ul>
+          </>
+        }
+        cta={
+          <>
+            <div className="glass-gold mx-auto max-w-md p-6">
+              <p className="font-display text-base leading-loose text-text">
+                «ألاحظ أنّ يوسف يتوتّر غالبًا عند الانتقال من اللعب إلى النوم؛ جرّبوا إخباره بالخطوة القادمة قبلها بخمس دقائق.»
+              </p>
+              <p className="mt-3 text-sm text-muted">هذا بالضبط ما يقوله آدم حين يعرف طفلكم فعلًا.</p>
+            </div>
+            <CTA label="خصّصوا آدم لطفلكم" />
+          </>
+        }
+      />
 
-      {/* ===== 7. الرحلة / الشجرة — بطاقة صورة محتواة؛ النص والزر خارج حدودها تمامًا ===== */}
-      <PlainSection>
-        <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">في كل مرة تختارون فيها الهدوء… تبنون شيئًا.</h2>
-        <p className="max-w-lg text-[15px] leading-relaxed text-[color:var(--text-secondary)]">
-          ليست نقاطًا، وليست لعبة؛ إنها لحظات حقيقية تغيّرت فيها طريقة تعاملكم، تتراكم في شجرة واحدة، ورقة بعد ورقة.
-        </p>
-        <PhotoCard src={TREE_IMG} alt="شجرة آدم الذهبية" aspect="3 / 4" />
-        <CTA label="ابدأوا شجرتكم" />
-      </PlainSection>
+      {/* ===== 7. الرحلة / الشجرة — focus="none" يزيل التمويه كليًا فتبقى الشجرة حادة بالكامل؛ النص أُنزل topPad إضافي (90px) ليجلس أسفل الغصن الكبير مباشرة ===== */}
+      <SectionImage
+        src={TREE_IMG}
+        alt="شجرة آدم الذهبية"
+        textAlign="top"
+        focus="none"
+        minH="820px"
+        topPad={170}
+        content={
+          <>
+            <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">في كل مرة تختارون فيها الهدوء… تبنون شيئًا.</h2>
+            <p className="max-w-lg text-[15px] leading-relaxed text-[color:var(--text-secondary)]">
+              ليست نقاطًا، وليست لعبة؛ إنها لحظات حقيقية تغيّرت فيها طريقة تعاملكم، تتراكم في شجرة واحدة، ورقة بعد ورقة.
+            </p>
+          </>
+        }
+        cta={<CTA label="ابدأوا شجرتكم" />}
+      />
 
       {/* ===== 8. لماذا آدم ===== */}
       <SectionImage
