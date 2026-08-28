@@ -12,6 +12,8 @@ import { WelcomeSplash } from "@/components/WelcomeSplash";
 // the first place, which is what was actually serving a stale build to the
 // production domain alias for days across multiple newer deployments.
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 export const metadata: Metadata = {
   title: "آدم — رفيق التربية",
