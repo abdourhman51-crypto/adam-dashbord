@@ -351,21 +351,21 @@ export default function LandingPage() {
         }
       />
 
-      {/* ===== 7. الرحلة / الشجرة — focus="none" يزيل التمويه كليًا فتبقى الشجرة حادة بالكامل؛ النص أُنزل topPad إضافي (90px) ليجلس أسفل الغصن الكبير مباشرة ===== */}
+      {/* ===== 7. الرحلة / الشجرة — focus="none" يزيل التمويه كليًا فتبقى الشجرة حادة بالكامل؛ العنوان والفقرة موزّعان بـjustify-between على طرفي القسم (العنوان أعلى التاج، الفقرة أسفل الجذع) بدل قيمة بكسل واحدة مخمَّنة ===== */}
       <SectionImage
         src={TREE_IMG}
         alt="شجرة آدم الذهبية"
         textAlign="top"
         focus="none"
-        minH="900px"
-        topPad={320}
+        minH="980px"
+        topPad={0}
         content={
-          <>
+          <div className="flex flex-1 flex-col justify-between">
             <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">في كل مرة تختارون فيها الهدوء… تبنون شيئًا.</h2>
             <p className="max-w-lg text-[15px] leading-relaxed text-[color:var(--text-secondary)]">
               ليست نقاطًا، وليست لعبة؛ إنها لحظات حقيقية تغيّرت فيها طريقة تعاملكم، تتراكم في شجرة واحدة، ورقة بعد ورقة.
             </p>
-          </>
+          </div>
         }
         cta={<CTA label="ابدأوا شجرتكم" />}
       />
