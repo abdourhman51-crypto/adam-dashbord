@@ -2,16 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sparkles, BookOpenText, Sprout, MessageCircle } from "lucide-react";
+import { Sparkles, Compass, Sprout, MessageCircle } from "lucide-react";
 import { returnToAdamChat } from "@/lib/upsell";
 import { haptic } from "@/lib/telegram/client";
 
 const TABS_BEFORE = [
-  { href: "/", label: "اليوم", icon: Sparkles },
-  { href: "/insights", label: "ما يعرفه آدم", icon: BookOpenText },
+  { href: "/", label: "الآن", icon: Sparkles },
+  { href: "/insights", label: "طريقتي", icon: Compass },
 ] as const;
 
-const TABS_AFTER = [{ href: "/journey", label: "رحلتي", icon: Sprout }] as const;
+const TABS_AFTER = [{ href: "/child", label: "طفلي", icon: Sprout }] as const;
 
 function TabLink({ href, label, icon: Icon, active }: { href: string; label: string; icon: typeof Sparkles; active: boolean }) {
   return (

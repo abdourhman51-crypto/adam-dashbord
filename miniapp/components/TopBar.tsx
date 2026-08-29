@@ -176,7 +176,7 @@ export function TopBar() {
           <Link
             href="/journey/start"
             onClick={() => haptic("light")}
-            className="pressable-gold flex items-center gap-1.5 whitespace-nowrap !rounded-full px-3.5 py-2.5 text-[13px] font-bold"
+            className="pressable flex items-center gap-1.5 whitespace-nowrap !rounded-full px-3.5 py-2.5 text-[13px] font-semibold"
           >
             <Sparkles size={14} strokeWidth={2.4} />
             بصيص أمل

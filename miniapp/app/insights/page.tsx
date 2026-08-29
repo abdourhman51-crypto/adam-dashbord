@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 import { useScreenData } from "@/lib/telegram/useScreenData";
 import { ScreenShell } from "@/components/ScreenShell";
 import { AdamIntro } from "@/components/AdamIntro";
@@ -11,9 +10,8 @@ import { UpsellButton } from "@/components/UpsellButton";
 import { AchievementCelebration } from "@/components/AchievementCelebration";
 import { useScrollReveal } from "@/components/useScrollReveal";
 import { LoadingState, OutsideTelegramState, NotFoundState, ErrorState } from "@/components/states";
-import { formatNightLabel } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 import { computeStreak, isMilestone } from "@/lib/streak";
-import { IconText } from "@/lib/emojiIcons";
 
 function celebratedKey(streak: number) {
   return `adam_celebrated_streak_${streak}`;
@@ -37,6 +35,36 @@ interface InsightsResponse {
   wall: { isPaid: boolean; moments: { logDate: string; stepGiven: string | null }[] };
 }
 
+interface Move {
+  text: string;
+  count: number;
+  lastDate: string;
+}
+
+/**
+ * تجميع "اللحظات الهادئة" (نفس بيانات wall.moments، لا استعلام جديد) حسب
+ * نصّ الخطوة — فتتحول كل خطوة نجحت أكثر من مرة إلى "حركة" لها عدد. هذا هو
+ * الفرق كله بين "سجلّ ماضٍ" و"طريقة تُبنى": نفس البيانات، ترتيب مختلف.
+ */
+function groupMoves(moments: { logDate: string; stepGiven: string | null }[]): Move[] {
+  const map = new Map<string, Move>();
+  for (const m of moments) {
+    const text = m.stepGiven?.trim();
+    if (!text) continue;
+    const existing = map.get(text);
+    if (existing) {
+      existing.count += 1;
+      if (m.logDate > existing.lastDate) existing.lastDate = m.logDate;
+    } else {
+      map.set(text, { text, count: 1, lastDate: m.logDate });
+    }
+  }
+  return Array.from(map.values()).sort((a, b) => b.count - a.count || (a.lastDate < b.lastDate ? 1 : -1));
+}
+
+const FREE_MOVE_LIMIT = 10;
+const ESTABLISHED_AT = 4;
+
 function Section({ children }: { children: React.ReactNode }) {
   const { ref, visible } = useScrollReveal<HTMLDivElement>();
   return (
@@ -46,7 +74,21 @@ function Section({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function InsightsPage() {
+function Chip({ children, tone = "default" }: { children: React.ReactNode; tone?: "default" | "gold" }) {
+  return (
+    <span
+      className={
+        tone === "gold"
+          ? "glass-gold rounded-full px-3 py-1 text-[11px] font-semibold text-gold-strong"
+          : "rounded-full border-[1.5px] border-emerald-strong px-3 py-1 text-[11px] font-medium text-text-secondary"
+      }
+    >
+      {children}
+    </span>
+  );
+}
+
+export default function MyWayPage() {
   const [result, refetch] = useScreenData<InsightsResponse>("/api/insights");
   const [celebrating, setCelebrating] = useState(false);
 
@@ -68,41 +110,26 @@ export default function InsightsPage() {
   if (result.state === "not_found") return <NotFoundState />;
   if (result.state === "error") return <ErrorState message={result.message} />;
 
-  const { childName, insight, effort, todayOpen, patterns, wall } = result.data;
+  const { childName, todayOpen, wall } = result.data;
   const child = childName ?? "طفلكم";
 
-  // "لحظات تستاهل تُذكر" — أفضل 3 لحظات فقط، قصة قصيرة لا سجلّاً كاملاً.
-  const highlightMoments = wall.moments.slice(0, 3);
-  const visibleMoments = wall.isPaid ? highlightMoments : highlightMoments.slice(0, 1);
-  const hiddenCount = wall.isPaid ? 0 : Math.max(0, highlightMoments.length - 1);
+  const allMoves = groupMoves(wall.moments);
+  const visibleMoves = wall.isPaid ? allMoves : allMoves.slice(0, FREE_MOVE_LIMIT);
+  const hiddenCount = wall.isPaid ? 0 : Math.max(0, allMoves.length - FREE_MOVE_LIMIT);
+  const establishedCount = allMoves.filter((m) => m.count >= ESTABLISHED_AT).length;
 
   return (
     <ScreenShell>
-      <AdamIntro text={`هذي كل ما أعرفه عنكم وعن ${child}، وشو بدأ يتغيّر — بمكان واحد.`} />
+      <AdamIntro text={`هذي الحركات اللي جرّبتوها ونفعت مع ${child} — كل ما تتكرّر، تصير أكثر طريقتكم.`} />
 
-      {/* قسم ١: ماذا تعلّم آدم عن الطفل */}
       <Section>
-        <div className="mt-2 flex flex-col items-center gap-4 text-center">
-          <div className="glass-gold h-24 w-24 overflow-hidden !rounded-full p-0">
-            <Image src="/brand/adam.png" alt="" width={192} height={192} className="h-full w-full object-cover object-top" priority />
-          </div>
-          <div>
-            <p className="text-sm text-text-muted">آدم يحكي لكم عن</p>
-            <h1 className="font-display text-[24px] text-gold-strong">{child}</h1>
-          </div>
-          {insight ? (
-            <GlassCard variant="strong" className="text-right">
-              <p className="font-display text-[18px] leading-loose text-text">
-                <IconText text={insight} />
-              </p>
-            </GlassCard>
-          ) : (
-            <GlassCard>
-              <p className="text-sm leading-relaxed text-text-muted">
-                لسّا آدم يتعرّف على {child} أكثر. كل ما تحكوا لي، تتوضّح لي شخصيته أكثر.
-              </p>
-            </GlassCard>
-          )}
+        <div className="mt-2 flex flex-col items-center gap-1 text-center">
+          <p className="font-display text-[44px] leading-none text-gold-strong">
+            {formatNumber(establishedCount)}
+          </p>
+          <p className="text-sm text-text-muted">
+            {establishedCount > 0 ? `حركة صارت طريقتكم مع ${child}` : `لسّا ما عندنا حركة ثابتة مع ${child}`}
+          </p>
         </div>
       </Section>
 
@@ -112,80 +139,50 @@ export default function InsightsPage() {
         </Section>
       )}
 
-      {/* قسم ٢: شو بدأ يتغيّر — دليل التحوّل، لا أرقام مجردة */}
       <Section>
-        <p className="font-display mb-3 mt-2 text-[16px] text-gold-strong">شو بدأ يتغيّر</p>
-        {patterns.length > 0 ? (
-          <GlassCard>
-            <div className="flex flex-col gap-3">
-              {patterns.map((p, i) => (
-                <div
-                  key={p.label}
-                  className="rise-in flex items-start gap-2 border-e-2 border-e-emerald-strong pe-3"
-                  style={{ animationDelay: `${i * 70}ms` }}
-                >
-                  <div>
-                    <p className="text-sm font-medium text-text">
-                      <IconText text={p.label} />
-                    </p>
-                    {p.description && (
-                      <p className="mt-0.5 text-xs leading-relaxed text-text-muted">
-                        <IconText text={p.description} />
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-            {effort.triedThisWeek > 0 && (
-              <p className="mt-3 border-t border-glass-border pt-3 text-xs text-text-muted">
-                جرّبتوا هالأسبوع {effort.triedThisWeek} {effort.triedThisWeek === 1 ? "مرة" : "مرات"}
-                {effort.triedLastWeek > 0 ? ` — الأسبوع اللي فات ${effort.triedLastWeek}.` : "."}
-              </p>
-            )}
-          </GlassCard>
-        ) : (
+        {allMoves.length === 0 ? (
           <GlassCard className="text-center">
             <p className="text-sm leading-relaxed text-text-muted">
-              لسّا آدم يلاحظ معكم. أول نمط يتوضّح، يبان هنا.
+              أول حركة تجرّبونها وتنجح مع {child}، تصير أول شيء هنا.
             </p>
-          </GlassCard>
-        )}
-      </Section>
-
-      {/* قسم ٣: لحظات تستاهل تُذكر — قصة قصيرة، لا سجلّ كامل */}
-      <Section>
-        <p className="font-display mb-3 mt-2 text-[16px] text-gold-strong">لحظات تستاهل تُذكر</p>
-        {highlightMoments.length === 0 ? (
-          <GlassCard className="text-center">
-            <p className="text-sm leading-relaxed text-text-muted">أول خطوة تجرّبونها وتنجح، بتصير أول لحظة هنا.</p>
           </GlassCard>
         ) : (
           <div className="flex flex-col gap-3">
-            {visibleMoments.map((m, i) => (
+            {visibleMoves.map((m, i) => (
               <div
-                key={m.logDate}
-                className="glass-gold glow-pulse card-form-in flex flex-col gap-2 !p-5"
-                style={{ animationDelay: `${i * 90}ms` }}
+                key={m.text}
+                className={`card-form-in flex flex-col gap-2.5 !p-5 ${
+                  m.count >= ESTABLISHED_AT ? "glass-gold glow-pulse" : "glass"
+                }`}
+                style={{ animationDelay: `${i * 70}ms` }}
               >
-                <span className="text-xs font-medium text-text-muted">{formatNightLabel(m.logDate)}</span>
-                <p className="font-display text-[17px] leading-relaxed text-text">
-                  لمّا جرّبتوا «{m.stepGiven}»، هدأ {child}.
-                  <span className="mt-1 block text-gold-strong">هذا أنتم.</span>
-                </p>
+                <p className="font-display text-[16px] leading-relaxed text-text">{m.text}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  {m.count === 1 ? (
+                    <Chip>جديدة</Chip>
+                  ) : (
+                    <Chip tone={m.count >= ESTABLISHED_AT ? "gold" : "default"}>
+                      نفعت {formatNumber(m.count)} {m.count === 2 ? "مرتين" : "مرات"}
+                    </Chip>
+                  )}
+                  {m.count >= ESTABLISHED_AT && <Chip tone="gold">صارت طريقتكم</Chip>}
+                </div>
               </div>
             ))}
+
             {hiddenCount > 0 && (
               <div className="relative">
-                <div className="blur-content glass-gold flex flex-col gap-2 !p-5">
-                  <span className="text-xs font-medium text-text-muted">{formatNightLabel(highlightMoments[1].logDate)}</span>
-                  <p className="font-display text-[17px] leading-relaxed text-text">لمّا جرّبتوا «{highlightMoments[1].stepGiven}»، هدأ {child}.</p>
+                <div className="blur-content glass flex flex-col gap-2.5 !p-5">
+                  <p className="font-display text-[16px] leading-relaxed text-text">حركة أخرى نفعت معكم</p>
                 </div>
-                <span className="blur-badge absolute top-4 start-4 px-4 py-1.5 text-sm">+{hiddenCount} لحظات محجوبة</span>
+                <span className="blur-badge absolute top-4 start-4 px-4 py-1.5 text-sm">
+                  +{hiddenCount} حركات محجوبة
+                </span>
               </div>
             )}
           </div>
         )}
+
         {hiddenCount > 0 && (
           <div className="mt-4">
             <UpsellButton label="وفيه أكثر من هذا — يظهر كامل مع المرافقة الكاملة" />

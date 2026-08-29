@@ -7,6 +7,7 @@ import { ScreenShell } from "@/components/ScreenShell";
 import { AdamIntro } from "@/components/AdamIntro";
 import { GlassCard } from "@/components/GlassCard";
 import { ChatCTAButton } from "@/components/ChatCTAButton";
+import { PanicButton } from "@/components/PanicButton";
 import { TreeLightbox } from "@/components/TreeLightbox";
 import { LoadingState, OutsideTelegramState, NotFoundState, ErrorState } from "@/components/states";
 import { postAction } from "@/lib/telegram/fetcher";
@@ -77,6 +78,7 @@ export default function HomePage() {
     return (
       <ScreenShell>
         <AdamIntro text={`هذي شاشتكم كل يوم — خطوة واحدة صغيرة تناسب ${child} بالذات، تُبنى من حكاياتكم لي.`} />
+        <PanicButton />
         <GlassCard variant="gold" className="rise-in text-center">
           <p className="font-display text-[19px] leading-relaxed text-text">
             ما عندنا خطوة لليوم بعد.
@@ -97,6 +99,7 @@ export default function HomePage() {
   return (
     <ScreenShell>
       <AdamIntro text={`هذي خطوة اليوم مع ${child} — بُنيت من آخر شي حكيتوه لي، جرّبوها بأسوأ لحظة لا أحسنها.`} />
+      <PanicButton />
 
       <GlassCard variant="gold" className="rise-in">
         <p className="text-xs font-medium text-text-muted">خطوة اليوم</p>
