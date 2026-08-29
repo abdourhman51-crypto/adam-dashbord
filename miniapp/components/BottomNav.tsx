@@ -40,20 +40,18 @@ export function BottomNav() {
           <TabLink key={t.href} {...t} active={pathname === t.href} />
         ))}
 
-        <div className="flex flex-1 items-center justify-center">
-          <button
-            type="button"
-            onClick={() => {
-              haptic("light");
-              returnToAdamChat();
-            }}
-            className="pressable-gold -mt-6 flex h-16 w-16 flex-col items-center justify-center gap-0.5 !rounded-2xl border-2 border-bg-deep p-0 shadow-lg"
-            aria-label="تحدّث مع آدم"
-          >
-            <MessageCircle size={24} strokeWidth={2.2} />
-            <span className="text-[10px] font-bold leading-none">آدم</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => {
+            haptic("light");
+            returnToAdamChat();
+          }}
+          className="pressable flex flex-1 flex-col items-center gap-1 border-0 bg-transparent px-2 py-2 text-center"
+          aria-label="تحدّث مع آدم"
+        >
+          <MessageCircle size={22} strokeWidth={2} />
+          <span className="text-[11px] font-medium leading-none">آدم</span>
+        </button>
 
         {TABS_AFTER.map((t) => (
           <TabLink key={t.href} {...t} active={pathname === t.href} />

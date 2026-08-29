@@ -1,41 +1,46 @@
 "use client";
 
 import { useState } from "react";
+import { LifeBuoy, ChevronLeft } from "lucide-react";
 import { haptic } from "@/lib/telegram/client";
 
-type Kind = "flood" | "demand";
+type Kind = "demand" | "flood";
 type Stage = "idle" | "asking" | "answered";
 
 /**
  * السكربتان ثابتان بنصّهما — لا توليد، لا استدعاء شبكة. الوالد في هذه
- * اللحظة لا يملك ثانية ينتظر فيها تحميلاً، ولا شيء هنا يستحق التخصيص أكثر
- * من الوصول الفوري. النصّان معتمدان مسبقاً (نفس صياغة migration الوكيل).
+ * اللحظة لا يملك ثانية ينتظر فيها تحميلاً. النصّان معتمدان مسبقاً (نفس
+ * صياغة migration الوكيل)، والوسم فوقهما يعطي الجواب دفعة واحدة قبل القراءة.
  */
-const SCRIPTS: Record<Kind, string[]> = {
-  flood: [
-    "جسده أكبر منه الآن، والكلام لا يصله.",
-    "اجلسوا قريباً منه، صوت أخفض، كلمات أقل — ولا شيء تعلّمونه في هذه اللحظة.",
-    "ستمرّ. وأنتم لم تخسروا شيئاً.",
-  ],
-  demand: [
-    "ما زال معكم، وهذا يعني أنه يطلب — لا ينهار.",
-    "جملة واحدة قصيرة، تُقال مرة: «لا. وأنا هنا.» ثم صمت، بلا نقاش.",
-    "ثباتكم الآن هو الجواب كلّه.",
-  ],
+const RESULT: Record<Kind, { tag: string; lines: string[] }> = {
+  demand: {
+    tag: "لسّا يطلب منكم",
+    lines: [
+      "ما زال معكم، وهذا يعني أنه يطلب — لا ينهار.",
+      "جملة واحدة قصيرة، تُقال مرة: «لا. وأنا هنا.» ثم صمت، بلا نقاش.",
+      "ثباتكم الآن هو الجواب كلّه.",
+    ],
+  },
+  flood: {
+    tag: "دخل في انهيار",
+    lines: [
+      "جسده أكبر منه الآن، والكلام لا يصله.",
+      "اجلسوا قريباً منه، صوت أخفض، كلمات أقل — ولا شيء تعلّمونه في هذه اللحظة.",
+      "ستمرّ. وأنتم لم تخسروا شيئاً.",
+    ],
+  },
 };
 
 /**
- * زرّ النجدة — أضخم عنصر في شاشة "الآن" عمداً. الذهبي القويّ هنا، لا في
- * دعوة الاشتراك: والدٌ على وشك الانفجار يجب أن يرى المخرج قبل أي شيء آخر.
+ * زرّ النجدة — متاح دائماً بضغطة واحدة، لكن بوزن بصري هادئ لا يزاحم خطوة
+ * اليوم (الفعل الرئيسي اليومي). لا يشتعل إلا حين يُفتح فعلاً.
  */
 export function PanicButton() {
   const [stage, setStage] = useState<Stage>("idle");
   const [kind, setKind] = useState<Kind | null>(null);
-  const [acked, setAcked] = useState(false);
 
   function open() {
     haptic("medium");
-    setAcked(false);
     setStage("asking");
   }
 
@@ -54,32 +59,26 @@ export function PanicButton() {
   if (stage === "asking") {
     return (
       <div className="glass-strong rise-in relative z-10 flex flex-col gap-4 p-5">
-        <p className="font-display text-[17px] leading-relaxed text-text">
-          أنا معكم الآن.
-          <br />
-          هل يراكم وينتظر ردّكم — أم غائب عنكم تماماً؟
+        <p className="font-display text-[16px] leading-relaxed text-text">
+          أيّ وصف أقرب لِما تشوفونه فيه الآن؟
         </p>
         <div className="flex flex-col gap-2.5">
           <button
             type="button"
-            onClick={() => choose("flood")}
-            className="pressable px-5 py-3 text-sm font-medium"
-          >
-            غائب عني تماماً
-          </button>
-          <button
-            type="button"
             onClick={() => choose("demand")}
-            className="pressable px-5 py-3 text-sm font-medium"
+            className="pressable px-5 py-3.5 text-start text-sm font-medium leading-relaxed"
           >
-            يراني ويطلب شيئاً
+            يراقبكم وينتظر ردّكم، ويقدر يتكلّم
           </button>
           <button
             type="button"
-            onClick={reset}
-            className="px-4 py-3 text-center text-xs font-medium text-text-muted"
+            onClick={() => choose("flood")}
+            className="pressable px-5 py-3.5 text-start text-sm font-medium leading-relaxed"
           >
-            شيء آخر
+            ما يشوفكم، صراخ بلا كلام، وجسمه متيبّس
+          </button>
+          <button type="button" onClick={reset} className="px-4 py-3 text-center text-xs font-medium text-text-muted">
+            رجوع
           </button>
         </div>
       </div>
@@ -87,9 +86,13 @@ export function PanicButton() {
   }
 
   if (stage === "answered" && kind) {
+    const r = RESULT[kind];
     return (
       <div className="glass-gold rise-in relative z-10 flex flex-col gap-3 p-5">
-        {SCRIPTS[kind].map((line, i) => (
+        <span className="w-fit rounded-full bg-bg-deep/40 px-3 py-1 text-[11px] font-semibold text-gold-strong">
+          {r.tag}
+        </span>
+        {r.lines.map((line, i) => (
           <p
             key={i}
             className={
@@ -109,31 +112,20 @@ export function PanicButton() {
   }
 
   return (
-    <div className="rise-in flex flex-col gap-2">
-      <button
-        type="button"
-        onClick={open}
-        className="pressable-gold glow-pulse flex w-full flex-col items-center gap-1 !rounded-[28px] px-6 py-5 text-center"
-      >
-        <span className="font-display text-[19px] font-extrabold leading-tight">الوضع ينفجر الآن</span>
-        <span className="text-[13px] font-medium opacity-80">اضغطوا — أنا معكم في ثانية</span>
-      </button>
-      {!acked ? (
-        <button
-          type="button"
-          onClick={() => {
-            haptic("light");
-            setAcked(true);
-          }}
-          className="px-4 py-2 text-center text-xs font-medium text-text-muted"
-        >
-          انفجرتُ اليوم
-        </button>
-      ) : (
-        <p className="rise-in px-4 text-center text-xs leading-relaxed text-text-muted">
-          لا شيء مطلوب منكم الآن. أنا هنا، وغداً ليلة جديدة.
-        </p>
-      )}
-    </div>
+    <button
+      type="button"
+      onClick={open}
+      className="glass-soft rise-in relative z-10 flex w-full items-center gap-3 !rounded-2xl px-4 py-3.5 text-start transition-transform active:scale-[0.97]"
+      style={{ touchAction: "manipulation" }}
+    >
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-bg-deep/30 text-gold-strong">
+        <LifeBuoy size={18} strokeWidth={2.2} />
+      </span>
+      <span className="flex-1">
+        <span className="block text-[14px] font-semibold text-text">الوضع صعب الآن؟</span>
+        <span className="block text-[12px] text-text-muted">اضغطوا، أنا معكم في ثانية</span>
+      </span>
+      <ChevronLeft size={16} className="shrink-0 text-text-muted" />
+    </button>
   );
 }

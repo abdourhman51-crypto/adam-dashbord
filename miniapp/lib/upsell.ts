@@ -1,28 +1,18 @@
-import { getWebApp } from "@/lib/telegram/client";
+import { openLink } from "@/lib/telegram/client";
 
 /**
- * رابط احتياطي فقط لمعاينة خارج تيليغرام (حيث لا وجود لـ WebApp.close). داخل
- * تيليغرام فعلياً لا حاجة له إطلاقاً — انظر returnToAdamChat أدناه.
+ * مثبّت في الكود عمداً، لا عبر متغيّر بيئة: اسم البوت الحقيقي الوحيد هو
+ * @adam_os_brain_bot. اعتماد متغيّر بيئة هنا هو بالضبط ما سبّب المشكلة —
+ * قيمة محلية خاطئة (AdamCompanionBot) كانت كافية لتوجيه كل أزرار "تحدّث
+ * مع آدم" لبوت لا وجود له.
  */
-function getChatLinkFallback(): string | null {
-  const username = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "adam_os_brain_bot";
-  return `https://t.me/${username}`;
-}
+const BOT_USERNAME = "adam_os_brain_bot";
 
 /**
- * يرجّع الوالد لمحادثته الفعلية مع بوت آدم على تيليغرام. التطبيق المصغّر
- * دائماً يُفتح من داخل تلك المحادثة بالذات، فأقرب وأصح طريق هو ببساطة إغلاقه
- * (WebApp.close) — يرجع تيليغرام تلقائياً لنفس المحادثة، بلا أي حاجة لمعرفة
- * اسم مستخدم البوت أو بناء رابط قد يكون خاطئاً.
+ * ينقل الوالد فعلياً إلى محادثته مع بوت آدم، لا يغلق التطبيق فقط.
+ * WebApp.close() كان يرجع أحياناً لشاشة فارغة لا للمحادثة — openTelegramLink
+ * برابط البوت الصريح يضمن الوصول لنفس المحادثة دائماً.
  */
 export function returnToAdamChat() {
-  const wa = getWebApp();
-  if (wa?.close) {
-    wa.close();
-    return;
-  }
-  const href = getChatLinkFallback();
-  if (href && typeof window !== "undefined") {
-    window.open(href, "_blank", "noopener,noreferrer");
-  }
+  openLink(`https://t.me/${BOT_USERNAME}`);
 }

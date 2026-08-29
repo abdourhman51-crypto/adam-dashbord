@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { useScreenData } from "@/lib/telegram/useScreenData";
 import { ScreenShell } from "@/components/ScreenShell";
@@ -9,6 +10,8 @@ import { useScrollReveal } from "@/components/useScrollReveal";
 import { LoadingState, OutsideTelegramState, NotFoundState, ErrorState } from "@/components/states";
 import { formatNightLabel } from "@/lib/format";
 import { IconText } from "@/lib/emojiIcons";
+import { returnToAdamChat } from "@/lib/upsell";
+import { haptic } from "@/lib/telegram/client";
 
 interface Night {
   logDate: string;
@@ -45,6 +48,7 @@ function Section({ children }: { children: React.ReactNode }) {
 
 export default function ChildPage() {
   const [result] = useScreenData<InsightsResponse>("/api/insights");
+  const [confirmed, setConfirmed] = useState(false);
 
   if (result.state === "loading") return <LoadingState />;
   if (result.state === "outside_telegram") return <OutsideTelegramState />;
@@ -76,10 +80,38 @@ export default function ChildPage() {
             <h1 className="font-display text-[24px] text-gold-strong">{child}</h1>
           </div>
           {insight ? (
-            <GlassCard variant="strong" className="text-right">
+            <GlassCard variant="strong" className="w-full text-right">
               <p className="font-display text-[18px] leading-loose text-text">
                 <IconText text={insight} />
               </p>
+              {confirmed ? (
+                <p className="mt-4 border-t border-glass-border pt-3 text-xs text-text-muted">
+                  تمام، هذا يساعدني أفهم {child} أكثر.
+                </p>
+              ) : (
+                <div className="mt-4 flex gap-2.5 border-t border-glass-border pt-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      haptic("light");
+                      setConfirmed(true);
+                    }}
+                    className="pressable flex-1 px-4 py-2.5 text-xs font-medium"
+                  >
+                    هذا صحيح
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      haptic("light");
+                      returnToAdamChat();
+                    }}
+                    className="pressable flex-1 px-4 py-2.5 text-xs font-medium"
+                  >
+                    فيه شي مو مضبوط
+                  </button>
+                </div>
+              )}
             </GlassCard>
           ) : (
             <GlassCard>
