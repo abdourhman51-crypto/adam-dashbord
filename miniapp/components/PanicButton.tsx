@@ -4,91 +4,92 @@ import { useState } from "react";
 import { LifeBuoy, ChevronLeft } from "lucide-react";
 import { haptic } from "@/lib/telegram/client";
 import { postAction } from "@/lib/telegram/fetcher";
-import { TreeLoader } from "@/components/TreeLoader";
+import { returnToAdamChat } from "@/lib/upsell";
 
-type Kind = "demand" | "flood";
-type Stage = "idle" | "asking" | "loading" | "answered";
-
-interface PanicResponse {
-  childName: string;
-  tag: string;
-  lines: string[];
-  personalized: boolean;
-}
+type Route = "away" | "stay";
+type Stage = "idle" | "asking" | "script" | "closing" | "done";
 
 /**
- * سكربتان احتياطيان فقط — تُستعمل حين يتعذّر الوصول للخادم (بلا اتصال، أو
- * فشل). المسار الطبيعي دائماً عبر /api/panic، الذي يقرأ نمط هذه الأسرة
- * بالذات (get_tantrum_frame) بدل نص واحد يُعطى للجميع.
+ * سكربتان ثابتان — لا توليد ولا انتظار شبكة. والدٌ على وشك الانفجار لا يملك
+ * ثانية للتحميل، ولا شيء هنا يستحق التخصيص أكثر من الوصول الفوري.
+ *
+ * المحتوى موجّه للوالد لا للطفل، لأنّ هذه هي المشكلة الأولى في البيانات:
+ * ٤٩ من ١٨٦ أسرة كتبت عن انفجارها هي. والافتراق بين السكربتين ليس عن حالة
+ * الطفل بل عمّا يستطيعه الوالد الآن — والابتعاد الجسدي هو الأنجع حين يمكن.
  */
-function fallback(kind: Kind, child: string): PanicResponse {
-  return {
-    childName: child,
-    tag: kind === "flood" ? "دخل في انهيار" : "لسّا يطلب منكم",
-    lines:
-      kind === "flood"
-        ? [
-            `${child} جسده أكبر منه الآن، والكلام لا يصله.`,
-            "اجلسوا قريباً منه، صوت أخفض، كلمات أقل — ولا شيء تعلّمونه في هذه اللحظة.",
-            "ستمرّ. وأنتم لم تخسروا شيئاً.",
-          ]
-        : [
-            `${child} ما زال معكم، وهذا يعني أنه يطلب — لا ينهار.`,
-            "جملة واحدة قصيرة، تُقال مرة: «لا. وأنا هنا.» ثم صمت، بلا نقاش.",
-            "ثباتكم الآن هو الجواب كلّه.",
-          ],
-    personalized: false,
-  };
-}
+const SCRIPTS: Record<Route, { tag: string; lines: string[] }> = {
+  away: {
+    tag: "ابتعدي لحظة",
+    lines: [
+      "ابتعدي خطوتين وأديري ظهركِ — الآن، قبل أي كلمة.",
+      "زفير طويل من الفم، أطول من الشهيق. ثلاث مرات.",
+      "هو بأمان في هذه الثواني، وأنتِ تحتاجينها.",
+    ],
+  },
+  stay: {
+    tag: "لا تقدرين أن تبتعدي",
+    lines: [
+      "اخفضي صوتكِ عمداً بدل أن ترفعيه — الجسد يتبع الصوت.",
+      "قولي بهدوء: «أنا غاضبة الآن، وسنتكلّم بعد قليل.» ثم اصمتي.",
+      "تأجيل العقاب ليس ضعفاً — الضعف هو أن يقع وأنتِ في ذروتكِ.",
+    ],
+  },
+};
 
 /**
- * زرّ النجدة — متاح دائماً بضغطة واحدة، بوزن بصري هادئ لا يزاحم خطوة
- * اليوم. الردّ يأتي من /api/panic فيخصَّص فعلياً بمعرفة آدم بهذا الطفل
- * بالذات، لا نصّ عام واحد لكل المواقف.
+ * زرّ النجدة — متاح دائماً بضغطة، بوزن بصري هادئ لا يزاحم خطوة اليوم.
+ * وينتهي دائماً بسؤال واحد صادق، لأنّ إجابته هي المقياس الشمالي للمنتج.
  */
-export function PanicButton({ child }: { child: string }) {
+export function PanicButton() {
   const [stage, setStage] = useState<Stage>("idle");
-  const [result, setResult] = useState<PanicResponse | null>(null);
+  const [route, setRoute] = useState<Route | null>(null);
+  const [held, setHeld] = useState(false);
 
   function open() {
     haptic("medium");
     setStage("asking");
   }
 
-  async function choose(kind: Kind) {
+  function choose(r: Route) {
     haptic("light");
-    setStage("loading");
-    const r = await postAction<PanicResponse>("/api/panic", { kind });
-    setResult(r.state === "ok" ? r.data : fallback(kind, child));
-    setStage("answered");
+    setRoute(r);
+    setStage("script");
+  }
+
+  async function close(kind: "held" | "erupted") {
+    haptic(kind === "held" ? "medium" : "light");
+    setHeld(kind === "held");
+    setStage("done");
+    // بأفضل جهد: الردّ وصل بالفعل، وفشل التسجيل لا يُظهر خطأً في هذه اللحظة
+    await postAction("/api/moment", { kind, source: "panic_button" });
   }
 
   function reset() {
     haptic("light");
     setStage("idle");
-    setResult(null);
+    setRoute(null);
   }
 
   if (stage === "asking") {
     return (
       <div className="glass-strong rise-in relative z-10 flex flex-col gap-4 p-5">
         <p className="font-display text-[16px] leading-relaxed text-text">
-          أيّ وصف أقرب لِما تشوفونه في {child} الآن؟
+          أنا معكِ. تقدرين تبتعدين لحظة عنه الآن؟
         </p>
         <div className="flex flex-col gap-2.5">
           <button
             type="button"
-            onClick={() => choose("demand")}
+            onClick={() => choose("away")}
             className="pressable px-5 py-3.5 text-start text-sm font-medium leading-relaxed"
           >
-            {child} يراقبكم وينتظر ردّكم، ويقدر يتكلّم
+            نعم، أقدر أبتعد دقيقة
           </button>
           <button
             type="button"
-            onClick={() => choose("flood")}
+            onClick={() => choose("stay")}
             className="pressable px-5 py-3.5 text-start text-sm font-medium leading-relaxed"
           >
-            {child} ما يشوفكم، صراخ بلا كلام، وجسمه متيبّس
+            لا، لازم أبقى معه
           </button>
           <button type="button" onClick={reset} className="px-4 py-3 text-center text-xs font-medium text-text-muted">
             رجوع
@@ -98,22 +99,14 @@ export function PanicButton({ child }: { child: string }) {
     );
   }
 
-  if (stage === "loading") {
-    return (
-      <div className="glass-strong rise-in relative z-10 flex items-center justify-center gap-3 p-6 text-sm text-text-muted">
-        <TreeLoader size="sm" />
-        <span>لحظة، أفكّر في حالة {child}…</span>
-      </div>
-    );
-  }
-
-  if (stage === "answered" && result) {
+  if (stage === "script" && route) {
+    const s = SCRIPTS[route];
     return (
       <div className="glass-gold rise-in relative z-10 flex flex-col gap-3 p-5">
         <span className="w-fit rounded-full bg-bg-deep/40 px-3 py-1 text-[11px] font-semibold text-gold-strong">
-          {result.tag}
+          {s.tag}
         </span>
-        {result.lines.map((line, i) => (
+        {s.lines.map((line, i) => (
           <p
             key={i}
             className={
@@ -125,28 +118,85 @@ export function PanicButton({ child }: { child: string }) {
             {line}
           </p>
         ))}
-        <button type="button" onClick={reset} className="pressable mt-1 px-5 py-2.5 text-sm font-medium">
-          رجوع
+        <button
+          type="button"
+          onClick={() => setStage("closing")}
+          className="pressable mt-2 px-5 py-2.5 text-sm font-medium"
+        >
+          مرّت اللحظة
+        </button>
+      </div>
+    );
+  }
+
+  if (stage === "closing") {
+    return (
+      <div className="glass-strong rise-in relative z-10 flex flex-col gap-4 p-5">
+        <p className="font-display text-[16px] leading-relaxed text-text">كيف انتهت؟</p>
+        <div className="flex flex-col gap-2.5">
+          <button
+            type="button"
+            onClick={() => close("held")}
+            className="pressable px-5 py-3.5 text-sm font-medium"
+          >
+            تماسكتُ
+          </button>
+          <button
+            type="button"
+            onClick={() => close("erupted")}
+            className="pressable px-5 py-3.5 text-sm font-medium"
+          >
+            انفجرتُ رغم ذلك
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (stage === "done") {
+    return (
+      <div className="glass-gold rise-in relative z-10 flex flex-col gap-3 p-5 text-center">
+        <p className="font-display text-[17px] leading-loose text-text">
+          {held
+            ? "هذي مرة أوشكتِ فيها ولم تنفجري. سُجّلت — وهي التي نعدّها."
+            : "حدث. ولا يُلغي هذا محاولتكِ — أنّكِ فتحتِ هذي الشاشة أصلاً يعني شيئاً."}
+        </p>
+        <button type="button" onClick={reset} className="pressable px-5 py-2.5 text-sm font-medium">
+          تمام
         </button>
       </div>
     );
   }
 
   return (
-    <button
-      type="button"
-      onClick={open}
-      className="glass-soft rise-in relative z-10 flex w-full items-center gap-3 !rounded-2xl px-4 py-3.5 text-start transition-transform active:scale-[0.97]"
-      style={{ touchAction: "manipulation" }}
-    >
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-bg-deep/30 text-gold-strong">
-        <LifeBuoy size={18} strokeWidth={2.2} />
-      </span>
-      <span className="flex-1">
-        <span className="block text-[14px] font-semibold text-text">الوضع صعب الآن؟</span>
-        <span className="block text-[12px] text-text-muted">اضغطوا، أنا معكم في ثانية</span>
-      </span>
-      <ChevronLeft size={16} className="shrink-0 text-text-muted" />
-    </button>
+    <div className="rise-in flex flex-col gap-2">
+      <button
+        type="button"
+        onClick={open}
+        className="glass-soft relative z-10 flex w-full items-center gap-3 !rounded-2xl px-4 py-3.5 text-start transition-transform active:scale-[0.97]"
+        style={{ touchAction: "manipulation" }}
+      >
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-bg-deep/30 text-gold-strong">
+          <LifeBuoy size={18} strokeWidth={2.2} />
+        </span>
+        <span className="flex-1">
+          <span className="block text-[14px] font-semibold text-text">على وشك الانفجار؟</span>
+          <span className="block text-[12px] text-text-muted">اضغطي، أنا معكِ في ثانية</span>
+        </span>
+        <ChevronLeft size={16} className="shrink-0 text-text-muted" />
+      </button>
+
+      {/* باب الاعتراف — آدم يحسن الردّ عليه فعلاً، وينقصه أن يُدعى إليه */}
+      <button
+        type="button"
+        onClick={() => {
+          haptic("light");
+          returnToAdamChat();
+        }}
+        className="px-4 py-3 text-center text-xs font-medium text-text-muted"
+      >
+        انفجرتُ اليوم — أريد أن أحكي
+      </button>
+    </div>
   );
 }

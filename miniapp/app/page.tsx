@@ -8,6 +8,7 @@ import { AdamIntro } from "@/components/AdamIntro";
 import { GlassCard } from "@/components/GlassCard";
 import { ChatCTAButton } from "@/components/ChatCTAButton";
 import { PanicButton } from "@/components/PanicButton";
+import { EveningCheckIn } from "@/components/EveningCheckIn";
 import { TreeLightbox } from "@/components/TreeLightbox";
 import { LoadingState, OutsideTelegramState, NotFoundState, ErrorState } from "@/components/states";
 import { postAction } from "@/lib/telegram/fetcher";
@@ -32,8 +33,13 @@ interface TodayResponse {
   stepCommittedAt: string | null;
 }
 
+interface CurveResponse {
+  answeredToday: boolean;
+}
+
 export default function HomePage() {
   const [result, refetch] = useScreenData<TodayResponse>("/api/today");
+  const [curveResult, refetchCurve] = useScreenData<CurveResponse>("/api/curve");
   const [committing, setCommitting] = useState(false);
   const [error, setError] = useState(false);
   const [leafCount, setLeafCount] = useState<number | null>(null);
@@ -48,6 +54,9 @@ export default function HomePage() {
 
   const { childName, stepGiven, stepCommittedAt } = result.data;
   const child = childName ?? "طفلكم";
+
+  // سؤال المساء يُعرض ما لم تجب اليوم — وهو مقياس المنتج كلّه
+  const showCheckIn = curveResult.state === "ok" && !curveResult.data.answeredToday;
 
   async function commit() {
     if (committing) return;
@@ -78,7 +87,8 @@ export default function HomePage() {
     return (
       <ScreenShell>
         <AdamIntro text={`هذي شاشتكم كل يوم — خطوة واحدة صغيرة تناسب ${child} بالذات، تُبنى من حكاياتكم لي.`} />
-        <PanicButton child={child} />
+        <PanicButton />
+        {showCheckIn && <EveningCheckIn onAnswered={refetchCurve} />}
         <GlassCard variant="gold" className="rise-in text-center">
           <p className="font-display text-[19px] leading-relaxed text-text">
             ما عندنا خطوة لليوم بعد.
@@ -99,7 +109,8 @@ export default function HomePage() {
   return (
     <ScreenShell>
       <AdamIntro text={`هذي خطوة اليوم مع ${child} — بُنيت من آخر شي حكيتوه لي، جرّبوها بأسوأ لحظة لا أحسنها.`} />
-      <PanicButton child={child} />
+      <PanicButton />
+      {showCheckIn && <EveningCheckIn onAnswered={refetchCurve} />}
 
       <GlassCard variant="gold" className="rise-in">
         <p className="text-xs font-medium text-text-muted">خطوة اليوم</p>

@@ -7,7 +7,7 @@ import { useScreenData } from "@/lib/telegram/useScreenData";
 import { ScreenShell } from "@/components/ScreenShell";
 import { AdamIntro } from "@/components/AdamIntro";
 import { GlassCard } from "@/components/GlassCard";
-import { QuickReplyCard } from "@/components/QuickReplyCard";
+import { ProgressCurve, type CurveData } from "@/components/ProgressCurve";
 import { UpsellButton } from "@/components/UpsellButton";
 import { AchievementCelebration } from "@/components/AchievementCelebration";
 import { useScrollReveal } from "@/components/useScrollReveal";
@@ -156,8 +156,9 @@ function Chip({ children, tone = "default" }: { children: React.ReactNode; tone?
 }
 
 export default function MyWayPage() {
-  const [result, refetch] = useScreenData<InsightsResponse>("/api/insights");
+  const [result] = useScreenData<InsightsResponse>("/api/insights");
   const [journeyResult] = useScreenData<JourneyResponse>("/api/journey");
+  const [curveResult] = useScreenData<CurveData>("/api/curve");
   const [celebrating, setCelebrating] = useState(false);
 
   const streak = useMemo(() => {
@@ -178,7 +179,7 @@ export default function MyWayPage() {
   if (result.state === "not_found") return <NotFoundState />;
   if (result.state === "error") return <ErrorState message={result.message} />;
 
-  const { childName, todayOpen, wall } = result.data;
+  const { childName, wall } = result.data;
   const child = childName ?? "طفلكم";
 
   const allMoves = groupMoves(wall.moments);
@@ -193,22 +194,21 @@ export default function MyWayPage() {
     <ScreenShell>
       <AdamIntro text={`هذي الحركات اللي جرّبتوها ونفعت مع ${child} — كل ما تتكرّر، تصير أكثر طريقتكم.`} />
 
+      {/* المنحنى أولاً — هو الرقم الذي يُباع، والوعد الذي دُفع مقابله */}
+      {curveResult.state === "ok" && (
+        <Section>
+          <ProgressCurve curve={curveResult.data} />
+        </Section>
+      )}
+
       {hasActiveObjective && journey && <ObjectiveCard j={journey} />}
 
-      <Section>
-        <div className="mt-2 flex flex-col items-center gap-1 text-center">
-          <p className="font-display text-[44px] leading-none text-gold-strong">
-            {formatNumber(establishedCount)}
-          </p>
-          <p className="text-sm text-text-muted">
-            {establishedCount > 0 ? `حركة صارت طريقتكم مع ${child}` : `لسّا ما عندنا حركة ثابتة مع ${child}`}
-          </p>
-        </div>
-      </Section>
-
-      {todayOpen && (
+      {establishedCount > 0 && (
         <Section>
-          <QuickReplyCard onAnswered={refetch} />
+          <p className="mt-2 text-center text-sm text-text-muted">
+            وصارت عندكِ {formatNumber(establishedCount)}{" "}
+            {establishedCount === 1 ? "حركة ثابتة" : "حركات ثابتة"} مع {child}
+          </p>
         </Section>
       )}
 
