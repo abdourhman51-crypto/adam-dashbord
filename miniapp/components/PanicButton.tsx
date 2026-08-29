@@ -3,64 +3,77 @@
 import { useState } from "react";
 import { LifeBuoy, ChevronLeft } from "lucide-react";
 import { haptic } from "@/lib/telegram/client";
+import { postAction } from "@/lib/telegram/fetcher";
+import { TreeLoader } from "@/components/TreeLoader";
 
 type Kind = "demand" | "flood";
-type Stage = "idle" | "asking" | "answered";
+type Stage = "idle" | "asking" | "loading" | "answered";
+
+interface PanicResponse {
+  childName: string;
+  tag: string;
+  lines: string[];
+  personalized: boolean;
+}
 
 /**
- * السكربتان ثابتان بنصّهما — لا توليد، لا استدعاء شبكة. الوالد في هذه
- * اللحظة لا يملك ثانية ينتظر فيها تحميلاً. النصّان معتمدان مسبقاً (نفس
- * صياغة migration الوكيل)، والوسم فوقهما يعطي الجواب دفعة واحدة قبل القراءة.
+ * سكربتان احتياطيان فقط — تُستعمل حين يتعذّر الوصول للخادم (بلا اتصال، أو
+ * فشل). المسار الطبيعي دائماً عبر /api/panic، الذي يقرأ نمط هذه الأسرة
+ * بالذات (get_tantrum_frame) بدل نص واحد يُعطى للجميع.
  */
-const RESULT: Record<Kind, { tag: string; lines: string[] }> = {
-  demand: {
-    tag: "لسّا يطلب منكم",
-    lines: [
-      "ما زال معكم، وهذا يعني أنه يطلب — لا ينهار.",
-      "جملة واحدة قصيرة، تُقال مرة: «لا. وأنا هنا.» ثم صمت، بلا نقاش.",
-      "ثباتكم الآن هو الجواب كلّه.",
-    ],
-  },
-  flood: {
-    tag: "دخل في انهيار",
-    lines: [
-      "جسده أكبر منه الآن، والكلام لا يصله.",
-      "اجلسوا قريباً منه، صوت أخفض، كلمات أقل — ولا شيء تعلّمونه في هذه اللحظة.",
-      "ستمرّ. وأنتم لم تخسروا شيئاً.",
-    ],
-  },
-};
+function fallback(kind: Kind, child: string): PanicResponse {
+  return {
+    childName: child,
+    tag: kind === "flood" ? "دخل في انهيار" : "لسّا يطلب منكم",
+    lines:
+      kind === "flood"
+        ? [
+            `${child} جسده أكبر منه الآن، والكلام لا يصله.`,
+            "اجلسوا قريباً منه، صوت أخفض، كلمات أقل — ولا شيء تعلّمونه في هذه اللحظة.",
+            "ستمرّ. وأنتم لم تخسروا شيئاً.",
+          ]
+        : [
+            `${child} ما زال معكم، وهذا يعني أنه يطلب — لا ينهار.`,
+            "جملة واحدة قصيرة، تُقال مرة: «لا. وأنا هنا.» ثم صمت، بلا نقاش.",
+            "ثباتكم الآن هو الجواب كلّه.",
+          ],
+    personalized: false,
+  };
+}
 
 /**
- * زرّ النجدة — متاح دائماً بضغطة واحدة، لكن بوزن بصري هادئ لا يزاحم خطوة
- * اليوم (الفعل الرئيسي اليومي). لا يشتعل إلا حين يُفتح فعلاً.
+ * زرّ النجدة — متاح دائماً بضغطة واحدة، بوزن بصري هادئ لا يزاحم خطوة
+ * اليوم. الردّ يأتي من /api/panic فيخصَّص فعلياً بمعرفة آدم بهذا الطفل
+ * بالذات، لا نصّ عام واحد لكل المواقف.
  */
-export function PanicButton() {
+export function PanicButton({ child }: { child: string }) {
   const [stage, setStage] = useState<Stage>("idle");
-  const [kind, setKind] = useState<Kind | null>(null);
+  const [result, setResult] = useState<PanicResponse | null>(null);
 
   function open() {
     haptic("medium");
     setStage("asking");
   }
 
-  function choose(k: Kind) {
+  async function choose(kind: Kind) {
     haptic("light");
-    setKind(k);
+    setStage("loading");
+    const r = await postAction<PanicResponse>("/api/panic", { kind });
+    setResult(r.state === "ok" ? r.data : fallback(kind, child));
     setStage("answered");
   }
 
   function reset() {
     haptic("light");
     setStage("idle");
-    setKind(null);
+    setResult(null);
   }
 
   if (stage === "asking") {
     return (
       <div className="glass-strong rise-in relative z-10 flex flex-col gap-4 p-5">
         <p className="font-display text-[16px] leading-relaxed text-text">
-          أيّ وصف أقرب لِما تشوفونه فيه الآن؟
+          أيّ وصف أقرب لِما تشوفونه في {child} الآن؟
         </p>
         <div className="flex flex-col gap-2.5">
           <button
@@ -68,14 +81,14 @@ export function PanicButton() {
             onClick={() => choose("demand")}
             className="pressable px-5 py-3.5 text-start text-sm font-medium leading-relaxed"
           >
-            يراقبكم وينتظر ردّكم، ويقدر يتكلّم
+            {child} يراقبكم وينتظر ردّكم، ويقدر يتكلّم
           </button>
           <button
             type="button"
             onClick={() => choose("flood")}
             className="pressable px-5 py-3.5 text-start text-sm font-medium leading-relaxed"
           >
-            ما يشوفكم، صراخ بلا كلام، وجسمه متيبّس
+            {child} ما يشوفكم، صراخ بلا كلام، وجسمه متيبّس
           </button>
           <button type="button" onClick={reset} className="px-4 py-3 text-center text-xs font-medium text-text-muted">
             رجوع
@@ -85,14 +98,22 @@ export function PanicButton() {
     );
   }
 
-  if (stage === "answered" && kind) {
-    const r = RESULT[kind];
+  if (stage === "loading") {
+    return (
+      <div className="glass-strong rise-in relative z-10 flex items-center justify-center gap-3 p-6 text-sm text-text-muted">
+        <TreeLoader size="sm" />
+        <span>لحظة، أفكّر في حالة {child}…</span>
+      </div>
+    );
+  }
+
+  if (stage === "answered" && result) {
     return (
       <div className="glass-gold rise-in relative z-10 flex flex-col gap-3 p-5">
         <span className="w-fit rounded-full bg-bg-deep/40 px-3 py-1 text-[11px] font-semibold text-gold-strong">
-          {r.tag}
+          {result.tag}
         </span>
-        {r.lines.map((line, i) => (
+        {result.lines.map((line, i) => (
           <p
             key={i}
             className={

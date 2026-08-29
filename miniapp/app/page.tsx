@@ -78,7 +78,7 @@ export default function HomePage() {
     return (
       <ScreenShell>
         <AdamIntro text={`هذي شاشتكم كل يوم — خطوة واحدة صغيرة تناسب ${child} بالذات، تُبنى من حكاياتكم لي.`} />
-        <PanicButton />
+        <PanicButton child={child} />
         <GlassCard variant="gold" className="rise-in text-center">
           <p className="font-display text-[19px] leading-relaxed text-text">
             ما عندنا خطوة لليوم بعد.
@@ -99,7 +99,7 @@ export default function HomePage() {
   return (
     <ScreenShell>
       <AdamIntro text={`هذي خطوة اليوم مع ${child} — بُنيت من آخر شي حكيتوه لي، جرّبوها بأسوأ لحظة لا أحسنها.`} />
-      <PanicButton />
+      <PanicButton child={child} />
 
       <GlassCard variant="gold" className="rise-in">
         <p className="text-xs font-medium text-text-muted">خطوة اليوم</p>

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { Check } from "lucide-react";
 import { useScreenData } from "@/lib/telegram/useScreenData";
 import { ScreenShell } from "@/components/ScreenShell";
 import { AdamIntro } from "@/components/AdamIntro";
@@ -39,6 +41,71 @@ interface Move {
   text: string;
   count: number;
   lastDate: string;
+}
+
+interface JourneyResponse {
+  isPaid: boolean;
+  inStage?: boolean;
+  objectiveText?: string | null;
+  objectiveTarget?: number | null;
+  objectiveCurrent?: number | null;
+  objectiveMet?: boolean;
+  loggedDays?: number;
+  daysRemaining?: number;
+}
+
+/**
+ * بطاقة الهدف الذي دفع المشترك مقابله — نفس بيانات /api/journey، معروضة
+ * هنا لأن هذا هو المكان الذي يفتحه يومياً أصلاً. اختفاؤها من هنا كان يعني
+ * أن المشترك المدفوع لا يجد مقياس تقدّمه في أول مكان ينظر إليه.
+ */
+function ObjectiveCard({ j }: { j: JourneyResponse }) {
+  const progress =
+    j.objectiveTarget && j.objectiveTarget > 0
+      ? Math.min(100, Math.round(((j.objectiveCurrent ?? 0) / j.objectiveTarget) * 100))
+      : 0;
+
+  return (
+    <Section>
+      <GlassCard variant="gold" className="rise-in">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-medium text-text-muted">الهدف اللي اتفقنا عليه</p>
+          {j.daysRemaining !== undefined && j.daysRemaining > 0 && (
+            <span className="text-xs text-text-muted">و{formatNumber(j.daysRemaining)} يوم متبقّي</span>
+          )}
+        </div>
+        <p className="font-display mt-2 text-[19px] leading-relaxed text-text">{j.objectiveText}</p>
+
+        <div className="mt-5">
+          <div className="h-3 w-full overflow-hidden rounded-full bg-glass-bg">
+            <div
+              className="h-full rounded-full bg-gradient-to-l from-gold to-gold-strong transition-all duration-700"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <div className="mt-2 flex items-center justify-between text-xs text-text-muted">
+            <span>
+              {formatNumber(j.objectiveCurrent ?? 0)} من {formatNumber(j.objectiveTarget ?? 0)}
+            </span>
+            <span className="flex items-center gap-1">
+              {j.objectiveMet ? (
+                <>
+                  <Check size={13} strokeWidth={2.5} />
+                  تحقّق الهدف
+                </>
+              ) : (
+                `${progress}٪`
+              )}
+            </span>
+          </div>
+        </div>
+
+        <Link href="/journey" className="mt-4 block text-center text-xs font-medium text-gold-strong">
+          شوفوا قصة رحلتكم كاملة
+        </Link>
+      </GlassCard>
+    </Section>
+  );
 }
 
 /**
@@ -90,6 +157,7 @@ function Chip({ children, tone = "default" }: { children: React.ReactNode; tone?
 
 export default function MyWayPage() {
   const [result, refetch] = useScreenData<InsightsResponse>("/api/insights");
+  const [journeyResult] = useScreenData<JourneyResponse>("/api/journey");
   const [celebrating, setCelebrating] = useState(false);
 
   const streak = useMemo(() => {
@@ -118,9 +186,14 @@ export default function MyWayPage() {
   const hiddenCount = wall.isPaid ? 0 : Math.max(0, allMoves.length - FREE_MOVE_LIMIT);
   const establishedCount = allMoves.filter((m) => m.count >= ESTABLISHED_AT).length;
 
+  const journey = journeyResult.state === "ok" ? journeyResult.data : null;
+  const hasActiveObjective = Boolean(journey?.isPaid && journey?.inStage && journey?.objectiveText);
+
   return (
     <ScreenShell>
       <AdamIntro text={`هذي الحركات اللي جرّبتوها ونفعت مع ${child} — كل ما تتكرّر، تصير أكثر طريقتكم.`} />
+
+      {hasActiveObjective && journey && <ObjectiveCard j={journey} />}
 
       <Section>
         <div className="mt-2 flex flex-col items-center gap-1 text-center">
