@@ -117,6 +117,32 @@ pattern the disclosure safeguard makes impossible to create.
 What replaced it is `seed_test.sql`: four rows of prices, which are business data rather
 than schema. `fixture_mirror.sql` went with it — the real `v_child_record` exists.
 
+## `harvest_window_test.sql`
+
+Five cases, and the reason they exist is worth more than the cases.
+
+Between 17 and 30 August 2026 the evening question — the only thing that ever
+writes `daily_logs.night_result`, and therefore the only source of every number
+ADAM shows a parent — was **structurally impossible to ask**. Seeds went out
+every day; not one was harvested for thirteen days. In the product's whole life:
+117 seeds, 27 harvests, 14 nights with a result.
+
+The cause was an off-by-one between two lines of `get_rhythm_due`: the gate
+admits families whose `local_hour < 23`, and the harvest fires when
+`local_hour > win_end`, where a family with no confirmed situation defaults to
+`win_end = 22`. No hour satisfies both. It hid while situations were being
+confirmed (a real window of 18, 19 or 20 leaves hours free) and became total the
+moment seeds started going to families without one.
+
+**Every other suite drove the harvest directly through `record_harvest_answer()`
+and never asked whether the scheduler would have offered it.** That is the gap
+this file closes: it asserts the *scheduler's* verdict, not the recorder's.
+
+It cannot move the clock, so it moves the family — it picks a real IANA zone in
+which it is 22:00 right now, which exists at every moment of the day. Run it
+against the migrations without
+`20260830150000_the_evening_question_can_be_asked_again.sql` and it goes 2/5.
+
 ## `telegram_surface_test.sql`
 
 Twelve parents — the seven states, plus paused, strain L2, unsupported country, dormant, and a parent who does not exist — then two groups of assertions.
