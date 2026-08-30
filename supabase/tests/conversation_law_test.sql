@@ -205,19 +205,10 @@ rollback;
 -- The Router dispatches a callback when it is in its TAPS table, or starts
 -- with menu_ / ck_mom_ / ck_step_ / ck_gen_ / set_country_. Anything else is
 -- the rescue. This asserts the property directly.
---
--- PHASE 1 (نوبات الغضب) ADDS THREE, AND THEY ARE NOT LIVE YET.
--- now_flood, now_demand and incident_tell are listed here as the
--- Router contract this layer requires. Until W1's TAPS table
--- carries all three, the four now_* moments MUST NOT be surfaced
--- to a parent — a tap would fall through to the rescue, which is
--- the exact bug this block exists to catch. The gate is stated in
--- docs/tantrum-engine.md §6 and is the first item there.
 with taps(cb) as (
   values ('menu_help'),('help_start'),('other'),('how_exactly'),('how_start'),
          ('not_now'),('cta_later'),('cta_ready'),('cta_full_companion'),
-         ('waitlist_join'),
-         ('now_flood'),('now_demand'),('incident_tell')
+         ('waitlist_join')
 ),
 buttons as (
   select distinct c.key as from_moment, b->>'cb' as cb

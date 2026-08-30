@@ -527,60 +527,24 @@ grant execute on function public.commit_incident(uuid, text, text, text, text, t
 
 
 -- ------------------------------------------------------------
--- «الوضع ينفجر الآن» — the moment ADAM exists for.
+-- The panic button used to live here as four conversation_moments
+-- (now_entry / now_flood / now_demand / now_after). They were
+-- removed on 2026-08-30 and never reached production.
 --
--- Three content lines, because P6 says so and because a flooded
--- parent cannot read a fourth. These are FIXED, not composed:
--- composition takes seconds this parent does not have, and there
--- is nothing to personalise that matters more than arriving now.
+-- Two reasons, and the second is the important one:
 --
--- THIS IS AN EXPERIMENT, AND ITS FAILURE MODE IS NAMED.
--- The hypothesis is that a parent reaches for their phone mid-
--- tantrum. It may be false. `now_entry` is deliberately the
--- cheapest possible version of it — one question, three replies —
--- so that four weeks of use answers the question before anything
--- is built on top of it. If the taps do not come, pillar 2 moves
--- to the `before` window, where the leverage was always greater.
+-- 1. The button now lives entirely inside the mini app
+--    (components/PanicButton.tsx) with its scripts inline, because
+--    a parent mid-crisis cannot wait for a round trip. Nothing in
+--    the bot routes those callbacks, so shipping them would have
+--    created exactly the dead buttons conversation_law_test guards
+--    against.
+--
+-- 2. They were written about the CHILD's tantrum. Reading 5,712
+--    real messages showed the first problem is the PARENT's own
+--    loss of control (49 of 186 families), so the scripts were
+--    rewritten to address the parent — see
+--    20260830090000_the_parent_is_the_one_we_measure.sql.
 -- ------------------------------------------------------------
-insert into public.conversation_moments
-  (key, category, tier, body_ar, buttons, max_lines, requires_commerce, note)
-values
-  ('now_entry', 'rescue', 'fixed',
-   'أنا معكم الآن.' || chr(10) ||
-   'هل يراكم وينتظر ردّكم — أم غائب عنكم تماماً؟',
-   '[{"label":"غائب عني تماماً","cb":"now_flood"},
-     {"label":"يراني ويطلب شيئاً","cb":"now_demand"},
-     {"label":"شيء آخر","cb":"other"}]'::jsonb,
-   2, false,
-   'The panic-button entry. One question, because it is the single question that changes what the parent should do next, and because a flooded parent will not answer two.'),
-
-  ('now_flood', 'rescue', 'fixed',
-   'جسده أكبر منه الآن، والكلام لا يصله.' || chr(10) ||
-   'اجلسوا قريباً منه، صوت أخفض، كلمات أقل — ولا شيء تعلّمونه في هذه اللحظة.' || chr(10) ||
-   'ستمرّ. وأنتم لم تخسروا شيئاً.',
-   '[{"label":"شيء آخر","cb":"other"}]'::jsonb,
-   3, false,
-   'The meltdown script. The third line is not decoration: the parent reading this is mid-guilt, and a script that only instructs leaves them alone with it.'),
-
-  ('now_demand', 'rescue', 'fixed',
-   'ما زال معكم، وهذا يعني أنه يطلب — لا ينهار.' || chr(10) ||
-   'جملة واحدة قصيرة، تُقال مرة: «لا. وأنا هنا.» ثم صمت، بلا نقاش.' || chr(10) ||
-   'ثباتكم الآن هو الجواب كلّه.',
-   '[{"label":"شيء آخر","cb":"other"}]'::jsonb,
-   3, false,
-   'The demand script. "Then silence" is the whole instruction — parents repeat the sentence, and repetition is what turns a boundary into a negotiation.'),
-
-  ('now_after', 'rescue', 'fixed',
-   'انتهت. لا تعودوا إليها بالكلام الآن.' || chr(10) ||
-   'قربٌ بلا درس — والحديث عنها يأتي لاحقاً، بجملة واحدة قصيرة.',
-   '[{"label":"احكوا لي ما حدث","cb":"incident_tell"},
-     {"label":"شيء آخر","cb":"other"}]'::jsonb,
-   2, false,
-   'Offered after the storm. The first button is the bridge from pillar 2 to pillar 1: the calm right after is when a parent will actually describe what happened.')
-on conflict (key) do update
-  set body_ar   = excluded.body_ar,
-      buttons   = excluded.buttons,
-      max_lines = excluded.max_lines,
-      note      = excluded.note;
 
 commit;

@@ -166,52 +166,15 @@ begin
 end $$;
 
 -- ===============================================================
--- The panic button. Its whole value is that it arrives instantly
--- and can be read one-handed, so the constraints ARE the feature.
+-- The panic button is NOT tested here any more.
+--
+-- It moved into the mini app (components/PanicButton.tsx) on
+-- 2026-08-30, with its scripts inline, because a parent mid-crisis
+-- cannot wait for a round trip — and because reading 5,712 real
+-- messages showed the scripts had to address the PARENT's own loss
+-- of control, not the child's tantrum. Its data now lands in
+-- parent_moments; see supabase/tests/parent_moments_test.sql.
 -- ===============================================================
-do $$
-declare m jsonb;
-begin
-  perform pg_temp.chk('all four now_* moments exist',
-    (select count(*) from public.conversation_moments where key like 'now\_%') = 4);
-
-  perform pg_temp.chk('every panic line is within the three-line budget',
-    not exists (select 1 from public.conversation_moments
-                where key like 'now\_%'
-                  and public.content_line_count(body_ar) > 3),
-    'a flooded parent does not read a fourth line');
-
-  perform pg_temp.chk('all of them are fixed, none composed',
-    not exists (select 1 from public.conversation_moments
-                where key like 'now\_%' and tier <> 'fixed'),
-    'composing costs seconds this parent does not have');
-
-  perform pg_temp.chk('every one keeps the escape hatch',
-    not exists (select 1 from public.conversation_moments
-                where key like 'now\_%'
-                  and not (buttons @> '[{"cb":"other"}]'::jsonb)));
-
-  perform pg_temp.chk('none of them is commerce-gated',
-    not exists (select 1 from public.conversation_moments
-                where key like 'now\_%' and requires_commerce),
-    'the worst minute of a parent day is never a place to sell');
-
-  -- The entry asks the ONE question that changes the answer.
-  m := public.get_conversation_moment('now_entry', null);
-  perform pg_temp.chk('the entry routes to both kinds and nothing else',
-    m->'buttons' @> '[{"cb":"now_flood"}]'::jsonb
-    and m->'buttons' @> '[{"cb":"now_demand"}]'::jsonb);
-
-  perform pg_temp.chk('the two scripts say opposite things, as they must',
-    (select body_ar from public.conversation_moments where key = 'now_flood') like '%كلمات أقل%'
-    and (select body_ar from public.conversation_moments where key = 'now_demand') like '%ثباتكم%',
-    'reduce input vs hold the line — the misread this layer exists to correct');
-
-  perform pg_temp.chk('after the storm, the bridge to being understood is offered',
-    (select buttons from public.conversation_moments where key = 'now_after')
-      @> '[{"cb":"incident_tell"}]'::jsonb,
-    'the calm right after is when a parent will actually describe it');
-end $$;
 
 -- ===============================================================
 -- The catalogs are copy, and copy is law-bound. These CHECKs
