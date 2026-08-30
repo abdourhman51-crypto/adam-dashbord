@@ -86,7 +86,7 @@ export default function HomePage() {
   if (!stepGiven) {
     return (
       <ScreenShell>
-        <AdamIntro text={`هذي شاشتكم كل يوم — خطوة واحدة صغيرة تناسب ${child} بالذات، تُبنى من حكاياتكم لي.`} />
+        <AdamIntro text={`هذي شاشتكم كل يوم — خطوة واحدة صغيرة تساعدكم تتصرّفوا بشكل مختلف مع ${child}، تُبنى من حكاياتكم لي.`} />
         <PanicButton />
         {showCheckIn && <EveningCheckIn onAnswered={refetchCurve} />}
         <GlassCard variant="gold" className="rise-in text-center">
@@ -108,7 +108,7 @@ export default function HomePage() {
 
   return (
     <ScreenShell>
-      <AdamIntro text={`هذي خطوة اليوم مع ${child} — بُنيت من آخر شي حكيتوه لي، جرّبوها بأسوأ لحظة لا أحسنها.`} />
+      <AdamIntro text={`هذي خطوتكم لليوم — بُنيت من آخر شي حكيتوه لي عن ${child}، جرّبوها بأسوأ لحظة لا أحسنها.`} />
       <PanicButton />
       {showCheckIn && <EveningCheckIn onAnswered={refetchCurve} />}
 

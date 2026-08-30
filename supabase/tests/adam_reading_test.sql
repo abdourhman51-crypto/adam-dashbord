@@ -65,7 +65,7 @@ begin
 
   perform pg_temp.chk('a free parent is locked', r->>'state' = 'locked', r->>'state');
   perform pg_temp.chk('and is told one TRUE thing from their own house',
-    r->>'body' like '%ما يتعبكم مع يوسف هو عند النوم%',
+    r->>'body' like '%عند النوم يستهلك صبركم مع يوسف%',
     'the situation they actually confirmed, not a sample');
   perform pg_temp.chk('the offer is named, and named as فريق آدم''s',
     r->>'body' like '%يتولّاها فريق آدم%');
@@ -95,7 +95,7 @@ begin
   perform pg_temp.chk('a paid parent with NOTHING logged is already opened',
     r->>'state' = 'opened', r->>'state');
   perform pg_temp.chk('and the reading is not empty — it says what ADAM already knows',
-    r->>'body' like '%طفلكم يوسف%' and r->>'body' like '%ما يتعبكم هو عند النوم%');
+    r->>'body' like '%طفلكم يوسف%' and r->>'body' like '%عند النوم يستهلك صبركم أكثر من غيره%');
   perform pg_temp.chk('the agreed goal is read back to them',
     r->>'body' like '%خمس ليالٍ هادئة من سبع%',
     'they paid for a goal, so the goal is the first thing they see');

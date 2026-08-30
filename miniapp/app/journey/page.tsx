@@ -40,7 +40,7 @@ function FreeTierPreview() {
         <GlassCard variant="gold" className="rise-in">
           <p className="text-xs font-medium text-text-muted">الهدف اللي اتفقنا عليه</p>
           <p className="font-display mt-2 text-[20px] leading-relaxed text-text">
-            ينام طفلكم بهدوء بلا صراخ 5 ليالٍ من كل 7
+            تهدأون خلال دقيقة بدل الانفجار 5 مرّات من كل 7
           </p>
           <div className="mt-5">
             <div className="h-3 w-full overflow-hidden rounded-full bg-glass-bg">
