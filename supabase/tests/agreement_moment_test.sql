@@ -217,7 +217,7 @@ begin
   p := pg_temp.family('كريم', true);
   perform public.agree_objective(p);
 
-  r := public.activate_subscription(p, 30, null, null, 'confirmed by hand');
+  r := public.activate_subscription(p, null, null, 'confirmed by hand');
 
   -- The payment is recorded, and the journey started FROM THE RECEIPT.
   perform pg_temp.chk('cashier: journey started from the agreed goal',
@@ -242,7 +242,7 @@ begin
   -- No agreement, no goal passed → money recorded, journey withheld loudly.
   -- (The pre-existing safety behaviour must survive this change.)
   p := pg_temp.family('بلا', true);   -- ready, but never agreed
-  r := public.activate_subscription(p, 30, null, null, null);
+  r := public.activate_subscription(p, null, null, null);
   perform pg_temp.chk('no receipt + no goal: payment recorded',
     exists (select 1 from public.payments where follower_id = p));
   perform pg_temp.chk('no receipt + no goal: journey withheld, objective_required',
@@ -256,7 +256,7 @@ begin
   -- An explicitly passed goal still wins over any receipt.
   p := pg_temp.family('صريح', true);
   perform public.agree_objective(p);   -- receipt says 'sleep'
-  r := public.activate_subscription(p, 30, null, null, null,
+  r := public.activate_subscription(p, null, null, null,
          'defiance', 'ثلاث ليالٍ من خمس بلا معركة', 3, 5, 20);
   select problem_key into v_problem from public.stages
   where parent_id = p order by created_at desc limit 1;

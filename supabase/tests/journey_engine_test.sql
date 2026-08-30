@@ -251,7 +251,7 @@ begin
   on conflict (code) do update set price_subscription = 2300, is_active = true;
 
   p := pg_temp.family('ريان');
-  a := public.activate_subscription(p, 30, null, null, null,
+  a := public.activate_subscription(p, null, null, null,
                                     'sleep', 'خمس ليالٍ هادئة من سبع مع ريان');
   perform pg_temp.chk('paying starts the agreed journey',
     (a->'journey'->>'started')::boolean, a::text);
@@ -262,7 +262,7 @@ begin
 
   -- The half-state this whole migration exists to remove: paid, no journey.
   p := pg_temp.family('تيم');
-  a := public.activate_subscription(p, 30);
+  a := public.activate_subscription(p);
   perform pg_temp.chk('paying with no agreed goal records the money',
     (a->>'payment_id') is not null, a::text);
   perform pg_temp.chk('but says so out loud instead of leaving a paid parent adrift',

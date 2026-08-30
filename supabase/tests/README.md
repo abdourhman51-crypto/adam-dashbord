@@ -66,6 +66,44 @@ lost an argument and a whole `pinned.lines` key while still creating cleanly —
 Postgres does not resolve function calls inside a `plpgsql` body at `CREATE`
 time, so a wrong call site is a runtime error, not a deploy error.
 
+### The four levels of drift, and how each one hides
+
+Run on 2026-08-30, this comparison found drift at four separate levels. Each
+level is invisible to the check above it, which is why all four are worth
+running:
+
+1. **Missing columns** (12). A repo-built database lacked
+   `followers.journey_form_state` and eleven others, so the functions that read
+   them could not even be created. Compare:
+   `select table_name, count(*), md5(string_agg(column_name, ',' order by column_name))
+    from information_schema.columns where table_schema='public' group by 1`
+   on both sides — 43 rows, easy to eyeball.
+2. **Missing functions** (34). Applied to production by hand, never written
+   down. Compare the `proname` sets.
+3. **Different bodies, same signature** (18 real, 46 counting comment and
+   keyword-case noise). `pg_get_functiondef` differs. To separate real drift
+   from formatting, hash the definition with comments stripped, all whitespace
+   removed and the text lower-cased:
+   `md5(lower(regexp_replace(regexp_replace(regexp_replace(
+      pg_get_functiondef(p.oid), '--[^' || chr(10) || ']*', '', 'g'),
+      'SET search_path TO [^' || chr(10) || ']*', '', 'g'), '\s', '', 'g')))`
+   Anything still different after that is behaviour, not style.
+4. **Different SIGNATURES** (7) — the worst, because every check above it is
+   blind to it. `create or replace` cannot replace a function whose argument
+   list changed; it creates a second one. So the repo kept building
+   `get_rhythm_due(integer)` while production ran
+   `get_rhythm_due(integer, text)`, and both databases looked "fine".
+   Compare `p.oid::regprocedure::text`, never `p.proname`.
+5. **Constraints.** `followers.chk_active_has_expiry` existed only in the repo
+   and made `activate_subscription` fail outright — payment, on a database
+   built from this repository, was broken. Compare
+   `select conrelid::regclass, conname from pg_constraint where contype='c'`.
+
+Do not compare an aggregate hash across the two databases. `string_agg(...
+order by sig)` sorts by collation, and Supabase's collation is not the one a
+local `initdb` picks by default, so the aggregates differ even when every
+single function matches. Join per function instead.
+
 ## ~~`fixture_minimal.sql`~~ — deleted 2026-08-07
 
 It described the schema by hand, because the repository could not build the real one. Every

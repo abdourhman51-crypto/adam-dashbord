@@ -36,7 +36,7 @@ begin
     from public.situation_catalog sc where sc.key = 'sleep' returning id into s;
 
   if p_paid then
-    a := public.activate_subscription(p, 30, null, null, 'test', 'sleep',
+    a := public.activate_subscription(p, null, null, 'test', 'sleep',
            'خمس ليالٍ هادئة من سبع عند النوم مع يوسف', 5, 7, 29);
   end if;
 

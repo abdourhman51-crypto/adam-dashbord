@@ -31,7 +31,7 @@ begin
     from public.situation_catalog sc where sc.key='sleep' returning id into s;
   insert into public.checkin_state (parent_id, cadence, local_hour) values (p,'nightly',20);
 
-  a := public.activate_subscription(p, 30, null, null, 'test', 'sleep',
+  a := public.activate_subscription(p, null, null, 'test', 'sleep',
          'خمس ليالٍ هادئة من سبع عند النوم مع يوسف', 5, 7, 29);
 
   -- Eight nights of the journey, one of them hard.
