@@ -163,7 +163,7 @@ export default function WizardPage() {
 
   return (
     <ScreenShell>
-      <AdamIntro text="نبني خطتكم أنتم — نصف دقيقة، بلا أي التزام." />
+      <AdamIntro text="نبني اتفاقكم أنتم — نصف دقيقة، بلا أي التزام." />
 
       {step === "problem" && (
         <>
@@ -358,7 +358,7 @@ function ConfirmStep({
           نُفعّل الاتفاق مع فريق آدم
         </button>
       ) : (
-        <p className="text-center text-sm text-text-muted">تواصلوا مع آدم على تيليغرام لتفعيل الخطة.</p>
+        <p className="text-center text-sm text-text-muted">تواصلوا مع آدم على تيليغرام لتفعيل الاتفاق.</p>
       )}
     </>
   );

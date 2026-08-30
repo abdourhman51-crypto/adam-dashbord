@@ -65,7 +65,7 @@ function FreeTierPreview() {
         className="pressable-gold flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold"
       >
         <Target size={17} strokeWidth={2.2} />
-        نبني خطتكم الآن — نصف دقيقة، بلا التزام
+        نبني اتفاقكم الآن — نصف دقيقة، بلا التزام
       </Link>
     </ScreenShell>
   );
