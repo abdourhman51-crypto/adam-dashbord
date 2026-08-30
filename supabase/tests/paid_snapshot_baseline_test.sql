@@ -231,8 +231,13 @@ begin
   perform pg_temp.lived_day(f.parent, f.child, f.situation, 'succeeded',    1);
 
   ctx := public.get_agent_context(f.parent);
+  -- The objective label was renamed in 20260830210000 from the ownerless
+  -- "- objective:" to "- هدف الوالد عن نفسه:". The assertion is about ORDER and
+  -- containment (baseline sits inside JOURNEY, after objective/phase/progress),
+  -- not about the label's wording — so it tracks the new label and keeps
+  -- asserting exactly what it was written to assert.
   perform pg_temp.chk('the baseline line lives inside == JOURNEY ==, after objective/phase/progress',
-    ctx ~ '== JOURNEY ==.*- objective:.*- phase:.*- progress:.*- baseline: في الأسبوع الأول',
+    ctx ~ '== JOURNEY ==.*- هدف الوالد عن نفسه:.*- phase:.*- progress:.*- baseline: في الأسبوع الأول',
     ctx);
   perform pg_temp.chk('no new bracket-section was introduced for the baseline — it is one line inside JOURNEY, not its own header',
     ctx !~ '== *(BASELINE|نقطة البداية|SNAPSHOT) *==' and ctx ~ '- baseline: ', ctx);

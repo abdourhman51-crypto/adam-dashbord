@@ -210,7 +210,16 @@ do $$
 declare p uuid; sid uuid; c jsonb; s jsonb;
 begin
   p := pg_temp.family('ليان');
-  perform public.start_stage(p, 'sleep', 'خمس ليالٍ هادئة من سبع مع ليان');
+  -- ⭐ The metric is passed explicitly now. start_stage's default became
+  -- steps_done_in_window in 20260830210000, because a goal the parent agreed
+  -- about their own response must not be scored by the child's calm nights.
+  -- This block is not about that choice — it tests the window arithmetic and
+  -- the completed-vs-expired distinction the guarantee rests on. Pinning the
+  -- legacy metric keeps that coverage exactly as written, and keeps
+  -- calm_nights_in_window itself under test while stages agreed under the old
+  -- wording are still running.
+  perform public.start_stage(p, 'sleep', 'خمس ليالٍ هادئة من سبع مع ليان',
+                             5, 7, 29, 'calm_nights_in_window');
   sid := pg_temp.live_stage(p);
 
   -- Three calm nights is not five of seven, however good they feel.
