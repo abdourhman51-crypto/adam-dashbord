@@ -73,6 +73,10 @@ export function TopBar() {
   const router = useRouter();
   const [calmCount, setCalmCount] = useState<number | null>(null);
   const [treeOpen, setTreeOpen] = useState(false);
+  // ⭐ والدٌ مشترك وله هدف نشط بالفعل: «بصيص أمل» يقوده لتقدّمه الفعلي،
+  // لا لاستمارة فارغة يظنّ أنها ستُبنى من جديد. المستخدم الحر أو المشترك
+  // بلا هدف نشط يبقى يذهب للاستمارة كما هو متوقّع.
+  const [hopeTarget, setHopeTarget] = useState("/journey/start");
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeKey, setActiveKey] = useState<string | null>(null);
@@ -90,6 +94,14 @@ export function TopBar() {
       .then((data: { calmCount: number } | null) => {
         if (cancelled || !data) return;
         setCalmCount(data.calmCount);
+      })
+      .catch(() => {});
+
+    fetch("/api/journey", { headers: { "x-telegram-init-data": initData } })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { isPaid?: boolean; inStage?: boolean } | null) => {
+        if (cancelled || !data) return;
+        if (data.isPaid && data.inStage) setHopeTarget("/journey");
       })
       .catch(() => {});
 
@@ -114,7 +126,9 @@ export function TopBar() {
     haptic("light");
     if (b.cb && ROUTE_TARGETS[b.cb]) {
       closeAll();
-      router.push(ROUTE_TARGETS[b.cb]);
+      // نفس منطق «بصيص أمل»: زر يقود لواجهة الاستمارة يجب أن يقود لتقدّم
+      // الوالد الفعلي إن كان له هدف نشط بالفعل، لا استمارة فارغة من جديد.
+      router.push(b.cb === "menu_journey" ? hopeTarget : ROUTE_TARGETS[b.cb]);
       return;
     }
     if (b.url) {
@@ -174,7 +188,7 @@ export function TopBar() {
 
         <div className="flex shrink-0 items-center gap-2">
           <Link
-            href="/journey/start"
+            href={hopeTarget}
             onClick={() => haptic("light")}
             className="pressable flex items-center gap-1.5 whitespace-nowrap !rounded-full px-3.5 py-2.5 text-[13px] font-semibold"
           >

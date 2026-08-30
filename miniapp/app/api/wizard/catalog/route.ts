@@ -24,10 +24,11 @@ export async function GET(request: Request) {
 
   const db = supabaseAdmin();
 
-  const [problemsRes, countryRes, journeyMomentRes] = await Promise.all([
+  const [problemsRes, countryRes, journeyMomentRes, stageRes] = await Promise.all([
     db.from("journey_problem_catalog").select("key, emoji, label_ar").order("sort_order"),
     db.rpc("country_state", { p_parent_id: parent.parentId }),
     db.rpc("get_conversation_moment", { p_key: "menu_journey", p_parent_id: parent.parentId }),
+    db.rpc("stage_state", { p_parent_id: parent.parentId }),
   ]);
 
   if (problemsRes.error) {
@@ -38,6 +39,11 @@ export async function GET(request: Request) {
   const countryState = countryRes.data as { state?: string; price?: string; name_ar?: string } | null;
   const journeyMoment = journeyMomentRes.data as { buttons?: MenuButton[] } | null;
   const teamUrl = journeyMoment?.buttons?.find((b) => b.url)?.url ?? null;
+  const stage = stageRes.data as { in_stage?: boolean; objective_text?: string } | null;
+
+  // ⭐ من غير المنطقي أن يفتح والدٌ مشترك، اختار هدفه بالفعل، استمارة
+  // فارغة من جديد. الاستمارة تُعرض له فقط إذا لم يكن في رحلة نشطة الآن.
+  const alreadyInStage = parent.isPaid && Boolean(stage?.in_stage);
 
   return NextResponse.json({
     childName: parent.childName,
@@ -46,5 +52,7 @@ export async function GET(request: Request) {
     price: countryState?.price ?? null,
     countryName: countryState?.name_ar ?? null,
     teamUrl,
+    alreadyInStage,
+    currentObjectiveText: alreadyInStage ? (stage?.objective_text ?? null) : null,
   });
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Calendar, CalendarDays, Waves, ClipboardList, Gift, Shield, Gem, Phone, type LucideIcon } from "lucide-react";
+import { Calendar, CalendarDays, Waves, ClipboardList, Gift, Shield, Gem, Phone, Target, type LucideIcon } from "lucide-react";
+import Link from "next/link";
 import { ScreenShell } from "@/components/ScreenShell";
 import { AdamIntro } from "@/components/AdamIntro";
 import { GlassCard } from "@/components/GlassCard";
@@ -18,6 +19,8 @@ interface CatalogResponse {
   price: string | null;
   countryName: string | null;
   teamUrl: string | null;
+  alreadyInStage: boolean;
+  currentObjectiveText: string | null;
 }
 
 interface OutcomesResponse {
@@ -45,6 +48,46 @@ function StepHeader({ step, title }: { step: number; title: string }) {
       <p className="text-xs font-medium text-text-muted">خطوة {step} من 4</p>
       <p className="font-display mt-1 text-[19px] leading-relaxed text-text">{title}</p>
     </div>
+  );
+}
+
+/**
+ * والدٌ مشترك، له هدف نشط بالفعل — فتح الاستمارة الفارغة هنا كان منطقياً
+ * فقط للوالد الذي لم يختر هدفاً بعد. من غير المنطقي أن يعيد استمارة كاملة
+ * ليعدّل هدفاً موجوداً بالفعل، فيصل لصفحة تشرح له وضعه الحالي وتقوده
+ * لمكانين حقيقيين: تقدّمه الفعلي، أو فريق آدم إن أراد تغييراً حقيقياً.
+ */
+function AlreadyInStage({ objectiveText, teamUrl }: { objectiveText: string | null; teamUrl: string | null }) {
+  return (
+    <ScreenShell>
+      <AdamIntro text="عندكم هدف نشط بالفعل — الاستمارة هذي لمن لم يبدأ بعد." />
+      <GlassCard variant="gold" className="rise-in">
+        <p className="text-xs font-medium text-text-muted">هدفكم الحالي</p>
+        <p className="font-display mt-2 text-[19px] leading-relaxed text-text">
+          {objectiveText ?? "قيد المتابعة"}
+        </p>
+      </GlassCard>
+      <Link
+        href="/journey"
+        className="pressable-gold flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold"
+      >
+        <Target size={17} strokeWidth={2.2} />
+        أشوف تقدّمي
+      </Link>
+      {teamUrl && (
+        <button
+          type="button"
+          onClick={() => {
+            haptic("light");
+            openLink(teamUrl);
+          }}
+          className="pressable flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-medium text-text-muted"
+        >
+          <Phone size={16} strokeWidth={2.2} />
+          أريد تغيير الهدف — أتحدّث مع فريق آدم
+        </button>
+      )}
+    </ScreenShell>
   );
 }
 
@@ -81,6 +124,9 @@ export default function WizardPage() {
   if (catalog === "outside") return <OutsideTelegramState />;
   if (catalog === "error") {
     return <ErrorState message={catalogError ?? "تعذّر تحميل الاستمارة الآن."} onRetry={loadCatalog} />;
+  }
+  if (catalog.alreadyInStage) {
+    return <AlreadyInStage objectiveText={catalog.currentObjectiveText} teamUrl={catalog.teamUrl} />;
   }
 
   const who = catalog.childName ?? "طفلكم";
@@ -203,7 +249,7 @@ function OutcomeStep({
 
   return (
     <>
-      <StepHeader step={3} title="ولو تغيّر أمر واحد فقط خلال 29 يوماً، ماذا تحبّون أن يحدث؟" />
+      <StepHeader step={3} title="ولو تغيّر شيء واحد في كيف تتعاملون معه خلال 29 يوماً، ماذا تحبّون أن يتغيّر؟" />
       {loading ? (
         <div className="mx-auto mt-6">
           <TreeLoader />
@@ -234,7 +280,7 @@ function OutcomeStep({
 
           {outcomes.promises.length > 0 && (
             <GlassCard className="rise-in mt-2">
-              <p className="font-display mb-2 text-[14px] text-gold-strong">وما الذي يتغيّر فعلاً مع {who}</p>
+              <p className="font-display mb-2 text-[14px] text-gold-strong">وما الذي ينتظركم فعلاً</p>
               <div className="flex flex-col gap-1.5">
                 {outcomes.promises.map((p) => (
                   <p key={p} className="text-xs leading-relaxed text-text-secondary">
@@ -270,7 +316,7 @@ function ConfirmStep({
       <GlassCard variant="gold" className="rise-in">
         <p className="font-display flex items-center gap-2 text-[16px] text-gold-strong">
           <ClipboardList size={18} strokeWidth={2.2} />
-          خطتكم جاهزة:
+          اتّفاقكم جاهز:
         </p>
         <div className="mt-4 flex flex-col gap-3 text-sm leading-relaxed text-text">
           <p className="flex items-start gap-2">
@@ -309,7 +355,7 @@ function ConfirmStep({
           className="pressable-gold flex w-full items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold"
         >
           <Phone size={16} strokeWidth={2.2} />
-          نُفعّل الخطة مع فريق آدم
+          نُفعّل الاتفاق مع فريق آدم
         </button>
       ) : (
         <p className="text-center text-sm text-text-muted">تواصلوا مع آدم على تيليغرام لتفعيل الخطة.</p>

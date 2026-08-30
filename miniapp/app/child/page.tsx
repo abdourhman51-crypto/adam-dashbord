@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { useScreenData } from "@/lib/telegram/useScreenData";
 import { ScreenShell } from "@/components/ScreenShell";
 import { AdamIntro } from "@/components/AdamIntro";
@@ -61,7 +63,9 @@ export default function ChildPage() {
 
   return (
     <ScreenShell>
-      <AdamIntro text={`هذا ما فهمته عن ${child} حتى الآن — وتقدرون تصحّحوني إن حسّيتوا إني أخطأت.`} />
+      <AdamIntro
+        text={`هذا ما فهمته عن ${child} — يساعدني أوجّهكم صوب اللي اتفقنا عليه. صحّحوني إن حسّيتوا إني أخطأت.`}
+      />
 
       <Section>
         <div className="mt-2 flex flex-col items-center gap-4 text-center">
@@ -185,6 +189,16 @@ export default function ChildPage() {
           </GlassCard>
         </Section>
       )}
+
+      <Section>
+        <Link
+          href="/"
+          className="pressable flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-medium text-text-muted"
+        >
+          كل هذا يوجّه خطوتكم الجاية معه
+          <ChevronLeft size={16} strokeWidth={2.2} />
+        </Link>
+      </Section>
     </ScreenShell>
   );
 }

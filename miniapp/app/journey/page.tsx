@@ -205,7 +205,7 @@ export default function JourneyPage() {
         className="pressable flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-medium text-text-muted"
       >
         <Target size={16} strokeWidth={2.2} />
-        نبي نعدّل الهدف أو نبدأ استمارة جديدة
+        أريد تغيير هذا الهدف
       </Link>
     </ScreenShell>
   );
