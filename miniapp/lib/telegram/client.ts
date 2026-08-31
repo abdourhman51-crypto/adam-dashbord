@@ -10,10 +10,21 @@ export function getInitDataRaw(): string | null {
   return wa?.initData && wa.initData.length > 0 ? wa.initData : null;
 }
 
+/**
+ * روابط تيليجرام (t.me) تُفتح عبر openTelegramLink، وأي رابط خارجي آخر عبر
+ * openLink من نفس الجسر — هذا هو الاستدعاء الذي توثّقه تيليجرام رسمياً
+ * لفتح رابط خارجي من داخل التطبيق المصغّر. window.open كان يُستخدم لكل رابط
+ * خارجي، وهو استدعاء متصفّح عادي تحجبه بعض عملاء تيليجرام بصمت من داخل بيئة
+ * التطبيق المصغّر — يبقى fallback فقط حين لا يتوفّر أي من الاثنين (خارج تيليجرام).
+ */
 export function openLink(url: string) {
   const wa = getWebApp();
   if (wa?.openTelegramLink && url.startsWith("https://t.me/")) {
     wa.openTelegramLink(url);
+    return;
+  }
+  if (wa?.openLink) {
+    wa.openLink(url);
     return;
   }
   window.open(url, "_blank", "noopener,noreferrer");

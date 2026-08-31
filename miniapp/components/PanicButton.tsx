@@ -19,19 +19,19 @@ type Stage = "idle" | "asking" | "script" | "closing" | "done";
  */
 const SCRIPTS: Record<Route, { tag: string; lines: string[] }> = {
   away: {
-    tag: "ابتعدي لحظة",
+    tag: "ابتعاد لحظة",
     lines: [
-      "ابتعدي خطوتين وأديري ظهركِ — الآن، قبل أي كلمة.",
+      "الابتعاد خطوتين وإدارة الظهر — الآن، قبل أي كلمة.",
       "زفير طويل من الفم، أطول من الشهيق. ثلاث مرات.",
-      "هو بأمان في هذه الثواني، وأنتِ تحتاجينها.",
+      "هو بأمان في هذه الثواني — وهذه الثواني هي ما ينقص الآن، لا هو.",
     ],
   },
   stay: {
-    tag: "لا تقدرين أن تبتعدي",
+    tag: "لا يمكن الابتعاد",
     lines: [
-      "اخفضي صوتكِ عمداً بدل أن ترفعيه — الجسد يتبع الصوت.",
-      "قولي بهدوء: «أنا غاضبة الآن، وسنتكلّم بعد قليل.» ثم اصمتي.",
-      "تأجيل العقاب ليس ضعفاً — الضعف هو أن يقع وأنتِ في ذروتكِ.",
+      "خفض الصوت عمداً بدل رفعه — الجسد يتبع الصوت.",
+      "جملة واحدة بهدوء بدل الانفعال، مثل: «الوضع صعب الآن، ونتكلّم بعد قليل.» ثم صمت.",
+      "تأجيل العقاب ليس ضعفاً — الضعف أن يقع في ذروة الانفعال.",
     ],
   },
 };
@@ -74,7 +74,7 @@ export function PanicButton() {
     return (
       <div className="glass-strong rise-in relative z-10 flex flex-col gap-4 p-5">
         <p className="font-display text-[16px] leading-relaxed text-text">
-          أنا معكِ. تقدرين تبتعدين لحظة عنه الآن؟
+          أنا معكم. ممكن الابتعاد لحظة عنه الآن؟
         </p>
         <div className="flex flex-col gap-2.5">
           <button
@@ -82,14 +82,14 @@ export function PanicButton() {
             onClick={() => choose("away")}
             className="pressable px-5 py-3.5 text-start text-sm font-medium leading-relaxed"
           >
-            نعم، أقدر أبتعد دقيقة
+            نعم، ممكن الابتعاد دقيقة
           </button>
           <button
             type="button"
             onClick={() => choose("stay")}
             className="pressable px-5 py-3.5 text-start text-sm font-medium leading-relaxed"
           >
-            لا، لازم أبقى معه
+            لا، لازم البقاء معه
           </button>
           <button type="button" onClick={reset} className="px-4 py-3 text-center text-xs font-medium text-text-muted">
             رجوع
@@ -158,8 +158,8 @@ export function PanicButton() {
       <div className="glass-gold rise-in relative z-10 flex flex-col gap-3 p-5 text-center">
         <p className="font-display text-[17px] leading-loose text-text">
           {held
-            ? "هذي مرة أوشكتِ فيها ولم تنفجري. سُجّلت — وهي التي نعدّها."
-            : "حدث. ولا يُلغي هذا محاولتكِ — أنّكِ فتحتِ هذي الشاشة أصلاً يعني شيئاً."}
+            ? "هذي مرة اقتُرب فيها من الحافة ولم يقع الانفجار. سُجّلت — وهي التي نعدّها."
+            : "حدث. ولا يُلغي هذا المحاولة — فتح هذي الشاشة أصلاً يعني شيئاً."}
         </p>
         <button type="button" onClick={reset} className="pressable px-5 py-2.5 text-sm font-medium">
           تمام
@@ -181,7 +181,7 @@ export function PanicButton() {
         </span>
         <span className="flex-1">
           <span className="block text-[14px] font-semibold text-text">على وشك الانفجار؟</span>
-          <span className="block text-[12px] text-text-muted">اضغطي، أنا معكِ في ثانية</span>
+          <span className="block text-[12px] text-text-muted">اضغطوا، أنا معكم في ثانية</span>
         </span>
         <ChevronLeft size={16} className="shrink-0 text-text-muted" />
       </button>

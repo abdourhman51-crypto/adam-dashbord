@@ -206,7 +206,7 @@ export default function MyWayPage() {
       {establishedCount > 0 && (
         <Section>
           <p className="mt-2 text-center text-sm text-text-muted">
-            وصارت عندكِ {formatNumber(establishedCount)}{" "}
+            وصارت عندكم {formatNumber(establishedCount)}{" "}
             {establishedCount === 1 ? "حركة ثابتة" : "حركات ثابتة"} مع {child}
           </p>
         </Section>

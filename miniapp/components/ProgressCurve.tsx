@@ -15,7 +15,7 @@ export interface CurveData {
 
 /**
  * المنحنى — الرقم الوحيد الذي يستحق أن يكون كبيراً في التطبيق: كم مرة
- * أوشكتِ ولم تنفجري. وهو الوعد المُباع نفسه، مقيساً.
+ * وقع الاقتراب من الحافة بلا انفجار. وهو الوعد المُباع نفسه، مقيساً.
  *
  * قاعدتان تحكمان هذا المكوّن:
  * ١ — لا يُعرض أي حكم على «انفجرتُ». الرقم بيانات، لا وصمة.
@@ -29,7 +29,7 @@ function Bar({ label, held, erupt, dim = false }: { label: string; held: number;
       <div className="mb-1.5 flex items-baseline justify-between">
         <span className="text-xs text-text-muted">{label}</span>
         <span className="text-xs text-text-secondary">
-          تماسكتِ {formatNumber(held)} · انفجرتِ {formatNumber(erupt)}
+          تماسك {formatNumber(held)} · انفجار {formatNumber(erupt)}
         </span>
       </div>
       <div className="flex h-3 w-full overflow-hidden rounded-full bg-glass-bg">
@@ -51,7 +51,7 @@ export function ProgressCurve({ curve }: { curve: CurveData }) {
       <div className="text-center">
         <p className="font-display text-[44px] leading-none text-gold-strong">{formatNumber(heldTotal)}</p>
         <p className="mt-1.5 text-sm text-text-muted">
-          {heldTotal > 0 ? "مرة أوشكتِ فيها ولم تنفجري" : "لسّا ما عندنا لحظة مسجّلة"}
+          {heldTotal > 0 ? "مرة اقتُرب فيها من الحافة ولم يقع الانفجار" : "لسّا ما عندنا لحظة مسجّلة"}
         </p>
       </div>
 
@@ -64,7 +64,7 @@ export function ProgressCurve({ curve }: { curve: CurveData }) {
 
       {ready && eruptDelta < 0 && (
         <p className="mt-4 border-t border-glass-border pt-3 text-center text-sm leading-relaxed text-text">
-          انفجاراتكِ نقصت{" "}
+          الانفجارات نقصت{" "}
           <span className="font-semibold text-gold-strong">
             {formatNumber(Math.abs(eruptDelta))} {Math.abs(eruptDelta) === 1 ? "مرة" : "مرات"}
           </span>{" "}
@@ -86,7 +86,7 @@ export function ProgressCurve({ curve }: { curve: CurveData }) {
 
       {!ready && (heldWeek > 0 || eruptWeek > 0) && (
         <p className="mt-4 border-t border-glass-border pt-3 text-center text-xs leading-relaxed text-text-muted">
-          بعد أسبوع كامل، تشوفين المقارنة هنا.
+          بعد أسبوع كامل، تظهر المقارنة هنا.
         </p>
       )}
     </GlassCard>

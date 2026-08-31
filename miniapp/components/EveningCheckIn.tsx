@@ -23,7 +23,7 @@ const OPTIONS = [
 
 const THANKS: Record<string, string> = {
   none: "يوم هادئ يستحق أن يُذكر. سُجّل.",
-  held: "هذي هي اللحظة التي نعدّها — أوشكتِ ولم تنفجري.",
+  held: "هذي هي اللحظة التي نعدّها — اقتراب من الحافة بلا انفجار.",
   erupted: "سُجّلت، بلا حكم. غداً يوم جديد، وأنا هنا.",
 };
 
@@ -68,8 +68,8 @@ export function EveningCheckIn({ onAnswered }: { onAnswered?: () => void }) {
 
   return (
     <GlassCard variant="strong" className="rise-in text-center">
-      <p className="font-display text-[17px] leading-relaxed text-text">كيف كان اليوم معكِ؟</p>
-      <p className="mt-1 text-xs text-text-muted">عنكِ أنتِ، لا عنه.</p>
+      <p className="font-display text-[17px] leading-relaxed text-text">كيف كان اليوم؟</p>
+      <p className="mt-1 text-xs text-text-muted">السؤال عن حالكم أنتم، لا عنه.</p>
       <div className="mt-4 flex flex-col gap-2.5">
         {OPTIONS.map((o) => (
           <button
@@ -83,7 +83,7 @@ export function EveningCheckIn({ onAnswered }: { onAnswered?: () => void }) {
           </button>
         ))}
       </div>
-      {error && <p className="mt-3 text-xs text-text-muted">ما قدرنا نسجّل، جرّبي مرة ثانية.</p>}
+      {error && <p className="mt-3 text-xs text-text-muted">ما قدرنا نسجّل، جرّبوا مرة ثانية.</p>}
     </GlassCard>
   );
 }
