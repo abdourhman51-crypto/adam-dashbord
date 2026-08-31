@@ -6,10 +6,12 @@ export const dynamic = "force-dynamic";
 
 /**
  * فعل نهائي بلا رجوع — لهذا نطلب حقل confirm صريحاً (لا نكتفي بوصول الطلب
- * نفسه)، ونطابق تماماً نطاق آخر ١٣ طلب محو حقيقي أُنجزت يدوياً قبل هذا:
- * محادثة اللانج تشين الخام، الاستبيانات، وملاحظة الدفع الشخصية — لا أكثر.
- * التفاصيل والتنفيذ في request_data_erasure نفسها، لتبقى نفس الدالة تُستدعى
- * من أي مكان يُتاح منه المحو مستقبلاً.
+ * نفسه). النطاق الأول (طابق الـ١٣ طلباً اليدوياً السابقة) اتّضح ناقصاً
+ * تجريبياً: محو المحادثة الخام لا يمحو المعرفة المُشتقّة منها (light_memory،
+ * المواقف، الأنماط) التي يقرأها الوكيل فعلياً في كل رد — فبدا آدم "يتذكّر"
+ * رغم محو المحادثة. request_data_erasure توسّعت لتمحو المعرفة المُشتقّة
+ * أيضاً؛ التفاصيل والتنفيذ فيها، لتبقى نفس الدالة تُستدعى من أي مكان
+ * يُتاح منه المحو مستقبلاً.
  */
 export async function POST(request: Request) {
   const parent = await resolveParent(request);
@@ -35,6 +37,7 @@ export async function POST(request: Request) {
     reason?: string;
     chat_deleted?: number;
     surveys_deleted?: number;
+    knowledge_deleted?: number;
     payments_anonymised?: number;
   };
 
@@ -46,6 +49,7 @@ export async function POST(request: Request) {
     erased: true,
     chatDeleted: result.chat_deleted ?? 0,
     surveysDeleted: result.surveys_deleted ?? 0,
+    knowledgeDeleted: result.knowledge_deleted ?? 0,
     paymentsAnonymised: result.payments_anonymised ?? 0,
   });
 }

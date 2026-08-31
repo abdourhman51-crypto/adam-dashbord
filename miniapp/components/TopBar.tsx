@@ -114,7 +114,9 @@ export function TopBar() {
 
   // محو البيانات — تأكيد صريح داخل التطبيق قبل الفعل النهائي، ثم نتيجة حقيقية
   const [eraseStep, setEraseStep] = useState<"idle" | "confirm" | "working" | "done">("idle");
-  const [eraseResult, setEraseResult] = useState<{ chatDeleted: number; surveysDeleted: number } | null>(null);
+  const [eraseResult, setEraseResult] = useState<{ chatDeleted: number; surveysDeleted: number; knowledgeDeleted: number } | null>(
+    null
+  );
   const [eraseError, setEraseError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -195,12 +197,18 @@ export function TopBar() {
     haptic("medium");
     setEraseStep("working");
     setEraseError(null);
-    const r = await postAction<{ erased: boolean; chatDeleted: number; surveysDeleted: number }>(
-      "/api/privacy/erase",
-      { confirm: true }
-    );
+    const r = await postAction<{
+      erased: boolean;
+      chatDeleted: number;
+      surveysDeleted: number;
+      knowledgeDeleted: number;
+    }>("/api/privacy/erase", { confirm: true });
     if (r.state === "ok" && r.data.erased) {
-      setEraseResult({ chatDeleted: r.data.chatDeleted, surveysDeleted: r.data.surveysDeleted });
+      setEraseResult({
+        chatDeleted: r.data.chatDeleted,
+        surveysDeleted: r.data.surveysDeleted,
+        knowledgeDeleted: r.data.knowledgeDeleted,
+      });
       setEraseStep("done");
     } else {
       setEraseError(r.state === "error" ? r.message : "تعذّر المحو الآن، حاولوا مرة أخرى.");
@@ -444,7 +452,9 @@ export function TopBar() {
                     {eraseStep === "confirm" && (
                       <>
                         <p className="text-sm leading-relaxed text-text">
-                          هذا محو نهائي ولا رجوع فيه: محادثتكم مع آدم، وأي استبيان أجبتم عليه. هل تؤكدون؟
+                          هذا محو نهائي ولا رجوع فيه: محادثتكم مع آدم، وكل ما استنتجه منها عن بيتكم، وأي
+                          استبيان أجبتم عليه. يبقى فقط تقدّمكم المسجَّل (الشجرة والسلسلة) واسم طفلكم، حتى
+                          لا تفقدوا ما بنيتموه. هل تؤكدون؟
                         </p>
                         {eraseError && <p className="mt-2 text-xs text-red-400">{eraseError}</p>}
                         <div className="mt-4 flex flex-col gap-2.5">
@@ -474,13 +484,16 @@ export function TopBar() {
                       </div>
                     )}
                     {eraseStep === "done" && eraseResult && (
-                      <p className="flex items-center justify-center gap-2 text-sm leading-relaxed text-emerald-strong">
-                        <Check size={16} strokeWidth={2.5} />
-                        تم. مُحيت {formatNumber(eraseResult.chatDeleted)} رسالة من محادثتنا
-                        {eraseResult.surveysDeleted > 0
-                          ? ` و${formatNumber(eraseResult.surveysDeleted)} إجابة استبيان`
-                          : ""}
-                        — ولا رجوع في هذا.
+                      <p className="flex items-start justify-center gap-2 text-sm leading-relaxed text-emerald-strong">
+                        <Check size={16} strokeWidth={2.5} className="mt-0.5 shrink-0" />
+                        <span>
+                          تم. مُحيت {formatNumber(eraseResult.chatDeleted)} رسالة من محادثتنا، و
+                          {formatNumber(eraseResult.knowledgeDeleted)} من الأشياء التي استنتجتها عنكم
+                          {eraseResult.surveysDeleted > 0
+                            ? ` و${formatNumber(eraseResult.surveysDeleted)} إجابة استبيان`
+                            : ""}
+                          — ولا رجوع في هذا.
+                        </span>
                       </p>
                     )}
                   </GlassCard>
