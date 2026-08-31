@@ -15,13 +15,17 @@ import {
   Users,
   Settings,
   ShieldCheck,
+  Minus,
+  Plus,
+  Check,
+  Trash2,
   type LucideIcon,
 } from "lucide-react";
 import { GlassCard } from "@/components/GlassCard";
 import { TreeLoader } from "@/components/TreeLoader";
 import { TreeLightbox } from "@/components/TreeLightbox";
 import { IconText } from "@/lib/emojiIcons";
-import { fetchScreen } from "@/lib/telegram/fetcher";
+import { fetchScreen, postAction } from "@/lib/telegram/fetcher";
 import { getInitDataRaw, openLink, haptic } from "@/lib/telegram/client";
 import { returnToAdamChat } from "@/lib/upsell";
 import { formatNumber } from "@/lib/format";
@@ -65,26 +69,23 @@ const ROUTE_TARGETS: Record<string, string> = {
 };
 
 /**
- * أزرار من get_conversation_moment تحتاج فعلاً كتابة بيانات (محو، تغيير
- * ساعة، إيقاف/تشغيل) — التطبيق المصغّر قراءة فقط ولا يقدر يُكملها. كانت
- * تُحوَّل صامتة إلى المحادثة بلا أي تفسير، فيرى الوالد نفسه هناك بلا سياق
- * ولا دليل أن شيئاً تحرّك أصلاً. كل واحد هنا يُشرح بجملة واحدة قبل التحويل:
- * ماذا سيحدث، وكيف، وما النتيجة — لا تحويل صامت لأي منها بعد الآن.
+ * هذان المفتاحان يُعرضان بضوابط حقيقية بدل نص+أزرار DB الخام — التطبيق
+ * المصغّر يكتب مباشرة الآن (عبر /api/settings و/api/privacy)، فلا حاجة لأي
+ * تحويل للمحادثة. نخفي الزرّين الخام القادمين من get_conversation_moment
+ * لهذين الفعلين تحديداً (menu_settings_hours/menu_settings_paused على
+ * menu_settings، وmenu_privacy_erase_ask على menu_privacy) ونستبدلهما
+ * بضوابط تعمل فوراً وتُظهر نتيجة حقيقية.
  */
-const ACTION_EXPLANATIONS: Record<string, { title: string; body: string }> = {
-  menu_privacy_erase_ask: {
-    title: "محو كل ما قلته",
-    body: "المحو نهائي ولا رجوع فيه، لذلك يحتاج تأكيدكم المباشر: في المحادثة، اكتبوا كلمة تأكيد واحدة ويُمحى كل شيء فوراً.",
-  },
-  menu_settings_hours: {
-    title: "تغيير وقت الرسالة",
-    body: "في المحادثة، اكتبوا الساعة التي تناسبكم — ومن الغد يصلكم سؤال المساء في ذلك الوقت بالضبط.",
-  },
-  menu_settings_paused: {
-    title: "إيقاف الرسالة اليومية",
-    body: "في المحادثة، قولوا لآدم إنكم تريدون الإيقاف — تتوقف من فورها، وتُشغَّل من جديد وقتما شئتم بنفس الطريقة.",
-  },
-};
+const HIDDEN_CBS = new Set(["menu_settings_hours", "menu_settings_paused", "menu_privacy_erase_ask"]);
+
+const MIN_HOUR = 5;
+const MAX_HOUR = 22;
+
+function formatHourLabel(hour: number): string {
+  const period = hour < 12 ? "صباحاً" : hour === 12 ? "ظهراً" : "مساءً";
+  const h12 = hour % 12 === 0 ? 12 : hour % 12;
+  return `${formatNumber(h12)} ${period}`;
+}
 
 /**
  * الشريط العلوي الدائم للمنصة: شعار آدم + اسمه (يفتحان الشجرة الحيّة)، وزر
@@ -105,7 +106,16 @@ export function TopBar() {
   const [moment, setMoment] = useState<MenuMoment | null>(null);
   const [loading, setLoading] = useState(false);
   const [momentError, setMomentError] = useState<string | null>(null);
-  const [pendingAction, setPendingAction] = useState<{ title: string; body: string } | null>(null);
+
+  // إعدادات الرسائل — تُقرأ عند فتح menu_settings، وتُكتب مباشرة عند التغيير
+  const [checkinPaused, setCheckinPaused] = useState<boolean | null>(null);
+  const [checkinHour, setCheckinHour] = useState<number | null>(null);
+  const [savingSettings, setSavingSettings] = useState(false);
+
+  // محو البيانات — تأكيد صريح داخل التطبيق قبل الفعل النهائي، ثم نتيجة حقيقية
+  const [eraseStep, setEraseStep] = useState<"idle" | "confirm" | "working" | "done">("idle");
+  const [eraseResult, setEraseResult] = useState<{ chatDeleted: number; surveysDeleted: number } | null>(null);
+  const [eraseError, setEraseError] = useState<string | null>(null);
 
   useEffect(() => {
     const initData = getInitDataRaw();
@@ -139,10 +149,63 @@ export function TopBar() {
     setLoading(true);
     setMoment(null);
     setMomentError(null);
+    setCheckinPaused(null);
+    setCheckinHour(null);
+    setEraseStep("idle");
+    setEraseResult(null);
+    setEraseError(null);
+
     const r = await fetchScreen<MenuMoment>(`/api/menu?key=${encodeURIComponent(key)}`);
     if (r.state === "ok") setMoment(r.data);
     else setMomentError(r.state === "error" ? r.message : "تعذّر تحميل هذي الشاشة الآن.");
     setLoading(false);
+
+    if (key === "menu_settings") {
+      const s = await fetchScreen<{ localHour: number; paused: boolean }>("/api/settings/state");
+      if (s.state === "ok") {
+        setCheckinPaused(s.data.paused);
+        setCheckinHour(s.data.localHour);
+      }
+    }
+  }
+
+  async function savePaused(next: boolean) {
+    haptic("medium");
+    setSavingSettings(true);
+    const prev = checkinPaused;
+    setCheckinPaused(next);
+    const r = await postAction<{ paused: boolean }>("/api/settings/pause", { paused: next });
+    if (r.state === "ok") setCheckinPaused(r.data.paused);
+    else setCheckinPaused(prev);
+    setSavingSettings(false);
+  }
+
+  async function saveHour(next: number) {
+    if (next < MIN_HOUR || next > MAX_HOUR) return;
+    haptic("light");
+    setSavingSettings(true);
+    const prev = checkinHour;
+    setCheckinHour(next);
+    const r = await postAction<{ hour: number }>("/api/settings/hour", { hour: next });
+    if (r.state !== "ok") setCheckinHour(prev);
+    setSavingSettings(false);
+  }
+
+  async function confirmErase() {
+    haptic("medium");
+    setEraseStep("working");
+    setEraseError(null);
+    const r = await postAction<{ erased: boolean; chatDeleted: number; surveysDeleted: number }>(
+      "/api/privacy/erase",
+      { confirm: true }
+    );
+    if (r.state === "ok" && r.data.erased) {
+      setEraseResult({ chatDeleted: r.data.chatDeleted, surveysDeleted: r.data.surveysDeleted });
+      setEraseStep("done");
+    } else {
+      setEraseError(r.state === "error" ? r.message : "تعذّر المحو الآن، حاولوا مرة أخرى.");
+      setEraseStep("confirm");
+    }
   }
 
   function onButtonPress(b: MenuButton) {
@@ -166,11 +229,8 @@ export function TopBar() {
       loadKey(b.cb);
       return;
     }
-    if (b.cb && ACTION_EXPLANATIONS[b.cb]) {
-      setPendingAction(ACTION_EXPLANATIONS[b.cb]);
-      return;
-    }
-    // زر غير معروف تماماً — أقرب رد صحيح هو إرجاع الوالد لمحادثته الفعلية.
+    // زر غير معروف تماماً (خارج menu_settings/menu_privacy، حيث لهذه الأفعال
+    // ضوابط حقيقية أدناه) — أقرب رد صحيح هو إرجاع الوالد لمحادثته الفعلية.
     if (b.cb) {
       returnToAdamChat();
     }
@@ -186,7 +246,6 @@ export function TopBar() {
     setMenuOpen(false);
     setActiveKey(null);
     setMoment(null);
-    setPendingAction(null);
   }
 
   return (
@@ -311,18 +370,136 @@ export function TopBar() {
                 <GlassCard variant="strong" className="whitespace-pre-line text-[15px] leading-loose text-text">
                   <IconText text={moment.body} />
                 </GlassCard>
-                {moment.buttons.length > 0 && (
-                  <div className="flex flex-col gap-2.5">
-                    {moment.buttons.map((b) => (
+
+                {activeKey === "menu_settings" && (
+                  <GlassCard className="rise-in">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-text">الرسالة اليومية</p>
+                        <p className="mt-0.5 text-xs text-text-muted">
+                          {checkinPaused === null ? "…" : checkinPaused ? "متوقفة الآن" : "مفعّلة الآن"}
+                        </p>
+                      </div>
                       <button
-                        key={b.label}
                         type="button"
-                        onClick={() => onButtonPress(b)}
-                        className="pressable px-4 py-3.5 text-sm font-medium"
+                        onClick={() => checkinPaused !== null && savePaused(!checkinPaused)}
+                        disabled={checkinPaused === null || savingSettings}
+                        role="switch"
+                        aria-checked={checkinPaused === false}
+                        aria-label="الرسالة اليومية"
+                        className={`pressable flex h-7 w-12 items-center !rounded-full border-0 p-1 transition-colors disabled:opacity-60 ${
+                          checkinPaused === false ? "justify-start bg-emerald-strong" : "justify-end bg-glass-bg"
+                        }`}
                       >
-                        <IconText text={b.label} />
+                        <span className="h-5 w-5 rounded-full bg-white" />
                       </button>
-                    ))}
+                    </div>
+
+                    {checkinPaused === false && checkinHour !== null && (
+                      <div className="mt-4 flex items-center justify-between border-t border-glass-border pt-4">
+                        <p className="text-sm font-medium text-text">وقتها</p>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => checkinHour !== null && saveHour(checkinHour - 1)}
+                            disabled={savingSettings || checkinHour <= MIN_HOUR}
+                            className="pressable flex h-8 w-8 items-center justify-center !rounded-full border-0 disabled:opacity-40"
+                            aria-label="ساعة أبكر"
+                          >
+                            <Minus size={15} />
+                          </button>
+                          <span className="w-16 text-center text-sm font-semibold text-gold-strong">
+                            {formatHourLabel(checkinHour)}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => checkinHour !== null && saveHour(checkinHour + 1)}
+                            disabled={savingSettings || checkinHour >= MAX_HOUR}
+                            className="pressable flex h-8 w-8 items-center justify-center !rounded-full border-0 disabled:opacity-40"
+                            aria-label="ساعة أبعد"
+                          >
+                            <Plus size={15} />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </GlassCard>
+                )}
+
+                {activeKey === "menu_privacy" && (
+                  <GlassCard className="rise-in text-center">
+                    {eraseStep === "idle" && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          haptic("light");
+                          setEraseStep("confirm");
+                        }}
+                        className="pressable-gold flex w-full items-center justify-center gap-2 px-4 py-3.5 text-sm font-semibold"
+                      >
+                        <Trash2 size={16} strokeWidth={2.2} />
+                        امحوا كل ما قلته
+                      </button>
+                    )}
+                    {eraseStep === "confirm" && (
+                      <>
+                        <p className="text-sm leading-relaxed text-text">
+                          هذا محو نهائي ولا رجوع فيه: محادثتكم مع آدم، وأي استبيان أجبتم عليه. هل تؤكدون؟
+                        </p>
+                        {eraseError && <p className="mt-2 text-xs text-red-400">{eraseError}</p>}
+                        <div className="mt-4 flex flex-col gap-2.5">
+                          <button
+                            type="button"
+                            onClick={confirmErase}
+                            className="pressable-gold px-5 py-3 text-sm font-semibold"
+                          >
+                            نعم، امحوا نهائياً
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              haptic("light");
+                              setEraseStep("idle");
+                            }}
+                            className="pressable px-5 py-2.5 text-sm font-medium text-text-muted"
+                          >
+                            إلغاء
+                          </button>
+                        </div>
+                      </>
+                    )}
+                    {eraseStep === "working" && (
+                      <div className="flex items-center justify-center py-2">
+                        <TreeLoader />
+                      </div>
+                    )}
+                    {eraseStep === "done" && eraseResult && (
+                      <p className="flex items-center justify-center gap-2 text-sm leading-relaxed text-emerald-strong">
+                        <Check size={16} strokeWidth={2.5} />
+                        تم. مُحيت {formatNumber(eraseResult.chatDeleted)} رسالة من محادثتنا
+                        {eraseResult.surveysDeleted > 0
+                          ? ` و${formatNumber(eraseResult.surveysDeleted)} إجابة استبيان`
+                          : ""}
+                        — ولا رجوع في هذا.
+                      </p>
+                    )}
+                  </GlassCard>
+                )}
+
+                {moment.buttons.filter((b) => !b.cb || !HIDDEN_CBS.has(b.cb)).length > 0 && (
+                  <div className="flex flex-col gap-2.5">
+                    {moment.buttons
+                      .filter((b) => !b.cb || !HIDDEN_CBS.has(b.cb))
+                      .map((b) => (
+                        <button
+                          key={b.label}
+                          type="button"
+                          onClick={() => onButtonPress(b)}
+                          className="pressable px-4 py-3.5 text-sm font-medium"
+                        >
+                          <IconText text={b.label} />
+                        </button>
+                      ))}
                   </div>
                 )}
               </>
@@ -342,38 +519,6 @@ export function TopBar() {
         </div>
       )}
 
-      {/* تسلسل منطقي قبل أي تحويل للمحادثة: ماذا سيحدث، ولماذا هنا لا هناك، وكيف نكمل */}
-      {pendingAction && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-bg-deep/80 backdrop-blur-sm" role="dialog" aria-modal="true">
-          <GlassCard variant="strong" className="rise-in m-4 w-full max-w-md text-center">
-            <p className="font-display text-[17px] text-gold-strong">{pendingAction.title}</p>
-            <p className="mt-3 text-sm leading-relaxed text-text-secondary">{pendingAction.body}</p>
-            <div className="mt-5 flex flex-col gap-2.5">
-              <button
-                type="button"
-                onClick={() => {
-                  haptic("medium");
-                  setPendingAction(null);
-                  returnToAdamChat();
-                }}
-                className="pressable-gold px-5 py-3 text-sm font-semibold"
-              >
-                نكمل في المحادثة
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  haptic("light");
-                  setPendingAction(null);
-                }}
-                className="pressable px-5 py-2.5 text-sm font-medium text-text-muted"
-              >
-                رجوع
-              </button>
-            </div>
-          </GlassCard>
-        </div>
-      )}
     </>
   );
 }
