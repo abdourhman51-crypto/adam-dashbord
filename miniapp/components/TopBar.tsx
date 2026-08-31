@@ -65,6 +65,28 @@ const ROUTE_TARGETS: Record<string, string> = {
 };
 
 /**
+ * أزرار من get_conversation_moment تحتاج فعلاً كتابة بيانات (محو، تغيير
+ * ساعة، إيقاف/تشغيل) — التطبيق المصغّر قراءة فقط ولا يقدر يُكملها. كانت
+ * تُحوَّل صامتة إلى المحادثة بلا أي تفسير، فيرى الوالد نفسه هناك بلا سياق
+ * ولا دليل أن شيئاً تحرّك أصلاً. كل واحد هنا يُشرح بجملة واحدة قبل التحويل:
+ * ماذا سيحدث، وكيف، وما النتيجة — لا تحويل صامت لأي منها بعد الآن.
+ */
+const ACTION_EXPLANATIONS: Record<string, { title: string; body: string }> = {
+  menu_privacy_erase_ask: {
+    title: "محو كل ما قلته",
+    body: "المحو نهائي ولا رجوع فيه، لذلك يحتاج تأكيدكم المباشر: في المحادثة، اكتبوا كلمة تأكيد واحدة ويُمحى كل شيء فوراً.",
+  },
+  menu_settings_hours: {
+    title: "تغيير وقت الرسالة",
+    body: "في المحادثة، اكتبوا الساعة التي تناسبكم — ومن الغد يصلكم سؤال المساء في ذلك الوقت بالضبط.",
+  },
+  menu_settings_paused: {
+    title: "إيقاف الرسالة اليومية",
+    body: "في المحادثة، قولوا لآدم إنكم تريدون الإيقاف — تتوقف من فورها، وتُشغَّل من جديد وقتما شئتم بنفس الطريقة.",
+  },
+};
+
+/**
  * الشريط العلوي الدائم للمنصة: شعار آدم + اسمه (يفتحان الشجرة الحيّة)، وزر
  * القائمة، وزر ذهبي دائم يقود لواجهة التخصيص المدفوعة — كلها في شريط واحد
  * واضح لا يغطي محتوى الشاشة (المحتوى يُزاح تحته دائماً، انظر ScreenShell).
@@ -83,6 +105,7 @@ export function TopBar() {
   const [moment, setMoment] = useState<MenuMoment | null>(null);
   const [loading, setLoading] = useState(false);
   const [momentError, setMomentError] = useState<string | null>(null);
+  const [pendingAction, setPendingAction] = useState<{ title: string; body: string } | null>(null);
 
   useEffect(() => {
     const initData = getInitDataRaw();
@@ -143,11 +166,11 @@ export function TopBar() {
       loadKey(b.cb);
       return;
     }
-    // أي زر آخر غير معروف هنا (مثل menu_privacy_erase_ask أو
-    // menu_settings_hours) هو إجراء يحتاج محادثة حقيقية مع البوت — يكتب
-    // بيانات، يسأل تأكيداً، يفتح منتقي وقت... التطبيق المصغّر قراءة فقط ولا
-    // يقدر يُكمل هذا هنا. أصح رد هو إرجاع الوالد لمحادثته الفعلية ليكمل هناك،
-    // لا تجاهل صامت لأي زر — هذا بالضبط الخلل الذي أصلحناه مع menu_journey.
+    if (b.cb && ACTION_EXPLANATIONS[b.cb]) {
+      setPendingAction(ACTION_EXPLANATIONS[b.cb]);
+      return;
+    }
+    // زر غير معروف تماماً — أقرب رد صحيح هو إرجاع الوالد لمحادثته الفعلية.
     if (b.cb) {
       returnToAdamChat();
     }
@@ -163,6 +186,7 @@ export function TopBar() {
     setMenuOpen(false);
     setActiveKey(null);
     setMoment(null);
+    setPendingAction(null);
   }
 
   return (
@@ -315,6 +339,39 @@ export function TopBar() {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* تسلسل منطقي قبل أي تحويل للمحادثة: ماذا سيحدث، ولماذا هنا لا هناك، وكيف نكمل */}
+      {pendingAction && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-bg-deep/80 backdrop-blur-sm" role="dialog" aria-modal="true">
+          <GlassCard variant="strong" className="rise-in m-4 w-full max-w-md text-center">
+            <p className="font-display text-[17px] text-gold-strong">{pendingAction.title}</p>
+            <p className="mt-3 text-sm leading-relaxed text-text-secondary">{pendingAction.body}</p>
+            <div className="mt-5 flex flex-col gap-2.5">
+              <button
+                type="button"
+                onClick={() => {
+                  haptic("medium");
+                  setPendingAction(null);
+                  returnToAdamChat();
+                }}
+                className="pressable-gold px-5 py-3 text-sm font-semibold"
+              >
+                نكمل في المحادثة
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  haptic("light");
+                  setPendingAction(null);
+                }}
+                className="pressable px-5 py-2.5 text-sm font-medium text-text-muted"
+              >
+                رجوع
+              </button>
+            </div>
+          </GlassCard>
         </div>
       )}
     </>
