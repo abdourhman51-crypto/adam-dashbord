@@ -1,4 +1,4 @@
-import { getWebApp, openLink } from "@/lib/telegram/client";
+import { openLink } from "@/lib/telegram/client";
 
 /**
  * مثبّت في الكود عمداً، لا عبر متغيّر بيئة: اسم البوت الحقيقي الوحيد هو
@@ -8,23 +8,7 @@ import { getWebApp, openLink } from "@/lib/telegram/client";
  */
 const BOT_USERNAME = "adam_os_brain_bot";
 
-/**
- * ينقل الوالد فعلياً إلى محادثته مع بوت آدم.
- * openTelegramLink وحده غير كافٍ: التطبيق المصغّر يُفتح غالباً من داخل نفس
- * محادثة آدم (زر القائمة في تلك المحادثة)، فطلب فتح رابط لنفس المحادثة التي
- * هو مفتوح فوقها أصلاً لا ينقل شيئاً على أندرويد/ماك — عطلٌ موثّق في عميل
- * تيليجرام نفسه، لا في هذا الكود. الإصلاح: نطلب openTelegramLink كمحاولة
- * أولى (يفيد إن كانت المحادثة المفتوحة غير محادثة آدم)، ثم نغلق التطبيق
- * المصغّر بعدها مباشرة — إغلاقه يكشف المحادثة التي تحته، وهي محادثة آدم
- * نفسها في الحالة الشائعة. هذا يضمن نتيجة واحدة مضمونة بدل الاعتماد كلياً
- * على استدعاء قد يُتجاهَل بصمت.
- */
+/** ينقل الوالد فعلياً إلى محادثته مع بوت آدم — openLink يتولّى إغلاق التطبيق المصغّر بعدها. */
 export function returnToAdamChat() {
-  const wa = getWebApp();
-  if (wa?.openTelegramLink) {
-    wa.openTelegramLink(`https://t.me/${BOT_USERNAME}`);
-  } else {
-    openLink(`https://t.me/${BOT_USERNAME}`);
-  }
-  setTimeout(() => wa?.close?.(), 150);
+  openLink(`https://t.me/${BOT_USERNAME}`);
 }
