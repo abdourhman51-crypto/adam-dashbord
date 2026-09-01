@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Phone, Target, MessageCircle, ShieldCheck } from "lucide-react";
+import { Phone, Target, MessageCircle, ShieldCheck, Send } from "lucide-react";
 import Link from "next/link";
 import { ScreenShell } from "@/components/ScreenShell";
 import { AdamIntro } from "@/components/AdamIntro";
@@ -107,31 +107,81 @@ function AlreadyAgreed({
 /**
  * لا دليل كافٍ بعد لهدف حقيقي (suggest_objective.ready = false) — نفس
  * القاعدة التي تحكم لحظة الاتفاق في المحادثة: لا نخترع هدفاً لبيت لم
- * نتعرّف عليه بما يكفي. بدل استمارة تجمع إجابات لن تُستعمل أبداً، نقول
- * الحقيقة ونعيده لمحادثة حقيقية مع آدم — من هناك يُبنى الدليل الذي يجعل
- * هذه الشاشة جاهزة لاحقاً.
+ * نتعرّف عليه بما يكفي تلقائياً. لكن هذا لا يعني إغلاق باب من يريد
+ * التفعيل الآن: من يكتب وضعه هنا بكلماته يصل لفريق آدم بنفس ما كتبه —
+ * عبر capture_journey_form_answer، نفس ما يكتب به جدول journey_form_state
+ * الذي يبني منه الفريق يدوياً اتفاقاً فورياً من لوحة التحكم (نفس الآلية
+ * التي تستعملها استمارة آدم في المحادثة نفسها). لا اتفاق آلي هنا، لكن لا
+ * انتظار إجباري أيضاً لمن مستعجل.
  */
-function NotReadyYet({ childName }: { childName: string | null }) {
+function NotReadyYet({
+  childName,
+  teamUrl,
+}: {
+  childName: string | null;
+  teamUrl: string | null;
+}) {
   const who = childName ?? "طفلكم";
+  const [text, setText] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function sendToTeam() {
+    if (!text.trim()) {
+      setError("اكتبوا سطراً واحداً عن وضعكم أولاً.");
+      return;
+    }
+    haptic("medium");
+    setSending(true);
+    setError(null);
+    const r = await postAction<{ captured: boolean }>("/api/wizard/capture-intent", { text: text.trim() });
+    setSending(false);
+    if (r.state === "ok" || r.state === "error") {
+      // حتى لو تعذّر الحفظ، الأولوية ألّا نمنع الوالد من الوصول للفريق الآن.
+      if (teamUrl) openLink(teamUrl);
+      else returnToAdamChat();
+    }
+  }
+
   return (
     <ScreenShell>
       <AdamIntro text="لسّا نتعرّف على بيتكم — وهذا طبيعي في البداية." />
       <GlassCard className="rise-in text-center">
         <p className="text-sm leading-relaxed text-text-muted">
-          الاتفاق هنا يُبنى على أصعب لحظة عرفها آدم فعلاً مع {who}، لا على اختيار من قائمة.
-          احكوا له عنها في المحادثة أولاً — وحين تتوضّح الصورة، هذه الشاشة تفتح على اتفاقكم مباشرة.
+          الاتفاق الآلي يُبنى على أصعب لحظة عرفها آدم فعلاً مع {who}. إن كنتم مستعجلين، اكتبوا وضعكم
+          بكلماتكم واتّصل بكم فريق آدم مباشرة ليبنيه معكم، بلا انتظار.
         </p>
       </GlassCard>
+
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder={`مثال: ${who} يرفض النوم كل ليلة تقريباً ويصرخ لمدة نصف ساعة`}
+        rows={3}
+        maxLength={600}
+        className="glass w-full resize-none !rounded-2xl px-4 py-3 text-sm leading-relaxed text-text placeholder:text-text-muted"
+      />
+      {error && <p className="text-xs text-red-400">{error}</p>}
+
+      <button
+        type="button"
+        onClick={sendToTeam}
+        disabled={sending}
+        className="pressable-gold flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold disabled:opacity-60"
+      >
+        <Send size={16} strokeWidth={2.2} />
+        {sending ? "لحظة…" : "تواصلوا مع الفريق الآن"}
+      </button>
       <button
         type="button"
         onClick={() => {
-          haptic("medium");
+          haptic("light");
           returnToAdamChat();
         }}
-        className="pressable-gold flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold"
+        className="pressable flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-medium text-text-muted"
       >
-        <MessageCircle size={17} strokeWidth={2.2} />
-        أحكي لآدم الآن
+        <MessageCircle size={16} strokeWidth={2.2} />
+        أو أحكي لآدم في المحادثة أولاً
       </button>
     </ScreenShell>
   );
@@ -264,7 +314,7 @@ export default function WizardPage() {
   }
 
   if (!catalog.ready) {
-    return <NotReadyYet childName={catalog.childName} />;
+    return <NotReadyYet childName={catalog.childName} teamUrl={catalog.teamUrl} />;
   }
 
   return (
