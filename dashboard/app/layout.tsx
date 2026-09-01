@@ -3,6 +3,7 @@ import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
+import { getUnreadConversationCount } from "@/lib/queries/inbox";
 
 const plexArabic = IBM_Plex_Sans_Arabic({
   subsets: ["arabic", "latin"],
@@ -28,7 +29,9 @@ try {
 } catch (_) {}
 `;
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const unreadCount = await getUnreadConversationCount().catch(() => 0);
+
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <head>
@@ -36,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${plexArabic.variable} font-[family-name:var(--font-plex-arabic)] antialiased`}>
         <div className="flex min-h-dvh">
-          <Sidebar />
+          <Sidebar unreadCount={unreadCount} />
           <div className="flex min-w-0 flex-1 flex-col">
             <Header />
             <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-20 pt-6 sm:px-6 md:pb-6 lg:px-8">

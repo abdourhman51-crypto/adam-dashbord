@@ -10,7 +10,16 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export default function Sidebar() {
+function NavBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+  return (
+    <span className="mr-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[color:var(--error)] px-1.5 text-[10px] font-bold text-white">
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+}
+
+export default function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
   const pathname = usePathname();
   if (pathname === "/login") return null;
 
@@ -43,6 +52,7 @@ export default function Sidebar() {
               >
                 <Icon size={18} />
                 {label}
+                {href === "/conversations" && <NavBadge count={unreadCount} />}
               </Link>
             );
           })}
@@ -60,11 +70,16 @@ export default function Sidebar() {
             <Link
               key={href}
               href={href}
-              className={`flex flex-1 flex-col items-center gap-1 py-2.5 text-[10px] font-medium ${
+              className={`relative flex flex-1 flex-col items-center gap-1 py-2.5 text-[10px] font-medium ${
                 active ? "text-[color:var(--primary)]" : "text-[color:var(--text-muted)]"
               }`}
             >
-              <Icon size={19} />
+              <span className="relative">
+                <Icon size={19} />
+                {href === "/conversations" && unreadCount > 0 && (
+                  <span className="absolute -left-1.5 -top-1 h-2 w-2 rounded-full bg-[color:var(--error)]" />
+                )}
+              </span>
               {label}
             </Link>
           );

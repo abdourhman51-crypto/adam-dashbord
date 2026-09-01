@@ -188,3 +188,15 @@ export interface PatternPendingReview {
   pattern_label: string;
   description: string | null;
 }
+
+export interface InboxConversation {
+  follower_id: string;
+  platform_user_id: string;
+  first_name: string | null;
+  username: string | null;
+  last_message_at: string;
+  last_message_preview: string | null;
+  last_message_from: "human" | "ai";
+  last_human_message_at: string | null;
+  viewed_at: string | null;
+}
