@@ -10,6 +10,33 @@ function revalidateCustomer(followerId: string) {
   revalidatePath(`/customers/${followerId}`);
 }
 
+// activate_subscription/renew_stage_same_objective always record the payment even when
+// the journey itself does not start (design: taking money is never refused — see
+// supabase/tests/README.md "start_stage deliberately does not check"). They report that
+// loudly via journey.started/reason on the return value; without this, the dashboard
+// silently closed the dialog as if a new stage had begun.
+const JOURNEY_NOT_STARTED_MESSAGES: Record<string, string> = {
+  stage_already_live: "سُجِّل الدفع، لكن لم تبدأ رحلة جديدة: توجد رحلة أخرى نشطة بالفعل لهذا العميل.",
+  objective_required: "سُجِّل الدفع، لكن لم تبدأ الرحلة بعد: لا يوجد هدف متفق عليه. أدخِلوا هدفاً يدوياً أو انتظروا اتفاقه في المحادثة.",
+  target_exceeds_window: "سُجِّل الدفع، لكن الهدف يتجاوز مدة النافذة المحددة.",
+  clock_out_of_range: "سُجِّل الدفع، لكن عدد أيام المرافقة المخطَّط خارج النطاق المسموح (7–60).",
+};
+
+function assertJourneyStarted(data: unknown) {
+  const journey = (data as { journey?: { started?: boolean; reason?: string } } | null)?.journey;
+  if (journey && journey.started === false) {
+    const reason = journey.reason ?? "";
+    throw new Error(JOURNEY_NOT_STARTED_MESSAGES[reason] ?? `سُجِّل الدفع، لكن لم تبدأ الرحلة (${reason}).`);
+  }
+}
+
+function assertRenewed(data: unknown) {
+  const renewed = (data as { renewed?: boolean; reason?: string } | null)?.renewed;
+  if (renewed === false) {
+    throw new Error("لا توجد رحلة سابقة لهذا العميل يمكن التجديد بهدفها.");
+  }
+}
+
 export async function activateSubscriptionAction(
   followerId: string,
   input: {
@@ -38,6 +65,7 @@ export async function activateSubscriptionAction(
   });
   if (error) throw new Error(error.message);
   revalidateCustomer(followerId);
+  assertJourneyStarted(data);
   return data;
 }
 
@@ -63,6 +91,8 @@ export async function renewStageSameObjectiveAction(
   });
   if (error) throw new Error(error.message);
   revalidateCustomer(followerId);
+  assertRenewed(data);
+  assertJourneyStarted(data);
   return data;
 }
 
