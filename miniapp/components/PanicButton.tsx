@@ -5,6 +5,7 @@ import { LifeBuoy, ChevronLeft } from "lucide-react";
 import { haptic } from "@/lib/telegram/client";
 import { postAction } from "@/lib/telegram/fetcher";
 import { returnToAdamChat } from "@/lib/upsell";
+import { trackClick } from "@/lib/analytics";
 
 type Route = "away" | "stay";
 type Stage = "idle" | "asking" | "script" | "closing" | "done";
@@ -47,6 +48,7 @@ export function PanicButton() {
 
   function open() {
     haptic("medium");
+    trackClick("panic_button_open", "home");
     setStage("asking");
   }
 
@@ -191,6 +193,7 @@ export function PanicButton() {
         type="button"
         onClick={() => {
           haptic("light");
+          trackClick("panic_confession", "home");
           returnToAdamChat();
         }}
         className="px-4 py-3 text-center text-xs font-medium text-text-muted"

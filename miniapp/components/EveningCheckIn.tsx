@@ -4,6 +4,7 @@ import { useState } from "react";
 import { GlassCard } from "@/components/GlassCard";
 import { postAction } from "@/lib/telegram/fetcher";
 import { haptic } from "@/lib/telegram/client";
+import { trackClick } from "@/lib/analytics";
 
 /**
  * سؤال المساء — عن الوالد، لا عن الطفل.
@@ -36,6 +37,7 @@ export function EveningCheckIn({ onAnswered }: { onAnswered?: () => void }) {
     if (pending) return;
     setPending(kind);
     setError(false);
+    trackClick(`evening_checkin_${kind}`, "home");
 
     // «ما أوشكتُ» ليس حدثاً يُسجَّل — لا شيء حدث. نشكرها ولا نكتب صفاً وهمياً
     // يضخّم العدّاد.

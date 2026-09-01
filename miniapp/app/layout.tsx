@@ -4,6 +4,7 @@ import "./globals.css";
 import { BottomNav } from "@/components/BottomNav";
 import { TopBar } from "@/components/TopBar";
 import { WelcomeSplash } from "@/components/WelcomeSplash";
+import { ScreenViewTracker } from "@/components/ScreenViewTracker";
 
 // Force every route to render on each request instead of being statically
 // prerendered and cached at Vercel's edge. The Cache-Control: no-store header
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ar" dir="rtl">
       <body>
         <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
+        <ScreenViewTracker />
         <TopBar />
         {children}
         <BottomNav />

@@ -15,6 +15,7 @@ import { postAction } from "@/lib/telegram/fetcher";
 import { haptic, getInitDataRaw } from "@/lib/telegram/client";
 import { returnToAdamChat } from "@/lib/upsell";
 import { formatNumber } from "@/lib/format";
+import { trackClick } from "@/lib/analytics";
 
 /**
  * جمل التحوّل — كل ليلة تُلتزم يُختار منها واحدة عشوائياً بدل "تم الحفظ" أو
@@ -62,6 +63,7 @@ export default function HomePage() {
     if (committing) return;
     setCommitting(true);
     setError(false);
+    trackClick("commit_step", "home");
     const r = await postAction<{ committed: boolean }>("/api/commit-step", {});
     if (r.state === "ok" && r.data.committed) {
       haptic("medium");

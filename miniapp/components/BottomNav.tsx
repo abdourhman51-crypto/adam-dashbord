@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Sparkles, Compass, Sprout, MessageCircle } from "lucide-react";
 import { returnToAdamChat } from "@/lib/upsell";
 import { haptic } from "@/lib/telegram/client";
+import { trackClick } from "@/lib/analytics";
 
 const TABS_BEFORE = [
   { href: "/", label: "الآن", icon: Sparkles },
@@ -44,6 +45,7 @@ export function BottomNav() {
           type="button"
           onClick={() => {
             haptic("light");
+            trackClick("bottom_nav_chat");
             returnToAdamChat();
           }}
           className="pressable flex flex-1 flex-col items-center gap-1 border-0 bg-transparent px-2 py-2 text-center"
