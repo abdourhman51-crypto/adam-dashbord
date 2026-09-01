@@ -171,12 +171,12 @@ export default function LandingPage() {
           cta={
             <>
               <h1 className="font-display text-[1.7rem] font-extrabold leading-[1.3] sm:text-[2.2rem]">
-                وراء كل تصرّف من طفلكم سبب.
+                ما تعيشونه كل ليلة مع طفلكم لن يمرّ دون أن يُرى،
                 <br />
-                <span className="text-gold-strong">آدم يكتشفه — لا يخمّنه.</span>
+                <span className="text-gold-strong">ولن يضيع دون أن يُبنى عليه.</span>
               </h1>
               <p className="max-w-md text-sm leading-relaxed text-[color:var(--text-secondary)]">
-                احكوا لآدم بكلامكم عمّا يمرّ به طفلكم، فيمنحكم خطوة اليوم: أمرًا عمليًا واحدًا مبنيًا على حالة طفلكم بالذات — لا نصيحة عامة تصلح لكل الأطفال.
+                احكوا لآدم سطرًا واحدًا عن يومكم معه، ويردّ بخطوة صغيرة تناسب هذه الليلة بالذات — لا نصيحة عامة تصلح لأي بيت.
               </p>
               <div className="flex flex-col items-center gap-2 pt-2">
                 <CTA />
@@ -215,7 +215,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-            <p className="text-on-image text-center text-sm text-muted">محادثة حقيقية من آدم، دون شرح طويل ودون عشرين صفحة من النصائح.</p>
+            <p className="text-on-image text-center text-sm text-muted">محادثة حقيقية مع آدم — سطر منكم، وخطوة واحدة منه. لا شرح طويل، ولا عشرون صفحة نصائح.</p>
           </>
         }
         cta={<CTA label="جرّبوا محادثة مثلها" />}
@@ -229,13 +229,15 @@ export default function LandingPage() {
         focus="top"
         content={
           <>
-            <h2 className="font-display text-on-image text-[1.6rem] font-bold sm:text-3xl">المشكلة ليست نقص النصائح.</h2>
+            <h2 className="font-display text-on-image text-[1.6rem] font-bold sm:text-3xl">
+              المشكلة ليست نقص النصائح — بل أنّ القصة نفسها تتكرّر.
+            </h2>
             <TextPanel>
               <p className="max-w-xl text-[15px] leading-relaxed text-[color:var(--text-secondary)]">
-                الإنترنت مليء بالنصائح العامة، وأنتم غارقون فيها أصلاً. ما ينقصكم خطوة تخصّ طفلكم تحديدًا، في اللحظة التي تحتاجونها فعلًا.
+                الإنترنت مليء بالنصائح، وأنتم تقرأونها أصلاً. لكن الليلة الصعبة تمرّ وتُنسى، وتعود بعد أيام كأنها المرة الأولى — لأن لا أحد يربط بينها وبين سابقاتها.
               </p>
               <div className="mt-1 flex flex-col gap-2.5 text-[15px] text-[color:var(--text-secondary)]">
-                {["وقت النوم يتحوّل إلى معركة يوميًا.", "النصائح العامة لا تنجح مع طفلكم بالذات.", "أعصابكم تصل إلى حدّها الأخير، ولا أحد يفهم السبب."].map((t) => (
+                {["نفس الليلة الصعبة تتكرر، ولا أحد يلاحظ أنها تتكرر.", "النصائح العامة تبدأ من الصفر كل مرة، لأنها لا تعرف بيتكم.", "تصلون إلى حدّكم، ولا أحد يرى كم يكلّفكم ذلك فعلًا."].map((t) => (
                   <p key={t} className="flex items-center justify-center gap-2.5">
                     <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--gold-strong)]" aria-hidden="true" />
                     {t}
@@ -258,12 +260,12 @@ export default function LandingPage() {
         content={
           <>
             <h2 className="font-display text-on-image text-[1.6rem] font-bold sm:text-3xl">آدم لا يمنحكم نصائح أكثر.</h2>
-            <p className="text-on-image text-[15px] text-gold-strong">بل يمنحكم خطوة اليوم: الأمر الواحد الذي يناسب طفلكم في هذه المرحلة بالذات.</p>
+            <p className="text-on-image text-[15px] text-gold-strong">بل يمنحكم خطوة اليوم: الأمر الواحد الذي يناسب بيتكم في هذه المرحلة بالذات.</p>
             <div className="panel-group panel-group-row glass mt-1 grid sm:grid-cols-3">
               {[
                 { icon: Sparkles, title: "خطوة واحدة، لا عشرون", body: "ليست صفحة نصائح عامة، بل أمر صغير واحد تجرّبونه اليوم." },
-                { icon: Repeat, title: "آدم يتذكر", body: "يتعلّم من المواقف السابقة، ويفهم طفلكم أكثر مع الوقت." },
-                { icon: LineChart, title: "تشاهدون التغيير", body: "تتحوّل رحلتكم إلى دليل حقيقي على تطوّركم، لا مجرد أرقام." },
+                { icon: Repeat, title: "لن تبدأوا من الصفر", body: "كل ما حكيتوه لآدم يبقى معه، فكل خطوة جديدة تُبنى على التي قبلها." },
+                { icon: LineChart, title: "ترون تغيّركم أنتم", body: "رحلتكم تصير دليلًا حقيقيًا على أنكم تغيّرتم — لا مجرد أرقام عن طفلكم." },
               ].map((b) => (
                 <div key={b.title} className="flex flex-col items-center gap-2 p-6 text-center">
                   <b.icon size={22} strokeWidth={2} className="text-gold-strong" />
@@ -289,9 +291,9 @@ export default function LandingPage() {
             <h2 className="font-display text-on-image text-center text-[1.6rem] font-bold sm:text-3xl">كيف يعمل؟</h2>
             <div className="mt-1 grid gap-8 sm:grid-cols-3">
               {[
-                { n: "01", title: "احكوا لآدم", body: "بكلامكم الخاص، دون استمارات معقّدة." },
-                { n: "02", title: "يفهم طفلكم تحديدًا", body: "يكتشف ما وراء التصرّف، لا مجرد الأعراض." },
-                { n: "03", title: "خطوة اليوم", body: "أمر عملي واحد، يناسب طفلكم الآن بالذات." },
+                { n: "01", title: "احكوا لآدم", body: "بكلامكم أنتم، سطر يكفي — لا استمارة ولا شرح طويل." },
+                { n: "02", title: "يربط الليلة بسابقاتها", body: "لا يبدأ من جديد كل مرة — يرى الخيط بين الليلة وما قبلها." },
+                { n: "03", title: "خطوة تناسب الليلة", body: "أمر واحد صغير، مبنيّ على بيتكم أنتم بالذات." },
               ].map((s) => (
                 <div key={s.n} className="flex flex-col items-center gap-2 text-center">
                   <div className="glass-gold flex h-12 w-12 items-center justify-center rounded-full font-display text-lg font-bold text-gold-strong">
@@ -329,7 +331,7 @@ export default function LandingPage() {
           <>
             <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">لا يمنح آدم النصيحة نفسها لكل بيت.</h2>
             <ul className="flex flex-col gap-2 text-[15px] text-[color:var(--text-secondary)]">
-              {["عمر طفلكم", "المواقف التي تتكرر معه", "ما الذي نفع سابقًا وما لم ينفع", "الأنماط التي يلاحظها آدم"].map((li) => (
+              {["عمر طفلكم", "المواقف التي تتكرر في بيتكم", "ما الذي نفع سابقًا وما لم ينفع", "ما بدأ يتكرر عندكم بالذات"].map((li) => (
                 <li key={li} className="flex items-center justify-center gap-2.5">
                   <Check size={16} strokeWidth={2.6} className="shrink-0 text-gold-strong" />
                   {li}
@@ -344,9 +346,9 @@ export default function LandingPage() {
               <p className="font-display text-base leading-loose text-text">
                 «ألاحظ أنّ يوسف يتوتّر غالبًا عند الانتقال من اللعب إلى النوم؛ جرّبوا إخباره بالخطوة القادمة قبلها بخمس دقائق.»
               </p>
-              <p className="mt-3 text-sm text-muted">هذا بالضبط ما يقوله آدم حين يعرف طفلكم فعلًا.</p>
+              <p className="mt-3 text-sm text-muted">هذا بالضبط ما يقوله آدم حين يعرف بيتكم فعلًا.</p>
             </div>
-            <CTA label="خصّصوا آدم لطفلكم" />
+            <CTA label="دعوا آدم يتعرّف على بيتكم" />
           </>
         }
       />
@@ -363,7 +365,7 @@ export default function LandingPage() {
           <div className="flex flex-1 flex-col justify-between">
             <h2 className="font-display text-[1.6rem] font-bold sm:text-3xl">في كل مرة تختارون فيها الهدوء… تبنون شيئًا.</h2>
             <p className="max-w-lg text-[15px] leading-relaxed text-[color:var(--text-secondary)]">
-              ليست نقاطًا، وليست لعبة؛ إنها لحظات حقيقية تغيّرت فيها طريقة تعاملكم، تتراكم في شجرة واحدة، ورقة بعد ورقة.
+              ليست نقاطًا، وليست لعبة؛ لحظات حقيقية غيّرتم فيها طريقة تعاملكم، تتراكم في شجرة واحدة، ورقة بعد ورقة — إثبات أن شيئًا لم يضِع.
             </p>
           </div>
         }
@@ -392,7 +394,7 @@ export default function LandingPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {["يعرف طفلكم تحديدًا", "يتذكّر السياق", "يساعدكم في اللحظة", "يتطوّر معكم"].map((row) => (
+                    {["يعرف بيتكم تحديدًا", "لا يبدأ من الصفر كل مرة", "يساعدكم في اللحظة", "يكبر معكم يومًا بعد يوم"].map((row) => (
                       <tr key={row} className="border-b border-[color:var(--glass-border)] last:border-0">
                         <td className="p-4 text-[color:var(--text-secondary)]">{row}</td>
                         <td className="p-4">
@@ -453,13 +455,13 @@ export default function LandingPage() {
         content={
           <div className="glass-gold mx-auto flex w-full max-w-[300px] flex-col items-center gap-4 p-6 text-center">
             <span className="font-display text-xs font-semibold text-gold-strong">المرافقة الكاملة</span>
-            <h2 className="font-display text-[1.4rem] font-bold sm:text-xl">29 يومًا حتى تشاهدوا فرقًا حقيقيًا</h2>
+            <h2 className="font-display text-[1.4rem] font-bold sm:text-xl">29 يومًا تقتربون فيها ممّن أردتم أن تكونوه لطفلكم</h2>
             <ul className="flex w-full flex-col gap-2 text-sm text-[color:var(--text-secondary)]">
               {[
-                "هدف واحد واضح، تشاهدون تحقّقه بأعينكم",
-                "خطوة يومية مبنية على طفلكم تحديدًا",
-                "ذاكرة تتراكم معكم، فلا تكرّرون الحديث من جديد",
-                "وصول كامل إلى آدم دون حدود",
+                "هدف واحد تختارونه أنتم، وترون تقدّمكم فيه بأعينكم",
+                "خطوة كل يوم، مبنية على بيتكم أنتم بالذات",
+                "لن تبدأوا من الصفر — كل يوم يُبنى على الذي قبله",
+                "وصول كامل إلى آدم، بلا حدود",
               ].map((li) => (
                 <li key={li} className="flex items-center justify-center gap-2 text-center">
                   <Check size={15} strokeWidth={2.6} className="shrink-0 text-gold-strong" />
@@ -472,7 +474,7 @@ export default function LandingPage() {
               <ShieldCheck size={16} strokeWidth={2} className="mt-0.5 shrink-0 text-gold-strong" />
               <span>
                 <span className="font-semibold text-gold-strong">ضماننا: </span>
-                إن لم تشعروا بأثر واضح، نمدّد لكم نصف مدة الرحلة مجانًا.
+                نمشي معكم حتى تشعروا بالفرق — وإن لم يحدث خلال المدّة، نكمل نصف المدّة معكم مجانًا.
               </span>
             </div>
             <CTA label="ابدأوا رحلتكم مع آدم" />
@@ -493,10 +495,10 @@ export default function LandingPage() {
             <div className="glass panel-group flex flex-col text-right">
               {[
                 ["هل آدم بديل عن أخصائي؟", "لا. يرافقكم آدم يوميًا في اللحظات العادية، وإن احتاج الموقف إلى مختص حقيقي، يخبركم بذلك بصراحة."],
-                ["كيف يعرف آدم طفلي؟", "من خلال حديثكم معه يومًا بعد يوم، دون استمارات طويلة أو أسئلة مكررة."],
-                ["ماذا لو لم أشعر بأثر واضح؟", "نمدّد لكم نصف مدة الرحلة مجانًا، حتى تشعروا بالفرق فعلًا."],
+                ["كيف يعرف آدم بيتنا؟", "من خلال حديثكم معه يومًا بعد يوم، دون استمارات طويلة أو أسئلة مكررة."],
+                ["ماذا لو لم أشعر بالفرق؟", "نكمل معكم نصف مدة الرحلة مجانًا، حتى تشعروا به فعلًا."],
                 ["هل بياناتي آمنة؟", "نعم، ويمكنكم طلب محوها بالكامل في أي وقت."],
-                ["هل يمكنني تجربته مجانًا؟", "نعم، المحادثة الأساسية مع آدم مجانية دائمًا."],
+                ["هل يمكنني تجربته مجانًا؟", "نعم، والمحادثة الأساسية مع آدم مجانية دائمًا — لا تجربة محدودة، بل آدم كاملًا."],
                 ["كم السعر؟", "يختلف حسب بلدكم، ويظهر لكم بعملتكم المحلية مباشرة داخل المحادثة."],
                 ["كيف ألغي المرافقة الكاملة؟", "برسالة واحدة إلى آدم، دون شروط أو التزام."],
               ].map(([q, a]) => (
@@ -524,7 +526,7 @@ export default function LandingPage() {
         content={
           <TextPanel>
             <h2 className="font-display text-[1.7rem] font-bold sm:text-3xl">لستم بحاجة إلى أن تكونوا آباءً مثاليين.</h2>
-            <p className="text-[15px] text-gold-strong">تحتاجون فقط إلى معرفة ما تفعلونه في اللحظة القادمة.</p>
+            <p className="text-[15px] text-gold-strong">تحتاجون فقط إلى أن يبقى أحد معكم، حتى تعرفوا الخطوة القادمة.</p>
           </TextPanel>
         }
         cta={
@@ -537,7 +539,7 @@ export default function LandingPage() {
 
       {/* امتداد أنيق وخفيف من ظل الصورة الأخيرة نفسه — لا حافة فاصلة، بل تلاشٍ فاخر ينتهي بختم العلامة */}
       <footer className="bg-[rgba(8,14,10,0.97)] px-5 py-14 text-center">
-        <p className="font-display text-lg font-semibold text-gold-strong">آدم — مرافق التربية الذكي</p>
+        <p className="font-display text-lg font-semibold text-gold-strong">آدم — مرافق أبوّة يومي</p>
       </footer>
     </>
   );

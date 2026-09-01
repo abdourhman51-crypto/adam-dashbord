@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "آدم — مرافق التربية الذكي",
-  description: "آدم يفهم طفلكم تحديدًا، ويرافقكم خطوة بخطوة في أصعب لحظات التربية.",
+  title: "آدم — مرافق أبوّة يومي",
+  description: "ما تعيشونه كل ليلة مع طفلكم لن يمرّ دون أن يُرى، ولن يضيع دون أن يُبنى عليه. احكوا لآدم سطرًا عن يومكم، ويردّ بخطوة صغيرة تناسب هذه الليلة بالذات.",
 };
 
 export const viewport: Viewport = {
