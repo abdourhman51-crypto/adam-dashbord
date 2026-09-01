@@ -11,9 +11,16 @@ import { LoadingState, OutsideTelegramState, NotFoundState, ErrorState } from "@
 import { formatNumber } from "@/lib/format";
 import type { CriticalWindowSnapshot } from "@/lib/criticalWindow";
 
+interface LastStage {
+  status: "completed" | "failed";
+  objectiveText: string;
+  daysTogether: number;
+}
+
 interface JourneyResponse {
   isPaid: boolean;
   inStage?: boolean;
+  lastStage?: LastStage | null;
   childName: string | null;
   objectiveText?: string | null;
   objectiveTarget?: number | null;
@@ -84,6 +91,31 @@ export default function JourneyPage() {
   if (!j.isPaid) return <FreeTierPreview />;
 
   if (!j.inStage) {
+    // ⭐ رحلة أُنهيت للتوّ (نجحت أو لا) تستحقّ ملخّصاً حقيقياً، لا نفس جملة
+    // "ما عندكم رحلة نشطة" التي يراها من لم يبدأ شيئاً بعد.
+    if (j.lastStage) {
+      const succeeded = j.lastStage.status === "completed";
+      return (
+        <ScreenShell>
+          <AdamIntro text={succeeded ? "🎉 وصلتم." : "انتهت هذه الجولة — وما بنيتموه لا يستحق أن يتوقف هنا."} />
+          <GlassCard variant={succeeded ? "gold" : undefined} className="rise-in text-center">
+            <p className="text-xs font-medium text-text-muted">الهدف الذي اتّفقنا عليه</p>
+            <p className="font-display mt-2 text-[19px] leading-relaxed text-text">{j.lastStage.objectiveText}</p>
+            <p className="mt-3 text-xs text-text-muted">
+              {formatNumber(j.lastStage.daysTogether)} يوماً معاً
+            </p>
+          </GlassCard>
+          <Link
+            href="/journey/start"
+            className="pressable-gold flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold"
+          >
+            <Target size={17} strokeWidth={2.2} />
+            نتّفق على هدف جديد
+          </Link>
+        </ScreenShell>
+      );
+    }
+
     return (
       <ScreenShell>
         <AdamIntro text="هذي شاشة رحلتكم — وين وصلتوا بالضبط بالهدف اللي اتفقنا عليه." />

@@ -76,8 +76,39 @@ export async function GET(request: Request) {
 
   const stage = (stageRes.data ?? { in_stage: false }) as StageStateRpc;
 
+  // ⭐ لا رحلة نشطة لا تعني بالضرورة "لم يبدأ بعد" — قد يكون قد أنهى رحلته
+  // للتوّ (close_stage تحوّل الحالة إلى completed/failed ولا تُبقيها active).
+  // الرسالة العامة "ما عندكم رحلة نشطة" كانت تُقال للحالتين بلا تمييز؛
+  // نميّز هنا لنعرض إنجازاً حقيقياً بدل جملة محايدة تبتلع نجاحاً فعلياً.
   if (!stage.in_stage) {
-    return NextResponse.json({ isPaid: true, inStage: false, childName: parent.childName });
+    const lastStageRes = await supabaseAdmin()
+      .from("stages")
+      .select("status, objective_text, started_at, completed_at")
+      .eq("parent_id", parent.parentId)
+      .in("status", ["completed", "failed"])
+      .order("completed_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const last = lastStageRes.data as
+      | { status: "completed" | "failed"; objective_text: string; started_at: string; completed_at: string }
+      | null;
+
+    return NextResponse.json({
+      isPaid: true,
+      inStage: false,
+      childName: parent.childName,
+      lastStage: last
+        ? {
+            status: last.status,
+            objectiveText: last.objective_text,
+            daysTogether: Math.max(
+              1,
+              Math.round((new Date(last.completed_at).getTime() - new Date(last.started_at).getTime()) / 86400000)
+            ),
+          }
+        : null,
+    });
   }
 
   const child = parent.childName ?? "طفلكم";
