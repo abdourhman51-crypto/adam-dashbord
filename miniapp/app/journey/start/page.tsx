@@ -20,6 +20,7 @@ interface CatalogResponse {
   countryName: string | null;
   teamUrl: string | null;
   alreadyInStage: boolean;
+  alreadyAgreed: boolean;
   currentObjectiveText: string | null;
 }
 
@@ -91,9 +92,63 @@ function AlreadyInStage({ objectiveText, teamUrl }: { objectiveText: string | nu
   );
 }
 
+/**
+ * والدٌ اتّفق على هدفه بالفعل في المحادثة (لحظة الاتفاق) قبل أن يدفع —
+ * agreed_objective موجود، لكن لا رحلة نشطة بعد. فتح استمارة فارغة هنا يعني
+ * سؤاله عمّا أجاب عنه بالفعل قبل قليل؛ الأصحّ أن يرى اتفاقه ويُفعّله مباشرة،
+ * تماماً كما تعرضه نفس اللحظة في المحادثة.
+ */
+function AlreadyAgreed({
+  objectiveText,
+  teamUrl,
+  onRestart,
+}: {
+  objectiveText: string | null;
+  teamUrl: string | null;
+  onRestart: () => void;
+}) {
+  return (
+    <ScreenShell>
+      <AdamIntro text="🎉 هذا اتّفاقكم — اتّفقنا عليه في المحادثة، ولم يبقَ إلا تفعيله." />
+      <GlassCard variant="gold" className="rise-in">
+        <p className="text-xs font-medium text-text-muted">هدفكم المتّفق عليه</p>
+        <p className="font-display mt-2 text-[19px] leading-relaxed text-text">
+          {objectiveText ?? "قيد المتابعة"}
+        </p>
+      </GlassCard>
+      {teamUrl ? (
+        <button
+          type="button"
+          onClick={() => {
+            haptic("medium");
+            openLink(teamUrl);
+          }}
+          className="pressable-gold flex w-full items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold"
+        >
+          <Phone size={16} strokeWidth={2.2} />
+          نُفعّل الاتفاق مع فريق آدم
+        </button>
+      ) : (
+        <p className="text-center text-sm text-text-muted">تواصلوا مع آدم على تيليغرام لتفعيل الاتفاق.</p>
+      )}
+      <button
+        type="button"
+        onClick={() => {
+          haptic("light");
+          onRestart();
+        }}
+        className="pressable flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-medium text-text-muted"
+      >
+        أُعيد الاستمارة من جديد
+      </button>
+    </ScreenShell>
+  );
+}
+
 export default function WizardPage() {
   const [catalog, setCatalog] = useState<CatalogResponse | null | "error" | "outside">(null);
   const [step, setStep] = useState<Step>("problem");
+  const [forceForm, setForceForm] = useState(false);
   const [problemKey, setProblemKey] = useState<string | null>(null);
   const [frequencyKey, setFrequencyKey] = useState<string | null>(null);
   const [outcomes, setOutcomes] = useState<OutcomesResponse | null>(null);
@@ -127,6 +182,16 @@ export default function WizardPage() {
   }
   if (catalog.alreadyInStage) {
     return <AlreadyInStage objectiveText={catalog.currentObjectiveText} teamUrl={catalog.teamUrl} />;
+  }
+
+  if (catalog.alreadyAgreed && !forceForm) {
+    return (
+      <AlreadyAgreed
+        objectiveText={catalog.currentObjectiveText}
+        teamUrl={catalog.teamUrl}
+        onRestart={() => setForceForm(true)}
+      />
+    );
   }
 
   const who = catalog.childName ?? "طفلكم";

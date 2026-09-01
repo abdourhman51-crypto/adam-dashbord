@@ -24,11 +24,12 @@ export async function GET(request: Request) {
 
   const db = supabaseAdmin();
 
-  const [problemsRes, countryRes, journeyMomentRes, stageRes] = await Promise.all([
+  const [problemsRes, countryRes, journeyMomentRes, stageRes, followerRes] = await Promise.all([
     db.from("journey_problem_catalog").select("key, emoji, label_ar").order("sort_order"),
     db.rpc("country_state", { p_parent_id: parent.parentId }),
     db.rpc("get_conversation_moment", { p_key: "menu_journey", p_parent_id: parent.parentId }),
     db.rpc("stage_state", { p_parent_id: parent.parentId }),
+    db.from("followers").select("agreed_objective").eq("id", parent.parentId).maybeSingle(),
   ]);
 
   if (problemsRes.error) {
@@ -40,10 +41,18 @@ export async function GET(request: Request) {
   const journeyMoment = journeyMomentRes.data as { buttons?: MenuButton[] } | null;
   const teamUrl = journeyMoment?.buttons?.find((b) => b.url)?.url ?? null;
   const stage = stageRes.data as { in_stage?: boolean; objective_text?: string } | null;
+  const agreedObjective = followerRes.data?.agreed_objective as { objective_text?: string } | null;
 
   // ⭐ من غير المنطقي أن يفتح والدٌ مشترك، اختار هدفه بالفعل، استمارة
   // فارغة من جديد. الاستمارة تُعرض له فقط إذا لم يكن في رحلة نشطة الآن.
   const alreadyInStage = parent.isPaid && Boolean(stage?.in_stage);
+
+  // ⭐ نفس المبدأ، لمرحلة أبكر: والدٌ اتّفق على هدفه بالفعل في المحادثة
+  // (لحظة الاتفاق) قبل أن يدفع — get_conversation_moment('menu_journey')
+  // يعرف هذا ويعرض «🎉 هذا اتفاقكم» بدل العرض التسويقي، لكن الاستمارة هنا
+  // كانت تتجاهل agreed_objective تماماً وتعرض له نفس الاستمارة الفارغة
+  // التي يراها من لم يبدأ بعد — يُعاد سؤاله عمّا أجاب عنه بالفعل.
+  const alreadyAgreed = !alreadyInStage && Boolean(agreedObjective?.objective_text);
 
   return NextResponse.json({
     childName: parent.childName,
@@ -53,6 +62,11 @@ export async function GET(request: Request) {
     countryName: countryState?.name_ar ?? null,
     teamUrl,
     alreadyInStage,
-    currentObjectiveText: alreadyInStage ? (stage?.objective_text ?? null) : null,
+    alreadyAgreed,
+    currentObjectiveText: alreadyInStage
+      ? (stage?.objective_text ?? null)
+      : alreadyAgreed
+        ? (agreedObjective?.objective_text ?? null)
+        : null,
   });
 }
