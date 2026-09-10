@@ -43,24 +43,16 @@ function TextPanel({ children, className = "" }: { children: React.ReactNode; cl
 }
 
 /**
- * كل صورة أو فيديو خلفية يحصل على طبقة مموّهة (blur) في نفس منطقة التغميق
- * (focus) — لا حواف حادة بين صورة وأخرى، بل تلاشٍ ضبابي أنيق يجعل الصفحة
- * كلها تبدو متصلة. النص يتموضع فوق هذه المنطقة المموّهة بالذات (عبر
- * textAlign)، والزر (cta) دائمًا في أسفل القسم منفصلاً عن النص.
+ * كل صورة أو فيديو خلفية يحصل على تعتيم متدرّج (focus) بثلاث محطات يعمّق
+ * التلاشي تدريجياً بدل حافة حادة — لا حاجة لطبقة ميديا مموّهة إضافية.
+ * النص يتموضع فوق هذه المنطقة المعتّمة بالذات (عبر textAlign)، والزر (cta)
+ * دائمًا في أسفل القسم منفصلاً عن النص.
  * object-top يمنع اقتصاص أعلى الصورة (كالرأس) عند التحجيم بـobject-cover.
- * focus="none" يوقف طبقة التمويه كليًا (بلا أي تمويه، لا حتى جزئي) — تُستخدم
- * للصور التي نصّها مطبوع داخل البكسلات نفسها أو التي يجب أن تبقى حادة تمامًا.
+ * focus="none" يوقف التعتيم كليًا — تُستخدم للصور التي نصّها مطبوع داخل
+ * البكسلات نفسها أو التي يجب أن تبقى حادة تمامًا.
  * focus="topNarrow" مثل "top" لكن بمساحة تعتيم أقصر بكثير، محصورة في منطقة
  * النص فقط، لتفادي تغطية عنصر بصري (كوجه) أسفل النص مباشرة.
  */
-function maskForFocus(focus: "top" | "bottom" | "center" | "full" | "topNarrow") {
-  if (focus === "top") return "linear-gradient(180deg, black 0%, black 42%, transparent 62%)";
-  if (focus === "topNarrow") return "linear-gradient(180deg, black 0%, black 20%, transparent 34%)";
-  if (focus === "bottom") return "linear-gradient(0deg, black 0%, black 42%, transparent 62%)";
-  if (focus === "center") return "radial-gradient(55% 55% at 50% 50%, transparent 0%, black 100%)";
-  return "black";
-}
-
 function SectionImage({
   src,
   alt,
@@ -71,6 +63,7 @@ function SectionImage({
   topPad = 80,
   content,
   cta,
+  priority = false,
 }: {
   src: string;
   alt: string;
@@ -81,21 +74,20 @@ function SectionImage({
   topPad?: number;
   content: React.ReactNode;
   cta?: React.ReactNode;
+  priority?: boolean;
 }) {
-  const showBlur = focus !== "none";
   const focusBg =
     focus === "top"
-      ? "linear-gradient(180deg, rgba(8,14,10,0.55) 0%, transparent 55%)"
+      ? "linear-gradient(180deg, rgba(8,14,10,0.8) 0%, rgba(8,14,10,0.5) 30%, transparent 62%)"
       : focus === "topNarrow"
-      ? "linear-gradient(180deg, rgba(8,14,10,0.6) 0%, transparent 34%)"
+      ? "linear-gradient(180deg, rgba(8,14,10,0.85) 0%, rgba(8,14,10,0.55) 18%, transparent 36%)"
       : focus === "bottom"
-      ? "linear-gradient(0deg, rgba(8,14,10,0.55) 0%, transparent 55%)"
+      ? "linear-gradient(0deg, rgba(8,14,10,0.8) 0%, rgba(8,14,10,0.5) 30%, transparent 62%)"
       : focus === "center"
-      ? "radial-gradient(60% 60% at 50% 50%, rgba(8,14,10,0.1) 0%, rgba(8,14,10,0.5) 100%)"
+      ? "radial-gradient(60% 60% at 50% 50%, rgba(8,14,10,0.15) 0%, rgba(8,14,10,0.55) 60%, rgba(8,14,10,0.8) 100%)"
       : focus === "none"
       ? "transparent"
-      : "rgba(8,14,10,0.4)";
-  const mask = showBlur ? maskForFocus(focus) : undefined;
+      : "rgba(8,14,10,0.5)";
   const contentAlignClass = textAlign === "top" ? "justify-start" : textAlign === "bottom" ? "justify-end" : "justify-center";
   const contentStyle = textAlign === "top" ? { paddingTop: topPad } : undefined;
 
@@ -104,28 +96,27 @@ function SectionImage({
   return (
     <section className="relative flex w-full flex-col overflow-hidden" style={{ minHeight: minH }}>
       {isVideo ? (
-        <video src={src} autoPlay muted loop playsInline preload="none" aria-hidden="true" {...mediaProps} />
+        <video
+          src={src}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload={priority ? "metadata" : "none"}
+          aria-hidden="true"
+          {...mediaProps}
+        />
       ) : (
         /* eslint-disable-next-line @next/next/no-img-element */
-        <img src={src} alt={alt} {...mediaProps} />
+        <img
+          src={src}
+          alt={alt}
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          fetchPriority={priority ? "high" : "low"}
+          {...mediaProps}
+        />
       )}
-      {showBlur &&
-        (isVideo ? (
-          <video
-            src={src}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="none"
-            aria-hidden="true"
-            {...mediaProps}
-            style={{ filter: "blur(28px)", WebkitMaskImage: mask, maskImage: mask }}
-          />
-        ) : (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={src} alt="" aria-hidden="true" {...mediaProps} style={{ filter: "blur(28px)", WebkitMaskImage: mask, maskImage: mask }} />
-        ))}
       <div
         className="absolute inset-0"
         style={{ background: "linear-gradient(180deg, rgba(8,14,10,0.97) 0%, transparent 24%, transparent 76%, rgba(8,14,10,0.97) 100%)" }}
@@ -164,6 +155,7 @@ export default function LandingPage() {
           src="/brand/adam-moment.mp4"
           alt="آدم وأمّه"
           isVideo
+          priority
           textAlign="bottom"
           focus="bottom"
           minH="calc(100dvh - 4rem)"
