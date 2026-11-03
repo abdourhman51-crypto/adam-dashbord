@@ -14,6 +14,7 @@ export default async function Followers({ searchParams }: { searchParams: SP }) 
   const stage = one(sp.stage);
   const q = one(sp.q).trim().toLowerCase();
   const only = one(sp.only);
+  const sort = one(sp.sort);
   const { data, error } = await getNoor(30);
   if (!data) return <Problem error={error ?? "?"} />;
 
@@ -21,10 +22,13 @@ export default async function Followers({ searchParams }: { searchParams: SP }) 
   if (stage) list = list.filter((f) => (f.stage ?? "unknown") === stage);
   if (only === "offered") list = list.filter((f) => f.offered.length && !f.customer);
   if (only === "customers") list = list.filter((f) => f.customer);
+  if (only === "hot") list = list.filter((f) => !f.customer && f.score >= 30);
+  if (only === "paused") list = list.filter((f) => f.paused);
+  if (sort === "score") list = [...list].sort((a, b) => b.score - a.score);
   if (q) list = list.filter((f) => [f.name, f.username, f.problem, f.summary, f.country, ...f.topics].join(" ").toLowerCase().includes(q));
 
   const link = (p: Record<string, string>) => {
-    const u = new URLSearchParams({ ...(stage && { stage }), ...(q && { q }), ...(only && { only }), ...p });
+    const u = new URLSearchParams({ ...(stage && { stage }), ...(q && { q }), ...(only && { only }), ...(sort && { sort }), ...p });
     for (const [k, v] of [...u]) if (!v) u.delete(k);
     return `/followers${u.size ? "?" + u : ""}`;
   };
@@ -42,6 +46,9 @@ export default async function Followers({ searchParams }: { searchParams: SP }) 
 
       <div className="flex flex-wrap gap-1 text-xs">
         <Link href={link({ stage: "", only: "" })} className={`chip ${!stage && !only ? "chip-on" : ""}`}>الكل</Link>
+        <Link href={link({ only: "hot", stage: "" })} className={`chip ${only === "hot" ? "chip-on" : ""}`}>🔥 مهتمات الآن</Link>
+        <Link href={link({ only: "paused", stage: "" })} className={`chip ${only === "paused" ? "chip-on" : ""}`}>نور متوقفة</Link>
+        <Link href={link({ sort: sort === "score" ? "" : "score" })} className={`chip ${sort === "score" ? "chip-on" : ""}`}>رتّب بالنقاط</Link>
         <Link href={link({ only: "offered", stage: "" })} className={`chip ${only === "offered" ? "chip-on" : ""}`}>عُرض عليها ولم تشترِ</Link>
         <Link href={link({ only: "customers", stage: "" })} className={`chip ${only === "customers" ? "chip-on" : ""}`}>المشتريات</Link>
         {STAGE_ORDER.filter((s) => data.stages[s]).map((s) => (
@@ -58,7 +65,7 @@ export default async function Followers({ searchParams }: { searchParams: SP }) 
           <div className="overflow-x-auto">
             <table>
               <thead>
-                <tr><th>المتابعة</th><th>المرحلة</th><th>المشكلة والملخص</th><th>المنتجات</th><th>آخر نشاط</th></tr>
+                <tr><th>المتابعة</th><th>نقاط</th><th>المرحلة</th><th>المشكلة والملخص</th><th>المنتجات</th><th>آخر نشاط</th></tr>
               </thead>
               <tbody>
                 {list.map((f) => {
@@ -66,17 +73,20 @@ export default async function Followers({ searchParams }: { searchParams: SP }) 
                   return (
                     <tr key={f.id}>
                       <td className="min-w-36">
-                        <div className="font-medium">{f.name || "بدون اسم"}</div>
+                        <Link href={`/followers/${f.id}`} className="font-medium underline-offset-4 hover:underline">{f.name || "بدون اسم"}</Link>
+                        {f.paused && <span className="ms-1 text-xs text-[var(--warn)]">⏸</span>}
                         <div className="text-xs text-[var(--muted)]">
                           {f.channel === "instagram" ? "إنستغرام" : "مسنجر"}{f.country ? ` · ${f.country}` : ""}
                           {f.children?.length ? ` · ${f.children.map((c) => [c.name, c.age].filter(Boolean).join(" ")).join("، ")}` : ""}
                         </div>
                       </td>
+                      <td className={`tabular-nums font-bold ${f.score >= 50 ? "text-[var(--gold)]" : f.score >= 30 ? "" : "text-[var(--muted)]"}`}>{f.score}</td>
                       <td><Pill tone={st.tone}>{st.label}</Pill>{f.signals > 0 && <div className="mt-1 text-xs text-[var(--gold)]">نية شراء ×{f.signals}</div>}</td>
                       <td className="min-w-64 max-w-md">
                         {f.problem && <div className="font-medium">{f.problem}</div>}
                         {f.summary && <div className="text-xs text-[var(--muted)]">{f.summary}</div>}
                         {f.objections.length > 0 && <div className="mt-1 text-xs text-[var(--warn)]">اعتراض: {f.objections.join("، ")}</div>}
+                        {f.tags.length > 0 && <div className="mt-1 flex flex-wrap gap-1">{f.tags.map((t) => <Pill key={t}>{t}</Pill>)}</div>}
                       </td>
                       <td className="min-w-28 text-xs">
                         {f.bought.map((p) => <div key={p} className="text-[var(--good)]">✓ {PRODUCTS[p]?.name ?? p}</div>)}

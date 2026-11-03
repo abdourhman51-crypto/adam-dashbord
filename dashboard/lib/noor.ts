@@ -6,10 +6,12 @@ export type Follower = {
   country: string | null; problem: string | null; topics: string[]; objections: string[];
   children: { name?: string; age?: string }[]; offered: string[]; bought: string[]; customer: boolean;
   signals: number; replies: number; summary: string | null; last_seen: string;
+  tags: string[]; paused: boolean; score: number;
 };
 export type Approval = {
   id: string; name: string | null; platform: string | null; status: "pending" | "approved" | "rejected";
   product: string | null; suggested: string | null; delivered: boolean; error: string | null; at: string;
+  conv: string | null; images: string[]; proof: string | null;
 };
 export type NoorStats = {
   generated_at: string;
@@ -68,3 +70,43 @@ export const STAGES: Record<string, { label: string; tone: string }> = {
   unknown: { label: "غير محدد", tone: "muted" },
 };
 export const STAGE_ORDER = ["cold", "warm", "ready", "committed", "customer", "freebie", "closed", "unknown"];
+
+export type TimelineItem = { at: string; kind: "in" | "nour" | "note" | "payment" | "cmd" | "site"; text: string | null; extra: string | null };
+export type Contact = {
+  conversation: { id: string; channel: string; name: string | null; username: string | null; external_id: string; created_at: string; last_message_at: string | null } | null;
+  profile: (Record<string, unknown> & {
+    stage?: string | null; manual_stage?: string | null; country?: string | null; main_problem?: string | null; summary?: string | null;
+    topics?: string[]; objections?: string[]; tags?: string[]; children?: { name?: string; age?: string }[];
+    products_offered?: string[]; products_bought?: string[]; is_customer?: boolean; nour_paused_until?: string | null; buying_signals?: number;
+  }) | null;
+  score: number;
+  code: string;
+  site: { visits: number; price: boolean | null; checkout: boolean | null; bought: boolean | null };
+  timeline: TimelineItem[];
+};
+
+export async function getContact(id: string): Promise<{ data: Contact | null; error: string | null }> {
+  const token = process.env.NOOR_DASH_TOKEN;
+  if (!token) return { data: null, error: "NOOR_DASH_TOKEN غير مضبوط في Vercel" };
+  try {
+    const r = await fetch(`${URL_}?view=contact&id=${encodeURIComponent(id)}`, { headers: { "x-dash-token": token }, cache: "no-store" });
+    if (!r.ok) return { data: null, error: `Supabase ردّ بـ ${r.status}` };
+    const data = (await r.json()) as Contact;
+    return data.conversation ? { data, error: null } : { data: null, error: "لم أجد هذه المحادثة." };
+  } catch (e) {
+    return { data: null, error: String(e instanceof Error ? e.message : e) };
+  }
+}
+
+export async function adminCall(action: string, payload: Record<string, unknown>): Promise<{ ok: boolean; reason?: string }> {
+  const token = process.env.NOOR_DASH_TOKEN;
+  if (!token) return { ok: false, reason: "no_token" };
+  const r = await fetch(URL_, {
+    method: "POST",
+    headers: { "x-dash-token": token, "Content-Type": "application/json" },
+    body: JSON.stringify({ action, payload }),
+    cache: "no-store",
+  });
+  if (!r.ok) return { ok: false, reason: `http_${r.status}` };
+  return (await r.json()) as { ok: boolean; reason?: string };
+}
