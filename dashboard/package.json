@@ -1,16 +1,14 @@
 {
   "name": "adam-dashboard",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "مركز قيادة آدم — لوحة تحليلات ذكية لمنصة آدم للمرافقة التربوية",
+  "description": "لوحة آدم: مؤشرات نور (الرسائل، المراحل، العروض، المبيعات) والموقع",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.49.4",
     "lucide-react": "^0.474.0",
     "next": "^15.3.3",
     "react": "^19.1.0",
