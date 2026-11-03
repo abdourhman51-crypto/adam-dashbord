@@ -24,21 +24,42 @@ function serviceKey() {
     ?? (() => { try { return JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") ?? "{}").default; } catch { return undefined; } })();
 }
 
+const rpc = (key: string, fn: string, body: unknown) =>
+  fetch(PROJECT_URL + "/rest/v1/rpc/" + fn, {
+    method: "POST",
+    headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+const pass = async (r: Response) =>
+  new Response(await r.text(), { status: r.status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const ACTIONS = ["pause", "resume", "note", "stage", "tags", "send_dm"];
+
 Deno.serve(async (req: Request) => {
-  if (req.method !== "GET") return json({ error: "method_not_allowed" }, 405);
+  if (req.method !== "GET" && req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
   const expected = Deno.env.get("DASHBOARD_TOKEN") ?? "";
   if (expected.length < 24) return json({ error: "dashboard_token_not_set" }, 503);
   const token = req.headers.get("x-dash-token") ?? "";
   if (!token || !(await same(token, expected))) return json({ error: "unauthorized" }, 401);
   const key = serviceKey();
   if (!key) return json({ error: "service_key_missing" }, 500);
+
+  // Writes from the dashboard: one action on one conversation.
+  if (req.method === "POST") {
+    let input: { action?: string; payload?: Record<string, unknown> };
+    try { input = await req.json(); } catch { return json({ error: "invalid_json" }, 400); }
+    const action = String(input.action ?? "");
+    if (!ACTIONS.includes(action)) return json({ error: "unsupported_action" }, 400);
+    return pass(await rpc(key, "adam_admin", { p_action: action, p: input.payload ?? {} }));
+  }
+
   const q = new URL(req.url).searchParams;
+  const view = q.get("view");
+  if (view === "contact") {
+    const id = q.get("id") ?? "";
+    if (!UUID.test(id)) return json({ error: "bad_id" }, 400);
+    return pass(await rpc(key, "adam_contact", { p_conv: id }));
+  }
   const days = Math.min(90, Math.max(1, Number(q.get("days")) || 14));
-  const fn = q.get("view") === "site" ? "adam_site_stats" : "noor_dashboard_stats";
-  const r = await fetch(PROJECT_URL + "/rest/v1/rpc/" + fn, {
-    method: "POST",
-    headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
-    body: JSON.stringify({ p_days: days }),
-  });
-  return new Response(await r.text(), { status: r.status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+  return pass(await rpc(key, view === "site" ? "adam_site_stats" : "noor_dashboard_stats", { p_days: days }));
 });

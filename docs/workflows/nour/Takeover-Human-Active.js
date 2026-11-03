@@ -8,6 +8,9 @@ const PAUSE_MIN = 30;
 const cutoff = Date.now() - PAUSE_MIN * 60 * 1000;
 const isHuman = m => m.direction === 'outgoing' && !m.sentVia;
 const human = list.find(m => isHuman(m) && new Date(m.createdAt || m.sentAt).getTime() >= cutoff);
+// A pause set from the dashboard counts as the founder being in the conversation.
+const pausedUntil = profile && profile.nour_paused_until ? new Date(profile.nour_paused_until).getTime() : 0;
+const paused = pausedUntil > Date.now();
 
 // Chronological history from the platform itself, founder replies included, minus the batch being answered now.
 const chrono = [...list].sort((a, b) => new Date(a.createdAt || a.sentAt) - new Date(b.createdAt || b.sentAt));
@@ -22,4 +25,4 @@ if (lastHuman) {
   try { const sd = $getWorkflowStaticData('global'); const c = sd.convs && sd.convs[d.conversationId]; if (c) c.meta = { ...(c.meta || {}), humanAt: lastHuman }; } catch (e) {}
 }
 
-return [{ json: { ...d, humanActive: !!human, humanAt: human ? (human.createdAt || human.sentAt) : null, platformHistory, zernioOk: Array.isArray(r.messages), profile } }];
+return [{ json: { ...d, humanActive: !!human || paused, pausedUntil: paused ? profile.nour_paused_until : null, humanAt: human ? (human.createdAt || human.sentAt) : null, platformHistory, zernioOk: Array.isArray(r.messages), profile } }];

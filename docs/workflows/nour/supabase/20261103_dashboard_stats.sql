@@ -1,5 +1,24 @@
 -- One read-only call that returns every number the dashboard shows.
 -- Days are bucketed in Algeria time (UTC+1). Service role only.
+-- Everyone who has written to Nour, with the profile when there is one, newest first.
+create or replace function public.adam_people(p_limit int default 300)
+returns jsonb language sql stable set search_path = public as $$
+  select coalesce(jsonb_agg(x order by (x->>'last_seen') desc nulls last), '[]') from (
+    select jsonb_build_object('id', c.id, 'name', coalesce(c.contact_name, p.contact_name), 'username', coalesce(c.contact_username, p.contact_username),
+      'channel', c.channel, 'stage', coalesce(p.manual_stage, p.stage), 'country', p.country, 'problem', p.main_problem,
+      'topics', coalesce(p.topics, '{}'), 'objections', coalesce(p.objections, '{}'), 'children', coalesce(p.children, '[]'),
+      'offered', coalesce(p.products_offered, '{}'), 'bought', coalesce(p.products_bought, '{}'), 'customer', coalesce(p.is_customer, false),
+      'signals', coalesce(p.buying_signals, 0), 'replies', coalesce(p.replies_count, 0), 'summary', p.summary, 'tags', coalesce(p.tags, '{}'),
+      'paused', coalesce(p.nour_paused_until > now(), false), 'score', adam_lead_score(c.id),
+      'last_seen', coalesce(c.last_message_at, p.last_seen_at, c.created_at)) x
+    from inbox_conversations c left join follower_profiles p on p.conversation_id = c.id
+    order by coalesce(c.last_message_at, p.last_seen_at, c.created_at) desc nulls last
+    limit greatest(1, least(p_limit, 1000))
+  ) t
+$$;
+revoke all on function public.adam_people(int) from public, anon, authenticated;
+grant execute on function public.adam_people(int) to service_role;
+
 create or replace function public.noor_dashboard_stats(p_days int default 14)
 returns jsonb
 language sql
@@ -70,11 +89,7 @@ select jsonb_build_object(
                  'suggested', suggested_product, 'delivered', delivered, 'error', delivery_error, 'at', created_at) order by created_at desc), '[]')
                from (select * from payment_approvals order by created_at desc limit 15) x)
   ),
-  'followers', (select coalesce(jsonb_agg(jsonb_build_object('id', conversation_id, 'name', contact_name, 'username', contact_username, 'channel', channel,
-                 'stage', stage, 'country', country, 'problem', main_problem, 'topics', topics, 'objections', objections, 'children', children,
-                 'offered', products_offered, 'bought', products_bought, 'customer', is_customer, 'signals', buying_signals,
-                 'replies', replies_count, 'summary', summary, 'last_seen', last_seen_at) order by last_seen_at desc), '[]')
-               from (select * from prof order by last_seen_at desc limit 200) x)
+  'followers', adam_people(300)
 );
 $$;
 revoke all on function public.noor_dashboard_stats(int) from public, anon, authenticated;

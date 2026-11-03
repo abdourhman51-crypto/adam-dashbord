@@ -28,6 +28,8 @@ function allowedPayload(action: string, p: Record<string, unknown>) {
     approval_create: ["p"],
     approval_decide: ["p_token","p_decision","p_product"],
     approval_delivered: ["p_token","p_error"],
+    commands_claim: ["p_limit"],
+    command_finish: ["p_id","p_ok","p_result"],
   };
   const keys = fields[action];
   if (!keys) throw new Error("Unsupported action");
@@ -45,6 +47,8 @@ function allowedPayload(action: string, p: Record<string, unknown>) {
     approval_create: ["p"],
     approval_decide: ["p_token","p_decision"],
     approval_delivered: ["p_token"],
+    commands_claim: [],
+    command_finish: ["p_id","p_ok"],
   };
   for (const key of required[action]) {
     if (out[key] === undefined || out[key] === null || out[key] === "") throw new Error("Missing required field: " + key);
@@ -89,6 +93,8 @@ Deno.serve(async (req: Request) => {
     approval_create: "noor_create_approval",
     approval_decide: "noor_decide_approval",
     approval_delivered: "noor_mark_delivered",
+    commands_claim: "noor_claim_commands",
+    command_finish: "noor_finish_command",
   };
   const functionName = rpc[action];
   if (!functionName) return json({ error: "unsupported_action" }, 400);
