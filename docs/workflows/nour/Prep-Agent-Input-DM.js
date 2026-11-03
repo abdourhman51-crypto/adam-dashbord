@@ -51,5 +51,9 @@ if (promise && (nWords <= 4 || (isFirstContact && nWords <= 8))) {
     'أعطيها أولاً أداة «مرآة المشاعر» (https://adamvoices.site/tools/mirror) في سطر مستقل مع جملة عمّا ستخرج به، ثم اسأليها: «من أي فيديو جئتِ؟ أرسل لكِ ما وعدنا به بالضبط». لا تقولي إنكِ لا تفهمين.';
 }
 
+// The agent's own memory holds only 10 raw turns and misses follow-ups; give it the clean stored history too.
+const recent = hist.slice(-14).map(m => (m.role === 'assistant' ? 'نور: ' : 'هي: ') + toText(m.content).replace(/\s+/g, ' ').slice(0, 400)).join('\n');
+const historyNote = recent ? '\n\n# آخر المحادثة (اقرئيها قبل الرد: رسالتها الجديدة غالباً جواب على آخر سطر «نور:»)\n' + recent : '';
+
 const prompt = 'رسالة المستخدم الجديدة:\n' + last + keywordNote + '\n\nتذكّري: إياكِ استخدام كلمة "تفريغ" أو أي كلمة تقنية! تحدّثي كإنسانة طبيعية. نادي بالاسم الواضح إن كان مفهوماً وإلا بـ «أختي» (لا تقولي عزيزتي ولا يا أم فلان). أخرجي JSON فقط.';
-return [{ json: { ...d, system, prompt } }];
+return [{ json: { ...d, system: system + historyNote, prompt } }];

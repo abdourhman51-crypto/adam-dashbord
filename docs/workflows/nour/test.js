@@ -41,6 +41,12 @@ check('plain question no note', !PH('كيف أتعامل مع نومه؟', hist)
 const s = run(prep, mk('ميزان'))[0].json.system;
 check('committed stage now offers product', s.includes('أكثر متابعة مستعدّة') && !s.includes('هذه أولويتكِ. ادعيها'), '');
 
+const dina = [{ role: 'user', content: 'هنا هلاقي' }, { role: 'assistant', content: 'أيوه يا دينا، هتلاقي التفاصيل في الرابط' }, { role: 'assistant', content: 'حبيت أطمئن إن رابط الدفتر فتح معكِ تمام؟' }];
+const dOut = run(prep, mk('فتح', dina))[0].json;
+check('follow-up question reaches the agent (Dina case)', dOut.system.includes('نور: حبيت أطمئن إن رابط الدفتر فتح معكِ تمام؟'), dOut.system.slice(-300));
+check('history kept out of prompt (memory stays small)', !dOut.prompt.includes('آخر المحادثة'), '');
+check('no history block on first contact', !run(prep, mk('سلام'))[0].json.system.includes('آخر المحادثة'), '');
+
 // ---------- extra_rules ----------
 const extra = load('Extra-Rules-DM.js');
 const prepOut = run(prep, mk('سعر الدفتر بالدينار؟', hist))[0].json;
