@@ -1,6 +1,10 @@
 const nf = new Intl.NumberFormat("ar-DZ-u-nu-latn");
 export const n = (x: number | null | undefined) => (x == null ? "—" : nf.format(x));
-export const pct = (a: number, b: number) => (b ? Math.round((100 * a) / b) + "%" : "—");
+export const pct = (a: number, b: number) => {
+  if (!b) return "—";
+  const v = (100 * a) / b;
+  return (v > 0 && v < 10 ? v.toFixed(1) : Math.round(v)) + "%";
+};
 export const day = (d: string) => new Date(d + "T12:00:00Z").toLocaleDateString("ar-DZ-u-nu-latn", { day: "numeric", month: "short" });
 export const ago = (iso: string) => {
   const s = (Date.now() - new Date(iso).getTime()) / 1000;

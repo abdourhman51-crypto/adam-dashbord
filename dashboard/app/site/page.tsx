@@ -69,6 +69,7 @@ export default async function Site({ searchParams }: { searchParams: Promise<Rec
         <Card title="خطوات أخرى">
           <ul className="space-y-2 text-sm">
             <li className="flex justify-between"><span>حمّلوا اليوم المجاني</span><b>{n(data.freeDownloads)}</b></li>
+            <li className="flex justify-between"><span>ضغطوا على منتج من صفحات الأدوات</span><b>{n(data.productClicks)}</b></li>
             <li className="flex justify-between"><span>ضغطوا على واتساب</span><b>{n(data.waClicks)}</b></li>
             <li className="flex justify-between"><span>دفعات Whop المؤكدة</span><b>{n(f.paid)}</b></li>
           </ul>

@@ -17,6 +17,7 @@ export type SiteStats = {
   tools: { k: string; started: number; done: number }[];
   freeDownloads: number;
   waClicks: number;
+  productClicks: number;
 };
 
 const dayKey = (t: number) => new Date(t + OFFSET).toISOString().slice(0, 10);
@@ -30,7 +31,7 @@ const SOURCE = (src: string) => {
   if (/facebook|fb/.test(f)) return "فيسبوك";
   if (f === "wa_channel") return "قناة واتساب";
   if (/google/.test(f)) return "قوقل";
-  if (!f || /adamvoices|direct/.test(f)) return "مباشر";
+  if (!f || /adamvoices|direct|sanitized/.test(f)) return "مباشر";
   return f;
 };
 
@@ -55,8 +56,9 @@ export async function getSite(days = 14): Promise<{ data: SiteStats | null; erro
 export function aggregate(all: Row[], days: number, now = Date.now()): SiteStats {
   const start = Math.floor((now + OFFSET) / 86400000) * 86400000 - OFFSET - (days - 1) * 86400000;
   const T = (r: Row) => new Date(r.ts).getTime();
+  const NOISE = /test|vercel\.(app|com)|eventsmanager/i;
   const rows = all.filter(
-    (r) => r && r.sid && r.event && T(r) >= start && !/test/i.test(r.src || "") && r.sid !== "claude1" && !/test\.html/.test(r.page || ""),
+    (r) => r && r.sid && r.event && T(r) >= start && !NOISE.test(r.src || "") && r.sid !== "claude1" && !/test\.html/.test(r.page || ""),
   );
   const J = (r: Row) => { try { return JSON.parse(r.detail || "{}"); } catch { return {}; } };
 
@@ -67,22 +69,26 @@ export function aggregate(all: Row[], days: number, now = Date.now()): SiteStats
   const bySid = new Map<string, Row[]>();
   for (const r of visits) (bySid.get(r.sid) ?? bySid.set(r.sid, []).get(r.sid)!).push(r);
 
-  type V = { day: string; src: string; country: string; device: string; engaged: boolean; price: boolean; checkout: boolean; buyer: boolean };
+  type V = { day: string; src: string; country: string; device: string; engaged: boolean; price: boolean; checkout: boolean; buyer: boolean; product: boolean };
   const visitors: V[] = [];
   for (const [, rs] of bySid) {
     rs.sort((a, b) => T(a) - T(b));
     const has = (f: (r: Row) => boolean) => rs.some(f);
     const ad = rs.find((r) => /^ig_a[123]$/.test(r.src || ""));
     const pv = rs.find((r) => r.event === "page_view" && r.src);
+    // Each step implies the ones before it, so the funnel never grows from one step to the next.
+    const buyer = has((r) => r.event === "purchase" || r.event === "whop_complete");
+    const checkout = buyer || has((r) => r.event === "cta_click" || r.event === "whop_link");
+    const price = checkout || has((r) => r.event === "view_buy");
+    const engaged = price || has((r) => r.event === "engaged" || r.event === "moved" || (r.event === "scroll" && Number(r.detail) >= 25) || r.event === "tool_start");
+    const c = (rs.find((r) => r.country)?.country || "?").toUpperCase();
     visitors.push({
       day: dayKey(T(rs[0])),
       src: SOURCE(ad?.src || pv?.src || rs.find((r) => r.src)?.src || ""),
-      country: (rs.find((r) => r.country)?.country || "?").toUpperCase(),
+      country: c === "WORLD" || c === "XX" ? "?" : c,
       device: rs.find((r) => r.device)?.device || "?",
-      engaged: has((r) => r.event === "engaged" || r.event === "moved" || (r.event === "scroll" && Number(r.detail) >= 25) || r.event === "tool_start"),
-      price: has((r) => r.event === "view_buy"),
-      checkout: has((r) => r.event === "cta_click" || r.event === "whop_link" || r.event === "product_click"),
-      buyer: has((r) => r.event === "purchase" || r.event === "whop_complete"),
+      engaged, price, checkout, buyer,
+      product: has((r) => r.event === "product_click"),
     });
   }
 
@@ -126,5 +132,6 @@ export function aggregate(all: Row[], days: number, now = Date.now()): SiteStats
     tools,
     freeDownloads: new Set(visits.filter((r) => r.event === "free_dl").map((r) => r.sid)).size,
     waClicks: new Set(visits.filter((r) => r.event === "wa_click").map((r) => r.sid)).size,
+    productClicks: visitors.filter((v) => v.product).length,
   };
 }
