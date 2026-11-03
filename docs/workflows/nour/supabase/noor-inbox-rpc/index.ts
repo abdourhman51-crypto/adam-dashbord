@@ -25,6 +25,9 @@ function allowedPayload(action: string, p: Record<string, unknown>) {
     profile_get: ["p_conversation_id"],
     profile_save: ["p_conversation_id","p_insight"],
     mark_customer: ["p_conversation_id","p_product"],
+    approval_create: ["p"],
+    approval_decide: ["p_token","p_decision","p_product"],
+    approval_delivered: ["p_token","p_error"],
   };
   const keys = fields[action];
   if (!keys) throw new Error("Unsupported action");
@@ -39,6 +42,9 @@ function allowedPayload(action: string, p: Record<string, unknown>) {
     profile_get: ["p_conversation_id"],
     profile_save: ["p_conversation_id","p_insight"],
     mark_customer: ["p_conversation_id"],
+    approval_create: ["p"],
+    approval_decide: ["p_token","p_decision"],
+    approval_delivered: ["p_token"],
   };
   for (const key of required[action]) {
     if (out[key] === undefined || out[key] === null || out[key] === "") throw new Error("Missing required field: " + key);
@@ -80,6 +86,9 @@ Deno.serve(async (req: Request) => {
     profile_get: "noor_get_profile",
     profile_save: "noor_save_profile",
     mark_customer: "noor_mark_customer",
+    approval_create: "noor_create_approval",
+    approval_decide: "noor_decide_approval",
+    approval_delivered: "noor_mark_delivered",
   };
   const functionName = rpc[action];
   if (!functionName) return json({ error: "unsupported_action" }, 400);

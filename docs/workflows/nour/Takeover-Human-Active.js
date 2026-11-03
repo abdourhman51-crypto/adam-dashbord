@@ -16,4 +16,10 @@ const label = m => m.direction === 'incoming' ? 'هي: ' : (isHuman(m) ? 'الف
 const text = m => (String(m.message || '').trim() || (m.attachments && m.attachments.length ? '[' + (m.attachments[0].type || 'مرفق') + ']' : '')).replace(/\s+/g, ' ').slice(0, 400);
 const platformHistory = chrono.filter(m => text(m)).slice(-14).map(m => label(m) + text(m)).join('\n');
 
+// Remember the founder's latest hand reply, so the automatic follow-up never talks over him.
+const lastHuman = list.filter(isHuman).map(m => m.createdAt || m.sentAt).sort().pop();
+if (lastHuman) {
+  try { const sd = $getWorkflowStaticData('global'); const c = sd.convs && sd.convs[d.conversationId]; if (c) c.meta = { ...(c.meta || {}), humanAt: lastHuman }; } catch (e) {}
+}
+
 return [{ json: { ...d, humanActive: !!human, humanAt: human ? (human.createdAt || human.sentAt) : null, platformHistory, zernioOk: Array.isArray(r.messages), profile } }];

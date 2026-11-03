@@ -1,0 +1,26 @@
+const fs=require('fs'); let fails=0; const check=(n,c,i)=>{console.log((c?'PASS ':'FAIL ')+n+(c?'':'  -> '+i)); if(!c) fails++;};
+const H=h=>new Date(Date.now()-h*3600000).toISOString();
+const silent=fs.readFileSync(__dirname+'/Find-Silent-Chats.js','utf8');
+const mk=(meta,hist)=>({history:hist||[{role:'user',content:'ابني يصرخ'},{role:'assistant',content:'هذا الدفتر\n👉 https://hodn.adamvoices.site'}],meta:{accountId:'a',platform:'facebook',lastUserAt:H(21),lastBotAt:H(20.9),...meta}});
+const sd={convs:{ok:mk({country:'الجزائر'}),human:mk({humanAt:H(5)}),oldHuman:mk({humanAt:H(60)}),cust:mk({stage:'customer'}),noOffer:mk({},[{role:'user',content:'سلام'},{role:'assistant',content:'أهلاً، جربي https://adamvoices.site/tools/boil'}]),tooSoon:mk({lastUserAt:H(5),lastBotAt:H(4.9)})}};
+const out=new Function('$getWorkflowStaticData',silent)(()=>sd).map(x=>x.json);
+const ids=out.map(o=>o.conversationId).sort();
+check('picks ok/oldHuman/noOffer only', JSON.stringify(ids)===JSON.stringify(['noOffer','ok','oldHuman']), JSON.stringify(ids));
+check('offered detected', out.find(o=>o.conversationId==='ok').offered==='hodn' && out.find(o=>o.conversationId==='noOffer').offered==='', '');
+check('country passed', out.find(o=>o.conversationId==='ok').country==='الجزائر','');
+check('human-handled not marked followedUp', !sd.convs.human.meta.followedUp,'');
+const fp=fs.readFileSync(__dirname+'/Build-Followup-Prompt.js','utf8');
+const run=d=>new Function('$getWorkflowStaticData','$input',fp)(()=>({sysTemplate:'# x\n{{PRICING}}\n'}),{all:()=>[{json:d}]})[0].json.payload.messages[0].content;
+const s1=run(out.find(o=>o.conversationId==='ok'));
+check('offered scenario used', s1.includes('ولم تشترِ بعد') && s1.includes('CCP بـ 1,900'), '');
+check('pricing has CCP, no vague line', s1.includes('00799999002824585207') && !s1.includes('دعيني أتأكد'), '');
+const s2=run({...out.find(o=>o.conversationId==='ok'),offered:'inad'});
+check('inad: no CCP push, product name', !s2.includes('CCP بـ 1,900 دج إن') && s2.includes('عن «وراء كلّ لا حكاية»'), '');
+const s3=run(out.find(o=>o.conversationId==='noOffer'));
+check('no offer -> old scenarios', !s3.includes('ولم تشترِ بعد'), '');
+// takeover stamps humanAt
+const tk=fs.readFileSync(__dirname+'/Takeover-Human-Active.js','utf8'); const sd2={convs:{c1:{meta:{stage:'warm'},history:[]}}};
+const msgs=[{direction:'outgoing',sentVia:null,message:'أهلا انا ادم',createdAt:H(3)},{direction:'incoming',message:'سلام',createdAt:H(3.1)}];
+const r=new Function('$','$input','$getWorkflowStaticData',tk)(n=>({first:()=>({json:n==='Prepare Claimed DM'?{conversationId:'c1'}:{messages:msgs}})}),{first:()=>({json:{ok:true,profile:null}})},()=>sd2)[0].json;
+check('takeover: old human reply not active but stamped', r.humanActive===false && sd2.convs.c1.meta.humanAt===msgs[0].createdAt && sd2.convs.c1.meta.stage==='warm', JSON.stringify(sd2.convs.c1.meta));
+console.log(fails?fails+' FAILED':'ALL PASSED'); process.exit(fails?1:0);
