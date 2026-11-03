@@ -20,12 +20,12 @@ export default async function Followers({ searchParams }: { searchParams: SP }) 
 
   let list = data.followers;
   if (stage) list = list.filter((f) => (f.stage ?? "unknown") === stage);
-  if (only === "offered") list = list.filter((f) => f.offered.length && !f.customer);
+  if (only === "offered") list = list.filter((f) => (f.offered ?? []).length && !f.customer);
   if (only === "customers") list = list.filter((f) => f.customer);
-  if (only === "hot") list = list.filter((f) => !f.customer && f.score >= 30);
+  if (only === "hot") list = list.filter((f) => !f.customer && (f.score ?? 0) >= 30);
   if (only === "paused") list = list.filter((f) => f.paused);
-  if (sort === "score") list = [...list].sort((a, b) => b.score - a.score);
-  if (q) list = list.filter((f) => [f.name, f.username, f.problem, f.summary, f.country, ...f.topics].join(" ").toLowerCase().includes(q));
+  if (sort === "score") list = [...list].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+  if (q) list = list.filter((f) => [f.name, f.username, f.problem, f.summary, f.country, ...(f.topics ?? [])].join(" ").toLowerCase().includes(q));
 
   const link = (p: Record<string, string>) => {
     const u = new URLSearchParams({ ...(stage && { stage }), ...(q && { q }), ...(only && { only }), ...(sort && { sort }), ...p });
@@ -80,17 +80,17 @@ export default async function Followers({ searchParams }: { searchParams: SP }) 
                           {f.children?.length ? ` · ${f.children.map((c) => [c.name, c.age].filter(Boolean).join(" ")).join("، ")}` : ""}
                         </div>
                       </td>
-                      <td className={`tabular-nums font-bold ${f.score >= 50 ? "text-[var(--gold)]" : f.score >= 30 ? "" : "text-[var(--muted)]"}`}>{f.score}</td>
+                      <td className={`tabular-nums font-bold ${(f.score ?? 0) >= 50 ? "text-[var(--gold)]" : (f.score ?? 0) >= 30 ? "" : "text-[var(--muted)]"}`}>{f.score ?? "—"}</td>
                       <td><Pill tone={st.tone}>{st.label}</Pill>{f.signals > 0 && <div className="mt-1 text-xs text-[var(--gold)]">نية شراء ×{f.signals}</div>}</td>
                       <td className="min-w-64 max-w-md">
                         {f.problem && <div className="font-medium">{f.problem}</div>}
                         {f.summary && <div className="text-xs text-[var(--muted)]">{f.summary}</div>}
-                        {f.objections.length > 0 && <div className="mt-1 text-xs text-[var(--warn)]">اعتراض: {f.objections.join("، ")}</div>}
-                        {f.tags.length > 0 && <div className="mt-1 flex flex-wrap gap-1">{f.tags.map((t) => <Pill key={t}>{t}</Pill>)}</div>}
+                        {(f.objections ?? []).length > 0 && <div className="mt-1 text-xs text-[var(--warn)]">اعتراض: {(f.objections ?? []).join("، ")}</div>}
+                        {(f.tags ?? []).length > 0 && <div className="mt-1 flex flex-wrap gap-1">{(f.tags ?? []).map((t) => <Pill key={t}>{t}</Pill>)}</div>}
                       </td>
                       <td className="min-w-28 text-xs">
-                        {f.bought.map((p) => <div key={p} className="text-[var(--good)]">✓ {PRODUCTS[p]?.name ?? p}</div>)}
-                        {f.offered.filter((p) => !f.bought.includes(p)).map((p) => <div key={p} className="text-[var(--muted)]">عُرض: {PRODUCTS[p]?.name ?? p}</div>)}
+                        {(f.bought ?? []).map((p) => <div key={p} className="text-[var(--good)]">✓ {PRODUCTS[p]?.name ?? p}</div>)}
+                        {(f.offered ?? []).filter((p) => !(f.bought ?? []).includes(p)).map((p) => <div key={p} className="text-[var(--muted)]">عُرض: {PRODUCTS[p]?.name ?? p}</div>)}
                       </td>
                       <td className="whitespace-nowrap text-xs text-[var(--muted)]">{ago(f.last_seen)}<div>{f.replies} رد</div></td>
                     </tr>
