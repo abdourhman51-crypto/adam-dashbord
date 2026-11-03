@@ -52,8 +52,28 @@ if (promise && (nWords <= 4 || (isFirstContact && nWords <= 8))) {
 }
 
 // The agent's own memory holds only 10 raw turns and misses follow-ups; give it the clean stored history too.
-const recent = hist.slice(-14).map(m => (m.role === 'assistant' ? 'نور: ' : 'هي: ') + toText(m.content).replace(/\s+/g, ' ').slice(0, 400)).join('\n');
-const historyNote = recent ? '\n\n# آخر المحادثة (اقرئيها قبل الرد: رسالتها الجديدة غالباً جواب على آخر سطر «نور:»)\n' + recent : '';
+// Prefer the platform's own record (it includes the team's hand-typed replies); fall back to the stored history.
+let platformHistory = '';
+try { platformHistory = $('Takeover: Human Active?').first().json.platformHistory || ''; } catch (e) {}
+const recent = platformHistory || hist.slice(-14).map(m => (m.role === 'assistant' ? 'نور: ' : 'هي: ') + toText(m.content).replace(/\s+/g, ' ').slice(0, 400)).join('\n');
+const teamNote = recent.includes('الفريق (إنسان):') ? '\nسطور «الفريق (إنسان)» ردود حقيقية من فريق آدم: لا تناقضيها ولا تكرّريها، ابني عليها وأكملي من حيث توقّف الفريق.' : '';
+const historyNote = recent ? '\n\n# آخر المحادثة (اقرئيها قبل الرد: رسالتها الجديدة غالباً جواب على آخر سطر قبلها)' + teamNote + '\n' + recent : '';
+
+let profile = null;
+try { profile = $('Takeover: Human Active?').first().json.profile || null; } catch (e) {}
+const arr = x => Array.isArray(x) ? x : [];
+const kids = arr(profile && profile.children).map(k => [k.name, k.age ? k.age + ' سنوات' : ''].filter(Boolean).join(' ')).filter(Boolean).join('، ');
+const profileLines = profile ? [
+  profile.country && '- البلد: ' + profile.country,
+  kids && '- الأطفال: ' + kids,
+  profile.main_problem && '- المشكلة الأساسية: ' + profile.main_problem,
+  arr(profile.topics).length && '- مواضيع تكلّمت عنها: ' + arr(profile.topics).slice(0, 8).join('، '),
+  arr(profile.objections).length && '- اعتراضات سابقة: ' + arr(profile.objections).join('، '),
+  arr(profile.products_offered).length && '- منتجات عُرضت عليها: ' + arr(profile.products_offered).join('، ') + (profile.last_offer_at ? ' (آخر عرض ' + String(profile.last_offer_at).slice(0, 10) + ')' : ''),
+  profile.is_customer && '- زبونة: اشترت ' + arr(profile.products_bought).join('، '),
+  profile.summary && '- ملخص: ' + profile.summary,
+].filter(Boolean) : [];
+const profileNote = profileLines.length ? '\n\n# ما نعرفه عنها من قبل (ملفها الدائم)\n' + profileLines.join('\n') + '\nاستعملي هذا بشكل طبيعي (مثلاً اسم طفلها)، ولا تسأليها عن شيء تعرفينه.' : '';
 
 const prompt = 'رسالة المستخدم الجديدة:\n' + last + keywordNote + '\n\nتذكّري: إياكِ استخدام كلمة "تفريغ" أو أي كلمة تقنية! تحدّثي كإنسانة طبيعية. نادي بالاسم الواضح إن كان مفهوماً وإلا بـ «أختي» (لا تقولي عزيزتي ولا يا أم فلان). أخرجي JSON فقط.';
-return [{ json: { ...d, system: system + historyNote, prompt } }];
+return [{ json: { ...d, system: system + profileNote + historyNote, prompt } }];

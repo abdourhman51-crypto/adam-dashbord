@@ -47,6 +47,17 @@ check('follow-up question reaches the agent (Dina case)', dOut.system.includes('
 check('history kept out of prompt (memory stays small)', !dOut.prompt.includes('آخر المحادثة'), '');
 check('no history block on first contact', !run(prep, mk('سلام'))[0].json.system.includes('آخر المحادثة'), '');
 
+const ph = 'هي: كم السعر؟\nالفريق (إنسان): 1900 دج عبر CCP\nنور: تمام';
+const pOut = run(prep, mk('وين نبعث الوصل؟', hist), { $: () => ({ first: () => ({ json: { platformHistory: ph } }) }) })[0].json;
+check('platform history (with team lines) preferred over stored history', pOut.system.includes('الفريق (إنسان): 1900 دج عبر CCP') && !pOut.system.includes('نور: أهلاً أختي'), pOut.system.slice(-400));
+check('team-lines rule added when founder spoke', pOut.system.includes('لا تناقضيها'), '');
+check('no team rule without founder lines', !run(prep, mk('فتح', dina))[0].json.system.includes('لا تناقضيها'), '');
+
+const prof = { country: 'الجزائر', children: [{ name: 'يوسف', age: '5' }], main_problem: 'صراخ', products_offered: ['hodn'], last_offer_at: '2026-11-01T10:00:00Z', objections: ['غالي'] };
+const prOut = run(prep, mk('سلام', hist), { $: n => ({ first: () => ({ json: n === 'Takeover: Human Active?' ? { profile: prof, platformHistory: '' } : {} }) }) })[0].json;
+check('durable profile reaches the prompt', prOut.system.includes('يوسف 5 سنوات') && prOut.system.includes('hodn (آخر عرض 2026-11-01)') && prOut.system.includes('اعتراضات سابقة: غالي'), prOut.system.slice(-500));
+check('no profile block when profile empty', !run(prep, mk('سلام', hist))[0].json.system.includes('ملفها الدائم'), '');
+
 // ---------- extra_rules ----------
 const extra = load('Extra-Rules-DM.js');
 const prepOut = run(prep, mk('سعر الدفتر بالدينار؟', hist))[0].json;
@@ -75,6 +86,15 @@ const r3 = R('جرّبي [ميزان الغليان](https://adamvoices.site/too
 check('markdown link unwrapped to own line', r3.reply.includes('\n👉 https://adamvoices.site/tools/boil\n') && !r3.reply.includes(']('), JSON.stringify(r3.reply));
 const r4 = R('أهلاً أختي\n\n👉 https://hodn.adamvoices.site\n\nكم عمره؟');
 check('already-formatted link unchanged', r4.reply === 'أهلاً أختي\n\n👉 https://hodn.adamvoices.site\n\nكم عمره؟', JSON.stringify(r4.reply));
+const RP = (reply, profile) => run(parse, { choices: [{ message: { content: JSON.stringify({ reply, stage: 'ready', buying_signal: true, country: 'الجزائر', analysis: 'a', profile }) } }] }, { sd: {}, $: () => ({ first: () => ({ json: { ...dmCtx, internalConversationId: 'uuid-1' } }) }) })[0].json;
+const i1 = RP('الدفتر هنا https://hodn.adamvoices.site', { child_name: 'يوسف', child_age: 5, problem: 'صراخ', topics: ['صراخ', 'نوم'], objection: '' });
+check('insight carries profile facts', i1.insight.child.name === 'يوسف' && i1.insight.child.age === '5' && i1.insight.topics.length === 2 && i1.insight.buying_signal === true, JSON.stringify(i1.insight));
+check('product detected from link even if model omits it', i1.insight.product_offered === 'hodn', i1.insight.product_offered);
+check('internal conversation id passed for the profile store', i1.internalConversationId === 'uuid-1', '');
+const i2 = RP('أهلاً', undefined);
+check('missing profile object -> empty insight fields, no child', i2.insight.child === null && i2.insight.topics.length === 0 && i2.insight.product_offered === '', JSON.stringify(i2.insight));
+const er = run(extra, prepOut)[0].json.system;
+check('profile output rule present', er.includes('أضيفي إلى JSON المفتاح profile') && er.includes('"child_name"'), '');
 const r5 = R('🤍');
 check('heart-only reply untouched', r5.reply === '🤍', r5.reply);
 

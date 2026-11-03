@@ -1,5 +1,5 @@
 // ===== توليد الصوت بنماذج ElevenLabs عبر OpenRouter =====
-const OPENROUTER_KEY = '<REDACTED: live value is hardcoded in n8n, rotate it>';
+const OPENROUTER_KEY = '__OPENROUTER_KEY__';
 
 const d = $('Build DM Prompt').first().json;
 const res = $input.first().json;
@@ -53,9 +53,19 @@ const links = reply.match(/https?:\/\/\S+/g) || [];
 const ttsText = reply.replace(/https?:\/\/\S+/g, '').replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}👉]/gu, '').replace(/\s*\n+\s*/g, '، ').replace(/\s{2,}/g, ' ').replace(/^[،\s]+|[،\s]+$/g, '').slice(0, 700);
 const voiceOut = !!OPENROUTER_KEY && !!d.voiceIn && !!reply && reply !== '🤍' && ttsText.length > 3;
 
+const pr = (out.profile && typeof out.profile === 'object') ? out.profile : {};
+const linkProduct = /inad\.adamvoices\.site/.test(reply) ? 'inad' : /hodn\.adamvoices\.site/.test(reply) ? 'hodn' : /adamvoices\.site\/cards/.test(reply) ? 'cards' : /adamvoices\.site\/21/.test(reply) ? '21' : '';
+const insight = {
+  user_text: d.userText || '', reply_text: reply, stage: out.stage || '', gender: out.gender || '', country: out.country || '',
+  buying_signal: !!out.buying_signal, payment_proof: !!out.payment_proof, escalate: !!out.escalate, escalate_reason: out.escalate_reason || '',
+  analysis: out.analysis || '', problem: String(pr.problem || ''), topics: Array.isArray(pr.topics) ? pr.topics.map(String).slice(0, 6) : [],
+  objection: String(pr.objection || ''), product_offered: linkProduct || String(pr.product_offered || ''), summary: String(pr.summary || ''),
+  child: (pr.child_name || pr.child_age) ? { name: pr.child_name ? String(pr.child_name) : null, age: pr.child_age ? String(pr.child_age) : null } : null
+};
+
 const flag = out.payment_proof ? '💰 وصل دفع' : (out.escalate ? '⚠️ تحتاج تدخّلك' : '');
 return [{ json: {
-  jobId: d.jobId, conversationId: d.conversationId, accountId: d.accountId, platform: d.platform,
+  jobId: d.jobId, internalConversationId: d.internalConversationId, insight, conversationId: d.conversationId, accountId: d.accountId, platform: d.platform,
   reply,
   sendBody,
   voiceOut, ttsText, orKey: OPENROUTER_KEY, elevenKey: OPENROUTER_KEY, hasLink: links.length > 0,
