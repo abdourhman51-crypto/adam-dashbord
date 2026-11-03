@@ -32,8 +32,10 @@ Deno.serve(async (req: Request) => {
   if (!token || !(await same(token, expected))) return json({ error: "unauthorized" }, 401);
   const key = serviceKey();
   if (!key) return json({ error: "service_key_missing" }, 500);
-  const days = Math.min(90, Math.max(1, Number(new URL(req.url).searchParams.get("days")) || 14));
-  const r = await fetch(PROJECT_URL + "/rest/v1/rpc/noor_dashboard_stats", {
+  const q = new URL(req.url).searchParams;
+  const days = Math.min(90, Math.max(1, Number(q.get("days")) || 14));
+  const fn = q.get("view") === "site" ? "adam_site_stats" : "noor_dashboard_stats";
+  const r = await fetch(PROJECT_URL + "/rest/v1/rpc/" + fn, {
     method: "POST",
     headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
     body: JSON.stringify({ p_days: days }),

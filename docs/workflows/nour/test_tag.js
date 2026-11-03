@@ -1,0 +1,18 @@
+const fs = require('fs'); let fails = 0;
+const check = (n, c, i) => { console.log((c ? 'PASS ' : 'FAIL ') + n + (c ? '' : '  -> ' + i)); if (!c) fails++; };
+const code = fs.readFileSync(__dirname + '/Parse-and-Remember.js', 'utf8');
+const ctx = { conversationId: 'c1', internalConversationId: '3db81696-dda4-4bf3-931c-ac08290966e9', accountId: 'a', platform: 'facebook', senderName: 'x', userText: 'y', images: [], voiceIn: false };
+const R = reply => new Function('$input', '$getWorkflowStaticData', '$', code)({ first: () => ({ json: { choices: [{ message: { content: JSON.stringify({ reply }) } }] } }) }, () => ({}), () => ({ first: () => ({ json: ctx }) }))[0].json;
+let r = R('جربي هذه https://adamvoices.site/tools/no الليلة');
+check('tool link tagged', r.reply.includes('👉 https://adamvoices.site/tools/no?src=dm_3db81696dd'), r.reply);
+check('linkBody tagged too', r.linkBody.message === 'https://adamvoices.site/tools/no?src=dm_3db81696dd', r.linkBody.message);
+r = R('الدفتر: https://hodn.adamvoices.site');
+check('subdomain tagged', r.reply.includes('https://hodn.adamvoices.site?src=dm_3db81696dd'), r.reply);
+check('product still detected', r.insight.product_offered === 'hodn', r.insight.product_offered);
+r = R('https://adamvoices.site/21?x=1#top');
+check('query + hash kept', r.reply.includes('https://adamvoices.site/21?x=1&src=dm_3db81696dd#top'), r.reply);
+r = R('https://adamvoices.site/cards?src=ig_bio');
+check('existing src untouched', r.reply.includes('https://adamvoices.site/cards?src=ig_bio') && !r.reply.includes('dm_'), r.reply);
+r = R('المجتمع https://chat.whatsapp.com/GPHi68kFZD9J2cxV2XSXdo');
+check('other domains untouched', !r.reply.includes('src='), r.reply);
+console.log(fails ? fails + ' FAILED' : 'ALL PASSED'); process.exit(fails ? 1 : 0);

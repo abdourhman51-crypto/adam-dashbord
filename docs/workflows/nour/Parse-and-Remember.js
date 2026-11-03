@@ -28,6 +28,16 @@ reply = reply
   .replace(/\n{3,}/g, '\n\n')
   .trim();
 
+// Tag our own links with the conversation, so the site visit joins this follower (?src=dm_<code>).
+const convCode = String(d.internalConversationId || '').replace(/-/g, '').slice(0, 10);
+if (/^[0-9a-f]{10}$/.test(convCode)) {
+  reply = reply.replace(/https?:\/\/(?:[a-z0-9-]+\.)*adamvoices\.site[^\s«»"'<>()،؛]*/gi, u => {
+    if (/[?&]src=/.test(u)) return u;
+    const [base, hash] = u.split('#');
+    return base + (base.includes('?') ? '&' : '?') + 'src=dm_' + convCode + (hash ? '#' + hash : '');
+  });
+}
+
 conv.history.push({ role: 'user', content: d.userText + (d.images.length ? ' [+صورة]' : '') });
 if (reply) conv.history.push({ role: 'assistant', content: reply });
 conv.history = conv.history.slice(-24);
