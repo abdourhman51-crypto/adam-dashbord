@@ -60,6 +60,6 @@ Deno.serve(async (req: Request) => {
     if (!UUID.test(id)) return json({ error: "bad_id" }, 400);
     return pass(await rpc(key, "adam_contact", { p_conv: id }));
   }
-  const days = Math.min(90, Math.max(1, Number(q.get("days")) || 14));
+  const days = q.get("days") === "0" ? 0 : Math.min(90, Math.max(1, Number(q.get("days")) || 14));
   return pass(await rpc(key, view === "site" ? "adam_site_stats" : "noor_dashboard_stats", { p_days: days }));
 });
