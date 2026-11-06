@@ -48,3 +48,10 @@
 - POST /media (multipart or JSON data: URI) -> med_ id, link expires 7 days. Sends: /messages/voice|video|image {to, media: url|med_id|base64, caption?}. Voice: MP3 ok, converted to opus.
 - ElevenLabs CDN (elevenlabsusercontent.com) blocked from sandbox; signed URLs expire ~3h -> rehost permanently (plan: Supabase edge fn fetch -> public storage bucket).
 - ElevenLabs flow C3nYZsrrN4FzD5F1CCuO; v1 = gen tkSj8BRJSG0xT9c6Ss79 (24.6s, 306 credits, eleven_v4). Voice name: "Sara – Premium Humanlike Arabic".
+## Storage
+- Supabase public bucket `adam-media` (50MB/file). Edge fn `adam-media-ingest` (no JWT): POST {url, path} copies from allowed hosts (elevenlabsusercontent.com, api.wapito.com, drive.usercontent.google.com) into folders voices|cards|videos|music|docs. Call it from n8n (sandbox cannot reach supabase.co).
+- Week-1 voices public: .../adam-media/voices/w1-v{0..8}.mp3 (v6, v8 pending: ElevenLabs busy).
+## Drive
+- longforme folder 1i80RVUw3xrDMRtLhAjYfckuPtu8Seyyu: 3 long mp4 (355-434MB): 1SlrpOGHcwwZtBOn4pevbafVNyIXH2KEZ, 1b1Q0VCrhkbTCABm_CEo8YWbPIAcu9BuD, 1f2uUHAXg7W_tSCYUnETT3r448sHao4H3.
+- background music folder 174UjuTB2aKK-VNL6NdArHyZrJDGYzsjz: 5 nasheed mp3.
+- Sandbox: googleapis reachable, drive.google.com blocked; env switch impossible this session. Video cutting needs compute with network (option: Vercel Sandbox via MCP).

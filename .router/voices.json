@@ -1,0 +1,50 @@
+{
+ "flow": "C3nYZsrrN4FzD5F1CCuO",
+ "voices": {
+  "v0": {
+   "session": "XlEhGXO6wWWnLbmnV4GT",
+   "gen": "EqDYOEnmx9oFflCMtYHF",
+   "url": "https://vpinaehjfflnrlpfxlko.supabase.co/storage/v1/object/public/adam-media/voices/w1-v0.mp3"
+  },
+  "v1": {
+   "session": "r3cWIgzB8sYxApy4Vp6f",
+   "gen": "tkSj8BRJSG0xT9c6Ss79",
+   "url": "https://vpinaehjfflnrlpfxlko.supabase.co/storage/v1/object/public/adam-media/voices/w1-v1.mp3"
+  },
+  "v2": {
+   "session": "KOvO6yrcvwP4Lmm33Rj5",
+   "gen": "fergIaVPopR0gZ3wDDmn",
+   "url": "https://vpinaehjfflnrlpfxlko.supabase.co/storage/v1/object/public/adam-media/voices/w1-v2.mp3"
+  },
+  "v3": {
+   "session": "pVlLmBAZiitPArExneaN",
+   "gen": "5ZeJoqhvYjRfKiJ2XrPX",
+   "url": "https://vpinaehjfflnrlpfxlko.supabase.co/storage/v1/object/public/adam-media/voices/w1-v3.mp3"
+  },
+  "v4": {
+   "session": "0DcIsda7Hdty9TCVimAs",
+   "gen": "8lCe70w6L1humlqPxRxf",
+   "url": "https://vpinaehjfflnrlpfxlko.supabase.co/storage/v1/object/public/adam-media/voices/w1-v4.mp3"
+  },
+  "v5": {
+   "session": "THXDIyJdy1ziri8qHIht",
+   "gen": "Ogz1sRqbHVDVvB9SGiqQ",
+   "url": "https://vpinaehjfflnrlpfxlko.supabase.co/storage/v1/object/public/adam-media/voices/w1-v5.mp3"
+  },
+  "v6": {
+   "session": null,
+   "gen": null,
+   "note": "busy, retry"
+  },
+  "v7": {
+   "session": "ZO8JaZWU021sLZHqmJde",
+   "gen": "sNioXCbIcMaQQdIYuuUu",
+   "url": "https://vpinaehjfflnrlpfxlko.supabase.co/storage/v1/object/public/adam-media/voices/w1-v7.mp3"
+  },
+  "v8": {
+   "session": null,
+   "gen": null,
+   "note": "busy, retry"
+  }
+ }
+}
