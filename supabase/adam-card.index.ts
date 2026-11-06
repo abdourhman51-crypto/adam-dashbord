@@ -105,7 +105,7 @@ ${tree ? `<image href="${tree}" xlink:href="${tree}" x="${f(x - ts / 2)}" y="${f
   };
 
   // medallion with Adam (clipped portrait) — the institution's crest
-  const mx = cx, my = 196, mr = 84;
+  const mx = cx, my = 200, mr = 84;
   const pw = mr * 2.35, ph = pw * faceH / faceW;
   const medallion = `<circle cx="${mx}" cy="${my + 6}" r="${mr + 18}" fill="url(#softShadow)"/>
 <circle cx="${mx}" cy="${my}" r="${mr + 12}" fill="url(#goldRing)"/>
@@ -115,12 +115,14 @@ ${tree ? `<image href="${tree}" xlink:href="${tree}" x="${f(x - ts / 2)}" y="${f
 ${face ? `<image href="${face}" xlink:href="${face}" x="${f(mx - pw / 2)}" y="${f(my - ph * 0.36)}" width="${f(pw)}" height="${f(ph)}" clip-path="url(#medalClip)"/>` : ''}
 <circle cx="${mx}" cy="${my}" r="${mr}" fill="none" stroke="#7d5f2e" stroke-width="1.2"/>`;
 
+  // vertical rhythm (one axis, five groups, tight inside a group and generous between groups):
+  // crest 200 | heading 470-560 | recipient 650-790 | citation 862-990 | seals & signatures 1128 | footer 1236
   const body = c
-    ? t(cx, 872, 'تقديراً لإتمامها مع صغيرها') +
-      gilt(948, esc(c), { size: fit(c, 66), font: fontName, weight: 700, fill: 'url(#goldText)', edge: '#6d5126', glow: false, dy: 1.2 }) +
-      t(cx, 1002, 'سبعَ ليالٍ وسبعَ جملٍ من الحبّ قبل النوم', { size: 27, fill: 'url(#inkSoft)' })
-    : t(cx, 868, 'تقديراً لإتمامها سبعَ ليالٍ وسبعَ جملٍ', { size: 30, fill: INK }) +
-      t(cx, 918, 'من الحبّ والحضن قبل النوم مع صغيرها', { size: 27 });
+    ? t(cx, 862, 'تقديراً لإتمامها مع صغيرها', { size: 27 }) +
+      gilt(934, esc(c), { size: fit(c, 58), font: fontName, weight: 700, fill: 'url(#goldText)', edge: '#6d5126', glow: false, dy: 1.2 }) +
+      t(cx, 990, 'سبعَ ليالٍ وسبعَ جملٍ من الحبّ قبل النوم', { size: 27, fill: 'url(#inkSoft)' })
+    : t(cx, 900, 'تقديراً لإتمامها سبعَ ليالٍ وسبعَ جملٍ', { size: 30, fill: 'url(#inkSoft)' }) +
+      t(cx, 952, 'من الحبّ والحضن قبل النوم مع صغيرها', { size: 27 });
 
   const no = String(serial || '').replace(/[^A-Za-z0-9-]/g, '').slice(0, 16);
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
@@ -165,28 +167,27 @@ ${[[45, 45], [W - 45, 45], [45, H - 45], [W - 45, H - 45]].map(([x, y]) => `<rec
 ${laurel(mx, my, mr + 34, -1)}${laurel(mx, my, mr + 34, 1)}
 ${medallion}
 
-${t(cx, 372, 'آدم · ما لا يقوله طفلك', { size: 22, fill: 'url(#goldText)' })}
-${gilt(486, 'بطاقة تهنئة', { size: 148, font: fontTitle })}
-${ornament(546)}
-${t(cx, 594, 'تحدّي «أمٌّ تعود» — سبع ليالٍ وسبع جمل', { size: 27, fill: 'url(#goldText)' })}
+${gilt(470, 'بطاقة تهنئة', { size: 140, font: fontTitle, glow: false })}
+${ornament(515, 140)}
+${t(cx, 562, 'بمناسبة إتمام تحدّي «أمٌّ تعود» بنجاح', { size: 27, fill: 'url(#goldText)' })}
 
-${t(cx, 672, 'تتشرّف عائلة آدم بأن تمنح هذه البطاقة إلى', { size: 28 })}
-${gilt(776, esc(n), { size: fit(n, 98), font: fontBlack, weight: 900, dy: 1.6 })}
-<rect x="${cx - 230}" y="810" width="460" height="1" fill="${GOLD}" opacity="0.8"/>${dia(cx, 810.5, 4)}
+${t(cx, 640, 'تتشرّف عائلة آدم بأن تمنح هذه البطاقة إلى', { size: 27 })}
+${gilt(752, esc(n), { size: fit(n, 96), font: fontBlack, weight: 900, dy: 1.6 })}
+<rect x="${cx - 190}" y="790" width="380" height="1" fill="${GOLD}" opacity="0.8"/>${dia(cx, 790.5, 4)}
 ${body}
 
-<!-- signatures -->
-${t(820, 1128, 'نور', { size: 40, font: fontOld, fill: 'url(#ink)', weight: 700 })}
-<rect x="700" y="1146" width="240" height="1" fill="${INK}" opacity="0.55"/>
-${t(820, 1178, 'مرافِقة التحدّي', { size: 20 })}
-${t(260, 1128, 'فريق آدم', { size: 40, font: fontOld, fill: 'url(#ink)', weight: 700 })}
-<rect x="140" y="1146" width="240" height="1" fill="${INK}" opacity="0.55"/>
-${t(260, 1178, 'الإشراف التربوي', { size: 20 })}
+<!-- signatures: two columns on x=260 / x=820, their lines on the seal's centre line -->
+${t(820, 1112, 'نور', { size: 40, font: fontOld, fill: 'url(#ink)', weight: 700 })}
+<rect x="710" y="1128" width="220" height="1" fill="${INK}" opacity="0.5"/>
+${t(820, 1160, 'مرافِقة التحدّي', { size: 20 })}
+${t(260, 1112, 'فريق آدم', { size: 40, font: fontOld, fill: 'url(#ink)', weight: 700 })}
+<rect x="150" y="1128" width="220" height="1" fill="${INK}" opacity="0.5"/>
+${t(260, 1160, 'الإشراف التربوي', { size: 20 })}
 
-${seal(cx, 1125, 62)}
+${seal(cx, 1128, 62)}
 
-${t(150, 1262, esc(date), { size: 19, anchor: 'middle' })}
-${no ? `<text direction="ltr" x="930" y="1262" text-anchor="middle" font-family="${fontText}, Amiri" font-size="19" fill="${SOFT}">No. ${esc(no)}</text>` : ''}
+${t(260, 1236, esc(date), { size: 18 })}
+${no ? `<text direction="ltr" x="820" y="1236" text-anchor="middle" font-family="${fontText}, Amiri" font-size="18" fill="${SOFT}">No. ${esc(no)}</text>` : ''}
 </svg>`;
 }
 
