@@ -1,4 +1,4 @@
-// Renders the «أمٌّ تعود» card for one mother (her name + her child's name) and stores it in the public adam-media bucket.
+// Renders the «بطاقة تهنئة» certificate for one mother (her name + her child's name) and stores it in the public adam-media bucket.
 // POST { name, child?, key, date? } -> { ok, public_url }. key = stable file name (e.g. week + participant hash).
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { encodeBase64 } from "jsr:@std/encoding@1/base64";
@@ -25,99 +25,156 @@ const boot = () => ready ??= (async () => {
   return { fonts, face: "data:image/png;base64," + encodeBase64(face), tree: "data:image/png;base64," + encodeBase64(tree) };
 })().catch((e) => { ready = null; throw e; });
 
-// «أمٌّ تعود» certificate, 1080x1350 SVG (rendered larger for sharpness). Pure function: Node (local test) and Deno (adam-card).
-// Editorial, quiet-luxury layout on a 12-column grid (margin 96, golden-ratio split at x≈667 / y≈834):
-//  - text column right-aligned (RTL) on the right two thirds, Adam rising from the bottom edge on the left third,
-//  - large "7" in champagne as a quiet layered numeral, hairline frame, soft ambient glows and shadow.
-// face / tree = image hrefs (data URIs in production).
-function cardSvg({ name, child = '', date = '', face = '', tree = '', faceW = 700, faceH = 883,
+// «بطاقة تهنئة» — academic congratulation certificate for mothers who finished «أمٌّ تعود». 1080x1350 SVG.
+// Pure function: runs in Node (local test) and Deno (adam-card edge function).
+// Classic, symmetric, institutional: patterned double border, guilloche rosette watermark, Adam inside a gold
+// medallion crowned by laurels, large title, formal wording, two signature lines, deep-green wax seal with ribbons.
+// face / tree = image hrefs (data URIs in production). serial = short certificate number (Western digits).
+function cardSvg({ name, child = '', date = '', serial = '', face = '', tree = '', faceW = 700, faceH = 883,
   fontBlack = "'thmanyah serif display'", fontName = "'thmanyah serif display'", fontText = "'thmanyah serif text'", fontOld = "'Aref Ruqaa'" }: Record<string, any>) {
   const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const clean = s => String(s || '').replace(/[\u0000-\u001f]/g, '').replace(/\s+/g, ' ').trim().slice(0, 30);
   const n = clean(name) || 'أمٌّ رائعة';
   const c = clean(child);
   const fit = (s, big) => s.length <= 9 ? big : s.length <= 13 ? Math.round(big * 0.84) : s.length <= 18 ? Math.round(big * 0.68) : Math.round(big * 0.54);
-  const W = 1080, H = 1350, R = W - 96;            // right edge of the text column
-  const INK = '#1d3a2f', SOFT = '#6b7468', GOLD = '#a8834a';
-  const t = (x, y, txt, { size = 30, font = fontText, fill = SOFT, weight = 400, anchor = 'end', dir = 'rtl' } = {}) =>
+  const W = 1080, H = 1350, cx = W / 2;
+  const INK = '#1b3a2e', SOFT = '#5f6b60', GOLD = '#a8834a';
+  const f = v => Number(v).toFixed(1);
+  const t = (x, y, txt, { size = 28, font = fontText, fill = SOFT, weight = 400, anchor = 'middle', dir = 'rtl' } = {}) =>
     `<text direction="${dir}" x="${x}" y="${y}" text-anchor="${anchor}" font-family="${font}, Amiri" font-weight="${weight}" font-size="${size}" fill="${fill}">${txt}</text>`;
-  const dia = (x, y, r = 4) => `<path transform="translate(${x} ${y})" d="M0,-${r} L${r},0 L0,${r} L-${r},0 Z" fill="${GOLD}"/>`;
-  const rule = (x1, x2, y, op = 1) => `<rect x="${Math.min(x1, x2)}" y="${y}" width="${Math.abs(x2 - x1)}" height="1" fill="${GOLD}" opacity="${op}"/>`;
-  // crop-mark ticks at the frame corners (micro detail)
-  const tick = (x, y, dx, dy) => `<path d="M${x},${y + dy * 18} L${x},${y} L${x + dx * 18},${y}" fill="none" stroke="${GOLD}" stroke-width="1.2"/>`;
-  // wax seal: irregular blob of deep-green wax, pressed ring, gold-leaf tree stamp, soft ambient shadow
-  const seal = (cx, cy, r) => {
+  const dia = (x, y, r = 5, fill = GOLD) => `<path transform="translate(${f(x)} ${f(y)})" d="M0,-${r} L${r},0 L0,${r} L-${r},0 Z" fill="${fill}"/>`;
+  // centred ornament rule: hairlines, centre diamond, two small diamonds
+  const ornament = (y, half = 150) => `<rect x="${cx - half}" y="${y - 0.5}" width="${half - 16}" height="1" fill="${GOLD}"/><rect x="${cx + 16}" y="${y - 0.5}" width="${half - 16}" height="1" fill="${GOLD}"/>${dia(cx, y, 6)}${dia(cx - half - 8, y, 3)}${dia(cx + half + 8, y, 3)}`;
+
+  // guilloche rosette watermark (security-paper feel)
+  const rosette = (rx, ry, x, y, k, op) => Array.from({ length: k }, (_, i) =>
+    `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" transform="rotate(${f(i * 180 / k)} ${x} ${y})" fill="none" stroke="${GOLD}" stroke-width="0.7" opacity="${op}"/>`).join('');
+
+  // laurel branch along an arc around the medallion (side = -1 left, +1 right)
+  const laurel = (x, y, R, side) => {
+    let out = '';
+    for (let i = 0; i < 11; i++) {
+      const deg = 98 + i * 11.5;                               // from bottom up the side
+      const th = (side < 0 ? deg : 180 - deg) * Math.PI / 180;
+      const px = x + R * Math.cos(th), py = y + R * Math.sin(th);
+      const tang = Math.atan2(Math.cos(th), -Math.sin(th)) * 180 / Math.PI * (side < 0 ? 1 : -1);
+      const len = 15 - i * 0.55;
+      for (const o of [-1, 1]) {
+        const ang = (side < 0 ? th * 180 / Math.PI + 90 : th * 180 / Math.PI - 90) + o * 38;
+        out += `<ellipse cx="${f(px)}" cy="${f(py)}" rx="${f(len)}" ry="${f(len * 0.36)}" transform="rotate(${f(ang)} ${f(px)} ${f(py)}) translate(${f(len * 0.9)} 0)" fill="url(#leaf)"/>`;
+      }
+      void tang;
+    }
+    const a0 = 98 * Math.PI / 180, a1 = (98 + 10 * 11.5) * Math.PI / 180;
+    const sx = v => side < 0 ? v : Math.PI - v;
+    return `<path d="M${f(x + R * Math.cos(sx(a0)))},${f(y + R * Math.sin(sx(a0)))} A${R},${R} 0 0 ${side < 0 ? 1 : 0} ${f(x + R * Math.cos(sx(a1)))},${f(y + R * Math.sin(sx(a1)))}" fill="none" stroke="${GOLD}" stroke-width="1.6"/>` + out;
+  };
+
+  // wax seal with ribbon tails
+  const seal = (x, y, r) => {
     const pts = [];
     for (let k = 0; k < 36; k++) {
       const a = k / 36 * Math.PI * 2;
       const rr = r * (1 + 0.045 * Math.sin(a * 5 + 0.7) + 0.03 * Math.sin(a * 9 + 2.1) + 0.02 * Math.sin(a * 14));
-      pts.push([cx + rr * Math.cos(a), cy + rr * Math.sin(a)]);
+      pts.push([x + rr * Math.cos(a), y + rr * Math.sin(a)]);
     }
     const mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
-    let d = `M${mid(pts[35], pts[0]).map(v => v.toFixed(1)).join(',')}`;
-    for (let k = 0; k < 36; k++) { const m = mid(pts[k], pts[(k + 1) % 36]); d += ` Q${pts[k][0].toFixed(1)},${pts[k][1].toFixed(1)} ${m[0].toFixed(1)},${m[1].toFixed(1)}`; }
-    const dots = Array.from({ length: 28 }, (_, k) => { const a = k / 28 * Math.PI * 2; return `<circle cx="${(cx + r * 0.8 * Math.cos(a)).toFixed(1)}" cy="${(cy + r * 0.8 * Math.sin(a)).toFixed(1)}" r="1.6" fill="#0e2119" opacity="0.55"/>`; }).join('');
-    const ts = r * 0.92;
-    return `<ellipse cx="${cx + 8}" cy="${cy + 12}" rx="${r * 1.12}" ry="${r * 1.08}" fill="url(#waxShadow)"/>
+    let d = `M${mid(pts[35], pts[0]).map(f).join(',')}`;
+    for (let k = 0; k < 36; k++) { const m = mid(pts[k], pts[(k + 1) % 36]); d += ` Q${f(pts[k][0])},${f(pts[k][1])} ${f(m[0])},${f(m[1])}`; }
+    const dots = Array.from({ length: 30 }, (_, k) => { const a = k / 30 * Math.PI * 2; return `<circle cx="${f(x + r * 0.8 * Math.cos(a))}" cy="${f(y + r * 0.8 * Math.sin(a))}" r="1.6" fill="#0e2119" opacity="0.55"/>`; }).join('');
+    const ribbon = (dx) => `<path d="M${x + dx * 0.25 * r},${y + r * 0.2} L${x + dx * 0.95 * r},${y + r * 2.0} L${x + dx * 0.7 * r},${y + r * 1.78} L${x + dx * 0.5 * r},${y + r * 2.1} L${x - dx * 0.2 * r},${y + r * 0.35} Z" fill="url(#ribbon)"/>`;
+    const ts = r * 0.95;
+    return `<ellipse cx="${x + 6}" cy="${y + r * 1.15}" rx="${r * 1.3}" ry="${r * 0.9}" fill="url(#softShadow)"/>
+${ribbon(-1)}${ribbon(1)}
+<ellipse cx="${x + 6}" cy="${y + 10}" rx="${r * 1.12}" ry="${r * 1.08}" fill="url(#softShadow)"/>
 <path d="${d}" fill="url(#wax)"/>
 <path d="${d}" fill="none" stroke="#5c8a70" stroke-width="1" opacity="0.35"/>
-<circle cx="${cx}" cy="${cy}" r="${r * 0.7}" fill="url(#waxPress)"/>
-<circle cx="${cx}" cy="${cy}" r="${r * 0.7}" fill="none" stroke="#0e2119" stroke-width="2.4" opacity="0.7"/>
-<circle cx="${cx + 0.8}" cy="${cy + 1.2}" r="${r * 0.7 + 1.6}" fill="none" stroke="#4f7d64" stroke-width="1" opacity="0.6"/>
+<circle cx="${x}" cy="${y}" r="${r * 0.7}" fill="url(#waxPress)"/>
+<circle cx="${x}" cy="${y}" r="${r * 0.7}" fill="none" stroke="#0e2119" stroke-width="2.4" opacity="0.7"/>
+<circle cx="${x + 0.8}" cy="${y + 1.2}" r="${r * 0.7 + 1.6}" fill="none" stroke="#4f7d64" stroke-width="1" opacity="0.6"/>
 ${dots}
-${tree ? `<image href="${tree}" xlink:href="${tree}" x="${cx - ts / 2}" y="${cy - ts * 0.55}" width="${ts}" height="${ts * 275 / 256}" opacity="0.92"/>` : ''}
-<ellipse cx="${cx - r * 0.35}" cy="${cy - r * 0.42}" rx="${r * 0.38}" ry="${r * 0.18}" transform="rotate(-28 ${cx - r * 0.35} ${cy - r * 0.42})" fill="url(#waxGloss)"/>`;
+${tree ? `<image href="${tree}" xlink:href="${tree}" x="${f(x - ts / 2)}" y="${f(y - ts * 0.55)}" width="${f(ts)}" height="${f(ts * 275 / 256)}" opacity="0.92"/>` : ''}
+<ellipse cx="${f(x - r * 0.35)}" cy="${f(y - r * 0.42)}" rx="${f(r * 0.38)}" ry="${f(r * 0.18)}" transform="rotate(-28 ${f(x - r * 0.35)} ${f(y - r * 0.42)})" fill="url(#gloss)"/>`;
   };
-  // Adam on the left third, bottom on the card edge
-  const fw = 470, fh = Math.round(fw * faceH / faceW), fx = 70, fy = H - fh;
+
+  // medallion with Adam (clipped portrait) — the institution's crest
+  const mx = cx, my = 196, mr = 84;
+  const pw = mr * 2.35, ph = pw * faceH / faceW;
+  const medallion = `<circle cx="${mx}" cy="${my + 6}" r="${mr + 18}" fill="url(#softShadow)"/>
+<circle cx="${mx}" cy="${my}" r="${mr + 12}" fill="url(#goldRing)"/>
+<circle cx="${mx}" cy="${my}" r="${mr + 12}" fill="none" stroke="#7d5f2e" stroke-width="1" opacity="0.6"/>
+<circle cx="${mx}" cy="${my}" r="${mr + 3}" fill="none" stroke="#f3e2b8" stroke-width="1" opacity="0.8"/>
+<circle cx="${mx}" cy="${my}" r="${mr}" fill="url(#medal)"/>
+${face ? `<image href="${face}" xlink:href="${face}" x="${f(mx - pw / 2)}" y="${f(my - ph * 0.36)}" width="${f(pw)}" height="${f(ph)}" clip-path="url(#medalClip)"/>` : ''}
+<circle cx="${mx}" cy="${my}" r="${mr}" fill="none" stroke="#7d5f2e" stroke-width="1.2"/>`;
+
   const body = c
-    ? t(R, 612, 'أتمّت مع صغيرها') +
-      t(R, 694, esc(c), { size: fit(c, 76), font: fontName, fill: GOLD, weight: 700 }) +
-      t(R, 750, 'سبعَ ليالٍ من الحبّ قبل النوم', { size: 30, fill: INK })
-    : t(R, 618, 'أتمّت تحدّي سبع ليالٍ وسبع جمل', { size: 32, fill: INK }) +
-      t(R, 670, 'وقالت لصغيرها كلّ ليلةٍ كلمةَ حبٍّ قبل النوم', { size: 28 });
+    ? t(cx, 872, 'تقديراً لإتمامها مع صغيرها') +
+      t(cx, 948, esc(c), { size: fit(c, 66), font: fontName, fill: GOLD, weight: 700 }) +
+      t(cx, 1002, 'سبعَ ليالٍ وسبعَ جملٍ من الحبّ قبل النوم', { size: 27, fill: INK })
+    : t(cx, 868, 'تقديراً لإتمامها سبعَ ليالٍ وسبعَ جملٍ', { size: 30, fill: INK }) +
+      t(cx, 918, 'من الحبّ والحضن قبل النوم مع صغيرها', { size: 27 });
+
+  const no = String(serial || '').replace(/[^A-Za-z0-9-]/g, '').slice(0, 16);
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
 <defs>
- <linearGradient id="paper" x1="0" y1="0" x2="0.35" y2="1"><stop offset="0" stop-color="#fcf8f0"/><stop offset="0.55" stop-color="#f6eedf"/><stop offset="1" stop-color="#ecdfc6"/></linearGradient>
- <radialGradient id="glowAdam" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#f6e2b6" stop-opacity="0.95"/><stop offset="0.45" stop-color="#f1dcb0" stop-opacity="0.45"/><stop offset="1" stop-color="#f1dcb0" stop-opacity="0"/></radialGradient>
- <radialGradient id="glowTop" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ffffff" stop-opacity="0.75"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
- <radialGradient id="vignette" cx="0.5" cy="0.45" r="0.75"><stop offset="0.6" stop-color="#c9b38a" stop-opacity="0"/><stop offset="1" stop-color="#b89c6a" stop-opacity="0.28"/></radialGradient>
- <linearGradient id="seven" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#ecdcb9"/><stop offset="0.6" stop-color="#dcc6a0"/><stop offset="1" stop-color="#c9ab78"/></linearGradient>
+ <linearGradient id="paper" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#fcf8ef"/><stop offset="0.55" stop-color="#f7efdf"/><stop offset="1" stop-color="#eee2c9"/></linearGradient>
+ <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ffffff" stop-opacity="0.85"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+ <radialGradient id="warm" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#f3dfb2" stop-opacity="0.55"/><stop offset="1" stop-color="#f3dfb2" stop-opacity="0"/></radialGradient>
+ <radialGradient id="vignette" cx="0.5" cy="0.48" r="0.72"><stop offset="0.62" stop-color="#c9b38a" stop-opacity="0"/><stop offset="1" stop-color="#a88b58" stop-opacity="0.3"/></radialGradient>
+ <linearGradient id="goldRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2dfae"/><stop offset="0.35" stop-color="#c9a160"/><stop offset="0.65" stop-color="#a47b3d"/><stop offset="1" stop-color="#e8cf96"/></linearGradient>
+ <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b48b4c"/><stop offset="1" stop-color="#d9bb80"/></linearGradient>
+ <radialGradient id="medal" cx="0.5" cy="0.4" r="0.6"><stop offset="0" stop-color="#2f5b47"/><stop offset="1" stop-color="#16302a"/></radialGradient>
+ <clipPath id="medalClip"><circle cx="${mx}" cy="${my}" r="${mr}"/></clipPath>
  <radialGradient id="wax" cx="0.36" cy="0.32" r="0.75"><stop offset="0" stop-color="#3f6b55"/><stop offset="0.45" stop-color="#244a39"/><stop offset="1" stop-color="#11271d"/></radialGradient>
  <radialGradient id="waxPress" cx="0.6" cy="0.65" r="0.7"><stop offset="0" stop-color="#2c5442"/><stop offset="1" stop-color="#18352a"/></radialGradient>
- <radialGradient id="waxGloss" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
- <radialGradient id="waxShadow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#1d3a2f" stop-opacity="0.35"/><stop offset="0.7" stop-color="#1d3a2f" stop-opacity="0.08"/><stop offset="1" stop-color="#1d3a2f" stop-opacity="0"/></radialGradient>
- <radialGradient id="shade" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#1d3a2f" stop-opacity="0.22"/><stop offset="0.6" stop-color="#1d3a2f" stop-opacity="0.08"/><stop offset="1" stop-color="#1d3a2f" stop-opacity="0"/></radialGradient>
+ <radialGradient id="gloss" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+ <radialGradient id="softShadow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#1b3a2e" stop-opacity="0.3"/><stop offset="0.7" stop-color="#1b3a2e" stop-opacity="0.07"/><stop offset="1" stop-color="#1b3a2e" stop-opacity="0"/></radialGradient>
+ <linearGradient id="ribbon" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a4f3f"/><stop offset="1" stop-color="#132a20"/></linearGradient>
+ <pattern id="band" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse">
+  <path d="M11,3 L19,11 L11,19 L3,11 Z" fill="none" stroke="${GOLD}" stroke-width="0.9" opacity="0.75"/>
+  <circle cx="11" cy="11" r="1.6" fill="${GOLD}" opacity="0.8"/>
+ </pattern>
 </defs>
 <rect width="${W}" height="${H}" fill="url(#paper)"/>
-<ellipse cx="${fx + fw / 2}" cy="${H - fh * 0.42}" rx="430" ry="470" fill="url(#glowAdam)"/>
-<ellipse cx="${W - 260}" cy="230" rx="520" ry="360" fill="url(#glowTop)"/>
+<ellipse cx="${cx}" cy="560" rx="560" ry="520" fill="url(#glow)"/>
+<ellipse cx="${cx}" cy="230" rx="300" ry="230" fill="url(#warm)"/>
+${rosette(330, 118, cx, 800, 24, 0.075)}${rosette(200, 70, cx, 800, 18, 0.06)}
 <rect width="${W}" height="${H}" fill="url(#vignette)"/>
 
-<rect x="40.5" y="40.5" width="${W - 81}" height="${H - 81}" fill="none" stroke="${GOLD}" stroke-width="1" opacity="0.45"/>
-${tick(40.5, 40.5, 1, 1)}${tick(W - 40.5, 40.5, -1, 1)}${tick(40.5, H - 40.5, 1, -1)}${tick(W - 40.5, H - 40.5, -1, -1)}
+<!-- border: hairline, patterned band, double inner hairline, corner rosettes -->
+<rect x="28.5" y="28.5" width="${W - 57}" height="${H - 57}" fill="none" stroke="${GOLD}" stroke-width="1.2"/>
+<path fill-rule="evenodd" d="M34,34 H${W - 34} V${H - 34} H34 Z M56,56 V${H - 56} H${W - 56} V56 Z" fill="url(#band)"/>
+<rect x="34.5" y="34.5" width="${W - 69}" height="${H - 69}" fill="none" stroke="${GOLD}" stroke-width="0.8"/>
+<rect x="56.5" y="56.5" width="${W - 113}" height="${H - 113}" fill="none" stroke="${GOLD}" stroke-width="1.4"/>
+<rect x="64.5" y="64.5" width="${W - 129}" height="${H - 129}" fill="none" stroke="${GOLD}" stroke-width="0.6" opacity="0.7"/>
+${[[45, 45], [W - 45, 45], [45, H - 45], [W - 45, H - 45]].map(([x, y]) => `<rect x="${x - 15}" y="${y - 15}" width="30" height="30" fill="#f7efdf"/><rect x="${x - 15.5}" y="${y - 15.5}" width="31" height="31" fill="none" stroke="${GOLD}" stroke-width="1"/>${dia(x, y, 9)}<circle cx="${x}" cy="${y}" r="2.4" fill="#f7efdf"/>`).join('')}
 
-${tree ? `<image href="${tree}" xlink:href="${tree}" x="${R - 54}" y="92" width="54" height="${Math.round(54 * 275 / 256)}"/>` : dia(R - 27, 120, 10)}
-${t(R - 72, 124, 'آدم', { size: 26, font: fontOld, fill: INK, weight: 700 })}
-${t(R - 72, 154, 'ما لا يقوله طفلك', { size: 19 })}
-${t(96, 124, esc(date), { size: 19, anchor: 'start' })}
-${rule(96, 236, 140, 0.6)}
+${laurel(mx, my, mr + 34, -1)}${laurel(mx, my, mr + 34, 1)}
+${medallion}
 
-${t(R, 328, 'أمٌّ تعود', { size: 150, font: fontOld, fill: INK, weight: 700 })}
-${rule(R, R - 132, 372)}${dia(R - 142, 372.5, 3.5)}
-${t(R, 440, 'تشهد عائلة آدم بكلّ محبّة أنّ', { size: 28 })}
-${t(R, 540, esc(n), { size: fit(n, 104), font: fontBlack, fill: INK, weight: 900 })}
+${t(cx, 372, 'آدم · ما لا يقوله طفلك', { size: 22, fill: GOLD })}
+${t(cx, 482, 'بطاقة تهنئة', { size: 132, font: fontOld, fill: INK, weight: 700 })}
+${ornament(546)}
+${t(cx, 594, 'تحدّي «أمٌّ تعود» — سبع ليالٍ وسبع جمل', { size: 27, fill: GOLD })}
+
+${t(cx, 672, 'تتشرّف عائلة آدم بأن تمنح هذه البطاقة إلى', { size: 28 })}
+${t(cx, 776, esc(n), { size: fit(n, 98), font: fontBlack, fill: INK, weight: 900 })}
+<rect x="${cx - 230}" y="810" width="460" height="1" fill="${GOLD}" opacity="0.8"/>${dia(cx, 810.5, 4)}
 ${body}
 
-<text x="${R}" y="1168" text-anchor="end" font-family="${fontBlack}, Amiri" font-weight="900" font-size="360" fill="url(#seven)">7</text>
-${t(R - 214, 1060, 'ليالٍ', { size: 34, font: fontName, fill: INK, weight: 700 })}
-${t(R - 214, 1100, 'وسبع جمل', { size: 22 })}
-${rule(R, R - 236, 1212, 0.7)}
-${t(R, 1262, 'فريق آدم', { size: 38, font: fontOld, fill: INK, weight: 700 })}
-${seal(R - 318, 1232, 60)}
+<!-- signatures -->
+${t(820, 1128, 'نور', { size: 40, font: fontOld, fill: INK, weight: 700 })}
+<rect x="700" y="1146" width="240" height="1" fill="${INK}" opacity="0.55"/>
+${t(820, 1178, 'مرافِقة التحدّي', { size: 20 })}
+${t(260, 1128, 'فريق آدم', { size: 40, font: fontOld, fill: INK, weight: 700 })}
+<rect x="140" y="1146" width="240" height="1" fill="${INK}" opacity="0.55"/>
+${t(260, 1178, 'الإشراف التربوي', { size: 20 })}
 
-${face ? `<ellipse cx="${fx + fw / 2 + 26}" cy="${H - fh * 0.35}" rx="${fw * 0.52}" ry="${fh * 0.5}" fill="url(#shade)"/>
-<image href="${face}" xlink:href="${face}" x="${fx}" y="${fy}" width="${fw}" height="${fh}"/>` : ''}
+${seal(cx, 1125, 62)}
+
+${t(150, 1262, esc(date), { size: 19, anchor: 'middle' })}
+${no ? `<text direction="ltr" x="930" y="1262" text-anchor="middle" font-family="${fontText}, Amiri" font-size="19" fill="${SOFT}">No. ${esc(no)}</text>` : ''}
 </svg>`;
 }
 
@@ -131,7 +188,8 @@ Deno.serve(async (req) => {
   if (!/^[a-z0-9._-]{4,80}$/.test(key)) return json({ ok: false, reason: "bad_key" }, 400);
   try {
     const a = await boot();
-    const svg = cardSvg({ name: b.name, child: b.child, date: String(b.date || "").slice(0, 30), face: a.face, tree: a.tree });
+    const serial = (key.split("-")[0] || "").toUpperCase().slice(0, 6) + "-" + (key.replace(/\D/g, "").slice(-4) || "0000");
+    const svg = cardSvg({ name: b.name, child: b.child, date: String(b.date || "").slice(0, 30), serial, face: a.face, tree: a.tree });
     const png = new Resvg(svg, { font: { fontBuffers: a.fonts, defaultFontFamily: "Amiri" }, fitTo: { mode: "width", value: 1350 } }).render().asPng();
     const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const path = `cards/${key}.png`;

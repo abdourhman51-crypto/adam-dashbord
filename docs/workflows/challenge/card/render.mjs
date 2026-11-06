@@ -8,7 +8,7 @@ const uri = f => 'data:image/png;base64,' + fs.readFileSync(f).toString('base64'
 const face = uri('thumb0.png'), tree = uri('thumb1.png');
 const cases = [['فاطمة الزهراء', 'مالك'], ['أم محمد', ''], ['أمل', 'عبد الرحمن يوسف']];
 for (const [i, [name, child]] of cases.entries()) {
-  const svg = cardSvg({ name, child, date: 'نوفمبر 2026', face, tree, faceW: 213, faceH: 269 });
+  const svg = cardSvg({ name, child, date: 'نوفمبر 2026', serial: 'W1-4396', face, tree, faceW: 213, faceH: 269 });
   const png = new Resvg(svg, { font: { fontFiles, loadSystemFonts: false, defaultFontFamily: 'Amiri' }, fitTo: { mode: 'width', value: 720 } }).render().asPng();
   fs.writeFileSync(`v3_${i}.png`, png); console.log(`v3_${i}.png`, png.length);
 }
