@@ -32,9 +32,8 @@
    "url": "https://vpinaehjfflnrlpfxlko.supabase.co/storage/v1/object/public/adam-media/voices/w1-v5.mp3"
   },
   "v6": {
-   "session": null,
-   "gen": null,
-   "note": "busy, retry"
+   "gen": "bCLFvtcNk7PCYTA4Fssq",
+   "url": "https://vpinaehjfflnrlpfxlko.supabase.co/storage/v1/object/public/adam-media/voices/w1-v6.mp3"
   },
   "v7": {
    "session": "ZO8JaZWU021sLZHqmJde",
@@ -42,9 +41,8 @@
    "url": "https://vpinaehjfflnrlpfxlko.supabase.co/storage/v1/object/public/adam-media/voices/w1-v7.mp3"
   },
   "v8": {
-   "session": null,
    "gen": null,
-   "note": "busy, retry"
+   "note": "ElevenLabs free tier disabled (unusual activity) -> post is text-only"
   }
  }
 }

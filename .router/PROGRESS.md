@@ -10,3 +10,9 @@
 | admin read | util | eUTQf91dchqn4BPP (Table node id) |
 | group brain | next | events wf HVhsXj0qsVw2DLir to extend; LLM via gateway op=llm (OpenRouter cred) |
 | Wapito webhooks | 1 only | ours ("*"). No DM responder on WhatsApp -> ask founder |
+| events wf | extended, published | HVhsXj0qsVw2DLir: inbox, ✅ check-ins (+heart react), join_queue |
+| brain | built, published, OFF | XAmtgzVVM0wfntpf cron 17 7-23/2 UTC; control brain_on=false until creds bound |
+| control | published | lmbbSSGeegWGznvl GET /webhook/adam-control?t=&k=paused|brain_on|join_window&v= |
+| gateway | +LLM branch | op=llm -> OpenRouter (cred openRouterApi to pick in UI) |
+| voices | 8/9 | v8 text-only: ElevenLabs free tier disabled ("unusual activity") -> founder must upgrade for future weeks |
+| next | todo | certificate PNG route + finisher DM gift; join approvals (needs Nour admin); channel plan + shorts (Vercel sandbox); WhatsApp DM responder question |
