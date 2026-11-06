@@ -16,3 +16,7 @@
 | gateway | +LLM branch | op=llm -> OpenRouter (cred openRouterApi to pick in UI) |
 | voices | 8/9 | v8 text-only: ElevenLabs free tier disabled ("unusual activity") -> founder must upgrade for future weeks |
 | next | todo | certificate PNG route + finisher DM gift; join approvals (needs Nour admin); channel plan + shorts (Vercel sandbox); WhatsApp DM responder question |
+| voices | 9/9 | v8 generated (22s), voices/w1-v8.mp3, row w1-d8-am now voice+text; all 17 rows approved |
+| card | done | academic «بطاقة تهنئة» via adam-card (Amiri title, Thmanyah Serif, wax seal); desk takes «بطاقتي name - child», 3x retry on cold start |
+| cleanup | done | archived TEMP JOffxbOlSUZsGPjz + j5hH2PPtSsOI0cZM; admin read Summary restored. Left alone: P21 Whop Probe lmyoIrhsikIal15d (older session), Wapito test anDsaXXmBU9EZUbJ (founder's) |
+| next | todo | WhatsApp DM brain for Nour (task 13); channel shorts + weekly plan (task 12); dashboard KPIs |

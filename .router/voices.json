@@ -41,8 +41,9 @@
    "url": "https://vpinaehjfflnrlpfxlko.supabase.co/storage/v1/object/public/adam-media/voices/w1-v7.mp3"
   },
   "v8": {
-   "gen": null,
-   "note": "ElevenLabs free tier disabled (unusual activity) -> post is text-only"
+   "session": "1PxN5Ms46cYrMAD49mUB",
+   "gen": "SwTmsxY0epLoAtMHyC3D",
+   "url": "https://vpinaehjfflnrlpfxlko.supabase.co/storage/v1/object/public/adam-media/voices/w1-v8.mp3"
   }
  }
 }
