@@ -32,3 +32,14 @@
 - Description promise: 🎥 short video from Adam · 💡 idea · 🧰 free tool · DM Nour.
 - Webhook now subscribed to ALL events (user choice). DMs to 213672471891 also arrive (chat_id @lid / @s.whatsapp.net) -> moderator must ignore anything not the group. Group msgs: verify `participant` field on first group message.
 - ElevenLabs MCP: "Free generations are busy" twice on 2026-11-06 13:00 -> retry later / plan limits.
+
+## Decisions 2026-11-06 (founder)
+- Finisher gift: card + chapter 1 free + 48h price: 4$ (Whop card) / 900 DZD (CCP). Egypt 3$, Lebanon 4$ (proposal).
+- Countries where card payment fails: Nour apologises, explains, offers priority waitlist (honest scarcity, no fake claims).
+- Channel: use Adam short clips (cut from long videos). State clearly: group = mothers only, no men.
+- Join rule: nobody joins mid-challenge. Join window opens only before each challenge (Sat). Requests wait = scarcity.
+- Join requests: approve women only (name check). Uncertain -> stay pending.
+## Group facts (GET /groups/{id})
+- settings: info_admin_only true, messages_admin_only false, member_add_mode all_member_add (members can add directly = bypass), membership_approval true.
+- invite_code null => linked number is NOT admin. Owner 131452339523686@lid. Approve/reject/settings need admin.
+- Docs: GET /groups/{id}/applications, POST .../applications/{pid}/approve, DELETE .../applications/{pid}, PATCH /groups/{id}/settings, GET|DELETE /groups/{id}/invite. groups.participants event action join_request. No API to edit newsletter description.
