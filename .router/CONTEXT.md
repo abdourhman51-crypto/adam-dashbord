@@ -43,3 +43,8 @@
 - settings: info_admin_only true, messages_admin_only false, member_add_mode all_member_add (members can add directly = bypass), membership_approval true.
 - invite_code null => linked number is NOT admin. Owner 131452339523686@lid. Approve/reject/settings need admin.
 - Docs: GET /groups/{id}/applications, POST .../applications/{pid}/approve, DELETE .../applications/{pid}, PATCH /groups/{id}/settings, GET|DELETE /groups/{id}/invite. groups.participants event action join_request. No API to edit newsletter description.
+## Media facts
+- Group msgs carry `participant` = sender LID (e.g. 242777958940894@lid) -> ✅ tracking key.
+- POST /media (multipart or JSON data: URI) -> med_ id, link expires 7 days. Sends: /messages/voice|video|image {to, media: url|med_id|base64, caption?}. Voice: MP3 ok, converted to opus.
+- ElevenLabs CDN (elevenlabsusercontent.com) blocked from sandbox; signed URLs expire ~3h -> rehost permanently (plan: Supabase edge fn fetch -> public storage bucket).
+- ElevenLabs flow C3nYZsrrN4FzD5F1CCuO; v1 = gen tkSj8BRJSG0xT9c6Ss79 (24.6s, 306 credits, eleven_v4). Voice name: "Sara – Premium Humanlike Arabic".
