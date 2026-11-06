@@ -8,6 +8,7 @@ const CDN = "https://cdn.jsdelivr.net/npm/";
 const MEDIA = (Deno.env.get("SUPABASE_URL") ?? "") + "/storage/v1/object/public/adam-media/";
 const FONTS = [
   CDN + "@expo-google-fonts/amiri@0.4.1/400Regular/Amiri_400Regular.ttf",
+  CDN + "@expo-google-fonts/amiri@0.4.1/700Bold/Amiri_700Bold.ttf",
   CDN + "@expo-google-fonts/aref-ruqaa@0.4.1/700Bold/ArefRuqaa_700Bold.ttf",
   MEDIA + "fonts/thmanyah-display-bold.otf",
   MEDIA + "fonts/thmanyah-display-black.otf",
@@ -31,7 +32,7 @@ const boot = () => ready ??= (async () => {
 // medallion crowned by laurels, large title, formal wording, two signature lines, deep-green wax seal with ribbons.
 // face / tree = image hrefs (data URIs in production). serial = short certificate number (Western digits).
 function cardSvg({ name, child = '', date = '', serial = '', face = '', tree = '', faceW = 700, faceH = 883,
-  fontBlack = "'thmanyah serif display'", fontName = "'thmanyah serif display'", fontText = "'thmanyah serif text'", fontOld = "'Aref Ruqaa'" }: Record<string, any>) {
+  fontBlack = "'thmanyah serif display'", fontName = "'thmanyah serif display'", fontText = "'thmanyah serif text'", fontOld = "'Aref Ruqaa'", fontTitle = "'Amiri'" }: Record<string, any>) {
   const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const clean = s => String(s || '').replace(/[\u0000-\u001f]/g, '').replace(/\s+/g, ' ').trim().slice(0, 30);
   const n = clean(name) || 'أمٌّ رائعة';
@@ -45,6 +46,12 @@ function cardSvg({ name, child = '', date = '', serial = '', face = '', tree = '
   const dia = (x, y, r = 5, fill = GOLD) => `<path transform="translate(${f(x)} ${f(y)})" d="M0,-${r} L${r},0 L0,${r} L-${r},0 Z" fill="${fill}"/>`;
   // centred ornament rule: hairlines, centre diamond, two small diamonds
   const ornament = (y, half = 150) => `<rect x="${cx - half}" y="${y - 0.5}" width="${half - 16}" height="1" fill="${GOLD}"/><rect x="${cx + 16}" y="${y - 0.5}" width="${half - 16}" height="1" fill="${GOLD}"/>${dia(cx, y, 6)}${dia(cx - half - 8, y, 3)}${dia(cx + half + 8, y, 3)}`;
+
+  // gilded lettering: soft champagne glow, a thin gold edge under the letters, then the gradient ink on top
+  const gilt = (y, txt, { size, font, weight = 700, fill = 'url(#ink)', edge = 'url(#giltEdge)', glow = true, dy = 2 }) =>
+    (glow ? `<ellipse cx="${cx}" cy="${f(y - size * 0.32)}" rx="${f(size * 2.7)}" ry="${f(size * 0.85)}" fill="url(#textGlow)"/>` : '') +
+    `<text direction="rtl" x="${cx}" y="${y + dy}" text-anchor="middle" font-family="${font}, Amiri" font-weight="${weight}" font-size="${size}" fill="${edge}">${txt}</text>` +
+    `<text direction="rtl" x="${cx}" y="${y}" text-anchor="middle" font-family="${font}, Amiri" font-weight="${weight}" font-size="${size}" fill="${fill}">${txt}</text>`;
 
   // guilloche rosette watermark (security-paper feel)
   const rosette = (rx, ry, x, y, k, op) => Array.from({ length: k }, (_, i) =>
@@ -110,8 +117,8 @@ ${face ? `<image href="${face}" xlink:href="${face}" x="${f(mx - pw / 2)}" y="${
 
   const body = c
     ? t(cx, 872, 'تقديراً لإتمامها مع صغيرها') +
-      t(cx, 948, esc(c), { size: fit(c, 66), font: fontName, fill: GOLD, weight: 700 }) +
-      t(cx, 1002, 'سبعَ ليالٍ وسبعَ جملٍ من الحبّ قبل النوم', { size: 27, fill: INK })
+      gilt(948, esc(c), { size: fit(c, 66), font: fontName, weight: 700, fill: 'url(#goldText)', edge: '#6d5126', glow: false, dy: 1.2 }) +
+      t(cx, 1002, 'سبعَ ليالٍ وسبعَ جملٍ من الحبّ قبل النوم', { size: 27, fill: 'url(#inkSoft)' })
     : t(cx, 868, 'تقديراً لإتمامها سبعَ ليالٍ وسبعَ جملٍ', { size: 30, fill: INK }) +
       t(cx, 918, 'من الحبّ والحضن قبل النوم مع صغيرها', { size: 27 });
 
@@ -122,6 +129,11 @@ ${face ? `<image href="${face}" xlink:href="${face}" x="${f(mx - pw / 2)}" y="${
  <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ffffff" stop-opacity="0.85"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
  <radialGradient id="warm" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#f3dfb2" stop-opacity="0.55"/><stop offset="1" stop-color="#f3dfb2" stop-opacity="0"/></radialGradient>
  <radialGradient id="vignette" cx="0.5" cy="0.48" r="0.72"><stop offset="0.62" stop-color="#c9b38a" stop-opacity="0"/><stop offset="1" stop-color="#a88b58" stop-opacity="0.3"/></radialGradient>
+ <linearGradient id="ink" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f6049"/><stop offset="0.55" stop-color="#1b3a2e"/><stop offset="1" stop-color="#0f2219"/></linearGradient>
+ <linearGradient id="inkSoft" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a6450"/><stop offset="1" stop-color="#1f3d31"/></linearGradient>
+ <linearGradient id="giltEdge" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9a743a"/><stop offset="0.5" stop-color="#e6cd93"/><stop offset="1" stop-color="#9a743a"/></linearGradient>
+ <linearGradient id="goldText" x1="0" y1="0" x2="1" y2="0.3"><stop offset="0" stop-color="#8a6630"/><stop offset="0.5" stop-color="#c8a25f"/><stop offset="1" stop-color="#8a6630"/></linearGradient>
+ <radialGradient id="textGlow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#f6e4b8" stop-opacity="0.85"/><stop offset="1" stop-color="#f6e4b8" stop-opacity="0"/></radialGradient>
  <linearGradient id="goldRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2dfae"/><stop offset="0.35" stop-color="#c9a160"/><stop offset="0.65" stop-color="#a47b3d"/><stop offset="1" stop-color="#e8cf96"/></linearGradient>
  <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b48b4c"/><stop offset="1" stop-color="#d9bb80"/></linearGradient>
  <radialGradient id="medal" cx="0.5" cy="0.4" r="0.6"><stop offset="0" stop-color="#2f5b47"/><stop offset="1" stop-color="#16302a"/></radialGradient>
@@ -153,21 +165,21 @@ ${[[45, 45], [W - 45, 45], [45, H - 45], [W - 45, H - 45]].map(([x, y]) => `<rec
 ${laurel(mx, my, mr + 34, -1)}${laurel(mx, my, mr + 34, 1)}
 ${medallion}
 
-${t(cx, 372, 'آدم · ما لا يقوله طفلك', { size: 22, fill: GOLD })}
-${t(cx, 482, 'بطاقة تهنئة', { size: 132, font: fontOld, fill: INK, weight: 700 })}
+${t(cx, 372, 'آدم · ما لا يقوله طفلك', { size: 22, fill: 'url(#goldText)' })}
+${gilt(486, 'بطاقة تهنئة', { size: 148, font: fontTitle })}
 ${ornament(546)}
-${t(cx, 594, 'تحدّي «أمٌّ تعود» — سبع ليالٍ وسبع جمل', { size: 27, fill: GOLD })}
+${t(cx, 594, 'تحدّي «أمٌّ تعود» — سبع ليالٍ وسبع جمل', { size: 27, fill: 'url(#goldText)' })}
 
 ${t(cx, 672, 'تتشرّف عائلة آدم بأن تمنح هذه البطاقة إلى', { size: 28 })}
-${t(cx, 776, esc(n), { size: fit(n, 98), font: fontBlack, fill: INK, weight: 900 })}
+${gilt(776, esc(n), { size: fit(n, 98), font: fontBlack, weight: 900, dy: 1.6 })}
 <rect x="${cx - 230}" y="810" width="460" height="1" fill="${GOLD}" opacity="0.8"/>${dia(cx, 810.5, 4)}
 ${body}
 
 <!-- signatures -->
-${t(820, 1128, 'نور', { size: 40, font: fontOld, fill: INK, weight: 700 })}
+${t(820, 1128, 'نور', { size: 40, font: fontOld, fill: 'url(#ink)', weight: 700 })}
 <rect x="700" y="1146" width="240" height="1" fill="${INK}" opacity="0.55"/>
 ${t(820, 1178, 'مرافِقة التحدّي', { size: 20 })}
-${t(260, 1128, 'فريق آدم', { size: 40, font: fontOld, fill: INK, weight: 700 })}
+${t(260, 1128, 'فريق آدم', { size: 40, font: fontOld, fill: 'url(#ink)', weight: 700 })}
 <rect x="140" y="1146" width="240" height="1" fill="${INK}" opacity="0.55"/>
 ${t(260, 1178, 'الإشراف التربوي', { size: 20 })}
 
