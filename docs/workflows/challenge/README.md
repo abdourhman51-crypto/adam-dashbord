@@ -25,3 +25,7 @@ Tests: `node test_decide.js`, `node test_sched.js`.
 - AI down or bad JSON: nothing marked, retried next cycle, founder told.
 - WhatsApp disconnected / banned / QR: Telegram alert (max once per 2h) and on recovery.
 - Kill switch: `paused=true` stops posting and replies.
+| ADAM · Join gate | `atR7YM8ss6B1wbcs` | every 15 min: pending join requests; AI name check; women approved only between challenges (`join_window=auto`), men declined, unclear -> founder. `join_*.js` |
+| ADAM · Card desk | `skiyqO45iL3ccJCS` | DM «بطاقتي»: finisher (6+ nights) -> name -> card (edge fn `adam-card`) + free chapter PDF + 48h price; «أريد الكتاب» -> founder. `desk*.js`, `done_card.js`, `test_desk.js` |
+
+Card: `card/card.mjs` (SVG, Arabic via resvg + Amiri / Aref Ruqaa / Reem Kufi), edge function `adam-card` (POST {name,key,date} -> public PNG in `adam-media/cards/`). Free chapter: `adam-media/docs/hodn-sample.pdf`.

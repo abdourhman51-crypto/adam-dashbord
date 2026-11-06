@@ -6,6 +6,10 @@ const d = b.data || {};
 if (b.event === 'groups.participants' && d.group_id === GROUP && d.action === 'join_request') {
   return (d.participants || []).map(p => ({ json: { kind: 'join', pid: p.id, phone: p.phone || '', name: '', requested_at: new Date(Number(b.timestamp) || Date.now()).toISOString(), verdict: 'pending', status: 'pending' } }));
 }
+// A private message to Nour's number (text only): handed to the card desk.
+if (b.event === 'messages' && !d.from_me && d.chat_id && d.chat_id !== GROUP && !/@g\.us$|@newsletter$|broadcast/.test(d.chat_id) && d.type === 'text') {
+  return [{ json: { kind: 'dm', chat_id: d.chat_id, from: d.from || '', from_lid: d.from_lid || '', name: d.from_name || '', msg_id: d.id, text: String((d.text && d.text.body) || '').slice(0, 500) } }];
+}
 if (b.event !== 'messages' || d.chat_id !== GROUP) return [];
 // The founder answered by hand from the phone: the message they replied to is handled, Nour stays out of it.
 if (d.from_me) {
